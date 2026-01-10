@@ -17,6 +17,9 @@ O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a
 | **US-001** (Extract SigPesq) | Sim | Sim | Concluído. |
 | **US-007** (Ingestão Grupos Pesquisa) | Sim | Sim | Integrado com Knowledge Areas e cnpq_url (PR #4). |
 | **US-005** (Observability) | Sim | Sim | Logs e estrutura base implementadas. |
+| **US-005** (Observability) | Sim | Sim | Logs e estrutura base implementadas. |
+| **US-Dashboard-01** (Smart Search) | Sim | Sim | Busca unificada com filtros multifatoriais. |
+| **US-Dashboard-02** (CI/CD Pages) | Sim | Sim | Deploy automático para GitHub Pages. |
 | **US-006** (Fapes API) | Não | Não | Agendado para R3. |
 
 ---
@@ -24,6 +27,8 @@ O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a
 ## 3. Entregáveis desde o Último Relato
 - `src/core/logic/research_group_loader.py`: Ingestão de grupos via Excel.
 - `src/flows/ingest_sigpesq.py`: Pipeline ETL atualizado com US-007.
+- `src/components/Search.astro`: Componente de busca inteligente.
+- `.github/workflows/deploy.yml`: Pipeline de CI/CD.
 - `docs/2 - implementacao/SI.3-design.md`: Arquitetura Hexagonal documentada.
 - `PM1.3 Release Plan`: Atualizado com datas reais.
 - `tests/test_loader_mapping.py`: Testes unitários para mapeamento de grupos.

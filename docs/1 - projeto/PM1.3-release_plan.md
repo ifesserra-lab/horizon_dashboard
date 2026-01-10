@@ -24,6 +24,7 @@ O projeto será entregue em 4 releases mensais incrementais.
 - Setup do ambiente Prefect + Supabase.
 - ETL de Projetos e Pesquisadores do SigPesq.
 - Tabelas Core no Banco de Dados.
+- **Horizon Dashboard v1.0**: Visualização de Grupos e Busca Unificada.
 
 ## 2.2 Release R2 – Lattes
 **Objetivo:** Enriquecer os perfis dos pesquisadores com dados públicos do CNPq.
