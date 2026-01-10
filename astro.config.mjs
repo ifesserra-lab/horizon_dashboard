@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://ifesserra-lab.github.io',
+  base: '/horizon_dashboard/',
   vite: {
     plugins: [tailwindcss()]
   }
