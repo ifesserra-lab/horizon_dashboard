@@ -19,7 +19,10 @@ Reflecting active work from `SI.3 Product Backlog`.
 
 - **Epic 1: Extração SigPesq (Release 1)**
     - [x] US-001 [Extração Projetos SigPesq](https://github.com/ifesserra-lab/horizon_etl/issues/2) (Merged)
-    - [Release v1.0.0](https://github.com/ifesserra-lab/horizon_dashboard/releases/tag/v1.0.0) | 2026-01-10
+    - [Release v1.0.1](https://github.com/ifesserra-lab/horizon_dashboard/releases/tag/v1.0.1) | 2026-01-10
+    - [PR #7](https://github.com/ifesserra-lab/horizon_dashboard/pull/7) - Fix CSS Dark Mode Strategy (Merged)
+    - [Issue #6](https://github.com/ifesserra-lab/horizon_dashboard/issues/6) - Fix CSS Dark Mode Mismatch (Closed)
+- [Release v1.0.0](https://github.com/ifesserra-lab/horizon_dashboard/releases/tag/v1.0.0) | 2026-01-10
     - [PR #1](https://github.com/ifesserra-lab/horizon_dashboard/pull/1) - Initialize Project
     - [Issue #3](https://github.com/ifesserra-lab/horizon_dashboard/issues/3) - Fix Breadcrumb Navigation (Closed)
     - [Issue #4](https://github.com/ifesserra-lab/horizon_dashboard/issues/4) - Fix CSS Contrast Light Mode (Closed)

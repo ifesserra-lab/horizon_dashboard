@@ -40,7 +40,7 @@ const { group } = Astro.props;
 								<span class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-widest border border-premium-accent/20">
 									{group.organization.name}
 								</span>
-								<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-text-secondary text-[10px] font-bold uppercase tracking-widest border border-border-main">
+								<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-text-secondary text-[10px] font-bold uppercase tracking-widest border border-border-main">
 									{group.campus.name}
 								</span>
 							</div>
@@ -48,7 +48,7 @@ const { group } = Astro.props;
 						</div>
 					</div>
 					{group.cnpq_url && (
-						<a href={group.cnpq_url} target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-slate-100 dark:bg-white/5 hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent">
+						<a href={group.cnpq_url} target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-[var(--tag-bg)] hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent">
 							Espelho CNPq
 							<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
 						</a>
@@ -66,7 +66,7 @@ const { group } = Astro.props;
 					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-4">Áreas de Conhecimento</h4>
 					<div class="flex flex-wrap gap-3" role="list" aria-label="Áreas de atuação">
 						{group.knowledge_areas.map(area => (
-							<div role="listitem" class="px-4 py-2 bg-slate-100 dark:bg-slate-800/50 border border-border-main rounded-xl text-xs text-text-main font-bold">
+							<div role="listitem" class="px-4 py-2 bg-[var(--tag-bg)] border border-border-main rounded-xl text-xs text-text-main font-bold">
 								{area.name}
 							</div>
 						))}
@@ -83,7 +83,7 @@ const { group } = Astro.props;
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{group.members.map(member => (
 						<div class="glass-card p-4 flex items-center gap-4 hover:border-premium-accent/30 transition-all">
-							<div aria-hidden="true" class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-border-main flex items-center justify-center text-text-secondary font-bold">
+							<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold">
 								{member.name.charAt(0)}
 							</div>
 							<div class="flex-1 overflow-hidden">
@@ -93,7 +93,7 @@ const { group } = Astro.props;
 								</p>
 							</div>
 							{member.lattes_url && (
-								<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent" aria-label={`Currículo Lattes de ${member.name}`}>
+								<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent" aria-label={`Currículo Lattes de ${member.name}`}>
 									<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
 								</a>
 							)}
