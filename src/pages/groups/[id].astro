@@ -1,0 +1,140 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import groupsData from '../../data/canonical/groups.json';
+import type { ResearchGroup } from '../../types/groups';
+
+export function getStaticPaths() {
+  const groups = groupsData as ResearchGroup[];
+  return groups.map(group => ({
+    params: { id: group.id.toString() },
+    props: { group },
+  }));
+}
+
+interface Props {
+  group: ResearchGroup;
+}
+
+const { group } = Astro.props;
+---
+
+<Layout title={group.name}>
+	<nav class="mb-8" aria-label="Navegação secundária">
+		<a href="/groups" class="text-sm font-bold text-text-secondary hover:text-premium-accent flex items-center gap-2 transition-colors focus:ring-2 focus:ring-premium-accent rounded px-1">
+			<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+			Voltar para lista
+		</a>
+	</nav>
+
+	<div class="flex flex-col lg:flex-row gap-8 items-start">
+		<!-- Main Details -->
+		<div class="flex-1 space-y-8">
+			<article class="glass-card p-8" aria-labelledby="group-title">
+				<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+					<div class="flex items-center gap-6">
+						<div aria-hidden="true" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-premium-accent to-premium-purple flex items-center justify-center text-white text-3xl font-bold font-['Outfit'] shadow-xl shadow-premium-accent/10">
+							{group.short_name.charAt(0)}
+						</div>
+						<div>
+							<div class="flex flex-wrap gap-2 mb-2">
+								<span class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-widest border border-premium-accent/20">
+									{group.organization.name}
+								</span>
+								<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-text-secondary text-[10px] font-bold uppercase tracking-widest border border-border-main">
+									{group.campus.name}
+								</span>
+							</div>
+							<h2 id="group-title" class="text-3xl font-bold font-['Outfit'] text-text-main leading-tight">{group.name}</h2>
+						</div>
+					</div>
+					{group.cnpq_url && (
+						<a href={group.cnpq_url} target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-slate-100 dark:bg-white/5 hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent">
+							Espelho CNPq
+							<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+						</a>
+					)}
+				</div>
+
+				<div class="prose dark:prose-invert max-w-none mb-10">
+					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">Sobre o Grupo</h4>
+					<p class="text-text-secondary leading-relaxed">
+						{group.description || "Este grupo de pesquisa foca em estudos avançados e desenvolvimento científico na sua respectiva área, contribuindo para o ecossistema acadêmico da instituição."}
+					</p>
+				</div>
+
+				<div>
+					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-4">Áreas de Conhecimento</h4>
+					<div class="flex flex-wrap gap-3" role="list" aria-label="Áreas de atuação">
+						{group.knowledge_areas.map(area => (
+							<div role="listitem" class="px-4 py-2 bg-slate-100 dark:bg-slate-800/50 border border-border-main rounded-xl text-xs text-text-main font-bold">
+								{area.name}
+							</div>
+						))}
+					</div>
+				</div>
+			</article>
+
+			<!-- Members Section -->
+			<section aria-labelledby="members-title">
+				<div class="flex justify-between items-center mb-6">
+					<h3 id="members-title" class="text-2xl font-bold font-['Outfit'] text-text-main">Membros do Grupo</h3>
+					<span class="text-sm font-bold text-text-secondary">{group.members.length} integrantes</span>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					{group.members.map(member => (
+						<div class="glass-card p-4 flex items-center gap-4 hover:border-premium-accent/30 transition-all">
+							<div aria-hidden="true" class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-border-main flex items-center justify-center text-text-secondary font-bold">
+								{member.name.charAt(0)}
+							</div>
+							<div class="flex-1 overflow-hidden">
+								<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
+								<p class={`text-[10px] font-bold uppercase tracking-tight ${member.role === 'Leader' ? 'text-premium-accent' : 'text-text-secondary'}`}>
+									{member.role}
+								</p>
+							</div>
+							{member.lattes_url && (
+								<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent" aria-label={`Currículo Lattes de ${member.name}`}>
+									<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+								</a>
+							)}
+						</div>
+					))}
+				</div>
+			</section>
+		</div>
+
+		<!-- Sidebar Info -->
+		<aside class="w-full lg:w-80 space-y-6">
+			<section class="bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-premium-accent/20 rounded-3xl p-6 backdrop-blur-md" aria-labelledby="leadership-title">
+				<h4 id="leadership-title" class="text-text-main font-bold mb-4">Liderança</h4>
+				<div class="space-y-4">
+					{group.leaders.map(leader => (
+						<div class="flex items-center gap-3 p-3 bg-white/30 dark:bg-white/5 rounded-2xl border border-border-main">
+							<div aria-hidden="true" class="w-10 h-10 rounded-full bg-premium-accent flex items-center justify-center text-white font-bold text-sm">
+								{leader.name.charAt(0)}
+							</div>
+							<div class="overflow-hidden">
+								<p class="text-xs font-bold text-text-main truncate">{leader.name}</p>
+								<p class="text-[10px] text-premium-accent font-bold">Coordenador</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<section class="glass-card p-6" aria-labelledby="additional-info-title">
+				<h4 id="additional-info-title" class="text-text-main font-bold mb-4">Informações Adicionais</h4>
+				<div class="space-y-4">
+					<div class="flex justify-between text-xs">
+						<span class="text-text-secondary font-bold">Site Oficial</span>
+						<span class="text-text-main truncate ml-4">{group.site || "Não informado"}</span>
+					</div>
+					<div class="flex justify-between text-xs">
+						<span class="text-text-secondary font-bold">Ano de Início</span>
+						<span class="text-text-main font-bold">2023 (Exemplo)</span>
+					</div>
+				</div>
+			</section>
+		</aside>
+	</div>
+</Layout>

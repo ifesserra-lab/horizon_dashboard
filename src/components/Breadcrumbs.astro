@@ -1,0 +1,33 @@
+---
+const { pathname } = Astro.url;
+const paths = pathname.split('/').filter(Boolean);
+
+const breadcrumbs = paths.map((path, index) => {
+  const url = `/${paths.slice(0, index + 1).join('/')}`;
+  const label = path === 'groups' ? 'Grupos' : (path.length > 10 ? path.substring(0, 10) + '...' : path);
+  return { label, url };
+});
+---
+
+<nav aria-label="Breadcrumb" class="flex mb-6">
+  <ol class="flex items-center space-x-2 text-xs font-medium text-text-secondary">
+    <li class="flex items-center">
+      <a href="/" class="hover:text-premium-accent transition-colors flex items-center gap-1">
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+    </li>
+    {breadcrumbs.map((crumb, index) => (
+      <li class="flex items-center space-x-2">
+        <svg aria-hidden="true" class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><path d="M1 9l4-4-4-4"/></svg>
+        <a 
+          href={crumb.url} 
+          class={`hover:text-premium-accent transition-colors capitalize ${index === breadcrumbs.length - 1 ? 'text-premium-accent font-bold pointer-events-none' : ''}`}
+          aria-current={index === breadcrumbs.length - 1 ? 'page' : undefined}
+        >
+          {crumb.label}
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>

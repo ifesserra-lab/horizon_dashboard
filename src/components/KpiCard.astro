@@ -1,0 +1,38 @@
+---
+interface Props {
+  title: string;
+  value: string | number;
+  trend?: {
+    value: number;
+    isUp: boolean;
+  };
+  icon: string;
+  color?: string;
+}
+
+const { title, value, trend, icon, color = "premium-accent" } = Astro.props;
+---
+
+<div class="glass-card p-6 flex flex-col gap-4 group hover:border-premium-accent/50 transition-all duration-300">
+  <div class="flex justify-between items-start">
+    <div 
+      class={`p-3 rounded-xl bg-${color}/10 text-${color} group-hover:scale-110 transition-transform`}
+      aria-hidden="true"
+    >
+      <Fragment set:html={icon} />
+    </div>
+    {trend && (
+      <div 
+        class={`flex items-center gap-1 text-xs font-bold ${trend.isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
+        aria-label={`${trend.isUp ? 'Aumento' : 'Redução'} de ${trend.value}%`}
+      >
+        <span aria-hidden="true">{trend.isUp ? '↑' : '↓'}</span>
+        <span>{trend.value}%</span>
+      </div>
+    )}
+  </div>
+  <div>
+    <p class="text-text-muted text-sm font-medium tracking-wide">{title}</p>
+    <h3 class="text-3xl font-bold font-['Outfit'] mt-1 tracking-tight text-text-main">{value}</h3>
+  </div>
+</div>

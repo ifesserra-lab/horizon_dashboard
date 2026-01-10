@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import KpiCard from '../components/KpiCard.astro';
+import groupsData from '../data/canonical/groups.json';
+import type { ResearchGroup } from '../types/groups';
+
+const groups = groupsData as ResearchGroup[];
+
+const totalGroups = groups.length;
+const totalMembers = groups.reduce((acc, g) => acc + g.members.length, 0);
+const totalCampus = new Set(groups.map(g => g.campus.id)).size;
+const totalKnowledgeAreas = new Set(groups.flatMap(g => g.knowledge_areas.map(ka => ka.id))).size;
+
+const icons = {
+  groups: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  members: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
+};
+---
+
+<Layout title="Dashboard Overview">
+	<header class="mb-10">
+		<h2 class="text-3xl font-bold font-['Outfit'] text-text-main text-balance">Bem-vindo ao Horizon</h2>
+		<p class="text-text-secondary mt-2 max-w-2xl">
+			Sua plataforma central para explorar o horizonte de <strong>pesquisa</strong>, <strong>extensão</strong> e <strong>pós-graduação</strong> da nossa instituição.
+		</p>
+	</header>
+
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" role="region" aria-label="Métricas principais">
+		<KpiCard title="Total de Grupos" value={totalGroups} icon={icons.groups} trend={{ value: 12, isUp: true }} />
+		<KpiCard title="Pesquisadores" value={totalMembers} icon={icons.members} color="premium-purple" trend={{ value: 5, isUp: true }} />
+		<KpiCard title="Campus" value={totalCampus} icon={icons.campus} color="text-secondary" />
+		<KpiCard title="Áreas de Conhecimento" value={totalKnowledgeAreas} icon={icons.areas} color="premium-accent" />
+	</div>
+
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+		<!-- Recent Groups Section -->
+		<section class="glass-card p-6" aria-labelledby="recent-groups-title">
+			<div class="flex justify-between items-center mb-6">
+				<h3 id="recent-groups-title" class="text-xl font-bold font-['Outfit'] text-text-main">Grupos Recentes</h3>
+				<a href="/groups" class="text-xs font-bold text-premium-accent hover:underline focus:ring-2 focus:ring-premium-accent rounded px-1">Ver todos</a>
+			</div>
+			<div class="flex flex-col gap-4">
+				{groups.slice(0, 3).map(group => (
+					<div class="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-border-main hover:bg-premium-accent/5 transition-all group">
+						<div aria-hidden="true" class="w-12 h-12 rounded-lg bg-premium-accent/10 border border-premium-accent/20 flex items-center justify-center text-premium-accent font-bold group-hover:scale-110 transition-transform">
+							{group.short_name.charAt(0)}
+						</div>
+						<div class="flex-1 overflow-hidden">
+							<h4 class="font-bold text-sm text-text-main truncate">{group.name}</h4>
+							<p class="text-xs text-text-secondary truncate">{group.campus.name} • {group.members.length} membros</p>
+						</div>
+						<a href={`/groups/${group.id}`} class="p-2 rounded-lg bg-border-main hover:bg-premium-accent/20 transition-all" aria-label={`Ver detalhes do grupo ${group.name}`}>
+							<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+						</a>
+					</div>
+				))}
+			</div>
+		</section>
+
+		<!-- Statistics and Areas -->
+		<section class="glass-card p-6" aria-labelledby="distribution-title">
+			<h3 id="distribution-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Distribuição por Área</h3>
+			<div class="flex flex-col gap-6">
+				{Array.from(new Set(groups.flatMap(g => g.knowledge_areas.map(ka => ka.name)))).slice(0, 5).map(area => {
+					const count = groups.filter(g => g.knowledge_areas.some(ka => ka.name === area)).length;
+					const percentage = (count / groups.length) * 100;
+					return (
+						<div class="space-y-2">
+							<div class="flex justify-between text-xs font-bold">
+								<span class="text-text-main">{area}</span>
+								<span class="text-text-secondary">{count} grupos</span>
+							</div>
+							<div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+								<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${percentage}%`}></div>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</section>
+	</div>
+</Layout>
