@@ -7,7 +7,8 @@
 ---
 
 ## 1. Resumo Executivo
-O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a infraestrutura de orquestração local. Recentemente, foi implementado o **Padrão de Estratégia Granular** para o `ResearchGroupLoader`, melhorando a extensibilidade. O ambiente está estável com Prefect 3 rodando em Docker, e a versão **v0.3.0** foi liberada no branch `main`.
+## 1. Resumo Executivo
+O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a **Release R1 do Horizon Dashboard**. O ambiente está estável com Prefect 3 rodando em Docker, e a versão **v1.0.3** foi liberada no branch `main` com ajustes de UI e temas.
 
 ---
 
@@ -54,6 +55,7 @@ O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a
 - Início da **US-001 (Researcher/Scholarship Ingestion - Pending Part)**.
 - Início da **US-002 (Lattes Extraction)**.
 - **Concluído**: Implementação de Líderes e Strategies (v0.3.0).
+- **Concluído**: Horizon Dashboard Release 1 (v1.0.3).
 
 ---
 

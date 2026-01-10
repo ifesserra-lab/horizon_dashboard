@@ -14,6 +14,7 @@ A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Rel
     1.2. Mapeamento de dados do SigPesq (IFES).
     1.3. Extrator SigPesq.
     1.4. Carga SigPesq no Supabase.
+    1.5. **Horizon Dashboard v1.0** (Astro/Tailwind).
 2.  **Lattes** (Mês 2)
     2.1. Investigação de APIs/Scrapers do Lattes.
     2.2. Extrator de Currículos e Produções.
@@ -48,7 +49,7 @@ A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Rel
 # 3. Recursos (PM1.4)
 - **Equipe Técnica**: 1 Desenvolvedor Fullstack (User).
 - **Stakeholders**: Gestão do Campus, Alunos, Pesquisadores.
-- **Tecnologia**: [Python](https://www.python.org/), [Prefect Cloud/Self-hosted](https://www.prefect.io/), [Supabase](https://supabase.com/) (PostgreSQL).
+- **Tecnologia**: [Python](https://www.python.org/), [Prefect Cloud/Self-hosted](https://www.prefect.io/), [Supabase](https://supabase.com/) (PostgreSQL), **Astro**, **Tailwind CSS**.
 
 ---
 

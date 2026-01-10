@@ -18,3 +18,4 @@
 2.  **Confiabilidade Técnica**: Pipelines robustos (Prefect) e dados consistentes (Supabase).
 3.  **Impacto**: Foco em dados que gerem valor real para a tomada de decisão e fomento à pesquisa.
 4.  **Integração**: Conectar silos de informação (Fontes Internas, Lattes, Google Scholar, FAPES) em um ecossistema unificado.
+5.  **Acessibilidade**: Prover uma interface visual (Dashboard) amigável e inclusiva para exploração dos dados.
