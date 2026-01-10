@@ -15,7 +15,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 		<meta charset="UTF-8" />
 		<meta name="description" content="Horizon - Portal de Pesquisa, Extensão e Pós-Graduação" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +42,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 		</script>
 	</head>
 	<body class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300">
-		<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-premium-accent focus:text-white rounded-br-xl shadow-xl">
+		<a href={`#main-content`} class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-premium-accent focus:text-white rounded-br-xl shadow-xl">
 			Pular para o conteúdo principal
 		</a>
 
@@ -57,11 +57,11 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 				</div>
 
 				<nav role="navigation" aria-label="Menu principal" class="flex-1 flex flex-col gap-2">
-					<a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group">
+					<a href={`${import.meta.env.BASE_URL}`} class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group">
 						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 opacity-70 group-hover:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
 						<span class="font-medium">Dashboard</span>
 					</a>
-					<a href="/groups" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group">
+					<a href={`${import.meta.env.BASE_URL}groups`} class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group">
 						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 opacity-70 group-hover:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 						<span class="font-medium">Grupos</span>
 					</a>
