@@ -1,12 +1,21 @@
 ---
 const { pathname } = Astro.url;
 const baseUrlSegment = import.meta.env.BASE_URL.replace(/^\/|\/$/g, '');
-let paths = pathname.split('/').filter(Boolean);
+const rawSegments = pathname.split('/').filter(Boolean);
 
-// Remove the base path segment if it exists (e.g., 'horizon_dashboard')
-if (paths.length > 0 && paths[0] === baseUrlSegment) {
-  paths.shift();
-}
+// Filter out base path segment (case-insensitive)
+const paths = rawSegments.filter(segment => {
+  const lowerSeg = segment.toLowerCase();
+  const lowerBase = baseUrlSegment.toLowerCase();
+  
+  // Remove if matches configured base
+  if (lowerBase.length > 0 && lowerSeg === lowerBase) return false;
+  
+  // Remove if matches project name explicitly (safety net for GitHub Pages)
+  if (lowerSeg === 'horizon_dashboard') return false;
+  
+  return true;
+});
 
 interface Props {
   replacements?: Record<string, string>;
