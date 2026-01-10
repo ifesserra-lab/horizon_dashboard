@@ -7,27 +7,25 @@
 ---
 
 # 1. Escopo e WBS (PM1.2)
-A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Releases):
+A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da interface de visualização:
 
-1.  **Fundação e SigPesq** (Mês 1)
-    1.1. Setup de Infraestrutura (Prefect + Supabase).
-    1.2. Mapeamento de dados do SigPesq (IFES).
-    1.3. Extrator SigPesq.
-    1.4. Carga SigPesq no Supabase.
-    1.5. **Horizon Dashboard v1.0** (Astro/Tailwind).
-2.  **Lattes** (Mês 2)
-    2.1. Investigação de APIs/Scrapers do Lattes.
-    2.2. Extrator de Currículos e Produções.
-    2.3. Normalização de autores.
-    2.4. Carga Lattes.
-3.  **SigFapes** (Mês 3)
-    3.1. Extrator de Dados de Execução (Projetos/Bolsas).
-    3.2. Extrator de **Projetos, Bolsistas e Compras/Prestação de Contas**.
-    3.3. Carga SigFapes.
-4.  **Google Scholar** (Mês 4)
-    4.1. Extrator de Metadados Acadêmicos.
-    4.2. Carga Google Scholar.
-    4.3. Relatório Final e Documentação de Encerramento.
+1.  **Fundação e Visualização de Grupos** (Mês 1)
+    1.1. Setup do Projeto (Astro + Tailwind + Linter).
+    1.2. Design System (Tipografia, Cores, Componentes Básicos).
+    1.3. Página de Listagem de Grupos (Busca e Filtros).
+    1.4. Página de Detalhes do Grupo (Metadados e Membros).
+2.  **Visualização de Pesquisadores** (Mês 2)
+    2.1. Perfil do Pesquisador (Integração Lattes).
+    2.2. Lista de Produções Bibliográficas.
+    2.3. Visualização de Rede de Co-autoria.
+3.  **Transparência e Fomento** (Mês 3)
+    3.1. Dashboard de Editais e Fomentos (FAPES).
+    3.2. Visualização de Execução Financeira de Projetos.
+    3.3. Gráficos de Distribuição de Bolsas.
+4.  **Métricas e Consolidação** (Mês 4)
+    4.1. Exibição de Métricas de Impacto (Google Scholar).
+    4.2. Otimização SEO e Performance (Lighthouse).
+    4.3. Documentação de Usuário e Encerramento.
 
 ---
 
@@ -35,10 +33,10 @@ A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Rel
 | Marco | Descrição | Data Estimada |
 |-------|-----------|---------------|
 | **Start** | Início do Projeto | 06/01/2026 |
-| **R1** | Entrega Release 1 (SigPesq) | 06/02/2026 |
-| **R2** | Entrega Release 2 (Lattes) | 06/03/2026 |
-| **R3** | Entrega Release 3 (SigFapes) | 06/04/2026 |
-| **R4** | Entrega Final (Google Scholar + Encerramento) | 06/05/2026 |
+| **R1** | Entrega R1 (Portal de Grupos) | 06/02/2026 |
+| **R2** | Entrega R2 (Perfis Lattes) | 06/03/2026 |
+| **R3** | Entrega R3 (Dashboards Financeiros) | 06/04/2026 |
+| **R4** | Entrega Final (Métricas + SEO) | 06/05/2026 |
 
 **Ritmo de Trabalho**:
 - Sprints quinzenais (2 s/mês).
@@ -49,22 +47,23 @@ A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Rel
 # 3. Recursos (PM1.4)
 - **Equipe Técnica**: 1 Desenvolvedor Fullstack (User).
 - **Stakeholders**: Gestão do Campus, Alunos, Pesquisadores.
-- **Tecnologia**: **Astro**, **Tailwind CSS**, [Supabase](https://supabase.com/).
+- **Tecnologia**: **Astro**, **Tailwind CSS**, [Supabase](https://supabase.com/) (Leitura).
 
 ---
 
 # 4. Plano de Gerenciamento de Riscos (PM1.7)
 | Risco | Impacto | Mitigação |
 |-------|---------|-----------|
-| Mudanças no Layout dos Sites (Scraping) | Alto | Utilizar libs resilientes e monitoramento de falhas no Prefect. |
-| Bloqueio de IP (Rate Limiting) | Alto | Implementar backoff exponencial e rotação de user-agents. |
-| Complexidade dos Dados Lattes | Médio | Focar apenas nos campos essenciais para o MVP. |
+| Baixa Performance (LCP > 2.5s) | Alto | Otimização de Imagens (WebP), Lazy Loading e SSG. |
+| Inconsistência Design System | Médio | Uso estrito de variaveis CSS e Componentes reutilizáveis. |
+| Acessibilidade Insuficiente | Alto | Testes manuais com leitores de tela e validação WCAG. |
+| Dados Incompletos (Supabase) | Médio | Fallbacks de UI (Skeleton Loaders/Empty States) elegantes. |
 
 ---
 
 # 5. Critérios de Aceite (PM1.8)
-- Os pipelines no Prefect devem rodar com sucesso (Status: Success).
-- Os dados devem estar persistidos no Supabase conforme esquema definido.
-- **Idempotência**: Múltiplas execuções do pipeline não devem gerar dados duplicados ou inconsistentes.
-- O código deve passar nos checks de qualidade (`black`, `isort`, `flake8`).
-- Testes unitários cobrindo a lógica de extração.
+- **Performance**: Pontuação Lighthouse > 90 em Performance, SEO e Acessibilidade.
+- **Responsividade**: Layout funcional em Mobile (320px+), Tablet e Desktop.
+- **Acessibilidade**: Navegação via teclado e contraste de cores adequado (WCAG AA).
+- **Integração**: Dados refletem com precisão o estado do banco Supabase.
+- **Código**: Clean Code, Componentização eficiente e sem erros de lint (`eslint`, `prettier`).

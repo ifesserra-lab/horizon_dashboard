@@ -1,13 +1,137 @@
-# Product Backlog – Horizon ETL
-**Última atualização:** 06/01/2026
+# Product Backlog – Horizon Dashboard
+**Última atualização:** 10/01/2026
 **Responsável (PO):** Antigravity (Senior Lead)
 **Versão do Documento:** 1.0
 
 ---
 
 # 1. Visão Geral
-Este Backlog traduz os Requisitos (SI.1) e Análise (SI.2) em itens de trabalho entregáveis (US).
-**Estratégia**: Todo item deve ser testável e deployável independentemente.
+Este Backlog foca na **Visualização e Acessibilidade** dos dados acadêmicos extraídos pelo pipeline de ETL.
+
+---
+
+# 2. Epics & User Stories
+
+## Epic 1: Portal de Grupos de Pesquisa (Release 1)
+**Objetivo**: Permitir a descoberta e detalhamento dos grupos de pesquisa da instituição.
+
+### US-001 – Listagem e Busca de Grupos
+```yaml
+id: US-001
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-01, RF-14]
+tags: [type:feature, area:frontend, component:search]
+```
+
+#### Descrição
+Implementar a página inicial com listagem de grupos em Grid/Cards e funcionalidade de busca/filtro em tempo real.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [x] Visualização em Cards com Nome, Líder, Área e Campus.
+    - [x] Busca textual por Nome do Grupo ou Líder.
+    - [x] Filtros por Campus e Área do Conhecimento.
+- **UI/UX**:
+    - [x] Design responsivo (Mobile/Desktop).
+    - [x] Feedback visual de carregamento (Skeleton) ou lista vazia.
+
+### US-002 – Detalhes do Grupo
+```yaml
+id: US-002
+milestone: R1
+prioridade: Alta
+tamanho: 8
+origem: [RF-07, RF-09]
+tags: [type:feature, area:frontend, component:details]
+```
+
+#### Descrição
+Página detalhada do grupo exibindo metadados completos, lista de membros, linhas de pesquisa e contatos.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [x] Exibição do Nome, Sigla, Link CNPq e Descrição.
+    - [x] Lista de Membros com fotos e link para Lattes.
+    - [x] Breadcrumbs para navegação hierárquica.
+- **Tech**:
+    - [x] Rota dinâmica `/groups/[id]`.
+    - [x] Build estático (SSG) para performance.
+
+---
+
+## Epic 2: Perfis de Pesquisadores (Release 2)
+**Objetivo**: Dar visibilidade à produção individual dos pesquisadores.
+
+### US-003 – Página de Perfil do Pesquisador
+```yaml
+id: US-003
+milestone: R2
+prioridade: Alta
+tamanho: 8
+origem: [RF-02]
+tags: [type:feature, area:frontend]
+```
+
+#### Descrição
+Página individual do pesquisador consolidando dados do Lattes (Resumo, Formação, Produções).
+
+#### Critérios de Aceitação
+- [ ] Foto, Nome, Bio e Instituição de vínculo.
+- [ ] Timeline de Formação Acadêmica.
+- [ ] Lista de Artigos e Orientações recentes.
+
+---
+
+## Epic 3: Transparência Financeira (Release 3)
+**Objetivo**: Visualização dos recursos captados e executados.
+
+### US-004 – Dashboard de Fomento
+```yaml
+id: US-004
+milestone: R3
+prioridade: Média
+tamanho: 13
+origem: [RF-04]
+tags: [type:feature, area:frontend, component:charts]
+```
+
+#### Descrição
+Gráficos e tabelas exibindo a distribuição de bolsas e recursos de projetos por Campus e Área.
+
+#### Critérios de Aceitação
+- [ ] Gráfico de Barras: Recursos por Área.
+- [ ] Gráfico de Pizza: Tipos de Bolsa.
+- [ ] Filtros temporais (Ano a Ano).
+
+---
+
+## Epic 4: Métricas de Impacto (Release 4)
+
+### US-005 – Visualização de Impacto Científico
+```yaml
+id: US-005
+milestone: R4
+prioridade: Baixa
+tamanho: 5
+origem: [RF-05]
+tags: [type:feature, area:frontend]
+```
+
+#### Descrição
+Exibir métricas consolidadas (Índice H, Citações totais) integradas aos cards de grupos e perfis.
+
+---
+
+# 3. Backlog Refinado (R1 - Entregue)
+
+| ID | Título | Status | PR/Commit |
+|----|--------|--------|-----------|
+| **US-001** | Listagem de Grupos | **Done** | v1.0.0 |
+| **US-002** | Detalhes do Grupo | **Done** | v1.0.0 |
+| **Fix** | CSS Contrast Issues | **Done** | v1.0.2 |
+
 
 ---
 
