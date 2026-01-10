@@ -1,9 +1,10 @@
 ---
 interface Props {
 	title: string;
+	breadcrumbReplacements?: Record<string, string>;
 }
 
-const { title } = Astro.props;
+const { title, breadcrumbReplacements } = Astro.props;
 import '../styles/global.css';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
@@ -88,7 +89,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 					<ThemeToggle />
 				</header>
 				<main id="main-content" role="main" class="flex-1 p-8 overflow-y-auto outline-none">
-					<Breadcrumbs />
+					<Breadcrumbs replacements={breadcrumbReplacements} />
 					<slot />
 				</main>
 			</div>

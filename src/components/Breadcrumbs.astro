@@ -1,14 +1,33 @@
 ---
 const { pathname } = Astro.url;
-const paths = pathname.split('/').filter(Boolean);
+const baseUrlSegment = import.meta.env.BASE_URL.replace(/^\/|\/$/g, '');
+let paths = pathname.split('/').filter(Boolean);
+
+// Remove the base path segment if it exists (e.g., 'horizon_dashboard')
+if (paths.length > 0 && paths[0] === baseUrlSegment) {
+  paths.shift();
+}
+
+interface Props {
+  replacements?: Record<string, string>;
+}
+
+const { replacements = {} } = Astro.props;
 
 const breadcrumbs = paths.map((path, index) => {
-  // Fix: split potentially includes 'horizon_dashboard' if the URL includes it, 
-  // but pathname from Astro.url usually doesn't include the base in development.
-  // In production it might. Let's be safe.
   const pathParts = paths.slice(0, index + 1);
   const url = `${import.meta.env.BASE_URL}${pathParts.join('/')}`;
-  const label = path === 'groups' ? 'Grupos' : (path.length > 10 ? path.substring(0, 10) + '...' : path);
+  
+  let label = path;
+  if (replacements[path]) {
+    label = replacements[path];
+  } else if (path === 'groups') {
+    label = 'Grupos';
+  } else {
+    // Increase truncation limit slightly for better readability
+    label = path.length > 20 ? path.substring(0, 20) + '...' : path;
+  }
+  
   return { label, url };
 });
 ---
