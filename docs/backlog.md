@@ -19,6 +19,9 @@ Reflecting active work from `SI.3 Product Backlog`.
 
 - **Epic 1: Extração SigPesq (Release 1)**
     - [x] US-001 [Extração Projetos SigPesq](https://github.com/ifesserra-lab/horizon_etl/issues/2) (Merged)
+    - [Release v1.0.3](https://github.com/ifesserra-lab/horizon_dashboard/releases/tag/v1.0.3) | 2026-01-10
+    - [PR #13](https://github.com/ifesserra-lab/horizon_dashboard/pull/13) - Remove Member Avatars (Merged)
+    - [Issue #12](https://github.com/ifesserra-lab/horizon_dashboard/issues/12) - Remove Member Avatars from Group Cards (Closed)
     - [Release v1.0.2](https://github.com/ifesserra-lab/horizon_dashboard/releases/tag/v1.0.2) | 2026-01-10
     - [PR #11](https://github.com/ifesserra-lab/horizon_dashboard/pull/11) - Fix UI Contrast & Dark Mode Conflict (Merged)
     - [Issue #9](https://github.com/ifesserra-lab/horizon_dashboard/issues/9) - Apply CSS Strategy to Group Details (Closed)
