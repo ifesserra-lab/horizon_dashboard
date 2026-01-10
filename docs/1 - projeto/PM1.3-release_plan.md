@@ -1,57 +1,57 @@
 # Release Plan
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Versão:** 1.0
 
 ---
 
 # 1. Visão Geral de Releases
-O projeto será entregue em 4 releases mensais incrementais.
+O projeto entrega valor através de interfaces visuais incrementais, consumindo dados já processados.
 
 | Release | Objetivo Principal | Data Estimada | Status |
 |---------|--------------------|----------------|--------|
-| **R1** | Integração SigPesq (IFES) | 06/02/2026 | Planejado |
-| **R2** | Integração Lattes (CNPq) | 06/03/2026 | Planejado |
-| **R3** | Integração SigFapes (FAPES) | 06/04/2026 | Planejado |
-| **R4** | Integração Google Scholar | 06/05/2026 | Planejado |
+| **R1** | Portal de Grupos de Pesquisa | 06/02/2026 | **Entregue** |
+| **R2** | Perfis de Pesquisadores (Lattes) | 06/03/2026 | Planejado |
+| **R3** | Transparência Financeira (FAPES) | 06/04/2026 | Planejado |
+| **R4** | Métricas de Impacto (Scholar) | 06/05/2026 | Planejado |
 
 ---
 
 # 2. Detalhamento por Release
 
-## 2.1 Release R1 – SigPesq (Fundação)
-**Objetivo:** Capturar dados institucionais de projetos de pesquisa e extensão do sistema interno (IFES).
+## 2.1 Release R1 – Portal de Grupos (v1.0.0)
+**Objetivo:** Permitir a busca e visualização detalhada dos Grupos de Pesquisa do IFES.
 **Funcionalidades:**
-- Setup do ambiente Prefect + Supabase.
-- ETL de Projetos e Pesquisadores do SigPesq.
-- Tabelas Core no Banco de Dados.
-- **Horizon Dashboard v1.0**: Visualização de Grupos e Busca Unificada.
+- [x] Listagem de Grupos com Filtros (Campus, Área).
+- [x] Busca Textual em tempo real.
+- [x] Página de Detalhes do Grupo (Líderes, Membros com Avatar).
+- [x] Adaptação Visual (Light/Dark Mode e Glassmorphism).
 
-## 2.2 Release R2 – Lattes
-**Objetivo:** Enriquecer os perfis dos pesquisadores com dados públicos do CNPq.
+## 2.2 Release R2 – Perfis de Pesquisadores (v1.1.0)
+**Objetivo:** Exibir a trajetória e produção dos pesquisadores de forma consolidada.
 **Funcionalidades:**
-- ETL de Currículos Lattes (identificação por nome/CPF obtidos no R1).
-- Extração de produções bibliográficas e técnicas.
+- [ ] Página de Perfil Individual (`/researchers/[id]`).
+- [ ] Timeline de Formação e Atuação Profissional.
+- [ ] Lista de Produções Bibliográficas e Orientações.
+- [ ] Grafo de conexões (Co-autoria).
 
-## 2.3 Release R3 – SigFapes
-**Objetivo:** Monitorar oportunidades de fomento, editais estaduais e a execução financeira dos projetos.
+## 2.3 Release R3 – Transparência Financeira (v1.2.0)
+**Objetivo:** Dashboards interativos para monitoramento de fomento e bolsas.
 **Funcionalidades:**
-- ETL de Projetos, Bolsas e Compras (Dados Abertos/API).
-- ETL de Projetos aprovados, Bolsistas vinculados e Compras realizadas.
-- **Integração API FAPES (Projetos, Bolsas e Pagamentos).**
-- Classificação de oportunidades.
+- [ ] Gráficos de Pizza/Barras para distribuição de bolsas FAPES.
+- [ ] Tabela interativa de Projetos Contratados.
+- [ ] Filtros por Ano e Modalidade de Bolsa.
 
-## 2.4 Release R4 – Google Scholar
-**Objetivo:** Métricas acadêmicas e citações.
+## 2.4 Release R4 – Métricas de Impacto (v1.3.0)
+**Objetivo:** Indicadores de qualidade e alcance científico.
 **Funcionalidades:**
-- ETL de perfil do Google Scholar.
-- Citações e índice-h.
-- Consolidação final dos dados.
+- [ ] Badges de Índice H e Citações (Google Scholar).
+- [ ] Ranking de Grupos por produtividade.
+- [ ] Relatórios PDF exportáveis.
 
 ---
 
 # 3. Milestones no GitHub
-Cada Release acima **DEVE** ter um Milestone correspondente criado no GitHub:
-- `v0.1.0 - R1 SigPesq`
-- `v0.2.0 - R2 Lattes`
-- `v0.3.0 - R3 SigFapes`
-- `v1.0.0 - R4 Scholar`
+- `v1.0.x - R1 Portal de Grupos` (Fechado)
+- `v1.1.0 - R2 Perfis Lattes` (Aberto)
+- `v1.2.0 - R3 Financeiro` (Aberto)
+- `v1.3.0 - R4 Impacto` (Aberto)
