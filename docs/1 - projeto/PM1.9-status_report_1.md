@@ -1,63 +1,54 @@
 # Status Report 1
-**Projeto:** Horizon ETL  
-**Período:** 01/01/2026 a 15/01/2026  
-**Versão:** 1.0  
-**Responsável pelo Relato:** Antigravity (Senior Lead)
+**Projeto:** Horizon Dashboard
+**Período:** 01/01/2026 a 15/01/2026
+**Versão Relatada:** v1.0.3 (R1)
+**Responsável:** Antigravity (Senior PM)
 
 ---
 
-## 1. Resumo Executivo
-## 1. Resumo Executivo
-O projeto concluiu a **Mecanismo de Ingestão do SigPesq (US-001 e US-007)** e a **Release R1 do Horizon Dashboard**. O ambiente está estável com Prefect 3 rodando em Docker, e a versão **v1.0.3** foi liberada no branch `main` com ajustes de UI e temas.
+# 1. Resumo Executivo
+A **Release R1 (Portal de Grupos)** foi entregue com sucesso e implantada em produção (v1.0.3). O sistema permite a busca unificada de grupos, visualização de detalhes e membros. A interface utiliza o design system "Premium Glassmorphism" e é totalmente responsiva.
 
 ---
 
-## 2. Progresso da Sprint / Iteração
-| Item | Previsto | Concluído | Observações |
-|------|----------|-----------|-------------|
-| **US-001** (Extract SigPesq) | Sim | Sim | Concluído. |
-| **US-007** (Ingestão Grupos Pesquisa) | Sim | Sim | Integrado com Knowledge Areas e cnpq_url (PR #4). |
-| **US-005** (Observability) | Sim | Sim | Logs e estrutura base implementadas. |
-| **US-005** (Observability) | Sim | Sim | Logs e estrutura base implementadas. |
-| **US-Dashboard-01** (Smart Search) | Sim | Sim | Busca unificada com filtros multifatoriais. |
-| **US-Dashboard-02** (CI/CD Pages) | Sim | Sim | Deploy automático para GitHub Pages. |
-| **US-006** (Fapes API) | Não | Não | Agendado para R3. |
+# 2. Progresso da Sprint / Iteração
+| Item | Descrição | Status | PR/Versão |
+|------|-----------|--------|-----------|
+| **US-001** | Listagem e Busca de Grupos | **Entregue** | v1.0.0 |
+| **US-002** | Detalhes do Grupo | **Entregue** | v1.0.0 |
+| **Fix** | Contraste e Tema Light (Acessibilidade) | **Entregue** | v1.0.2 |
+| **Fix** | Remoção de Avatares (Listagem) | **Entregue** | v1.0.3 |
 
 ---
 
-## 3. Entregáveis desde o Último Relato
-- `src/core/logic/research_group_loader.py`: Ingestão de grupos via Excel.
-- `src/flows/ingest_sigpesq.py`: Pipeline ETL atualizado com US-007.
-- `src/components/Search.astro`: Componente de busca inteligente.
-- `.github/workflows/deploy.yml`: Pipeline de CI/CD.
-- `docs/2 - implementacao/SI.3-design.md`: Arquitetura Hexagonal documentada.
-- `PM1.3 Release Plan`: Atualizado com datas reais.
-- `tests/test_loader_mapping.py`: Testes unitários para mapeamento de grupos.
+# 3. Entregáveis Técnicos
+- `src/pages/groups/index.astro`: Listagem com filtro Client-side.
+- `src/pages/groups/[id].astro`: Página de Detalhes (SSG).
+- `src/components/Search.astro`: Componente de Busca Reativa.
+- `src/styles/global.css`: Design System e Variáveis CSS (Dark Mode).
+- `docs/1 - projeto/`: Documentação de Governança atualizada.
 
 ---
 
-## 4. Pendências e Impedimentos
-| ID | Descrição | Responsável | Status | Ação Necessária |
-|----|------------|-------------|--------|-----------------|
-| P1 | Validação de Docstrings | Antigravity | **Resolvido** | Code Review (Self). |
-| P2 | Acesso VPN SigPesq | User | Aberto | Confirmar necessidade de VPN. |
+# 4. Pendências e Impedimentos
+| ID | Descrição | Impacto | Ação Necessária |
+|----|------------|---------|-----------------|
+| **IMP-01** | Dados de Lattes ainda não integrados na UI | R2 (Perfis) | Planejar Integração de JSONs de Pesquisadores. |
 
 ---
 
-## 5. Riscos Atualizados
-| ID | Risco | Impacto | Probabilidade | Status | Ação de Mitigação |
-|----|--------|----------|---------------|---------|-------------------|
-| R1 | Mudança no Layout SigPesq | Alto | Média | Controlado | Adaptador isolado para facilitar correções. |
+# 5. Riscos e Mitigações
+| ID | Risco | Status | Mitigação |
+|----|-------|--------|-----------|
+| **RISK-01** | Performance em Mobile | **Monitorado** | Imagens otimizadas e pouca carga JS. |
+| **RISK-02** | Contraste de Cores (Acessibilidade) | **Resolvido** | Correção de variáveis CSS na v1.0.2. |
 
 ---
 
-## 6. Próximas Ações (Próxima Quinzena)
-- Início da **US-001 (Researcher/Scholarship Ingestion - Pending Part)**.
-- Início da **US-002 (Lattes Extraction)**.
-- **Concluído**: Implementação de Líderes e Strategies (v0.3.0).
-- **Concluído**: Horizon Dashboard Release 1 (v1.0.3).
-
----
+# 6. Próximas Ações (Planejamento R2)
+- Iniciar UI/UX da Página de Pesquisador (`/researchers/[id]`).
+- Definir layout da Timeline de Formação.
+- Prototipar visualização de Grafo de Co-autoria.
 
 ## 7. Aprovação
 | Nome | Cargo | Data |
