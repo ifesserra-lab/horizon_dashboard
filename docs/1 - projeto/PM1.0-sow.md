@@ -33,12 +33,14 @@ O foco exclusivo é o processo de **ETL (Extract, Transform, Load)**.
     - Limpeza e normalização das informações.
 - **Armazenamento**:
     - Carga em banco de dados centralizado.
+- **Visualização (Horizon Dashboard)**:
+    - Interface Web para busca e visualização de grupos de pesquisa.
+    - Perfis detalhados de grupos e estatísticas.
 
 ## 2.2 O que NÃO ESTÁ no Escopo (Out-Scope)
-- Desenvolvimento de front-ends ou dashboards para visualização final (apenas a disponibilaização dos dados).
 - Análises de dados complexas ou Machine Learning (nesta fase).
 - Alterações nos sistemas fonte.
-- Qualquer atividade que não seja estritamente relacionada ao pipeline de ETL.
+- Qualquer atividade que não seja estritamente relacionada ao pipeline de ETL ou visualização.
 
 ---
 
@@ -59,10 +61,11 @@ O foco exclusivo é o processo de **ETL (Extract, Transform, Load)**.
 
 # 5. Premissas e Restrições
 ## 5.1 Premissas Técnicas
-- **Linguagem**: [Python](https://www.python.org/).
-- **Orquestração**: [Prefect](https://www.prefect.io/) (Gestor de Fluxo).
-- **Infraestrutura de Banco de Dados**: [Supabase](https://supabase.com/).
-- **Idempotência**: O sistema deve ser idempotente, permitindo rodar diversas vezes as fontes de dados e obtendo o mesmo resultado final (sem duplicatas).
+- **Framework**: [Astro](https://astro.build/) (SSG/SSR).
+- **Estilização**: [Tailwind CSS](https://tailwindcss.com/) (v4).
+- **Linguagem**: TypeScript / JavaScript.
+- **Fonte de Dados**: [Supabase](https://supabase.com/) (Leitura) e Arquivos JSON.
+- **Build/Deploy**: Node.js (LTS).
 
-## 5.2 Restrições
-- O projeto deve respeitar as limitações de acesso e _rate limits_ das fontes de dados externas.
+### Geral
+- **Idempotência**: O sistema deve ser idempotente, permitindo rodar diversas vezes as fontes de dados e obtendo o mesmo resultado final (sem duplicatas).

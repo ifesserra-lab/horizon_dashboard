@@ -49,7 +49,7 @@ A estrutura analítica do projeto (EAP/WBS) é dividida por fontes de dados (Rel
 # 3. Recursos (PM1.4)
 - **Equipe Técnica**: 1 Desenvolvedor Fullstack (User).
 - **Stakeholders**: Gestão do Campus, Alunos, Pesquisadores.
-- **Tecnologia**: [Python](https://www.python.org/), [Prefect Cloud/Self-hosted](https://www.prefect.io/), [Supabase](https://supabase.com/) (PostgreSQL), **Astro**, **Tailwind CSS**.
+- **Tecnologia**: **Astro**, **Tailwind CSS**, [Supabase](https://supabase.com/).
 
 ---
 

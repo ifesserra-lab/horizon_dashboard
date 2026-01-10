@@ -55,7 +55,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RNF-01** | Idempotência | Re-execução de pipelines não deve duplicar dados. | `UPSERT` obrigatório. |
 | **RNF-02** | Resiliência | Pipelines devem suportar falhas de rede (retries). | Prefect Retries. |
 | **RNF-03** | Arquitetura | Código desacoplado seguindo Clean/Hexagonal Arch. | Modules `etl`, `core`. |
-| **RNF-04** | Stack | Python 3.10+, Prefect, Supabase. | PM1.0 |
+| **RNF-04** | Stack | Astro, Tailwind, Node.js, Supabase (Source). | PM1.0 |
 | **RNF-05** | Qualidade | Cobertura de testes em lógicas de transformação. | Pytest, TDD. |
 | **RNF-06** | Observabilidade | Todas as ações do sistema devem gerar logs estruturados. | Loguru/Prefect Logger. |
 
