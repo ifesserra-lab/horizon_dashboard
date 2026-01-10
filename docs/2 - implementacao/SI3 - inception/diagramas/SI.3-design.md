@@ -183,3 +183,62 @@ class IExportSink(ABC):
 - **SI.1 Requirements**: Mapeados para **Flows**.
 - **SI.2 API/DB**: Mapeados para **Sinks** e **Domain**.
 - **UX/Data Goals**: Mapeados para **Seções 8 e 9**.
+## 5. Arquitetura Frontend (Horizon Dashboard)
+**Framework:** Astro (Static Site Generation + Server Side Rendering hybrd)
+**Estilização:** Tailwind CSS v4 + Variáveis CSS Semânticas (`global.css`)
+
+### 5.1 Diagrama de Componentes (Frontend)
+```mermaid
+flowchart TD
+    subgraph Pages [src/pages]
+        Index[index.astro\n(Lista de Grupos)]
+        Detail[[id].astro\n(Detalhes do Grupo)]
+    end
+
+    subgraph Layouts [src/layouts]
+        MainLayout[Layout.astro]
+    end
+
+    subgraph Components [src/components]
+        Search[Search.astro]
+        Header[Header.astro]
+        Sidebar[Sidebar.astro]
+        Breadcrumbs[Breadcrumbs.astro]
+        Footer[Footer.astro]
+    end
+
+    subgraph StaticAssets [public/]
+        Images[Logos/Icons]
+    end
+
+    Index --> MainLayout
+    Detail --> MainLayout
+    MainLayout --> Header
+    MainLayout --> Sidebar
+    MainLayout --> Breadcrumbs
+    MainLayout --> Footer
+    Index --> Search
+```
+
+### 5.2 Estilos e Design System
+- **Tema:** Light/Dark Mode automático via classe `.dark` no `html`.
+- **Cores Semânticas:**
+    - `--bg-primary`: Fundo da página base.
+    - `--tag-bg`: Fundo de tags (normalizado para #f1f5f9 em Light Mode).
+    - `--premium-accent`: Cor de destaque (Azul/Sky).
+- **Glassmorphism:** Uso extensivo de `backdrop-blur` e bordas semi-transparentes para cards.
+
+### 5.3 Estrutura de Diretórios (Frontend)
+```text
+src/
+├── components/        # UI Components (Atomic)
+├── layouts/           # Page Wrappers
+├── pages/             # Routing (File-based)
+│   ├── groups/
+│   │   ├── [id].astro # Dynamic Route
+│   │   └── index.astro
+│   └── index.astro    # Redirect or Home
+├── styles/
+│   └── global.css     # CSS Variables & Tailwind Directives
+└── assets/            # Local images/fonts
+```
