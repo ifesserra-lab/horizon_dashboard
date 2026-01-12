@@ -189,6 +189,50 @@ tags: [type:feature, area:frontend]
 Adicionar um card de visualização do "Top 10 Linhas de Pesquisa" na página de Áreas de Conhecimento, similar ao da home, para fornecer contexto imediato sobre os temas mais fortes.
 
 
+### US-013 – Separação de Membros por Função (Detalhes do Grupo)
+```yaml
+id: US-013
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [RF-22]
+tags: [type:feature, area:frontend, component:details]
+```
+
+#### Descrição
+Refatorar a seção de membros na página de detalhes do grupo (`src/pages/groups/[id].astro`) para exibir pesquisadores e estudantes em seções distintas, melhorando a organização visual e hierarquia.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Separar membros em seções: "Pesquisadores", "Estudantes" e "Técnicos" (se houver).
+    - [ ] Manter os Líderes destacados ou incluídos na seção de Pesquisadores (conforme regra de negócio, geralmente líderes são pesquisadores).
+- **UI/UX**:
+    - [ ] Títulos de seção claros para cada grupo.
+    - [ ] Manter o design dos cards de membros existente.
+
+### US-014 – Identificação de Egressos (Detalhes do Grupo)
+```yaml
+id: US-014
+milestone: R1
+prioridade: Média
+tamanho: 3
+origem: [RF-23]
+tags: [type:feature, area:frontend, component:details]
+```
+
+#### Descrição
+Como usuário, quero identificar facilmente quais membros são egressos (ex-membros) na lista do grupo de pesquisa, para entender o histórico de participação.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Identificar membros com `end_date` preenchido como Egressos.
+    - [ ] Adicionar um badge visual ou indicador "Egresso" no card do membro.
+    - [ ] Aplicar estilo visual distinto (ex: tons de cinza ou opacidade reduzida) para diferenciar de membros ativos.
+- **UI/UX**:
+    - [ ] Badge "Egresso" visível.
+    - [ ] Tooltip (opcional) indicando período de participação se disponível.
+
+
 ---
 
 # 2. Epics & User Stories
