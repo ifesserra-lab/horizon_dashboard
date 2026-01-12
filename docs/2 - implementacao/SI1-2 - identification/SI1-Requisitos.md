@@ -48,6 +48,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RF-16** | O Dashboard deve consumir dados dos arquivos JSON canônicos (`research_groups_canonical.json`). | Dashboard exibindo dados reais em vez de mocks. | User Req. |
 | **RF-17** | O Dashboard deve lidar com a ausência de nomes curtos (`short_name`) nos grupos. | Fallback visual (ex: primeira letra do nome completo) implementado nos ícones. | User Req. |
 | **RF-18** | O Dashboard deve exibir uma página dedicada para 'Áreas de Conhecimento'. | Dashboard exibindo resumo por área e vinculação direta com os grupos de pesquisa. | User Req. |
+| **RF-19** | O Dashboard deve exibir o Top 10 Linhas de Pesquisa por frequência na home. | Card de distribuição exibindo as linhas mais recorrentes entre os grupos, excluindo áreas genéricas. | User Req. |
 
 ---
 

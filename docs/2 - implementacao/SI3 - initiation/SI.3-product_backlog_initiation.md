@@ -154,6 +154,40 @@ Implementar uma página dedicada para visualizar a distribuição dos grupos de 
     - [x] Design responsivo.
     - [x] Estilo premium seguindo o padrão da plataforma.
 
+### US-011 – Top 10 Linhas de Pesquisa (Dashboard Home)
+```yaml
+id: US-011
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [RF-19]
+tags: [type:feature, area:frontend, component:charts]
+```
+
+#### Descrição
+Substituir a card de "Distribuição por Área" na home pelo "Top 10 Linhas de Pesquisa", filtrando áreas genéricas para mostrar temas específicos.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Cálculo dinâmico das 10 linhas mais frequentes.
+    - [ ] Filtro automático de áreas genéricas (ex: 'Educação', 'Interdisciplinar').
+- **UI/UX**:
+    - [ ] Rótulos atualizados para "Linha de Pesquisa".
+    - [ ] Tooltip/Texto explicativo se necessário.
+
+### US-012 – Top 10 Linhas de Pesquisa (Página de Áreas)
+```yaml
+id: US-012
+milestone: R1
+prioridade: Média
+tamanho: 3
+origem: [RF-19]
+tags: [type:feature, area:frontend]
+```
+
+#### Descrição
+Adicionar um card de visualização do "Top 10 Linhas de Pesquisa" na página de Áreas de Conhecimento, similar ao da home, para fornecer contexto imediato sobre os temas mais fortes.
+
 
 ---
 
@@ -461,6 +495,8 @@ Desenvolver um novo pipeline que extrai URLs de espelho de grupos do banco de da
 | **US-005** | Observabilidade e Idempotência (Base) | R1 | **Ready** |
 | **US-001** | Extração Projetos SigPesq | R1 | **Ready** |
 | **US-006** | Extração Editais FAPES (PDF) | R3 | **Ready** |
+| **US-011** | Top 10 Research Lines (Home) | R1 | **PR #25** |
+| **US-012** | Top 10 Research Lines (Areas) | R1 | **PR #25** |
 
 
 ---
