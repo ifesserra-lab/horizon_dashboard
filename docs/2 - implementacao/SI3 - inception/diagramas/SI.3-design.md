@@ -164,6 +164,7 @@ class IExportSink(ABC):
 | `AreaChart` | Fomento ao longo do tempo | Área / Linhas |
 | `MapComponent`| Distribuição de egressos | Mapa Coroplético |
 | `Sunburst` | Áreas do Conhecimento | Radial Hierárquico |
+| `HorizontalBar`| Top 10 Linhas de Pesquisa | Barras Horizontais (Frequência) |
 
 ---
 
