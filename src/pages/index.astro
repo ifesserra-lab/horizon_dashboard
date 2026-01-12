@@ -58,29 +58,6 @@ const top10Lines = Object.entries(lineCounts)
 	</div>
 
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-		<!-- Recent Groups Section -->
-		<section class="glass-card p-6" aria-labelledby="recent-groups-title">
-			<div class="flex justify-between items-center mb-6">
-				<h3 id="recent-groups-title" class="text-xl font-bold font-['Outfit'] text-text-main">Grupos Recentes</h3>
-				<a href={`${import.meta.env.BASE_URL}groups`} class="text-xs font-bold text-premium-accent hover:underline focus:ring-2 focus:ring-premium-accent rounded px-1">Ver todos</a>
-			</div>
-			<div class="flex flex-col gap-4">
-				{groups.slice(0, 3).map(group => (
-					<div class="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-border-main hover:bg-premium-accent/5 transition-all group">
-						<div aria-hidden="true" class="w-12 h-12 rounded-lg bg-premium-accent/10 border border-premium-accent/20 flex items-center justify-center text-premium-accent font-bold group-hover:scale-110 transition-transform">
-							{group.short_name?.charAt(0) || group.name.charAt(0)}
-						</div>
-						<div class="flex-1 overflow-hidden">
-							<h4 class="font-bold text-sm text-text-main truncate">{group.name}</h4>
-							<p class="text-xs text-text-secondary truncate">{group.campus.name} • {group.members.length} membros</p>
-						</div>
-						<a href={`${import.meta.env.BASE_URL}groups/${group.id}`} class="p-2 rounded-lg bg-border-main hover:bg-premium-accent/20 transition-all" aria-label={`Ver detalhes do grupo ${group.name}`}>
-							<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-						</a>
-					</div>
-				))}
-			</div>
-		</section>
 
 		<!-- Statistics and Areas -->
 		<section class="glass-card p-6" aria-labelledby="distribution-title">
