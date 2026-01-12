@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import groupsData from '../../data/canonical/groups.json';
+import groupsData from '../../data/canonical/research_groups_canonical.json';
 import type { ResearchGroup } from '../../types/groups';
 
 export function getStaticPaths() {
@@ -33,7 +33,7 @@ const { group } = Astro.props;
 				<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
 					<div class="flex items-center gap-6">
 						<div aria-hidden="true" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-premium-accent to-premium-purple flex items-center justify-center text-white text-3xl font-bold font-['Outfit'] shadow-xl shadow-premium-accent/10">
-							{group.short_name.charAt(0)}
+							{group.short_name?.charAt(0) || group.name.charAt(0)}
 						</div>
 						<div>
 							<div class="flex flex-wrap gap-2 mb-2">

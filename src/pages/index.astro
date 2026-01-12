@@ -1,13 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import KpiCard from '../components/KpiCard.astro';
-import groupsData from '../data/canonical/groups.json';
+import groupsData from '../data/canonical/research_groups_canonical.json';
 import type { ResearchGroup } from '../types/groups';
 
 const groups = groupsData as ResearchGroup[];
 
 const totalGroups = groups.length;
-const totalMembers = groups.reduce((acc, g) => acc + g.members.length, 0);
+const totalMembers = groups.reduce((acc, g) => acc + (g.members?.length || 0), 0);
 const totalCampus = new Set(groups.map(g => g.campus.id)).size;
 const totalKnowledgeAreas = new Set(groups.flatMap(g => g.knowledge_areas.map(ka => ka.id))).size;
 
@@ -45,7 +45,7 @@ const icons = {
 				{groups.slice(0, 3).map(group => (
 					<div class="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-border-main hover:bg-premium-accent/5 transition-all group">
 						<div aria-hidden="true" class="w-12 h-12 rounded-lg bg-premium-accent/10 border border-premium-accent/20 flex items-center justify-center text-premium-accent font-bold group-hover:scale-110 transition-transform">
-							{group.short_name.charAt(0)}
+							{group.short_name?.charAt(0) || group.name.charAt(0)}
 						</div>
 						<div class="flex-1 overflow-hidden">
 							<h4 class="font-bold text-sm text-text-main truncate">{group.name}</h4>
