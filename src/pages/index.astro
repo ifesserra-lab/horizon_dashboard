@@ -17,6 +17,23 @@ const icons = {
   campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
   areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
 };
+
+// Calculate Top 10 Knowledge Areas
+const areaCounts: Record<string, number> = {};
+groups.forEach(g => {
+	g.knowledge_areas.forEach(ka => {
+		areaCounts[ka.name] = (areaCounts[ka.name] || 0) + 1;
+	});
+});
+
+const top10Areas = Object.entries(areaCounts)
+	.sort(([, a], [, b]) => b - a)
+	.slice(0, 10)
+	.map(([area, count]) => ({
+		name: area,
+		count,
+		percentage: (count / groups.length) * 100
+	}));
 ---
 
 <Layout title="Dashboard Overview">
@@ -61,23 +78,19 @@ const icons = {
 
 		<!-- Statistics and Areas -->
 		<section class="glass-card p-6" aria-labelledby="distribution-title">
-			<h3 id="distribution-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Distribuição por Área</h3>
-			<div class="flex flex-col gap-6">
-				{Array.from(new Set(groups.flatMap(g => g.knowledge_areas.map(ka => ka.name)))).slice(0, 5).map(area => {
-					const count = groups.filter(g => g.knowledge_areas.some(ka => ka.name === area)).length;
-					const percentage = (count / groups.length) * 100;
-					return (
-						<div class="space-y-2">
-							<div class="flex justify-between text-xs font-bold">
-								<span class="text-text-main">{area}</span>
-								<span class="text-text-secondary">{count} grupos</span>
-							</div>
-							<div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-								<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${percentage}%`}></div>
-							</div>
+			<h3 id="distribution-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Distribuição por Área (Complexo)</h3>
+			<div class="flex flex-col gap-5">
+				{top10Areas.map((area) => (
+					<div class="space-y-1.5">
+						<div class="flex justify-between text-[10px] font-bold">
+							<span class="text-text-main truncate max-w-[70%]" title={area.name}>{area.name}</span>
+							<span class="text-text-secondary">{area.count} grupos</span>
 						</div>
-					);
-				})}
+						<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+							<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${Math.min(area.percentage * 5, 100)}%`}></div>
+						</div>
+					</div>
+				))}
 			</div>
 		</section>
 	</div>
