@@ -51,6 +51,9 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RF-19** | O sistema deve exibir o gráfico "Top 10 Áreas de Conhecimento" na home e na página de áreas. | Dashboard | Alta |
 | **RF-20** | O sistema deve listar os grupos de pesquisa em ordem alfabética e exibir a sigla (short_name) no avatar quando disponível. | Catálogo de Grupos | Média |
 | RF-21 | O sistema deve manter consistência visual nos ícones de navegação e dashboard para as Áreas de Conhecimento. | UI Consistency | Baixa |
+| **RF-22** | O sistema deve exibir, no detalhamento do grupo de pesquisa, a lista de membros separada por função: Pesquisadores, Estudantes e Técnicos. | Detalhamento de Grupo | Alta |
+| **RF-23** | O sistema deve identificar visualmente os membros egressos (ex-membros com data de término preenchida) no detalhamento do grupo de pesquisa. | Detalhamento de Grupo | Média |
+| **RF-24** | O sistema deve permitir a separação estrutural de membros ativos e egressos em sub-listas dentro de suas funções (Pesquisadores e Estudantes). | Detalhamento de Grupo | Alta |
 
 ---
 
