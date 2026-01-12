@@ -1,26 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import KpiCard from '../../components/KpiCard.astro';
 import knowledgeAreas from '../../data/mart/knowledge_areas_mart.json';
 import researchGroups from '../../data/canonical/research_groups_canonical.json';
 
 // Calculate KPI values from canonical data
 const totalGroups = researchGroups.length;
-
-const uniqueResearchers = new Set();
-const uniqueCampuses = new Set();
-
-researchGroups.forEach(group => {
-	if (group.members) {
-		group.members.forEach(member => uniqueResearchers.add(member.id));
-	}
-	if (group.campus && group.campus.name) {
-		uniqueCampuses.add(group.campus.name);
-	}
-});
-
-const totalResearchers = uniqueResearchers.size;
-const totalCampuses = uniqueCampuses.size;
 
 // Sort areas by group count descending
 const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups_count);
@@ -73,24 +57,23 @@ const top10Lines = Object.entries(lineCounts)
 			</div>
 		</header>
 
-		<!-- Dashboard Summary -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-			<KpiCard 
-				title="Total de Grupos" 
-				value={totalGroups.toString()} 
-				icon=`<span class="text-xs font-bold px-2 py-1 bg-premium-accent/20 rounded-lg">Grupos</span>`
-			/>
-			<KpiCard 
-				title="Pesquisadores" 
-				value={totalResearchers.toString()} 
-				icon=`<span class="text-xs font-bold px-2 py-1 bg-premium-accent/20 rounded-lg">Pesquisadores</span>`
-			/>
-			<KpiCard 
-				title="Campus" 
-				value={totalCampuses.toString()} 
-				icon=`<span class="text-xs font-bold px-2 py-1 bg-premium-accent/20 rounded-lg">Campi</span>`
-			/>
-		</div>
+		<!-- Top 10 Research Lines -->
+		<section class="glass-card p-6" aria-labelledby="lines-title">
+			<h3 id="lines-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Top 10 Áreas de Conhecimento</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
+				{top10Lines.map((line) => (
+					<div class="space-y-1.5">
+						<div class="flex justify-between text-[10px] font-bold">
+							<span class="text-text-main truncate max-w-[70%]" title={line.name}>{line.name}</span>
+							<span class="text-text-secondary">{line.count} grupos</span>
+						</div>
+						<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+							<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${Math.min(line.percentage * 5, 100)}%`}></div>
+						</div>
+					</div>
+				))}
+			</div>
+		</section>
 
 		<!-- Top 10 Research Lines -->
 		<section class="glass-card p-6" aria-labelledby="lines-title">
