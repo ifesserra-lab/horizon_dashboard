@@ -495,6 +495,8 @@ Desenvolver um novo pipeline que extrai URLs de espelho de grupos do banco de da
 | **US-005** | Observabilidade e Idempotência (Base) | R1 | **Ready** |
 | **US-001** | Extração Projetos SigPesq | R1 | **Ready** |
 | **US-006** | Extração Editais FAPES (PDF) | R3 | **Ready** |
+| **US-011** | Top 10 Research Lines (Home) | R1 | **PR #25** |
+| **US-012** | Top 10 Research Lines (Areas) | R1 | **PR #25** |
 
 
 ---
