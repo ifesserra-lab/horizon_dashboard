@@ -193,6 +193,7 @@ flowchart TD
     subgraph Pages [src/pages]
         Index[index.astro\n(Lista de Grupos)]
         Detail[[id].astro\n(Detalhes do Grupo)]
+        KnowledgeAreas[knowledge-areas/index.astro\n(Dashboard de Áreas)]
     end
 
     subgraph Layouts [src/layouts]
@@ -213,6 +214,7 @@ flowchart TD
 
     Index --> MainLayout
     Detail --> MainLayout
+    KnowledgeAreas --> MainLayout
     MainLayout --> Header
     MainLayout --> Sidebar
     MainLayout --> Breadcrumbs
