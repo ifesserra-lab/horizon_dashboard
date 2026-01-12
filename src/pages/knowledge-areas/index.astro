@@ -24,6 +24,27 @@ const totalCampuses = uniqueCampuses.size;
 
 // Sort areas by group count descending
 const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups_count);
+
+// Calculate Top 10 Research Lines (Linhas de Pesquisa)
+const broadAreaNames = new Set(knowledgeAreas.map(a => a.area_name));
+
+const lineCounts: Record<string, number> = {};
+researchGroups.forEach(g => {
+	g.knowledge_areas?.forEach(ka => {
+		if (!broadAreaNames.has(ka.name)) {
+			lineCounts[ka.name] = (lineCounts[ka.name] || 0) + 1;
+		}
+	});
+});
+
+const top10Lines = Object.entries(lineCounts)
+	.sort(([, a], [, b]) => b - a)
+	.slice(0, 10)
+	.map(([line, count]) => ({
+		name: line,
+		count,
+		percentage: (count / researchGroups.length) * 100
+	}));
 ---
 
 <Layout title="Áreas de Conhecimento">
@@ -70,6 +91,24 @@ const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups
 				icon=`<span class="text-xs font-bold px-2 py-1 bg-premium-accent/20 rounded-lg">Campi</span>`
 			/>
 		</div>
+
+		<!-- Top 10 Research Lines -->
+		<section class="glass-card p-6" aria-labelledby="lines-title">
+			<h3 id="lines-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Top 10 Áreas de Conhecimento</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
+				{top10Lines.map((line) => (
+					<div class="space-y-1.5">
+						<div class="flex justify-between text-[10px] font-bold">
+							<span class="text-text-main truncate max-w-[70%]" title={line.name}>{line.name}</span>
+							<span class="text-text-secondary">{line.count} grupos</span>
+						</div>
+						<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+							<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${Math.min(line.percentage * 5, 100)}%`}></div>
+						</div>
+					</div>
+				))}
+			</div>
+		</section>
 
 		<!-- Areas Grid -->
 		<div class="grid grid-cols-1 gap-6" id="areasGrid">

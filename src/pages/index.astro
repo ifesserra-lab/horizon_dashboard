@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import KpiCard from '../components/KpiCard.astro';
 import groupsData from '../data/canonical/research_groups_canonical.json';
+import knowledgeAreasMart from '../data/mart/knowledge_areas_mart.json';
 import type { ResearchGroup } from '../types/groups';
 
 const groups = groupsData as ResearchGroup[];
@@ -18,19 +19,24 @@ const icons = {
   areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
 };
 
-// Calculate Top 10 Knowledge Areas
-const areaCounts: Record<string, number> = {};
+// Calculate Top 10 Research Lines (Linhas de Pesquisa)
+// We filter out broad area names defined in the mart data
+const broadAreaNames = new Set(knowledgeAreasMart.map(a => a.area_name));
+
+const lineCounts: Record<string, number> = {};
 groups.forEach(g => {
 	g.knowledge_areas.forEach(ka => {
-		areaCounts[ka.name] = (areaCounts[ka.name] || 0) + 1;
+		if (!broadAreaNames.has(ka.name)) {
+			lineCounts[ka.name] = (lineCounts[ka.name] || 0) + 1;
+		}
 	});
 });
 
-const top10Areas = Object.entries(areaCounts)
+const top10Lines = Object.entries(lineCounts)
 	.sort(([, a], [, b]) => b - a)
 	.slice(0, 10)
-	.map(([area, count]) => ({
-		name: area,
+	.map(([line, count]) => ({
+		name: line,
 		count,
 		percentage: (count / groups.length) * 100
 	}));
@@ -78,16 +84,16 @@ const top10Areas = Object.entries(areaCounts)
 
 		<!-- Statistics and Areas -->
 		<section class="glass-card p-6" aria-labelledby="distribution-title">
-			<h3 id="distribution-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Distribuição por Área (Complexo)</h3>
+			<h3 id="distribution-title" class="text-xl font-bold font-['Outfit'] text-text-main mb-6">Top 10 Áreas de Conhecimento</h3>
 			<div class="flex flex-col gap-5">
-				{top10Areas.map((area) => (
+				{top10Lines.map((line) => (
 					<div class="space-y-1.5">
 						<div class="flex justify-between text-[10px] font-bold">
-							<span class="text-text-main truncate max-w-[70%]" title={area.name}>{area.name}</span>
-							<span class="text-text-secondary">{area.count} grupos</span>
+							<span class="text-text-main truncate max-w-[70%]" title={line.name}>{line.name}</span>
+							<span class="text-text-secondary">{line.count} grupos</span>
 						</div>
 						<div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-							<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${Math.min(area.percentage * 5, 100)}%`}></div>
+							<div class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full" style={`width: ${Math.min(line.percentage * 5, 100)}%`}></div>
 						</div>
 					</div>
 				))}
