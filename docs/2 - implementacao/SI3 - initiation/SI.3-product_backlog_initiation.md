@@ -130,7 +130,29 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 |----|--------|--------|-----------|
 | **US-001** | Listagem de Grupos | **Done** | v1.0.0 |
 | **US-002** | Detalhes do Grupo | **Done** | v1.0.0 |
-| **Fix** | CSS Contrast Issues | **Done** | v1.0.2 |
+| **Fix** | Remoção de Avatares (Listagem) | **Done** | v1.0.3 |
+| **Task** | Dados Reais & KPIs | **Done** | v1.0.4 |
+### US-006 – Dashboard de Áreas de Conhecimento
+```yaml
+id: US-006
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-18, RF-14]
+tags: [type:feature, area:frontend, component:dashboard]
+```
+
+#### Descrição
+Implementar uma página dedicada para visualizar a distribuição dos grupos de pesquisa por áreas acadêmicas.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [x] Dashboad Summary com KPIs (Grupos, Pesquisadores, Campi).
+    - [x] Listagem de áreas com grupos e campi vinculados.
+    - [ ] Busca em tempo real por nome da área ou grupos.
+- **UI/UX**:
+    - [x] Design responsivo.
+    - [x] Estilo premium seguindo o padrão da plataforma.
 
 
 ---

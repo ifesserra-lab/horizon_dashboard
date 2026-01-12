@@ -28,9 +28,28 @@ const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups
 
 <Layout title="Áreas de Conhecimento">
 	<div class="space-y-8">
-		<header>
-			<h1 class="text-3xl font-['Outfit'] font-bold mb-2">Áreas de Conhecimento</h1>
-			<p class="text-text-muted">Distribuição dos grupos de pesquisa por áreas acadêmicas.</p>
+		<header class="mb-10">
+			<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+				<div>
+					<h2 class="text-3xl font-bold font-['Outfit'] text-text-main">Áreas de Conhecimento</h2>
+					<p class="text-text-secondary mt-2">Distribuição dos grupos de pesquisa por áreas acadêmicas.</p>
+				</div>
+				
+				<div class="relative max-w-md w-full">
+					<label for="areaSearch" class="sr-only">Buscar por área ou grupos</label>
+					<input 
+						type="text" 
+						id="areaSearch"
+						placeholder="Buscar por área, campus ou grupos..." 
+						class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+					/>
+					<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+					
+					<button id="resetAreaSearch" class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden" title="Limpar busca">
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 9-6 6"/><path d="m9 9 6 6"/><circle cx="12" cy="12" r="10"/></svg>
+					</button>
+				</div>
+			</div>
 		</header>
 
 		<!-- Dashboard Summary -->
@@ -53,9 +72,14 @@ const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups
 		</div>
 
 		<!-- Areas Grid -->
-		<div class="grid grid-cols-1 gap-6">
+		<div class="grid grid-cols-1 gap-6" id="areasGrid">
 			{sortedAreas.map((area) => (
-				<div class="glass-card p-6 flex flex-col md:flex-row gap-6 group hover:border-premium-accent/30 transition-all">
+				<div 
+					class="area-card glass-card p-6 flex flex-col md:flex-row gap-6 group hover:border-premium-accent/30 transition-all"
+					data-name={area.area_name.toLowerCase()}
+					data-campuses={area.campuses.join('|').toLowerCase()}
+					data-groups={area.groups.map(g => g.name.toLowerCase()).join('|')}
+				>
 					<div class="md:w-1/3">
 						<div class="flex items-center gap-3 mb-4">
 							<div class="w-12 h-12 bg-premium-accent/10 rounded-xl flex items-center justify-center text-premium-accent group-hover:bg-premium-accent group-hover:text-white transition-all">
@@ -97,5 +121,71 @@ const sortedAreas = [...knowledgeAreas].sort((a, b) => b.groups_count - a.groups
 				</div>
 			))}
 		</div>
+
+		<!-- Empty State -->
+		<div id="emptyState" class="hidden flex-col items-center justify-center py-24 text-center">
+			<div class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed">
+				<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>
+			</div>
+			<h3 class="text-2xl font-bold font-['Outfit'] text-text-main mb-2">Nenhuma área encontrada</h3>
+			<p class="text-text-secondary max-w-sm">
+				Não encontramos nenhuma área de conhecimento ou grupo que corresponda à sua busca.
+			</p>
+		</div>
 	</div>
+
+	<script>
+		const searchInput = document.getElementById('areaSearch') as HTMLInputElement;
+		const resetBtn = document.getElementById('resetAreaSearch');
+		const emptyState = document.getElementById('emptyState');
+		const areaCards = document.querySelectorAll('.area-card');
+
+		function filterAreas() {
+			const query = searchInput.value.toLowerCase().trim();
+			let visibleCount = 0;
+
+			// Show/hide reset button
+			if (query) {
+				resetBtn?.classList.remove('hidden');
+			} else {
+				resetBtn?.classList.add('hidden');
+			}
+
+			areaCards.forEach(card => {
+				const element = card as HTMLElement;
+				const name = element.dataset.name || '';
+				const campuses = element.dataset.campuses || '';
+				const groups = element.dataset.groups || '';
+				
+				const matches = !query || 
+					name.includes(query) || 
+					campuses.includes(query) ||
+					groups.includes(query);
+
+				if (matches) {
+					element.style.display = 'flex';
+					visibleCount++;
+				} else {
+					element.style.display = 'none';
+				}
+			});
+
+			// Toggle empty state
+			if (visibleCount === 0) {
+				emptyState?.classList.remove('hidden');
+				emptyState?.classList.add('flex');
+			} else {
+				emptyState?.classList.add('hidden');
+				emptyState?.classList.remove('flex');
+			}
+		}
+
+		searchInput?.addEventListener('input', filterAreas);
+		
+		resetBtn?.addEventListener('click', () => {
+			searchInput.value = '';
+			filterAreas();
+			searchInput.focus();
+		});
+	</script>
 </Layout>
