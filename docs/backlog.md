@@ -21,19 +21,21 @@ Tracks the delivery of versions to production (Main Branch).
 Reflecting active work from `SI.3 Product Backlog`.
 
 - **Epic 1: Portal de Grupos (Release 1)** _(Entregue - Refinado)_
-    - [x] **US-001** Listagem e Busca de Grupos (Entregue na v1.0.0)
-    - [x] **US-002** Detalhes do Grupo (Entregue na v1.0.0)
+    - [x] **US-001** Listagem de Grupos (Done na v1.0.0)
+    - [x] **US-002** Detalhes do Grupo (Done na v1.0.0)
     - [x] **Fix** Contrast Issues (Entregue na v1.0.2)
-    - [x] **Fix** Avatar Removal (Entregue na v1.0.3)
-    - [x] **Task** Real Data Integration (Entregue na v1.0.4)
+    - [x] **Fix** Remoção de Avatares (Listagem) (Done na v1.0.3)
+    - [x] **Task** Dados Reais & KPIs (Done na v1.0.4)
     - [x] **US-003** Top 10 Areas Distribution (Entregue na v1.0.4)
-    - [x] **US-011** Top 10 Research Lines Home (Entregue na v1.0.6)
-    - [x] **US-012** Top 10 Research Lines Areas (Entregue na v1.0.6)
+    - [x] **US-011** Top 10 Research Lines (Home) (Done na v1.0.6)
+    - [x] **US-012** Top 10 Research Lines (Areas) (Done na v1.0.6)
     - [x] **Fix** KPI Trend Removal (Entregue na v1.0.4)
     - [x] **Fix** "Grupos Recentes" Removal (Entregue na v1.0.7)
     - [x] **Fix** Knowledge Areas KPI Removal (Entregue na v1.0.7)
     - [x] **Fix** Empty Top 10 Knowledge Areas (Entregue na v1.0.8)
     - [x] **US-015** Separação de Membros (Atuais/Egressos) (Entregue na v1.0.10)
+    - [x] **US-006** Dashboard de Áreas de Conhecimento (Entregue na v1.0.6)
+    - [x] **Task** Busca em Áreas de Conhecimento (Entregue na v1.0.8)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [ ] **US-003** Perfil do Pesquisador (Lattes UI)

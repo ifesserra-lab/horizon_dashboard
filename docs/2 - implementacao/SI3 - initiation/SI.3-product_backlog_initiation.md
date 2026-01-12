@@ -132,6 +132,10 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-002** | Detalhes do Grupo | **Done** | v1.0.0 |
 | **Fix** | Remoção de Avatares (Listagem) | **Done** | v1.0.3 |
 | **Task** | Dados Reais & KPIs | **Done** | v1.0.4 |
+| **US-006** | Dashboard de Áreas de Conhecimento | **Done** | v1.0.6 |
+| **US-011** | Top 10 Research Lines (Home) | **Done** | v1.0.6 |
+| **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 |
+| **US-015** | Separação de Membros | **Done** | v1.0.10 |
 ### US-006 – Dashboard de Áreas de Conhecimento
 ```yaml
 id: US-006
