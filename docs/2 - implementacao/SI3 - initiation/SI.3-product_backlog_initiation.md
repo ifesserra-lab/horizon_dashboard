@@ -192,6 +192,11 @@ Adicionar um card de visualização do "Top 10 Linhas de Pesquisa" na página de
 ---
 
 # 2. Epics & User Stories
+### UI Consistency: Padronização de Ícones
+**Descrição**: Padronizar o ícone de "Áreas de Conhecimento" no menu lateral para corresponder ao ícone utilizado no Dashboard.
+**Critérios de Aceitação**:
+- Ícone do menu lateral idêntico ao do card "Áreas de Conhecimento" da home.
+- RF Relacionado: RF-21.
 
 ## Epic 1: Extração SigPesq (Release 1)
 **Objetivo**: Coletar dados de projetos da base SigPesq.
