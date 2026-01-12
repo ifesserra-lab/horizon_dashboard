@@ -45,6 +45,8 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RF-13** | O sistema deve oferecer visualizações de dados segmentadas por perfil (Personas). | Dashboards específicos para Gestores (macros) e Pesquisadores (detalhados). | Data Analyst |
 | **RF-14** | O sistema deve permitir busca avançada e filtros multifatoriais na listagem de grupos. | Pesquisa por nome, campus, área de conhecimento e liderança funcionando em tempo real. | User Req. |
 | **RF-15** | O sistema deve possuir fluxo de CI/CD para deploy no GitHub Pages. | Build e push automatizados para a branch de produção via GitHub Actions. | User Req. |
+| **RF-16** | O Dashboard deve consumir dados dos arquivos JSON canônicos (`research_groups_canonical.json`). | Dashboard exibindo dados reais em vez de mocks. | User Req. |
+| **RF-17** | O Dashboard deve lidar com a ausência de nomes curtos (`short_name`) nos grupos. | Fallback visual (ex: primeira letra do nome completo) implementado nos ícones. | User Req. |
 
 ---
 

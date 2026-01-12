@@ -25,7 +25,7 @@ export interface ResearchGroup {
     id: number;
     name: string;
     description: string | null;
-    short_name: string;
+    short_name: string | null;
     organization_id: number;
     campus_id: number;
     cnpq_url: string | null;
