@@ -124,35 +124,37 @@ Maintain the following artifacts throughout the lifecycle:
     - [ ] **How to Test**: Clear steps for verification.
 
 
-## 9. Release Strategy (CD)
+## 9. Release Strategy (Automated CD)
 - [ ] **Promotion**: `developing` -> `main`.
 - [ ] **Trigger**: All tests passed on `developing`.
 - [ ] **Milestone Association**: Every Release defined in `PM1.3` MUST have a corresponding GitHub Milestone.
-- [ ] **Milestone Content**: The Milestone MUST contain one or more Epics, Tasks, or User Stories.
 - [ ] **Process**:
     - [ ] Open Pull Request from `developing` to `main`.
     - [ ] Title Format: `release: <description>`.
     - [ ] No direct commits to `main` allowed.
-        - [ ] **Versioning (MANDATORY)**:
-            - [ ] **MUST** create a new version (git tag) whenever `developing` is merged to `main`.
-            - [ ] **DO NOT** run `bump_version.py` locally (CI/CD handles this).
-            - [ ] **Create Tag**: `git tag vX.Y.Z` (at end of each feature/fix/release).
-            - [ ] **Update Latest**: `git tag -f latest` and `git push origin -f latest` (at end of each feature/fix/bug).
-            - [ ] **Push Tag**: `git push origin vX.Y.Z`.
-            - [ ] **CI/CD**: GitHub Action handles version bump & publish.
-    - [ ] **Post-Release Reporting**: Update `PM1.9 Status Report` with release details (version, date, items delivered).
+    - [ ] **Versioning (Tag-Triggered Deployment)**:
+        - [ ] **MUST** create a new version (git tag) matches the release.
+        - [ ] **DO NOT** run build/publish commands locally.
+        - [ ] **Action**: Push the tag `vX.Y.Z` to `origin`.
+        - [ ] **Automation**: The CI/CD Pipeline (`.github/workflows/deploy.yml`) MUST detect the tag and trigger production deployment.
+    - [ ] **Post-Release**:
+        - [ ] Verify functionality in Production environment.
+        - [ ] Update `PM1.9 Status Report`.
 
-## 10. Merge Standards
-- [ ] **Conflict Free**: PR can be merged if there are no conflicts.
-- [ ] **Automation**: If the CI pipeline (`.github/workflows/ci.yml`) passes, the PR MUST be merged and related issues closed automatically. **MANDATORY AND NON-NEGOTIABLE**.
+## 10. Merge Standards (Strict CI)
+- [ ] **Calculated Risk**: PR can be merged ONLY if:
+    - [ ] **CI Pipeline (GitHub Actions)** is GREEN (All tests passed).
+    - [ ] **Code Coverage** meets the defined threshold (e.g., 80%).
+    - [ ] **No Conflicts** with the base branch.
+- [ ] **Automation**: Enable "Auto-merge" if available, allowing the platform to merge once checks pass.
 - [ ] **Cleanup**: 
-    - [ ] **Remote**: Delete the feature/bugfix branch from GitHub immediately after the PR is merged.
-    - [ ] **Local**: Delete the local branch to keep the workspace clean.
-    - [ ] **Sync**: Run `git remote prune origin` to synchronize remote branch tracking.
+    - [ ] **Remote**: Delete the feature/bugfix branch from GitHub immediately.
+    - [ ] **Local**: Delete `git branch -d feature/...` to maintain hygiene.
 
 ## 11. Definition of Done (DoD)
 - [ ] **Verification**:
-    - [ ] Test suite passing.
+    - [ ] **Pipeline Success**: CI/CD pipeline passed on the PR.
+    - [ ] Test suite passing locally.
     - [ ] Linting checks passing.
 - [ ] **Documentation**:
     - [ ] Update Google-style docstrings.
@@ -165,7 +167,7 @@ Maintain the following artifacts throughout the lifecycle:
     - [ ] **Cleanup**: Confirm that all related feature/fix/bug branches (remote and local) have been deleted.
     - [ ] **Versioning**: Tag the release and update `latest` tag (see Section 7) after Feature/Fix/Bug closure.
 
-## 12. Tooling Standards
+## 12. Tooling Standards (Platform Engineering)
 - [ ] **GitHub Interaction**:
     - [ ] **MUST USE** GitHub MCP Tools (`github-mcp-server`) for:
         - Creating/Merging Pull Requests.
@@ -174,6 +176,22 @@ Maintain the following artifacts throughout the lifecycle:
         - Releases.
     - [ ] **AVOID** `git` CLI commands where MCP alternatives exist.
     - [ ] **GitHub CLI (`gh`) Usage**:
-        - [ ] **Initial Setup (MANDATORY)**: Always check for and create the mandatory labels (`epic`, `us`, `task`) if they do not exist when starting a project.
-        - [ ] **Release Milestones**: Always use `gh` or `gh api` to create all milestones defined in `PM1.3 Release Plan` (including titles, due dates, and descriptions) immediately after the plan is approved.
-    - [ ] **Legacy Git**: Use `git` CLI only for local workspace synchronization (checkout/pull) if MCP equivalent is unavailable.
+        - [ ] **Initial Setup (MANDATORY)**: Check/Create labels (`epic`, `us`, `task`).
+        - [ ] **Release Milestones**: Use `gh` or `gh api` to create milestones defined in `PM1.3`.
+    - [ ] **Legacy Git**: Use `git` CLI only for local workspace synchronization.
+- [ ] **CI/CD Configuration**:
+    - [ ] **Workflows**: Maintain `.github/workflows/*.yml` as Code.
+    - [ ] **Secrets**: NEVER commit secrets. Use GitHub Secrets.
+    - [ ] **Runners**: Use standard Ubuntu runners unless specific hardware is required.
+
+## 13. Pipeline Governance (Platform Engineering)
+> [!IMPORTANT]
+> **Pipeline as Code**: All build, test, and deploy logic MUST be defined in YAML. No manual steps in the console.
+
+- [ ] **Immutability**:
+    - Build once, deploy many. The artifact generated in `developing` must be the EXACT same one pushed to `production`.
+- [ ] **Fast Feedback**:
+    - CI pipelines must complete < 5 minutes to ensure developer velocity.
+- [ ] **Security**:
+    - Dependency Scanning (e.g., Dependabot) must be enabled.
+    - No hardcoded credentials in code.
