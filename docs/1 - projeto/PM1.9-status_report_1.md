@@ -1,7 +1,7 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.0.4 (R1-Refinement)
+**Versão Relatada:** v1.0.5 (Dashboard Áreas)
 **Responsável:** Antigravity (Senior PM)
 
 ---
@@ -21,6 +21,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **Task** | Dados Reais (research_groups_canonical.json) | **Entregue** | v1.0.4 |
 | **US-003** | Top 10 Áreas de Conhecimento | **Entregue** | v1.0.4 |
 | **Fix** | Limpeza de KPIs (Remoção de % de tendência) | **Entregue** | v1.0.4 |
+| **US-006** | Dashboard de Áreas de Conhecimento + Busca | **Entregue** | v1.0.5 |
 
 ---
 
