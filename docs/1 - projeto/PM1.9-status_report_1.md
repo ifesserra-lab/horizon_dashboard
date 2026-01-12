@@ -23,6 +23,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-011** | Top 10 Research Lines (Home) | **Entregue** | v1.0.6 |
 | **US-012** | Top 10 Research Lines (Areas) | **Entregue** | v1.0.6 |
 | **Fix** | Limpeza de KPIs (Remoção de % de tendência) | **Entregue** | v1.0.4 |
+| **US-015** | Separação de Membros (Atuais/Egressos) | **Ready to Merge** | PR #36 |
 | **Fix** | Dashboard: `v1.0.9` (Released). | **Entregue** | v1.0.9 |
 | **Fix** | Core: Stable. | **Entregue** | - |
 
