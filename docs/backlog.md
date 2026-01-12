@@ -7,7 +7,8 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
-| **v1.0.8** | 2026-01-12 | **Planned** | Fix Empty Top 10 Knowledge Areas |
+| **v1.0.9** | 2026-01-12 | **Released** | Feature: Group Card Sorting & Avatar update + Icon Fix |
+| v1.0.8 | [PR #30](https://github.com/ifesserra-lab/horizon_dashboard/pull/30) | Fix: Empty Top 10 Knowledge Areas | [b5049c2](https://github.com/ifesserra-lab/horizon_dashboard/commit/b5049c2) |
 | **v1.0.7** | 2026-01-12 | **Released** | Removal of Recent Groups & KA KPIs |
 | **v1.0.6** | 2026-01-12 | **Released** | Top 10 Knowledge Areas Distribution |
 | **v1.0.4** | 2026-01-12 | **Released** | Real Data Integration & Top 10 Areas |

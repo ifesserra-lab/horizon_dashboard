@@ -17,12 +17,15 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-001** | Listagem e Busca de Grupos | **Entregue** | v1.0.0 |
 | **US-002** | Detalhes do Grupo | **Entregue** | v1.0.0 |
 | **Fix** | Contraste e Tema Light (Acessibilidade) | **Entregue** | v1.0.2 |
-| **Fix** | Remoção de Avatares (Listagem) | **Entregue** | v1.0.3 |
+| **Fix** | Remoção de Avatares (Listagem) | **Entregue** | v1.1.0 |
 | **Task** | Dados Reais (research_groups_canonical.json) | **Entregue** | v1.0.4 |
 | **US-003** | Top 10 Áreas de Conhecimento (Old) | **Entregue** | v1.0.4 |
 | **US-011** | Top 10 Research Lines (Home) | **Entregue** | v1.0.6 |
 | **US-012** | Top 10 Research Lines (Areas) | **Entregue** | v1.0.6 |
 | **Fix** | Limpeza de KPIs (Remoção de % de tendência) | **Entregue** | v1.0.4 |
+| **US-015** | Separação de Membros (Atuais/Egressos) | **Ready to Merge** | PR #36 |
+| **Fix** | Dashboard: `v1.0.9` (Released). | **Entregue** | v1.0.9 |
+| **Fix** | Core: Stable. | **Entregue** | - |
 
 ---
 
