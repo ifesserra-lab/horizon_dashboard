@@ -7,8 +7,8 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
-| **v1.0.9** | 2026-01-12 | **Released** | Feature: Group Card Sorting & Avatar update + Icon Fix |
-| v1.0.8 | [PR #30](https://github.com/ifesserra-lab/horizon_dashboard/pull/30) | Fix: Empty Top 10 Knowledge Areas | [b5049c2](https://github.com/ifesserra-lab/horizon_dashboard/commit/b5049c2) |
+| **v1.0.10** | 2026-01-12 | **Released** | Feature: Member Lists Separation (Current vs Alumni) | [c0f18c4](https://github.com/ifesserra-lab/horizon_dashboard/commit/c0f18c4) |
+| **v1.0.9** | 2026-01-12 | **Released** | Feature: Group Card Sorting & Avatar update + Icon Fix | [01c2674](https://github.com/ifesserra-lab/horizon_dashboard/commit/01c2674) |
 | **v1.0.7** | 2026-01-12 | **Released** | Removal of Recent Groups & KA KPIs |
 | **v1.0.6** | 2026-01-12 | **Released** | Top 10 Knowledge Areas Distribution |
 | **v1.0.4** | 2026-01-12 | **Released** | Real Data Integration & Top 10 Areas |
@@ -33,6 +33,7 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **Fix** "Grupos Recentes" Removal (Entregue na v1.0.7)
     - [x] **Fix** Knowledge Areas KPI Removal (Entregue na v1.0.7)
     - [x] **Fix** Empty Top 10 Knowledge Areas (Entregue na v1.0.8)
+    - [x] **US-015** Separação de Membros (Atuais/Egressos) (Entregue na v1.0.10)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [ ] **US-003** Perfil do Pesquisador (Lattes UI)
