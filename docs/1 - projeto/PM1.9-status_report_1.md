@@ -1,13 +1,13 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.0.3 (R1)
+**Versão Relatada:** v1.0.4 (R1-Refinement)
 **Responsável:** Antigravity (Senior PM)
 
 ---
 
 # 1. Resumo Executivo
-A **Release R1 (Portal de Grupos)** foi entregue com sucesso e implantada em produção (v1.0.3). O sistema permite a busca unificada de grupos, visualização de detalhes e membros. A interface utiliza o design system "Premium Glassmorphism" e é totalmente responsiva.
+A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados reais (canonical) e melhorias na visualização da distribuição por área. A interface agora consome dados de 332 grupos de pesquisa.
 
 ---
 
@@ -18,6 +18,9 @@ A **Release R1 (Portal de Grupos)** foi entregue com sucesso e implantada em pro
 | **US-002** | Detalhes do Grupo | **Entregue** | v1.0.0 |
 | **Fix** | Contraste e Tema Light (Acessibilidade) | **Entregue** | v1.0.2 |
 | **Fix** | Remoção de Avatares (Listagem) | **Entregue** | v1.0.3 |
+| **Task** | Dados Reais (research_groups_canonical.json) | **Entregue** | v1.0.4 |
+| **US-003** | Top 10 Áreas de Conhecimento | **Entregue** | v1.0.4 |
+| **Fix** | Limpeza de KPIs (Remoção de % de tendência) | **Entregue** | v1.0.4 |
 
 ---
 
