@@ -65,9 +65,10 @@ Before moving a task to "In Progress":
 - [ ] **Design Assessment (Mandatory)**:
     - [ ] **Data Integrity Check**: The **Data Analyst** MUST verify if the proposed data structures support the required KPIs and visualization goals.
     - [ ] **Persona Alignment**: The **UX Designer** MUST confirm if the UI targets the specific needs of the stakeholders (Managers vs. Researchers).
-    - [ ] **Accessibility Check**: Confirm adherence to WCAG standards (contrast, semantic HTML, keyboard nav).
+    - [ ] **Accessibility Check**: Confirm strict adherence to **WCAG 2.1 AA** standards (contrast, semantic HTML, keyboard nav). **MANDATORY AND NON-NEGOTIABLE**.
     - [ ] **Question the User**: The Designer/Analyst MUST question the user about architectural or visualization decisions if `SI.3 Design` is ambiguous.
-    - [ ] **Structure Check**: Confirm implementation matches `src` folder structure defined in `SI.3 Design`.
+    - [ ] **Mobile First Check**: The **UX Designer** MUST confirm if the UI follows "Mobile First" principles, starting the design from the smallest screen size and progressively enhancing for larger ones.
+- [ ] **Structure Check**: Confirm implementation matches `src` folder structure defined in `SI.3 Design`.
 - [ ] **Hierarchy Check**: Confirm strict hierarchy: `Epic -> User Story -> Task`.
 - [ ] **Alignment Check**: ensure the Issue/User Story is aligned with **PM1.3 Release Plan**, **PM1.2 Scope** and **SI.1 Requirements**.
 - [ ] **Milestone Mapping**: The Issue MUST be assigned to a GitHub Milestone that corresponds directly to a Release defined in `PM1.3 Release Plan`.
@@ -113,6 +114,8 @@ Maintain the following artifacts throughout the lifecycle:
 - [ ] **Business Logic**: All business rules requirements must be satisfied and verified.
 - [ ] **Observability**: **MANDATORY**. All critical actions and state changes MUST be logged (Info/Error) with context.
 - [ ] **Design Patterns**: Apply the **Strategy Pattern** when multiple algorithms or behaviors are required for a specific task to ensure extensibility and reduce code duplication.
+- [ ] **Mobile First**: All UI components and layouts MUST be designed and implemented starting from the smallest screen size (Mobile) and progressively enhanced for larger screens using `min-width` media queries. Ad-hoc desktop-first styles (using `max-width`) are discouraged.
+- [ ] **WCAG Compliance**: All UI components MUST be strictly compliant with **WCAG 2.1 Level AA** standards. This includes semantic HTML, keyboard navigation, and color contrast. **MANDATORY AND NON-NEGOTIABLE**.
 
 ## 8. Pull Request Standards
 - [ ] **Process**:

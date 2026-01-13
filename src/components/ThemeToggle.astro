@@ -2,15 +2,13 @@
 ---
 
 <button
-  id="theme-toggle"
   type="button"
-  class="p-3 rounded-xl bg-border-main hover:bg-premium-accent/10 hover:text-premium-accent transition-all duration-300 group"
+  class="theme-toggle-btn p-3 rounded-xl bg-border-main hover:bg-premium-accent/10 hover:text-premium-accent transition-all duration-300 group"
   aria-label="Alternar tema entre claro e escuro"
 >
   <!-- Sun Icon (Light Mode) -->
   <svg
-    id="sun-icon"
-    class="w-5 h-5 hidden dark:block"
+    class="sun-icon w-5 h-5 hidden dark:block"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="none"
@@ -32,8 +30,7 @@
   
   <!-- Moon Icon (Dark Mode) -->
   <svg
-    id="moon-icon"
-    class="w-5 h-5 block dark:hidden"
+    class="moon-icon w-5 h-5 block dark:hidden"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="none"
@@ -47,7 +44,8 @@
 </button>
 
 <script>
-  const themeToggle = document.getElementById('theme-toggle');
+  // Select ALL theme toggle buttons
+  const themeToggles = document.querySelectorAll('.theme-toggle-btn');
   
   const handleToggleClick = () => {
     const element = document.documentElement;
@@ -56,9 +54,13 @@
     const isDark = element.classList.contains("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
     
-    // Update ARIA label dynamically if needed
-    themeToggle?.setAttribute('aria-label', isDark ? 'Ativar tema claro' : 'Ativar tema escuro');
+    // Update ARIA label for ALL buttons
+    themeToggles.forEach(btn => {
+      btn.setAttribute('aria-label', isDark ? 'Ativar tema claro' : 'Ativar tema escuro');
+    });
   };
 
-  themeToggle?.addEventListener('click', handleToggleClick);
+  themeToggles.forEach(btn => {
+    btn.addEventListener('click', handleToggleClick);
+  });
 </script>
