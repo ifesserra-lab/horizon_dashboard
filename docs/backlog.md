@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
+| **v1.0.11** | 2026-01-12 | **Released** | Fix: UI Regressions (Light Mode/Sidebar) & WCAG Improvements |
 | **v1.0.10** | 2026-01-12 | **Released** | Feature: Member Lists Separation (Current vs Alumni) | [c0f18c4](https://github.com/ifesserra-lab/horizon_dashboard/commit/c0f18c4) |
 | **v1.0.9** | 2026-01-12 | **Released** | Feature: Group Card Sorting & Avatar update + Icon Fix | [01c2674](https://github.com/ifesserra-lab/horizon_dashboard/commit/01c2674) |
 | **v1.0.7** | 2026-01-12 | **Released** | Removal of Recent Groups & KA KPIs |
