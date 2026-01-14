@@ -7,6 +7,8 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
+| **v1.1.1** | 2026-01-14 | **Released** | Feature: Accessibility Toggle (High Contrast / Grayscale) | [3652593](https://github.com/ifesserra-lab/horizon_dashboard/commit/3652593) |
+| **v1.1.0** | 2026-01-14 | **Released** | Feature: Project Team & Refined Sidebar | [868dba4](https://github.com/ifesserra-lab/horizon_dashboard/commit/868dba4) |
 | **v1.0.11** | 2026-01-12 | **Released** | Fix: UI Regressions (Light Mode/Sidebar) & WCAG Improvements |
 | **v1.0.10** | 2026-01-12 | **Released** | Feature: Member Lists Separation (Current vs Alumni) | [c0f18c4](https://github.com/ifesserra-lab/horizon_dashboard/commit/c0f18c4) |
 | **v1.0.9** | 2026-01-12 | **Released** | Feature: Group Card Sorting & Avatar update + Icon Fix | [01c2674](https://github.com/ifesserra-lab/horizon_dashboard/commit/01c2674) |
@@ -37,6 +39,11 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-015** Separação de Membros (Atuais/Egressos) (Entregue na v1.0.10)
     - [x] **US-006** Dashboard de Áreas de Conhecimento (Entregue na v1.0.6)
     - [x] **Task** Busca em Áreas de Conhecimento (Entregue na v1.0.8)
+    - [x] **US-016** Catálogo de Projetos (Ready)
+    - [x] **US-017** Detalhes do Projeto (Ready)
+    - [x] **US-018** Equipe nos Detalhes do Projeto (Entregue na v1.1.0)
+    - [x] **US-019** Recursos de Acessibilidade (Alto Contraste) (Entregue na v1.1.1)
+    - [ ] **US-020** Recursos para Baixa Visão (Aumento de Fonte) (Em Planejamento)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [ ] **US-003** Perfil do Pesquisador (Lattes UI)

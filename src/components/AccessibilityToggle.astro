@@ -26,34 +26,70 @@
   </button>
 
   <div
-    class="accessibility-dropdown absolute right-0 mt-2 w-56 glass-card p-2 hidden z-50 shadow-2xl origin-top-right transition-all duration-200 opacity-0 scale-95"
+    class="accessibility-dropdown absolute right-0 mt-2 w-64 glass-card p-3 hidden z-50 shadow-2xl origin-top-right transition-all duration-200 opacity-0 scale-95"
     role="menu"
     aria-orientation="vertical"
   >
-    <button
-      id="mode-default"
-      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium hover:bg-premium-accent/10 hover:text-premium-accent transition-colors"
-      role="menuitem"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"></path><path d="m9 12 2 2 4-4"></path></svg>
-      Modo Padrão
-    </button>
-    <button
-      id="mode-high-contrast"
-      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-      role="menuitem"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 18V6"></path><path d="M12 18A6 6 0 0 0 12 6"></path></svg>
-      Alto Contraste
-    </button>
-    <button
-      id="mode-grayscale"
-      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-      role="menuitem"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
-      Escala de Cinza
-    </button>
+    <!-- Visual Modes Section -->
+    <div class="mb-4">
+      <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted px-4 mb-2">Modos Visuais</p>
+      <div class="grid gap-1">
+        <button
+          id="mode-default"
+          class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium hover:bg-premium-accent/10 hover:text-premium-accent transition-colors"
+          role="menuitem"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"></path><path d="m9 12 2 2 4-4"></path></svg>
+          Padrão
+        </button>
+        <button
+          id="mode-high-contrast"
+          class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+          role="menuitem"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 18V6"></path><path d="M12 18A6 6 0 0 0 12 6"></path></svg>
+          Alto Contraste
+        </button>
+        <button
+          id="mode-grayscale"
+          class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+          role="menuitem"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
+          Escala de Cinza
+        </button>
+      </div>
+    </div>
+
+    <div class="h-px bg-border-main my-2"></div>
+
+    <!-- Font Size Section -->
+    <div>
+      <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted px-4 mb-2">Tamanho do Texto</p>
+      <div class="grid grid-cols-3 gap-1 px-1">
+        <button
+          id="size-base"
+          class="p-2 rounded-lg text-xs font-bold transition-all border border-transparent"
+          title="Tamanho Normal (100%)"
+        >
+          A
+        </button>
+        <button
+          id="size-lg"
+          class="p-2 rounded-lg text-base font-bold transition-all border border-transparent"
+          title="Tamanho Grande (125%)"
+        >
+          A+
+        </button>
+        <button
+          id="size-xl"
+          class="p-2 rounded-lg text-xl font-bold transition-all border border-transparent"
+          title="Tamanho Extra Grande (150%)"
+        >
+          A++
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -63,9 +99,16 @@
   containers.forEach(container => {
     const btn = container.querySelector('.accessibility-toggle-btn') as HTMLButtonElement;
     const dropdown = container.querySelector('.accessibility-dropdown') as HTMLDivElement;
+    
+    // Selectors for Visual Modes
     const defaultBtn = container.querySelector('#mode-default');
     const hcBtn = container.querySelector('#mode-high-contrast');
     const grayBtn = container.querySelector('#mode-grayscale');
+
+    // Selectors for Font Sizes
+    const sizeBaseBtn = container.querySelector('#size-base');
+    const sizeLgBtn = container.querySelector('#size-lg');
+    const sizeXlBtn = container.querySelector('#size-xl');
 
     const toggleDropdown = () => {
       const isHidden = dropdown.classList.contains('hidden');
@@ -89,39 +132,49 @@
       toggleDropdown();
     });
 
-    document.addEventListener('click', () => {
-      if (!dropdown.classList.contains('hidden')) {
+    document.addEventListener('click', (e) => {
+      if (!dropdown.classList.contains('hidden') && !container.contains(e.target as Node)) {
         toggleDropdown();
       }
     });
 
     const updateClasses = () => {
+      // Visual Modes
       const hc = localStorage.getItem('high-contrast') === 'true';
       const gray = localStorage.getItem('grayscale') === 'true';
       
-      if (hc) {
-        document.documentElement.classList.add('high-contrast');
-        hcBtn?.classList.add('bg-premium-accent/20', 'text-premium-accent');
-      } else {
-        document.documentElement.classList.remove('high-contrast');
-        hcBtn?.classList.remove('bg-premium-accent/20', 'text-premium-accent');
-      }
+      document.documentElement.classList.toggle('high-contrast', hc);
+      document.documentElement.classList.toggle('grayscale-mode', gray);
 
-      if (gray) {
-        document.documentElement.classList.add('grayscale-mode');
-        grayBtn?.classList.add('bg-premium-accent/20', 'text-premium-accent');
-      } else {
-        document.documentElement.classList.remove('grayscale-mode');
-        grayBtn?.classList.remove('bg-premium-accent/20', 'text-premium-accent');
-      }
+      hcBtn?.classList.toggle('bg-premium-accent/20', hc);
+      hcBtn?.classList.toggle('text-premium-accent', hc);
+      grayBtn?.classList.toggle('bg-premium-accent/20', gray);
+      grayBtn?.classList.toggle('text-premium-accent', gray);
+      defaultBtn?.classList.toggle('bg-premium-accent/10', !hc && !gray);
+      defaultBtn?.classList.toggle('text-premium-accent', !hc && !gray);
+
+      // Font Scaling
+      const textScale = localStorage.getItem('text-scale') || 'base';
+      const scales = ['base', 'lg', 'xl'];
       
-      if (!hc && !gray) {
-        defaultBtn?.classList.add('bg-premium-accent/10', 'text-premium-accent');
-      } else {
-        defaultBtn?.classList.remove('bg-premium-accent/10', 'text-premium-accent');
-      }
+      scales.forEach(s => {
+        document.documentElement.classList.toggle(`text-scale-${s}`, textScale === s);
+      });
+
+      sizeBaseBtn?.classList.toggle('bg-premium-accent/20', textScale === 'base');
+      sizeBaseBtn?.classList.toggle('text-premium-accent', textScale === 'base');
+      sizeBaseBtn?.classList.toggle('border-premium-accent', textScale === 'base');
+
+      sizeLgBtn?.classList.toggle('bg-premium-accent/20', textScale === 'lg');
+      sizeLgBtn?.classList.toggle('text-premium-accent', textScale === 'lg');
+      sizeLgBtn?.classList.toggle('border-premium-accent', textScale === 'lg');
+
+      sizeXlBtn?.classList.toggle('bg-premium-accent/20', textScale === 'xl');
+      sizeXlBtn?.classList.toggle('text-premium-accent', textScale === 'xl');
+      sizeXlBtn?.classList.toggle('border-premium-accent', textScale === 'xl');
     };
 
+    // Listeners for Visual Modes
     hcBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       const current = localStorage.getItem('high-contrast') === 'true';
@@ -143,7 +196,24 @@
       updateClasses();
     });
 
-    // Initial state on components load (for subsequent navigations)
+    // Listeners for Font Sizes
+    sizeBaseBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem('text-scale', 'base');
+      updateClasses();
+    });
+    sizeLgBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem('text-scale', 'lg');
+      updateClasses();
+    });
+    sizeXlBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem('text-scale', 'xl');
+      updateClasses();
+    });
+
+    // Initial state on components load
     updateClasses();
   });
 </script>

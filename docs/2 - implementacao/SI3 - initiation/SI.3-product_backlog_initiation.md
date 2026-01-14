@@ -632,3 +632,25 @@ Como um usuário com baixa visão ou daltonismo, quero poder ativar modos de vis
 - **UI/UX**:
     - [ ] Localizar o seletor próximo ao `ThemeToggle`.
     - [ ] Respeitar os padrões WCAG 2.1 AA de contraste.
+
+### US-020 – Recursos para Baixa Visão (Magnificação de Texto)
+```yaml
+id: US-020
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [RNF-02]
+tags: [type:feature, area:frontend, component:accessibility]
+```
+
+#### Descrição
+Como um usuário com baixa visão, quero poder aumentar o tamanho da fonte e o espaçamento entre linhas globalmente, para que eu possa ler o conteúdo confortavelmente sem depender apenas do zoom do navegador.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Adicionar opção "Aumentar Texto" ao menu de acessibilidade.
+    - [ ] Implementar pelo menos 2 níveis de magnificação (Ex: 125%, 150%).
+    - [ ] Persistir a escolha no `localStorage`.
+- **UI/UX**:
+    - [ ] Garantir que o layout não quebre ao aumentar a fonte (design responsivo).
+    - [ ] Prover feedback visual no menu para a opção selecionada.
