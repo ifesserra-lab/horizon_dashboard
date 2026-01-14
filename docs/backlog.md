@@ -7,7 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
-| **v1.1.3** | 2026-01-14 | **Released** | Feature: Social SEO (Open Graph Tags) | [d169ac5](https://github.com/ifesserra-lab/horizon_dashboard/commit/d169ac5) |
+| **v1.1.3** | 2026-01-14 | **Released** | Feature: Social SEO (Open Graph Tags) | [eedb9d1](https://github.com/ifesserra-lab/horizon_dashboard/commit/eedb9d1) |
 | **v1.1.2** | 2026-01-14 | **Released** | Feature: Low Vision Support (Text Scaling) | [abd03db](https://github.com/ifesserra-lab/horizon_dashboard/commit/abd03db) |
 | **v1.1.1** | 2026-01-14 | **Released** | Feature: Accessibility Toggle (High Contrast / Grayscale) | [3652593](https://github.com/ifesserra-lab/horizon_dashboard/commit/3652593) |
 | **v1.1.0** | 2026-01-14 | **Released** | Feature: Project Team & Refined Sidebar | [868dba4](https://github.com/ifesserra-lab/horizon_dashboard/commit/868dba4) |
