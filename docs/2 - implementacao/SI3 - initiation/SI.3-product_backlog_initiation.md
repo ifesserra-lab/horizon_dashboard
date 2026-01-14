@@ -673,3 +673,22 @@ Como um gestor de qualidade, quero realizar uma auditoria Lighthouse em páginas
     - [ ] Gerar relatório Lighthouse para a Home e listagem de Projetos.
     - [ ] Identificar oportunidades de melhoria (Score < 90).
     - [ ] Documentar os resultados no walkthrough.
+
+### US-022 – SEO Social (Open Graph Tags)
+```yaml
+id: US-022
+milestone: R1
+prioridade: Baixa
+tamanho: 1
+origem: [US-021 Audit]
+tags: [type:feature, area:seo, component:meta]
+```
+
+#### Descrição
+Como um produtor de conteúdo, quero que o portal tenha tags Open Graph para que, ao compartilhar links em redes sociais, o título, a descrição e uma imagem de pré-visualização sejam exibidos corretamente.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Adicionar tags `og:title`, `og:description`, `og:image` e `og:url` ao `Layout.astro`.
+    - [ ] Adicionar tags do Twitter (Twitter Cards).
+    - [ ] Garantir que o título da página seja usado dinamicamente na tag `og:title`.

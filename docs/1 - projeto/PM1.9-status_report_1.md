@@ -1,7 +1,7 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.1.2 (US-020: Low Vision)
+**Versão Relatada:** v1.1.3 (US-022: Social SEO)
 **Responsável:** Antigravity (Senior PM)
 
 ---
@@ -32,6 +32,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-019** | Recursos de Acessibilidade | **Entregue** | v1.1.1 |
 | **US-020** | Suporte a Baixa Visão (Text Scaling) | **Entregue** | v1.1.2 |
 | **US-021** | Auditoria de Qualidade (Lighthouse) | **Entregue** | v1.1.2 |
+| **US-022** | SEO Social (Open Graph Tags) | **Entregue** | v1.1.3 |
 
 ---
 
