@@ -1,7 +1,7 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.0.6 (R1-Refinement)
+**Versão Relatada:** v1.1.1 (US-019: Accessibility)
 **Responsável:** Antigravity (Senior PM)
 
 ---
@@ -28,7 +28,8 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **Task** | Busca em Áreas de Conhecimento | **Entregue** | v1.0.8 |
 | **Fix** | Dashboard: `v1.0.9` (Released). | **Entregue** | v1.0.9 |
 | **Fix** | Core: Stable. | **Entregue** | - |
-| **US-018** | Equipe nos Detalhes do Projeto | **Em Progresso** | - |
+| **US-018** | Equipe nos Detalhes do Projeto | **Entregue** | v1.1.0 |
+| **US-019** | Recursos de Acessibilidade | **Entregue** | v1.1.1 |
 
 ---
 

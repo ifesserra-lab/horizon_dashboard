@@ -138,7 +138,8 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-015** | Separação de Membros | **Done** | v1.0.10 |
 | **US-016** | Catálogo de Projetos de Pesquisa | **Ready** | - |
 | **US-017** | Detalhes do Projeto de Pesquisa | **Ready** | 1.0.13 |
-| **US-018** | Equipe nos Detalhes do Projeto | **Ready** | - |
+| **US-018** | Equipe nos Detalhes do Projeto | **Done** | v1.1.0 |
+| **US-019** | Recursos de Acessibilidade | **Ready** | - |
 ### US-006 – Dashboard de Áreas de Conhecimento
 ```yaml
 id: US-006
@@ -604,3 +605,30 @@ Desenvolver um novo pipeline que extrai URLs de espelho de grupos do banco de da
 - [x] US-005 e US-001 possuem arquitetura definida em `SI.3-design.md`.
 - [x] Critérios de Teste e Deploy explícitos.
 - [x] Origem rastreada para `SI.1`.
+
+---
+
+## Epic 7: Acessibilidade (Release 1 Extension)
+**Objetivo**: Garantir que a plataforma seja inclusiva para usuários com necessidades especiais.
+
+### US-019 – Recursos de Acessibilidade (Baixa Visão e Daltonismo)
+```yaml
+id: US-019
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RNF-02]
+tags: [type:feature, area:frontend, component:accessibility]
+```
+
+#### Descrição
+Como um usuário com baixa visão ou daltonismo, quero poder ativar modos de visualização específicos (Alto Contraste / Filtros de Daltonismo) para navegar no site com maior facilidade.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Implementar seletor de Acessibilidade (Alto Contraste e/ou Filtros).
+    - [ ] Garantir que as configurações sejam persistidas no `localStorage`.
+    - [ ] Aplicar modificações via CSS (variáveis ou filtros) de forma global.
+- **UI/UX**:
+    - [ ] Localizar o seletor próximo ao `ThemeToggle`.
+    - [ ] Respeitar os padrões WCAG 2.1 AA de contraste.

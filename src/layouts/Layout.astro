@@ -7,6 +7,7 @@ interface Props {
 const { title, breadcrumbReplacements } = Astro.props;
 import '../styles/global.css';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import AccessibilityToggle from '../components/AccessibilityToggle.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 ---
 
@@ -40,6 +41,14 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 				document.documentElement.classList.add('dark');
 			}
 			window.localStorage.setItem('theme', theme);
+
+			// Accessibility logic (Critical for preventing FOUC)
+			if (localStorage.getItem('high-contrast') === 'true') {
+				document.documentElement.classList.add('high-contrast');
+			}
+			if (localStorage.getItem('grayscale') === 'true') {
+				document.documentElement.classList.add('grayscale-mode');
+			}
 		</script>
 	</head>
 	<body class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300">
@@ -57,6 +66,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 					<h1 class="text-lg font-['Outfit'] font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-main to-slate-400">Horizon</h1>
 				</div>
 				<div class="flex items-center gap-4">
+					<AccessibilityToggle />
 					<ThemeToggle />
 					<label for="mobile-menu-toggle" class="p-2 hover:bg-premium-accent/10 rounded-lg transition-colors cursor-pointer" aria-label="Abrir menu">
 						<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +175,8 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 			<!-- Main Content -->
 			<div class="flex-1 flex flex-col h-screen overflow-hidden">
-				<header role="banner" class="hidden md:flex h-16 border-b border-border-main glass-card rounded-none border-x-0 items-center justify-end px-8 z-10 transition-[padding] duration-300">
+				<header role="banner" class="hidden md:flex h-16 border-b border-border-main glass-card rounded-none border-x-0 items-center justify-end px-8 z-10 transition-[padding] duration-300 gap-4">
+					<AccessibilityToggle />
 					<ThemeToggle />
 				</header>
 				<main id="main-content" role="main" class="flex-1 p-4 md:p-8 overflow-y-auto outline-none">

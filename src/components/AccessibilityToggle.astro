@@ -1,0 +1,149 @@
+---
+---
+
+<div class="relative inline-block accessibility-menu-container">
+  <button
+    type="button"
+    class="accessibility-toggle-btn p-3 rounded-xl bg-border-main hover:bg-premium-accent/10 hover:text-premium-accent transition-all duration-300 group"
+    aria-label="Opções de acessibilidade"
+    aria-expanded="false"
+    aria-haspopup="true"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M12 8v8"></path>
+      <path d="M8 12h8"></path>
+    </svg>
+  </button>
+
+  <div
+    class="accessibility-dropdown absolute right-0 mt-2 w-56 glass-card p-2 hidden z-50 shadow-2xl origin-top-right transition-all duration-200 opacity-0 scale-95"
+    role="menu"
+    aria-orientation="vertical"
+  >
+    <button
+      id="mode-default"
+      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium hover:bg-premium-accent/10 hover:text-premium-accent transition-colors"
+      role="menuitem"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"></path><path d="m9 12 2 2 4-4"></path></svg>
+      Modo Padrão
+    </button>
+    <button
+      id="mode-high-contrast"
+      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+      role="menuitem"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 18V6"></path><path d="M12 18A6 6 0 0 0 12 6"></path></svg>
+      Alto Contraste
+    </button>
+    <button
+      id="mode-grayscale"
+      class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+      role="menuitem"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
+      Escala de Cinza
+    </button>
+  </div>
+</div>
+
+<script>
+  const containers = document.querySelectorAll('.accessibility-menu-container');
+  
+  containers.forEach(container => {
+    const btn = container.querySelector('.accessibility-toggle-btn') as HTMLButtonElement;
+    const dropdown = container.querySelector('.accessibility-dropdown') as HTMLDivElement;
+    const defaultBtn = container.querySelector('#mode-default');
+    const hcBtn = container.querySelector('#mode-high-contrast');
+    const grayBtn = container.querySelector('#mode-grayscale');
+
+    const toggleDropdown = () => {
+      const isHidden = dropdown.classList.contains('hidden');
+      if (isHidden) {
+        dropdown.classList.remove('hidden');
+        setTimeout(() => {
+          dropdown.classList.remove('opacity-0', 'scale-95');
+          dropdown.classList.add('opacity-100', 'scale-100');
+        }, 10);
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        dropdown.classList.add('opacity-0', 'scale-95');
+        dropdown.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => dropdown.classList.add('hidden'), 200);
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    document.addEventListener('click', () => {
+      if (!dropdown.classList.contains('hidden')) {
+        toggleDropdown();
+      }
+    });
+
+    const updateClasses = () => {
+      const hc = localStorage.getItem('high-contrast') === 'true';
+      const gray = localStorage.getItem('grayscale') === 'true';
+      
+      if (hc) {
+        document.documentElement.classList.add('high-contrast');
+        hcBtn?.classList.add('bg-premium-accent/20', 'text-premium-accent');
+      } else {
+        document.documentElement.classList.remove('high-contrast');
+        hcBtn?.classList.remove('bg-premium-accent/20', 'text-premium-accent');
+      }
+
+      if (gray) {
+        document.documentElement.classList.add('grayscale-mode');
+        grayBtn?.classList.add('bg-premium-accent/20', 'text-premium-accent');
+      } else {
+        document.documentElement.classList.remove('grayscale-mode');
+        grayBtn?.classList.remove('bg-premium-accent/20', 'text-premium-accent');
+      }
+      
+      if (!hc && !gray) {
+        defaultBtn?.classList.add('bg-premium-accent/10', 'text-premium-accent');
+      } else {
+        defaultBtn?.classList.remove('bg-premium-accent/10', 'text-premium-accent');
+      }
+    };
+
+    hcBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = localStorage.getItem('high-contrast') === 'true';
+      localStorage.setItem('high-contrast', (!current).toString());
+      updateClasses();
+    });
+
+    grayBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = localStorage.getItem('grayscale') === 'true';
+      localStorage.setItem('grayscale', (!current).toString());
+      updateClasses();
+    });
+
+    defaultBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem('high-contrast', 'false');
+      localStorage.setItem('grayscale', 'false');
+      updateClasses();
+    });
+
+    // Initial state on components load (for subsequent navigations)
+    updateClasses();
+  });
+</script>
