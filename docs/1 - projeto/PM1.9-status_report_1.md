@@ -28,6 +28,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **Task** | Busca em Áreas de Conhecimento | **Entregue** | v1.0.8 |
 | **Fix** | Dashboard: `v1.0.9` (Released). | **Entregue** | v1.0.9 |
 | **Fix** | Core: Stable. | **Entregue** | - |
+| **US-018** | Equipe nos Detalhes do Projeto | **Em Progresso** | - |
 
 ---
 

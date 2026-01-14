@@ -137,7 +137,8 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 |
 | **US-016** | Catálogo de Projetos de Pesquisa | **Ready** | - |
-| US-017 | Detalhes do Projeto de Pesquisa | Ready | 1.0.13 |
+| **US-017** | Detalhes do Projeto de Pesquisa | **Ready** | 1.0.13 |
+| **US-018** | Equipe nos Detalhes do Projeto | **Ready** | - |
 ### US-006 – Dashboard de Áreas de Conhecimento
 ```yaml
 id: US-006

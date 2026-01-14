@@ -52,11 +52,6 @@ const currentStatusStyle = statusStyles[project.status as keyof typeof statusSty
 							<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
 						</div>
 						<div>
-							<div class="flex flex-wrap gap-2 mb-2">
-								<span class={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${currentStatusStyle}`}>
-									{project.status === 'active' ? 'Ativo' : project.status === 'concluded' ? 'Concluído' : project.status}
-								</span>
-							</div>
 							<h1 id="project-title" class="text-2xl md:text-3xl font-bold font-['Outfit'] text-text-main leading-tight">{project.name}</h1>
 						</div>
 					</div>
@@ -81,33 +76,198 @@ const currentStatusStyle = statusStyles[project.status as keyof typeof statusSty
 					</div>
 				</div>
 
-				<div class="prose dark:prose-invert max-w-none">
-					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">Sobre o Projeto</h4>
-					<p class="text-text-secondary leading-relaxed whitespace-pre-wrap">
-						{project.description || "Este projeto de pesquisa foca em estudos avançados e desenvolvimento científico na sua respectiva área, contribuindo para o ecossistema acadêmico da instituição."}
-					</p>
-				</div>
+				{project.description && (
+					<div class="prose dark:prose-invert max-w-none">
+						<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">Sobre o Projeto</h4>
+						<p class="text-text-secondary leading-relaxed whitespace-pre-wrap">
+							{project.description}
+						</p>
+					</div>
+				)}
 			</article>
+
+			<!-- Members Section -->
+			<section aria-labelledby="members-title" class="space-y-10">
+				<div>
+					<h3 id="members-title" class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">Equipe do Projeto</h3>
+					
+					{/* Researchers Section */}
+					{(project.team?.filter(m => m.roles.includes('Researcher') && !m.roles.includes('Coordinator')) || []).length > 0 && (
+						<div class="mb-12">
+							<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+								<span class="w-1.5 h-6 bg-premium-accent/60 rounded-full"></span>
+								Pesquisadores
+							</h4>
+
+							{/* Current Researchers */}
+							{project.team?.filter(m => m.roles.includes('Researcher') && !m.roles.includes('Coordinator') && !m.end_date).length > 0 && (
+								<div class="mb-8">
+									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Atuais</h5>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{project.team
+											.filter(m => m.roles.includes('Researcher') && !m.roles.includes('Coordinator') && !m.end_date)
+											.map(member => (
+											<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
+												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
+													{member.person_name.charAt(0)}
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">{member.person_name}</h5>
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														Pesquisador
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* Alumni Researchers */}
+							{project.team?.filter(m => m.roles.includes('Researcher') && !m.roles.includes('Coordinator') && m.end_date).length > 0 && (
+								<div>
+									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Egressos</h5>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{project.team
+											.filter(m => m.roles.includes('Researcher') && !m.roles.includes('Coordinator') && m.end_date)
+											.map(member => (
+											<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
+												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
+													{member.person_name.charAt(0)}
+													<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center" title="Egresso">
+														<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+													</span>
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">{member.person_name}</h5>
+														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">Egresso</span>
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														Pesquisador
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+
+					{/* Students Section */}
+					{(project.team?.filter(m => m.roles.includes('Student')) || []).length > 0 && (
+						<div class="mb-12">
+							<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+								<span class="w-1.5 h-6 bg-premium-purple rounded-full"></span>
+								Estudantes
+							</h4>
+
+							{/* Current Students */}
+							{project.team?.filter(m => m.roles.includes('Student') && !m.end_date).length > 0 && (
+								<div class="mb-8">
+									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Atuais</h5>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{project.team
+											.filter(m => m.roles.includes('Student') && !m.end_date)
+											.map(member => (
+											<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
+												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
+													{member.person_name.charAt(0)}
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">{member.person_name}</h5>
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														Estudante
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* Alumni Students */}
+							{project.team?.filter(m => m.roles.includes('Student') && m.end_date).length > 0 && (
+								<div>
+									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Egressos</h5>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{project.team
+											.filter(m => m.roles.includes('Student') && m.end_date)
+											.map(member => (
+											<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
+												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
+													{member.person_name.charAt(0)}
+													<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center" title="Egresso">
+														<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+													</span>
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">{member.person_name}</h5>
+														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">Egresso</span>
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														Estudante
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+				</div>
+			</section>
 		</div>
 
 		<aside class="w-full lg:w-80 space-y-6">
+			{/* Leadership Section */}
+			{project.team?.filter(m => m.roles.includes('Coordinator')).length > 0 && (
+				<section class="bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-premium-accent/20 rounded-3xl p-6 backdrop-blur-md" aria-labelledby="leadership-title">
+					<h4 id="leadership-title" class="text-text-main font-bold mb-4">Liderança</h4>
+					<div class="space-y-4">
+						{project.team
+							?.filter(m => m.roles.includes('Coordinator'))
+							.map(leader => (
+							<div class="flex items-center gap-3 p-3 bg-white/30 dark:bg-white/5 rounded-2xl border border-border-main shadow-sm transition-all hover:bg-white/40 dark:hover:bg-white/10">
+								<div aria-hidden="true" class="w-10 h-10 rounded-full bg-premium-accent flex items-center justify-center text-white font-bold text-sm">
+									{leader.person_name.charAt(0)}
+								</div>
+								<div class="overflow-hidden">
+									<p class="text-xs font-bold text-text-main truncate text-pretty">{leader.person_name}</p>
+									<p class="text-[10px] text-premium-accent font-bold">Coordenador</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</section>
+			)}
+
 			<section class="glass-card p-6" aria-labelledby="additional-info-title">
-				<h4 id="additional-info-title" class="text-text-main font-bold mb-4">Informações Técnicas</h4>
+				<h4 id="additional-info-title" class="text-text-main font-bold mb-4">Informações Adicionais</h4>
 				<div class="space-y-4">
+					<div class="flex justify-between text-xs items-center">
+						<span class="text-text-secondary font-bold text-left">Status</span>
+						<span class={`px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-[10px] ${
+							(project.status === 'active' || project.status === 'ativo') 
+								? 'bg-green-500/10 text-green-500 border border-green-500/20' 
+								: 'bg-slate-500/10 text-text-secondary border border-border-main'
+						}`}>
+							{project.status === 'active' || project.status === 'ativo' ? 'Ativo' : (project.status === 'concluded' || project.status === 'concluído' ? 'Concluído' : project.status)}
+						</span>
+					</div>
 					<div class="flex justify-between text-xs">
 						<span class="text-text-secondary font-bold text-left">Tipo</span>
-						<span class="text-text-main font-bold text-right">Projeto de Pesquisa</span>
+						<span class="text-text-main font-bold text-right italic">
+							{project.initiative_type?.name === 'Research Project' ? 'Projeto de pesquisa' : (project.initiative_type?.name || 'Projeto de pesquisa')}
+						</span>
 					</div>
-					<div class="flex justify-between text-xs">
-						<span class="text-text-secondary font-bold text-left">Tipo ID</span>
-						<span class="text-text-main font-bold text-right">{project.initiative_type_id}</span>
-					</div>
-					{project.organization_id && (
-						<div class="flex justify-between text-xs">
-							<span class="text-text-secondary font-bold text-left">Organização</span>
-							<span class="text-text-main font-bold text-right">{project.organization_id}</span>
-						</div>
-					)}
 				</div>
 			</section>
 		</aside>
