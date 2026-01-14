@@ -31,6 +31,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-018** | Equipe nos Detalhes do Projeto | **Entregue** | v1.1.0 |
 | **US-019** | Recursos de Acessibilidade | **Entregue** | v1.1.1 |
 | **US-020** | Suporte a Baixa Visão (Text Scaling) | **Entregue** | v1.1.2 |
+| **US-021** | Auditoria de Qualidade (Lighthouse) | **Entregue** | v1.1.2 |
 
 ---
 

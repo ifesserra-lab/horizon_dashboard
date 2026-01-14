@@ -654,3 +654,22 @@ Como um usuário com baixa visão, quero poder aumentar o tamanho da fonte e o e
 - **UI/UX**:
     - [ ] Garantir que o layout não quebre ao aumentar a fonte (design responsivo).
     - [ ] Prover feedback visual no menu para a opção selecionada.
+
+### US-021 – Auditoria de Qualidade (Lighthouse)
+```yaml
+id: US-021
+milestone: R1
+prioridade: Média
+tamanho: 2
+origem: [RNF-07]
+tags: [type:task, area:quality, component:audit]
+```
+
+#### Descrição
+Como um gestor de qualidade, quero realizar uma auditoria Lighthouse em páginas chave para garantir que a performance, acessibilidade e SEO atendam aos padrões institucionais.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Gerar relatório Lighthouse para a Home e listagem de Projetos.
+    - [ ] Identificar oportunidades de melhoria (Score < 90).
+    - [ ] Documentar os resultados no walkthrough.
