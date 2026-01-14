@@ -692,3 +692,21 @@ Como um produtor de conteúdo, quero que o portal tenha tags Open Graph para que
     - [ ] Adicionar tags `og:title`, `og:description`, `og:image` e `og:url` ao `Layout.astro`.
     - [ ] Adicionar tags do Twitter (Twitter Cards).
     - [ ] Garantir que o título da página seja usado dinamicamente na tag `og:title`.
+
+### US-023 – Bugfix: Quebra de linha no Dashboard
+```yaml
+id: US-023
+milestone: R1
+prioridade: Critica
+tamanho: 1
+origem: [User Feedback]
+tags: [type:bugfix, area:ui, component:home]
+```
+
+#### Descrição
+A frase de boas-vindas no dashboard está sofrendo uma quebra de linha indesejada em resoluções padrão, o que compromete a harmonia visual.
+
+#### Critérios de Aceitação
+- [ ] Eliminar a quebra de linha indesejada em resoluções desktop.
+- [ ] Manter a responsividade para telas menores.
+- [ ] Usar `text-balance` ou ajuste de largura máxima para otimização tipográfica.
