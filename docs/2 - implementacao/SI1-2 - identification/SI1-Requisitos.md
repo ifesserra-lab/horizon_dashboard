@@ -54,6 +54,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RF-22** | O sistema deve exibir, no detalhamento do grupo de pesquisa, a lista de membros separada por função: Pesquisadores, Estudantes e Técnicos. | Detalhamento de Grupo | Alta |
 | **RF-23** | O sistema deve identificar visualmente os membros egressos (ex-membros com data de término preenchida) no detalhamento do grupo de pesquisa. | Detalhamento de Grupo | Média |
 | **RF-24** | O sistema deve permitir a separação estrutural de membros ativos e egressos em sub-listas dentro de suas funções (Pesquisadores e Estudantes). | Detalhamento de Grupo | Alta |
+| **RF-25** | O sistema deve exibir uma página dedicada para 'Projetos de Pesquisa', listando todos os projetos e permitindo a busca/filtragem. | Catálogo de Projetos | Alta |
 
 ---
 

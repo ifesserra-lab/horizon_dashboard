@@ -136,6 +136,7 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-011** | Top 10 Research Lines (Home) | **Done** | v1.0.6 |
 | **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 |
+| **US-016** | Catálogo de Projetos de Pesquisa | **Ready** | - |
 ### US-006 – Dashboard de Áreas de Conhecimento
 ```yaml
 id: US-006
@@ -213,6 +214,29 @@ Refatorar a seção de membros na página de detalhes do grupo (`src/pages/group
 - **UI/UX**:
     - [ ] Títulos de seção claros para cada grupo.
     - [ ] Manter o design dos cards de membros existente.
+
+### US-016 – Catálogo de Projetos de Pesquisa
+```yaml
+id: US-016
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-25]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+#### Descrição
+Implementar uma página para listagem de todos os projetos de pesquisa (iniciativas) da instituição, permitindo a descoberta de temas e parcerias.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Visualização em Cards com Nome do Projeto, Status, Datas e Vínculos.
+    - [ ] Busca textual por Nome do Projeto.
+    - [ ] Filtro por Status (ativo/concluído).
+- **UI/UX**:
+    - [ ] Design responsivo (Mobile/Desktop).
+    - [ ] Estilo premium com glassmorphism.
+    - [ ] Badge de Status colorido de acordo com o estado do projeto.
 
 ### US-014 – Identificação de Egressos (Detalhes do Grupo)
 ```yaml
