@@ -1,5 +1,5 @@
 # SI.1 – Especificação dos Requisitos do Software
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Versão:** 1.0
 **Data:** 06/01/2026
 **Responsável:** Antigravity (Senior Analyst)
@@ -7,14 +7,15 @@
 ---
 
 ## 1. Objetivo do Documento
-Registrar os requisitos funcionais e não funcionais do sistema Horizon ETL, focando na extração, transformação e carga de dados de múltiplas fontes acadêmicas.
+Registrar os requisitos funcionais e não funcionais do sistema Horizon Dashboard, focando na visualização de dados acadêmicos.
 
 ---
 
 ## 2. Escopo do Sistema
-O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de informações de pesquisa e extensão.
-- **Entradas**: SigPesq, Lattes, FAPES, Google Scholar.
-- **Saída**: Banco de Dados Unificado (Supabase) para consumo por outros sistemas.
+O **Horizon Dashboard** é uma interface de visualização que automatiza a apresentação de informações de pesquisa e extensão.
+
+- **Entrada**: Arquivos JSON Canônicos (initiatives, researchers, groups).
+- **Saída**: Dashboard Web Responsivo e Acessível.
 
 ---
 
@@ -31,7 +32,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 
 | ID | Requisito | Critério de Aceitação | Origem |
 |----|-----------|------------------------|--------|
-| **RF-01** | O sistema deve extrair dados de projetos do SigPesq. | Projetos persistidos no Supabase com metadados completos. | PM1.3 (R1) |
+| **RF-01** | O sistema deve exibir dados de projetos de pesquisa. | Projetos exibidos no Dashboard com metadados completos. | PM1.3 (R1) |
 | **RF-02** | O sistema deve extrair dados curriculares da Plataforma Lattes. | Perfil, formação e produções carregadas para pesquisadores listados. | PM1.3 (R2) |
 | **RF-04** | O sistema deve extrair dados de execução (Projetos/Bolsas/Compras) da FAPES. | Dados financeiros e de bolsistas vinculados persistidos. | PM1.3 (R3) |
 | **RF-05** | O sistema deve coletar metadados do Google Scholar. | Citações e índice-h atualizados. | PM1.3 (R4) |
@@ -39,7 +40,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RF-07** | O sistema deve exportar dados de grupos de pesquisa de uma Unidade Organizacional para JSON. | Arquivo JSON gerado seguindo schema do ResearchGroup. | User Req. |
 | **RF-08** | O sistema deve exportar dados canônicos (Organização, Campus, Áreas) para arquivos JSON separados. | Arquivos `organizations.json`, `campuses.json`, `knowledge_areas.json` gerados. | User Req. |
 | **RF-09** | O sistema deve extrair e atualizar dados de grupos de pesquisa do CNPq DGP (identificação, linhas de pesquisa, membros). | Dados do grupo (espelho), membros e **linhas de pesquisa (mapeadas para Áreas do Conhecimento)** atualizados no banco de dados via `dgp_cnpq_lib`. | User Req. |
-| **RF-10** | O sistema deve identificar e sincronizar membros egressos do CNPq, registrando corretamente as datas de início e fim de participação. | Membros egressos identificados e datas de participação (início/fim) persistidas no Supabase. | User Req. |
+| **RF-10** | O sistema deve identificar e exibir membros egressos dos grupos de pesquisa, registrando corretamente as datas de início e fim de participação. | Membros egressos identificados e datas de participação (início/fim) visíveis. | User Req. |
 | **RF-11** | O Dashboard deve ser acessível e seguir as diretrizes WCAG 2.1 Nível AA. | Contraste adequado, navegação por teclado e compatibilidade com leitores de tela verificados. | UX Design |
 | **RF-12** | O sistema deve possuir alto desempenho de carregamento (Lighthouse > 90). | LCP < 2.5s e TBT < 200ms em conexões 4G estáveis. | UX Design |
 | **RF-13** | O sistema deve oferecer visualizações de dados segmentadas por perfil (Personas). | Dashboards específicos para Gestores (macros) e Pesquisadores (detalhados). | Data Analyst |
@@ -66,7 +67,7 @@ O **Horizon ETL** é uma infraestrutura de dados que automatiza a coleta de info
 | **RNF-01** | Idempotência | Re-execução de pipelines não deve duplicar dados. | `UPSERT` obrigatório. |
 | **RNF-02** | Resiliência | Pipelines devem suportar falhas de rede (retries). | Prefect Retries. |
 | **RNF-03** | Arquitetura | Código desacoplado seguindo Clean/Hexagonal Arch. | Modules `etl`, `core`. |
-| **RNF-04** | Stack | Astro, Tailwind, Node.js, Supabase (Source). | PM1.0 |
+| **RNF-04** | Stack | Astro, Tailwind, Node.js, JSON (Source). | PM1.0 |
 | **RNF-05** | Qualidade | Cobertura de testes em lógicas de transformação. | Pytest, TDD. |
 | **RNF-06** | Observabilidade | Todas as ações do sistema devem gerar logs estruturados. | Loguru/Prefect Logger. |
 

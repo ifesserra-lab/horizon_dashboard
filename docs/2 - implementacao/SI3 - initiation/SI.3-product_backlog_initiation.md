@@ -6,7 +6,7 @@
 ---
 
 # 1. Visão Geral
-Este Backlog foca na **Visualização e Acessibilidade** dos dados acadêmicos extraídos pelo pipeline de ETL.
+Este Backlog foca na **Visualização e Acessibilidade** dos dados acadêmicos consumidos de arquivos JSON canônicos.
 
 ---
 
@@ -307,7 +307,7 @@ modulos_afetados: [src/adapters/sources/sigpesq, src/flows]
 ```
 
 #### Descrição
-Desenvolver o pipeline de extração para o SigPesq. O sistema deve conectar e extrair dados de **Projetos**, **Grupos de Pesquisa** e **Bolsistas**, persistindo-os no Supabase.
+Implementar a visualização de extração para o Dashboard. O sistema deve conectar e exibir dados de **Projetos**, **Grupos de Pesquisa** e **Pesquisadores**, consumindo os arquivos JSON.
 
 #### Critérios de Aceitação (Definition of Done)
 - **Funcional**:
@@ -501,9 +501,9 @@ Ler o arquivo Excel de Grupos de Pesquisa (processado na US-001/Extração) e pe
 #### Critérios de Aceitação
 - **Funcional**:
     - [ ] Leitura do Excel `data/raw/sigpesq/research_group/*.xlsx`.
-    - [ ] **Universidade** "UFSC" criada (se não existir) via `UniversityController`.
-    - [ ] **Campus** "Florianópolis" criado (se não existir) via `CampusController`.
-    - [ ] **Grupo de Pesquisa** criado com nome, sigla e vínculos via `ResearchGroupController`.
+    - [ ] **Universidade** "IFES" configurada.
+    - [ ] **Campus** "Serra" configurado.
+    - [ ] **Grupo de Pesquisa** exibido com nome, sigla e vínculos.
 - **Teste**:
     - [ ] Teste de Integração com banco (Mock ou Local) validando a criação dos registros.
 - **Deploy**:

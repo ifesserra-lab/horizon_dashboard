@@ -1,12 +1,12 @@
 # SI.2 – Análise do Software
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Versão:** 1.0
 **Responsável:** Antigravity (Senior Analyst)
 
 ---
 
 ## 1. Objetivo do Documento
-Modelar o domínio de Dados Acadêmicos e desenhar os fluxos de orquestração do pipeline ETL.
+Modelar o domínio de Dados Acadêmicos e desenhar os fluxos de consumo de dados.
 
 ---
 
@@ -41,13 +41,12 @@ flowchart TD
     MemberUpdate --> Save[(Database UPSERT)]
     GroupUpdate --> Save
 ```
-### 3.3 Lógica de Busca Avançada (RF-14)
-Para suportar a busca multifatorial, o sistema aplicará filtros combinados via JavaScript (Client-side):
+### 3.3 Lógica de Busca Avançada
+Para suportar a busca multifatorial, o sistema aplica filtros combinados via JavaScript (Client-side):
 1. **Nome do Grupo**: Busca por substring case-insensitive.
 2. **Área de Conhecimento**: Filtro por tags exatas ou parciais.
-3. **Campus**: Filtro por ID ou Nome do campus.
+3. **Campus**: Filtro por Nome do campus.
 4. **Liderança**: Busca nos nomes dos coordenadores do grupo.
-5. **Composição**: Filtro por número mínimo de membros.
 
 ### 3. strategy de Normalização (Lattes/Scholar)
 ```mermaid
@@ -56,14 +55,14 @@ flowchart TD
     Staging --> Match{Existe no Banco?}
     Match -->|Sim| Merge[Fundir Metadados]
     Match -->|Não| Create[Criar Novo ID]
-    Merge --> Persist[(Supabase)]
+    Merge --> Persist[(Arquivos JSON)]
     Create --> Persist
 ```
 
 ---
 
-## 4. Modelo Conceitual (ER Diagram)
-Diagrama de Entidade-Relacionamento macro para o Supabase.
+## 4. Modelagem de Dados (Canonical JSON)
+Diagrama de Entidade-Relacionamento macro para os dados consumidos.
 
 ```mermaid
 erDiagram
@@ -105,7 +104,7 @@ erDiagram
 
 ---
 
-## 6. Regras de Negócio (ETL)
+## 6. Regras de Negócio e UX
 | Regra | Descrição | Impacto |
 |--------|-------------|----------|
 | **RN-01** | **Prioridade de Fonte** | Se dados conflitarem (ex: Título), Lattes tem prioridade sobre Scholar. | Transform Layer |

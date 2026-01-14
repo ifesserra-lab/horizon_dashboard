@@ -1,5 +1,5 @@
 # Statement of Work (SOW)
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Data:** 06/01/2026
 **Autor:** Antigravity (Senior PM)
 **Versão:** 1.0
@@ -8,7 +8,7 @@
 
 # 1. Introdução
 ## 1.1 Propósito
-Este documento define o escopo, objetivos e entregáveis do projeto **Horizon ETL**. O projeto visa criar uma infraestrutura de dados robusta para capturar, transformar e centralizar informações de diversas fontes relacionadas à pesquisa e extensão.
+Este documento define o escopo, objetivos e entregáveis do projeto **Horizon Dashboard**. O projeto visa criar uma interface de visualização robusta para centralizar informações de diversas fontes relacionadas à pesquisa e extensão.
 
 ## 1.2 Justificativa
 A gestão eficiente de Pesquisa, Extensão e Pós-Graduação requer dados consolidados para definir políticas de apoio assertivas. Atualmente, a dispersão dessas informações dificulta a transparência e a conectividade entre atores acadêmicos e o mercado.
@@ -22,7 +22,7 @@ Este projeto é necessário para:
 # 2. Escopo do Projeto
 
 ## 2.1 O que ESTÁ no Escopo (In-Scope)
-O foco exclusivo é o processo de **ETL (Extract, Transform, Load)**.
+O foco exclusivo é a **Visualização de Dados (Frontend)**.
 - **Extração de Dados**:
     - Sistemas de gestão de projetos da instituição de ensino.
     - Google Scholar (metadados acadêmicos).
@@ -40,7 +40,7 @@ O foco exclusivo é o processo de **ETL (Extract, Transform, Load)**.
 ## 2.2 O que NÃO ESTÁ no Escopo (Out-Scope)
 - Análises de dados complexas ou Machine Learning (nesta fase).
 - Alterações nos sistemas fonte.
-- Qualquer atividade que não seja estritamente relacionada ao pipeline de ETL ou visualização.
+- Qualquer atividade que não seja estritamente relacionada ao Dashboard ou visualização.
 
 ---
 
@@ -64,7 +64,7 @@ O foco exclusivo é o processo de **ETL (Extract, Transform, Load)**.
 - **Framework**: [Astro](https://astro.build/) (SSG/SSR).
 - **Estilização**: [Tailwind CSS](https://tailwindcss.com/) (v4).
 - **Linguagem**: TypeScript / JavaScript.
-- **Fonte de Dados**: [Supabase](https://supabase.com/) (Leitura) e Arquivos JSON.
+- **Fonte de Dados**: Arquivos JSON Canônicos (localizados em `src/data/canonical`).
 - **Build/Deploy**: Node.js (LTS).
 
 ### Geral

@@ -1,5 +1,5 @@
 # SI.3 – Projeto de Software (Design)
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Versão do Documento:** 1.0
 **Data:** 06/01/2026
 **Responsável pelo Design:** Antigravity (Senior Designer)
@@ -7,18 +7,17 @@
 ---
 
 ## 1. Objetivo do Documento
-Definir a Arquitetura Hexagonal e os padrões de design para o Horizon ETL, garantindo desacoplamento, testabilidade e idempotência.
+Definir a Arquitetura Frontend e os padrões de design para o Horizon Dashboard, garantindo acessibilidade, performance e consistência visual.
 
 ---
 
 ## 2. Visão Geral da Arquitetura
-**Estilo Arquitetural:** Hexagonal Architecture (Ports & Adapters)
-**Padrão de Integração:** ETL (Extract, Transform, Load) com Orchestration.
+**Estilo Arquitetural:** Static Site Generation (SSG) com Astro
+**Padrão de Integração:** Consumo de arquivos JSON Estáticos.
 
 **Diretrizes:**
-- **Core (Hexagon/Logic)**: Contém as regras de negócio puras, entidades e interfaces (Ports). Não depende de frameworks externos ou bancos de dados.
-- **Adapters (Infrastructure)**: Implementações concretas das interfaces (Sources = Scrapers/APIs; Sinks = Supabase/Files).
-- **Flows (Orchestration)**: Onde os componentes são "plugados" e executados via Prefect.
+- **Components (Astro)**: UI modular e acessível.
+- **Data (Static)**: Arquivos JSON canônicos consumidos via `import` ou `getStaticPaths`.
 
 ---
 
@@ -38,13 +37,10 @@ flowchart TD
         Domain[Domain Entities]
     end
 
-    subgraph Adapters [src/adapters]
-        SigPesq[SigPesq Source]
-        Lattes[Lattes Source]
-        Fapes[Fapes API Client]
-        Cnpq[CnpqCrawler]
-        Supabase[Supabase Sink]
-        JsonFile[JSON File Sink]
+    subgraph Adapters [src/data/canonical]
+        Initiatives[initiatives.json]
+        Researchers[researchers.json]
+        Groups[research_groups.json]
     end
 
     %% Dependency Injection (Orchestration)
@@ -92,7 +88,7 @@ src/
 
 ## 4. Modelagem de Dados (Schema Simplificado)
 
-O Banco de Dados (Supabase) reflete as Entidades do Domínio.
+O Dashboard consome arquivos JSON que refletem as Entidades do Domínio.
 
 ```mermaid
 erDiagram
@@ -149,7 +145,7 @@ class IExportSink(ABC):
 | ID | Decisão | Justificativa |
 |----|---------|---------------|
 | **D1** | **Prefect para Orquestração** | Suporte nativo a Retries, Caching e Observabilidade. |
-| **D2** | **Supabase como Sink Único** | Simplificação da infraestrutura e API REST automática. |
+| **D2** | **Arquivos JSON Estáticos** | Máxima performance e custo zero de infraestrutura. |
 | **D3** | **Flows Separados** | `src/flows` isola o framework de orquestração do Core. |
 | **D4** | **Consolidação no Core** | Todas as regras e interfaces vivem em `src/core` para evitar dependências circulares. |
 

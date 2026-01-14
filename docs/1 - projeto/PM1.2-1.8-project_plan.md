@@ -1,5 +1,5 @@
 # Project Plan
-**Projeto:** Horizon ETL
+**Projeto:** Horizon Dashboard
 **Data:** 06/01/2026
 **Autor:** Antigravity (Senior PM)
 **Versão:** 1.0
@@ -47,7 +47,7 @@ A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da inter
 # 3. Recursos (PM1.4)
 - **Equipe Técnica**: 1 Desenvolvedor Fullstack (User).
 - **Stakeholders**: Gestão do Campus, Alunos, Pesquisadores.
-- **Tecnologia**: **Astro**, **Tailwind CSS**, [Supabase](https://supabase.com/) (Leitura).
+- **Tecnologia**: **Astro**, **Tailwind CSS**, **Arquivos JSON**.
 
 ---
 
@@ -57,7 +57,7 @@ A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da inter
 | Baixa Performance (LCP > 2.5s) | Alto | Otimização de Imagens (WebP), Lazy Loading e SSG. |
 | Inconsistência Design System | Médio | Uso estrito de variaveis CSS e Componentes reutilizáveis. |
 | Acessibilidade Insuficiente | Alto | Testes manuais com leitores de tela e validação WCAG. |
-| Dados Incompletos (Supabase) | Médio | Fallbacks de UI (Skeleton Loaders/Empty States) elegantes. |
+| Dados Incompletos (JSON) | Médio | Fallbacks de UI (Skeleton Loaders/Empty States) elegantes. |
 
 ---
 
@@ -65,5 +65,5 @@ A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da inter
 - **Performance**: Pontuação Lighthouse > 90 em Performance, SEO e Acessibilidade.
 - **Responsividade**: Layout funcional em Mobile (320px+), Tablet e Desktop.
 - **Acessibilidade**: Navegação via teclado e contraste de cores adequado (WCAG AA).
-- **Integração**: Dados refletem com precisão o estado do banco Supabase.
+- **Integração**: Dados refletem com precisão o estado dos arquivos JSON canônicos.
 - **Código**: Clean Code, Componentização eficiente e sem erros de lint (`eslint`, `prettier`).

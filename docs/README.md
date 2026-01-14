@@ -1,6 +1,6 @@
-# Horizon ETL - Map of Documentation
+# Horizon Dashboard - Map of Documentation
 
-This directory contains all the governance, analysis, and design artifacts for the **Horizon ETL** project. The structure follows the project's **Agile Standards** for software development.
+This directory contains all the governance, analysis, and design artifacts for the **Horizon Dashboard** project. The structure follows the project's **Agile Standards** for software development.
 
 ## 📂 Directory Structure
 
