@@ -1,0 +1,135 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import projectsData from '../../data/canonical/initiatives_canonical.json';
+import ProjectCard from '../../components/ProjectCard.astro';
+import type { Project } from '../../types/projects';
+
+const projects = (projectsData as Project[]).sort((a, b) => {
+	// Sort by status (active first) then by name
+	if (a.status === 'active' && b.status !== 'active') return -1;
+	if (a.status !== 'active' && b.status === 'active') return 1;
+	return a.name.localeCompare(b.name);
+});
+
+const activeCount = projects.filter(p => p.status === 'active').length;
+const concludedCount = projects.filter(p => p.status !== 'active').length;
+---
+
+<Layout title="Projetos de Pesquisa">
+	<header class="mb-10">
+		<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+			<div class="flex-1">
+				<h1 class="text-3xl font-bold font-['Outfit'] text-text-main">Projetos de Pesquisa</h1>
+				<p class="text-text-secondary mt-2 max-w-2xl">
+					Explore as iniciativas de pesquisa em andamento e concluídas da instituição. 
+					Atualmente contamos com <span class="text-emerald-500 font-bold">{activeCount}</span> projetos ativos e 
+					<span class="text-text-main font-semibold">{concludedCount}</span> concluídos.
+				</p>
+			</div>
+			
+			<div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+				<div class="relative flex-1 sm:w-80">
+					<label for="projectSearch" class="sr-only">Buscar projetos</label>
+					<input 
+						type="text" 
+						id="projectSearch"
+						placeholder="Buscar por nome do projeto..." 
+						class="w-full bg-glass-bg border border-border-main rounded-xl px-11 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+					/>
+					<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+					
+					<button id="resetSearch" class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden" title="Limpar busca">
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 9-6 6"/><path d="m9 9 6 6"/><circle cx="12" cy="12" r="10"/></svg>
+					</button>
+				</div>
+
+				<div class="relative w-full sm:w-48">
+					<label for="statusFilter" class="sr-only">Filtrar por status</label>
+					<select 
+						id="statusFilter" 
+						class="w-full bg-glass-bg border border-border-main rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main appearance-none cursor-pointer"
+					>
+						<option value="all">Todos os Status</option>
+						<option value="active">Ativos</option>
+						<option value="concluded">Concluídos</option>
+					</select>
+					<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="projectsGrid" role="region" aria-label="Catálogo de projetos">
+		{projects.map(project => (
+			<ProjectCard project={project} />
+		))}
+	</div>
+
+	<!-- Empty State -->
+	<div id="emptyState" class="hidden flex-col items-center justify-center py-24 text-center">
+		<div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed">
+			<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>
+		</div>
+		<h3 class="text-xl font-bold font-['Outfit'] text-text-main mb-2">Sem resultados</h3>
+		<p class="text-text-secondary max-w-sm">
+			Não encontramos nenhum projeto que corresponda aos filtros aplicados.
+		</p>
+	</div>
+
+	<script>
+		const searchInput = document.getElementById('projectSearch') as HTMLInputElement;
+		const statusFilter = document.getElementById('statusFilter') as HTMLSelectElement;
+		const resetBtn = document.getElementById('resetSearch');
+		const emptyState = document.getElementById('emptyState');
+		const projectCards = document.querySelectorAll('.project-card');
+
+		function filterProjects() {
+			const query = searchInput.value.toLowerCase().trim();
+			const status = statusFilter.value.toLowerCase();
+			let visibleCount = 0;
+
+			// Show/hide reset button
+			if (query) {
+				resetBtn?.classList.remove('hidden');
+			} else {
+				resetBtn?.classList.add('hidden');
+			}
+
+			projectCards.forEach(card => {
+				const element = card as HTMLElement;
+				const name = element.dataset.name || '';
+				const pStatus = element.dataset.status || '';
+				
+				const matchesQuery = !query || name.includes(query);
+				const matchesStatus = status === 'all' || pStatus === status;
+
+				if (matchesQuery && matchesStatus) {
+					element.style.display = 'flex';
+					visibleCount++;
+				} else {
+					element.style.display = 'none';
+				}
+			});
+
+			// Toggle empty state
+			if (visibleCount === 0) {
+				emptyState?.classList.remove('hidden');
+				emptyState?.classList.add('flex');
+			} else {
+				emptyState?.classList.add('hidden');
+				emptyState?.classList.remove('flex');
+			}
+		}
+
+		searchInput?.addEventListener('input', filterProjects);
+		statusFilter?.addEventListener('change', filterProjects);
+		
+		resetBtn?.addEventListener('click', () => {
+			searchInput.value = '';
+			filterProjects();
+			searchInput.focus();
+		});
+	</script>
+</Layout>
