@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
+| **v1.1.5** | 2026-01-15 | **Released** | Data Fix: Initiative Team Synchronization | [TBD](https://github.com/ifesserra-lab/horizon_dashboard/commit/TBD) |
 | **v1.1.4** | 2026-01-14 | **Released** | Bugfix: Dashboard Line Break Optimization | [380b981](https://github.com/ifesserra-lab/horizon_dashboard/commit/380b981) |
 | **v1.1.3** | 2026-01-14 | **Released** | Feature: Social SEO (Open Graph Tags) | [eedb9d1](https://github.com/ifesserra-lab/horizon_dashboard/commit/eedb9d1) |
 | **v1.1.2** | 2026-01-14 | **Released** | Feature: Low Vision Support (Text Scaling) | [abd03db](https://github.com/ifesserra-lab/horizon_dashboard/commit/abd03db) |
@@ -50,6 +51,7 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-021** Auditoria de Qualidade (Lighthouse) (Entregue na v1.1.2)
     - [x] **US-022** SEO Social (Open Graph Tags) (Entregue na v1.1.3)
     - [x] **US-023** Bugfix: Quebra de linha no Dashboard (Entregue na v1.1.4)
+    - [x] **US-024** Sincronização de Equipes (Entregue na v1.1.5)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [ ] **US-003** Perfil do Pesquisador (Lattes UI)
