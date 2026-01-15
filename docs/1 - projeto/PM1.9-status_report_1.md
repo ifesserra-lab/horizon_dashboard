@@ -1,7 +1,8 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.1.4 (US-023: UI Fix)
+**Versão Relatada:** v1.1.5 (US-024: Data Sync & Teams)
+| **US-024** | Sincronização de Equipes e Dados | **Entregue** | v1.1.5 |
 **Responsável:** Antigravity (Senior PM)
 
 ---
