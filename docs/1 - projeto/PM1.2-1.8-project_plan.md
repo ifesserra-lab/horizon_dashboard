@@ -14,6 +14,7 @@ A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da inter
     1.2. Design System (Tipografia, Cores, Componentes Básicos).
     1.3. Página de Listagem de Grupos (Busca e Filtros).
     1.4. Página de Detalhes do Grupo (Metadados e Membros).
+    1.5. Dashboard de Projetos (Gráficos e KPIs).
 2.  **Visualização de Pesquisadores** (Mês 2)
     2.1. Perfil do Pesquisador (Integração Lattes).
     2.2. Lista de Produções Bibliográficas.

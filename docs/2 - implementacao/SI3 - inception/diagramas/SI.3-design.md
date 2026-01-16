@@ -156,11 +156,15 @@ class IExportSink(ABC):
 ## 8. Data Visualization Mapping (Data Analyst)
 | Componente UI | Métrica / KPI | Tipo de Gráfico |
 |---------------|---------------|-----------------|
-| `KpiCard` | Total de Grupos, Pesquisadores | Valor Numérico + Tendência |
-| `AreaChart` | Fomento ao longo do tempo | Área / Linhas |
-| `MapComponent`| Distribuição de egressos | Mapa Coroplético |
-| `Sunburst` | Áreas do Conhecimento | Radial Hierárquico |
+| `KpiCard` | Total de Grupos, Pesquisadores, Projetos | Valor Numérico + Tendência |
+| `AreaChart` | Evolução de Projetos (Novos por Ano) | Área / Linhas |
+| `DonutChart` | Distribuição de Status de Projetos | Pizza / Donut |
+| `VerticalBar`| Participantes por Categoria (Projetos) | Barras Verticais |
 | `HorizontalBar`| Top 10 Linhas de Pesquisa | Barras Horizontais (Frequência) |
+| `Sunburst` | Áreas do Conhecimento | Radial Hierárquico |
+| `MapComponent`| Distribuição de egressos | Mapa Coroplético |
+| `Tabs` | Alternância entre Visão Geral e Detalhes Analíticos | Tabs (Visão Geral / Temporal / Composição) |
+| `LineChart (Team)` | Evolução da Equipe (Pesquisadores vs Estudantes) | Gráfico de Linha Dupla |
 
 ---
 

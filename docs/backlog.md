@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
+| **v1.1.6** | 2026-01-16 | **Released** | Feature: Projects Dashboard (KPIs, Charts, Search) |
 | **v1.1.5** | 2026-01-15 | **Released** | Data Fix: Initiative Team Synchronization | [8e25f79](https://github.com/ifesserra-lab/horizon_dashboard/commit/8e25f79) |
 | **v1.1.4** | 2026-01-14 | **Released** | Bugfix: Dashboard Line Break Optimization | [380b981](https://github.com/ifesserra-lab/horizon_dashboard/commit/380b981) |
 | **v1.1.3** | 2026-01-14 | **Released** | Feature: Social SEO (Open Graph Tags) | [eedb9d1](https://github.com/ifesserra-lab/horizon_dashboard/commit/eedb9d1) |
@@ -43,15 +44,22 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-015** Separação de Membros (Atuais/Egressos) (Entregue na v1.0.10)
     - [x] **US-006** Dashboard de Áreas de Conhecimento (Entregue na v1.0.6)
     - [x] **Task** Busca em Áreas de Conhecimento (Entregue na v1.0.8)
-    - [x] **US-016** Catálogo de Projetos (Ready)
-    - [x] **US-017** Detalhes do Projeto (Ready)
-    - [x] **US-018** Equipe nos Detalhes do Projeto (Entregue na v1.1.0)
     - [x] **US-019** Recursos de Acessibilidade (Alto Contraste) (Entregue na v1.1.1)
     - [x] **US-020** Recursos para Baixa Visão (Aumento de Fonte) (Entregue na v1.1.2)
     - [x] **US-021** Auditoria de Qualidade (Lighthouse) (Entregue na v1.1.2)
     - [x] **US-022** SEO Social (Open Graph Tags) (Entregue na v1.1.3)
     - [x] **US-023** Bugfix: Quebra de linha no Dashboard (Entregue na v1.1.4)
+
+- **Epic 4: Portal de Projetos (Release 1 Extension)** _(Entregue - Refinado)_
+    - [x] **US-016** Catálogo de Projetos (Entregue na v1.1.6)
+    - [x] **US-017** Detalhes do Projeto (Ready)
+    - [x] **US-018** Equipe nos Detalhes do Projeto (Entregue na v1.1.0)
     - [x] **US-024** Sincronização de Equipes (Entregue na v1.1.5)
+    - [x] **US-025** Dashboard de Projetos (Listagem/Busca) (Entregue na v1.1.6)
+    - [x] **US-026** Dashboard de Projetos (Gráficos/KPIs) (Entregue na v1.1.6)
+    - [x] **US-027** Visualização por Abas (Dashboard) (Entregue na v1.1.6)
+    - [x] **US-028** Evolução Temporal da Equipe (Entregue na v1.1.6)
+    - [x] **US-029** Evolução dos Projetos (Início vs Conclusão) (Entregue na v1.1.6)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [ ] **US-003** Perfil do Pesquisador (Lattes UI)

@@ -35,6 +35,9 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-021** | Auditoria de Qualidade (Lighthouse) | **Entregue** | v1.1.2 |
 | **US-022** | SEO Social (Open Graph Tags) | **Entregue** | v1.1.3 |
 | **US-023** | Bugfix: Quebra de Linha no Dashboard | **Entregue** | v1.1.4 |
+| **US-025** | Dashboard de Projetos (Listagem/Busca) | **Entregue** | v1.1.6 |
+| **US-026** | Dashboard de Projetos (Gráficos/KPIs) | **Entregue** | v1.1.6 |
+| **US-027** | Visualização por Abas (Dashboard) | **Entregue** | v1.1.6 |
 
 ---
 
