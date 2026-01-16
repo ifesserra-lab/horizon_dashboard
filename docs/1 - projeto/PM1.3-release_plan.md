@@ -24,6 +24,7 @@ O projeto entrega valor através de interfaces visuais incrementais, consumindo 
 - [x] Listagem de Grupos com Filtros (Campus, Área).
 - [x] Busca Textual em tempo real.
 - [x] Página de Detalhes do Grupo (Líderes, Membros com Avatar).
+- [ ] Dashboard de Projetos (Gráficos de Status, Tipos e Participantes).
 - [x] Adaptação Visual (Light/Dark Mode e Glassmorphism).
 
 ## 2.2 Release R2 – Perfis de Pesquisadores (v1.1.0)

@@ -136,9 +136,7 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-011** | Top 10 Research Lines (Home) | **Done** | v1.0.6 |
 | **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 |
-| **US-016** | Catálogo de Projetos de Pesquisa | **Ready** | - |
-| **US-017** | Detalhes do Projeto de Pesquisa | **Ready** | 1.0.13 |
-| **US-018** | Equipe nos Detalhes do Projeto | **Done** | v1.1.0 |
+| **US-015** | Separação de Membros | **Done** | v1.0.10 |
 | **US-019** | Recursos de Acessibilidade | **Ready** | - |
 ### US-006 – Dashboard de Áreas de Conhecimento
 ```yaml
@@ -218,48 +216,6 @@ Refatorar a seção de membros na página de detalhes do grupo (`src/pages/group
     - [ ] Títulos de seção claros para cada grupo.
     - [ ] Manter o design dos cards de membros existente.
 
-### US-017: Detalhes do Projeto de Pesquisa
-**Como** um pesquisador ou gestor,  
-**Eu quero** ver os detalhes completos de um projeto de pesquisa específico,  
-**Para que** eu possa entender seu escopo, período de execução e status.
-
-**Critérios de Aceite:**
-- A página deve ser acessível via rota `/projects/[id]`.
-- Exibir nome, status (com badge colorido), período (início/fim) e descrição.
-- Design consistente com o restante da plataforma (glassmorphism).
-- Navegação de volta para a lista de projetos.
-- Responsividade (Mobile First) e acessibilidade (WCAG 2.1 AA).
-```yaml
-id: US-017
-milestone: R1
-prioridade: Alta
-tamanho: 5
-origem: [RF-26]
-tags: [type:feature, area:frontend, component:projects]
-```
-
-### US-016 – Catálogo de Projetos de Pesquisa
-```yaml
-id: US-016
-milestone: R1
-prioridade: Alta
-tamanho: 5
-origem: [RF-25]
-tags: [type:feature, area:frontend, component:projects]
-```
-
-#### Descrição
-Implementar uma página para listagem de todos os projetos de pesquisa (iniciativas) da instituição, permitindo a descoberta de temas e parcerias.
-
-#### Critérios de Aceitação
-- **Funcional**:
-    - [ ] Visualização em Cards com Nome do Projeto, Status, Datas e Vínculos.
-    - [ ] Busca textual por Nome do Projeto.
-    - [ ] Filtro por Status (ativo/concluído).
-- **UI/UX**:
-    - [ ] Design responsivo (Mobile/Desktop).
-    - [ ] Estilo premium com glassmorphism.
-    - [ ] Badge de Status colorido de acordo com o estado do projeto.
 
 ### US-014 – Identificação de Egressos (Detalhes do Grupo)
 ```yaml
@@ -710,3 +666,119 @@ A frase de boas-vindas no dashboard está sofrendo uma quebra de linha indesejad
 - [ ] Eliminar a quebra de linha indesejada em resoluções desktop.
 - [ ] Manter a responsividade para telas menores.
 - [ ] Usar `text-balance` ou ajuste de largura máxima para otimização tipográfica.
+## Epic 5: Portal de Projetos (Release 1 Extension)
+**Objetivo**: Centralizar a gestão e visualização dos projetos de pesquisa da instituição.
+
+### US-016 – Catálogo de Projetos de Pesquisa
+```yaml
+id: US-016
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-25]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+#### Descrição
+Implementar uma página para listagem de todos os projetos de pesquisa (iniciativas) da instituição, permitindo a descoberta de temas e parcerias.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [x] Visualização em Cards com Nome do Projeto, Status, Datas e Vínculos.
+    - [x] Busca textual por Nome do Projeto.
+    - [x] Filtro por Status (ativo/concluído).
+- **UI/UX**:
+    - [x] Design responsivo (Mobile/Desktop).
+    - [x] Estilo premium com glassmorphism.
+    - [x] Badge de Status colorido de acordo com o estado do projeto.
+
+### US-017 – Detalhes do Projeto de Pesquisa
+```yaml
+id: US-017
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-26]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+#### Descrição
+Página detalhada do projeto exibindo escopo, período de execução e status.
+
+#### Critérios de Aceitação
+- [x] Acessível via rota `/projects/[id]`.
+- [x] Exibir nome, status (badge colorido), período e descrição.
+- [x] Design consistente e responsivo.
+
+### US-018 – Equipe nos Detalhes do Projeto
+```yaml
+id: US-018
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [RF-27]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+#### Descrição
+Exibir a lista de pesquisadores e estudantes vinculados ao projeto.
+
+### US-024 – Sincronização de Equipes
+```yaml
+id: US-024
+milestone: R1
+prioridade: Crítica
+tamanho: 5
+origem: [Bugfix]
+tags: [type:fix, area:backend, component:projects]
+```
+
+### US-025 – Dashboard de Projetos (Busca)
+```yaml
+id: US-025
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [RF-28]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+### US-026 – Dashboard de Projetos (Indicadores)
+```yaml
+id: US-026
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-29]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+### US-027 – Visualização por Abas
+```yaml
+id: US-027
+milestone: R1
+prioridade: Média
+tamanho: 3
+origem: [UX]
+tags: [type:feature, area:ui, component:projects]
+```
+
+### US-028 – Evolução Temporal da Equipe
+```yaml
+id: US-028
+milestone: R1
+prioridade: Média
+tamanho: 3
+origem: [User Request]
+tags: [type:feature, area:ui, component:projects]
+```
+
+### US-029 – Evolução dos Projetos (Início vs Conclusão)
+```yaml
+id: US-029
+milestone: R1
+prioridade: Alta
+tamanho: 3
+origem: [User Request]
+tags: [type:feature, area:ui, component:projects]
+```

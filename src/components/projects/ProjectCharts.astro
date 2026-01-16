@@ -1,0 +1,459 @@
+---
+interface Props {
+	martData: any;
+}
+
+const { martData } = Astro.props;
+
+// 1. Status Distribution (Derived from summary)
+const active = martData.summary.active_projects;
+const totalStatus = martData.summary.total_projects;
+const concluded = totalStatus - active;
+const other = 0; // Mart summary doesn't explicit 'other' yet, so we assume 0 if everything is active
+
+const statusData = [
+	{ label: 'Ativos', value: active, color: 'var(--color-premium-accent, #38bdf8)' },
+];
+if (concluded > 0) statusData.push({ label: 'Concluídos', value: concluded, color: 'var(--color-text-muted, #94a3b8)' });
+
+// 2. Evolution Data (Direct from Mart)
+const evolutionData = martData.evolution.map((d: any) => ({ year: d.year, count: d.start }));
+const conclusionsData = martData.evolution.map((d: any) => ({ year: d.year, count: d.end }));
+
+const maxYearCount = Math.max(...evolutionData.map((d: any) => d.count), 1);
+const maxConclusionCount = Math.max(...conclusionsData.map((d: any) => d.count), 1);
+
+// 3. Team Composition Data (Direct from Mart)
+const participantsData = [
+    { label: 'Pesquisadores', value: martData.team_composition.researchers, color: 'var(--color-premium-accent)', lineId: 'res' },
+    { label: 'Estudantes', value: martData.team_composition.students, color: 'var(--color-premium-purple)', lineId: 'stu' },
+];
+
+const totalParticipantsUnique = martData.summary.total_participants;
+
+const finalTeamEvolution = martData.evolution.map((d: any) => ({
+    year: d.year,
+    researchers: d.researchers || 0,
+    students: d.students || 0
+}));
+
+const maxTeamCount = Math.max(
+    ...finalTeamEvolution.map((d: any) => Math.max(d.researchers, d.students)), 
+    1
+);
+---
+
+<div class="space-y-6">
+    <!-- Tabs Header -->
+    <div class="flex items-center justify-between border-b border-border-main/50 pb-px overflow-x-auto no-scrollbar">
+        <div class="flex gap-8" role="tablist" aria-label="Visualizações analíticas">
+            <button 
+                role="tab" 
+                aria-selected="true" 
+                aria-controls="panel-status" 
+                id="tab-status"
+                class="pb-4 text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-premium-accent border-b-2 border-premium-accent"
+            >
+                Visão Geral
+            </button>
+            <button 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="panel-evolution" 
+                id="tab-evolution"
+                class="pb-4 text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent"
+            >
+                Evolução dos Projetos
+            </button>
+            <button 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="panel-team" 
+                id="tab-team"
+                class="pb-4 text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent"
+            >
+                Composição da Equipe
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Panels Container -->
+    <div class="relative min-h-[400px]">
+        <!-- 1. Status Panel -->
+        <div 
+            id="panel-status" 
+            role="tabpanel" 
+            aria-labelledby="tab-status"
+            class="transition-all duration-300 opacity-100 scale-100"
+        >
+            <div class="glass-card p-8 flex flex-col md:flex-row items-center justify-center gap-12 min-h-[350px]">
+                <div class="relative w-64 h-64 flex-shrink-0">
+                    <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+                        {(() => {
+                            let currentOffset = 0;
+                            return statusData.map((item) => {
+                                const percentage = totalStatus > 0 ? (item.value / totalStatus) * 100 : 0;
+                                const dashArray = `${percentage} ${100 - percentage}`;
+                                const offset = -currentOffset;
+                                currentOffset += percentage;
+                                return (
+                                    <circle
+                                        cx="18"
+                                        cy="18"
+                                        r="15.915"
+                                        fill="transparent"
+                                        stroke={item.color}
+                                        stroke-width="3"
+                                        stroke-dasharray={dashArray}
+                                        stroke-dashoffset={offset}
+                                        class="transition-all duration-1000 ease-out"
+                                    />
+                                );
+                            });
+                        })()}
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-5xl font-bold font-['Outfit'] text-text-main">{totalStatus}</span>
+                        <span class="text-xs text-text-muted uppercase tracking-[0.2em] font-bold">Projetos</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 w-full max-w-xs">
+                    {statusData.map(item => (
+                        <div class="glass-card p-4 flex items-center gap-4 bg-white/5 border-white/5">
+                            <div class="w-4 h-4 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2)]" style={`background-color: ${item.color}`}></div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-text-main leading-none mb-1">{item.label}</span>
+                                <span class="text-xs text-text-muted font-medium">{item.value} projetos ({totalStatus > 0 ? Math.round((item.value/totalStatus)*100) : 0}%)</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Evolution Panel -->
+        <div 
+            id="panel-evolution" 
+            role="tabpanel" 
+            aria-labelledby="tab-evolution"
+            class="hidden transition-all duration-300 opacity-0 scale-95"
+        >
+            <section class="glass-card p-8 flex flex-col gap-12 min-h-[500px]">
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- 1. Starts Line Chart -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-gradient-to-r from-premium-accent to-premium-purple shadow-[0_0_10px_rgba(56,189,248,0.4)]"></div>
+                                <span class="text-[10px] font-bold text-text-main uppercase tracking-[0.2em]">Início de Projetos</span>
+                            </div>
+                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-white/5 uppercase tracking-wider">Tendência</span>
+                        </div>
+
+                        <div class="h-64 px-4 flex flex-col items-center justify-center relative">
+                            <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
+                                {(() => {
+                                    if (evolutionData.length < 2) return null;
+                                    const padding = 20;
+                                    const width = 400 - padding * 2;
+                                    const height = 150 - padding * 2;
+                                    const stepX = width / (evolutionData.length - 1);
+                                    
+                                    const points = evolutionData.map((d, i) => ({
+                                        x: padding + i * stepX,
+                                        y: (150 - padding) - (d.count / maxYearCount) * height,
+                                        ...d
+                                    }));
+
+                                    const pathData = points.reduce((acc, p, i) => 
+                                        i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
+                                    
+                                    const areaData = `${pathData} L ${points[points.length-1].x} ${150 - padding} L ${points[0].x} ${150 - padding} Z`;
+
+                                    return (
+                                        <g>
+                                            <defs>
+                                                <linearGradient id="line-gradient-start" x1="0" y1="0" x2="1" y2="0">
+                                                    <stop offset="0%" stop-color="var(--color-premium-accent)" />
+                                                    <stop offset="100%" stop-color="var(--color-premium-purple)" />
+                                                </linearGradient>
+                                                <linearGradient id="area-gradient-start" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stop-color="var(--color-premium-accent)" stop-opacity="0.2" />
+                                                    <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path d={areaData} fill="url(#area-gradient-start)" />
+                                            <path d={pathData} fill="none" stroke="url(#line-gradient-start)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_8px_rgba(56,189,248,0.3)]" />
+                                            {points.map((p) => (
+                                                <g class="group/point">
+                                                    <text x={p.x} y={p.y - 12} text-anchor="middle" class="text-[10px] font-bold fill-text-main select-none">{p.count}</text>
+                                                    <circle cx={p.x} cy={p.y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-accent stroke-[2.5]" />
+                                                    <text x={p.x} y="165" text-anchor="middle" class="text-[10px] font-bold fill-text-muted uppercase tracking-tighter">{p.year}</text>
+                                                </g>
+                                            ))}
+                                        </g>
+                                    );
+                                })()}
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 2. Conclusions Bar Chart -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
+                                <span class="text-[10px] font-bold text-text-main uppercase tracking-[0.2em]">Previsão de Término</span>
+                            </div>
+                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-white/5 uppercase tracking-wider">Cronograma</span>
+                        </div>
+
+                        <div class="h-64 px-4 flex flex-col items-center justify-center relative">
+                            <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
+                                {(() => {
+                                    if (conclusionsData.length === 0) return null;
+                                    const padding = 20;
+                                    const width = 400 - padding * 2;
+                                    const height = 150 - padding * 2;
+                                    const barWidth = Math.min(width / conclusionsData.length * 0.6, 25);
+                                    const stepX = width / (conclusionsData.length > 1 ? conclusionsData.length - 1 : 1);
+                                    
+                                    return (
+                                        <g>
+                                            <defs>
+                                                <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stop-color="#10b981" />
+                                                    <stop offset="100%" stop-color="#059669" />
+                                                </linearGradient>
+                                            </defs>
+                                            {conclusionsData.map((d, i) => {
+                                                const x = conclusionsData.length > 1 ? padding + i * stepX : 200;
+                                                const barHeight = (d.count / maxConclusionCount) * height;
+                                                const y = (150 - padding) - barHeight;
+                                                
+                                                return (
+                                                    <g class="group/bar">
+                                                        <rect 
+                                                            x={x - barWidth / 2} 
+                                                            y={y} 
+                                                            width={barWidth} 
+                                                            height={barHeight} 
+                                                            rx="4"
+                                                            fill="url(#bar-gradient)"
+                                                            class="transition-all duration-500 hover:brightness-110 drop-shadow-[0_4px_6px_rgba(0,0,0,0.1)]"
+                                                        />
+                                                        <text 
+                                                            x={x} 
+                                                            y={y - 12} 
+                                                            text-anchor="middle" 
+                                                            class="text-[10px] font-bold fill-emerald-500 select-none"
+                                                        >
+                                                            {d.count}
+                                                        </text>
+                                                        <text 
+                                                            x={x} 
+                                                            y="165" 
+                                                            text-anchor="middle" 
+                                                            class="text-[10px] font-bold fill-text-muted uppercase tracking-tighter"
+                                                        >
+                                                            {d.year}
+                                                        </text>
+                                                    </g>
+                                                );
+                                            })}
+                                        </g>
+                                    );
+                                })()}
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 3. Team Panel -->
+        <div 
+            id="panel-team" 
+            role="tabpanel" 
+            aria-labelledby="tab-team"
+            class="hidden transition-all duration-300 opacity-0 scale-95"
+        >
+            <section class="glass-card p-8 flex flex-col min-h-[450px]">
+                <!-- Chart Legend -->
+                <div class="flex items-center justify-center gap-6 mb-8">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-premium-accent shadow-[0_0_10px_rgba(56,189,248,0.4)]"></div>
+                        <span class="text-[10px] font-bold text-text-main uppercase tracking-widest">Pesquisadores</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-premium-purple shadow-[0_0_10px_rgba(147,51,234,0.4)]"></div>
+                        <span class="text-[10px] font-bold text-text-main uppercase tracking-widest">Estudantes</span>
+                    </div>
+                </div>
+
+                <!-- Team Evolution Chart -->
+                <div class="h-64 mb-12 px-8 flex flex-col items-center justify-center max-w-4xl mx-auto w-full relative">
+                    <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
+                        {(() => {
+                            if (finalTeamEvolution.length < 2) return null;
+                            
+                            const padding = 20;
+                            const width = 400 - padding * 2;
+                            const height = 150 - padding * 2;
+                            const stepX = width / (finalTeamEvolution.length - 1);
+                            
+                            const resPoints = finalTeamEvolution.map((d, i) => ({
+                                x: padding + i * stepX,
+                                y: (150 - padding) - (d.researchers / maxTeamCount) * height,
+                                count: d.researchers,
+                                year: d.year
+                            }));
+
+                            const stuPoints = finalTeamEvolution.map((d, i) => ({
+                                x: padding + i * stepX,
+                                y: (150 - padding) - (d.students / maxTeamCount) * height,
+                                count: d.students,
+                                year: d.year
+                            }));
+
+                            const resPath = resPoints.reduce((acc, p, i) => 
+                                i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
+                            
+                            const stuPath = stuPoints.reduce((acc, p, i) => 
+                                i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
+
+                            return (
+                                <g>
+                                    <!-- Researchers Line -->
+                                    <path d={resPath} fill="none" stroke="var(--color-premium-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_5px_rgba(56,189,248,0.2)]" />
+                                    
+                                    <!-- Students Line -->
+                                    <path d={stuPath} fill="none" stroke="var(--color-premium-purple)" stroke-width="2.5" stroke-dasharray="4 2" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_5px_rgba(147,51,234,0.2)]" />
+
+                                    <!-- Points and Labels -->
+                                    {resPoints.map((p, i) => (
+                                        <g>
+                                            <!-- Researcher Label -->
+                                            <text x={p.x} y={p.y - 12} text-anchor="middle" class="text-[10px] font-bold fill-premium-accent select-none">{p.count}</text>
+                                            <circle cx={p.x} cy={p.y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-accent stroke-[2]" />
+                                            
+                                            <!-- Student Label -->
+                                            <text x={stuPoints[i].x} y={stuPoints[i].y + 18} text-anchor="middle" class="text-[10px] font-bold fill-premium-purple select-none">{stuPoints[i].count}</text>
+                                            <circle cx={stuPoints[i].x} cy={stuPoints[i].y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-purple stroke-[2]" />
+
+                                            <!-- Year Label -->
+                                            <text x={p.x} y="165" text-anchor="middle" class="text-[10px] font-bold fill-text-muted select-none">{p.year}</text>
+                                        </g>
+                                    ))}
+                                </g>
+                            );
+                        })()}
+                    </svg>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-auto">
+                    {participantsData.map(item => (
+                        <div class="glass-card p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold text-text-muted uppercase tracking-wider">{item.label}</span>
+                                <div class="w-10 h-10 rounded-xl bg-premium-accent/10 flex items-center justify-center text-premium-accent group-hover:scale-110 transition-transform">
+                                    <span class="text-xs font-bold">{Math.round((item.value / (participantsData.reduce((acc, d) => acc + d.value, 0))) * 100)}%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-bold text-text-main">{item.value}</span>
+                                <span class="text-xs text-text-muted mb-2">participantes únicos</span>
+                            </div>
+                            <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div 
+                                    class="h-full bg-gradient-to-r from-premium-accent to-premium-purple transition-all duration-1000"
+                                    style={`width: ${(item.value / (participantsData.reduce((acc, d) => acc + d.value, 0))) * 100}%`}
+                                ></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        </div>
+    </div>
+<script>
+    const setupTabs = () => {
+        const tabs = document.querySelectorAll('[role="tab"]');
+        const panels = document.querySelectorAll('[role="tabpanel"]');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.getAttribute('aria-controls');
+
+                // Update tab states
+                tabs.forEach(t => {
+                    t.setAttribute('aria-selected', 'false');
+                    t.classList.remove('text-premium-accent', 'border-premium-accent');
+                    t.classList.add('text-text-muted', 'border-transparent');
+                });
+                tab.setAttribute('aria-selected', 'true');
+                tab.classList.add('text-premium-accent', 'border-premium-accent');
+                tab.classList.remove('text-text-muted', 'border-transparent');
+
+                // Switch panels
+                panels.forEach(panel => {
+                    if (panel.id === targetId) {
+                        panel.classList.remove('hidden');
+                        setTimeout(() => {
+                            panel.classList.add('opacity-100', 'scale-100');
+                            panel.classList.remove('opacity-0', 'scale-95');
+                        }, 10);
+                    } else {
+                        panel.classList.add('hidden', 'opacity-0', 'scale-95');
+                        panel.classList.remove('opacity-100', 'scale-100');
+                    }
+                });
+            });
+
+            // Keyboard navigation
+            tab.addEventListener('keydown', (e) => {
+                const index = Array.from(tabs).indexOf(e.target as HTMLButtonElement);
+                let nextIndex;
+
+                if (e.key === 'ArrowRight') {
+                    nextIndex = (index + 1) % tabs.length;
+                } else if (e.key === 'ArrowLeft') {
+                    nextIndex = (index - 1 + tabs.length) % tabs.length;
+                }
+
+                if (nextIndex !== undefined) {
+                    (tabs[nextIndex] as HTMLButtonElement).focus();
+                    (tabs[nextIndex] as HTMLButtonElement).click();
+                }
+            });
+        });
+    }
+
+    // Run on first load
+    setupTabs();
+    
+    // Support Astro view transitions if enabled later
+    document.addEventListener('astro:after-swap', setupTabs);
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    [role="tabpanel"] {
+        will-change: transform, opacity;
+    }
+</style>
+
+<style>
+    circle {
+        transition: stroke-dashoffset 0.8s ease-in-out;
+    }
+</style>
