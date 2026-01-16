@@ -3,10 +3,16 @@ import martData from '../../data/mart/initiatives_analytics_mart.json';
 import groupsData from '../../data/canonical/research_groups_canonical.json';
 
 // --- Data Preparation: Ecosystem Evolution ---
-const evolutionData = martData.evolution.map((d: any) => ({
-    year: d.year,
-    projects: d.active_total // or d.active, assuming strictly 'active' snapshot or cumulative
-}));
+// Calculate cumulative active projects (running total)
+let runningTotal = 0;
+const evolutionData = martData.evolution.map((d: any) => {
+    runningTotal += (d.start - d.end);
+    return {
+        year: d.year,
+        projects: runningTotal,
+        starts: d.start // Keeping raw starts for tooltip context if needed
+    };
+});
 
 // We only want to show history from a reasonable start, e.g., 2018
 const startYear = 2018;
@@ -118,7 +124,7 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
                 <p class="text-sm text-text-secondary mt-1">Crescimento de projetos ativos</p>
             </div>
             <div class="text-right">
-                <span class="text-2xl font-bold text-premium-accent">{filteredEvolution[filteredEvolution.length - 1].projects}</span>
+                <span class="text-2xl font-bold text-premium-accent">{martData.summary.active_projects}</span>
                 <p class="text-[10px] text-text-muted uppercase tracking-wider">Projetos Ativos</p>
             </div>
         </header>
