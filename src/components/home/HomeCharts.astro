@@ -3,10 +3,16 @@ import martData from '../../data/mart/initiatives_analytics_mart.json';
 import groupsData from '../../data/canonical/research_groups_canonical.json';
 
 // --- Data Preparation: Ecosystem Evolution ---
-const evolutionData = martData.evolution.map((d: any) => ({
-    year: d.year,
-    projects: d.active_total // or d.active, assuming strictly 'active' snapshot or cumulative
-}));
+// Calculate cumulative active projects (running total)
+let runningTotal = 0;
+const evolutionData = martData.evolution.map((d: any) => {
+    runningTotal += (d.start - d.end);
+    return {
+        year: d.year,
+        projects: runningTotal,
+        starts: d.start // Keeping raw starts for tooltip context if needed
+    };
+});
 
 // We only want to show history from a reasonable start, e.g., 2018
 const startYear = 2018;
@@ -118,7 +124,7 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
                 <p class="text-sm text-text-secondary mt-1">Crescimento de projetos ativos</p>
             </div>
             <div class="text-right">
-                <span class="text-2xl font-bold text-premium-accent">{filteredEvolution[filteredEvolution.length - 1].projects}</span>
+                <span class="text-2xl font-bold text-premium-accent">{martData.summary.active_projects}</span>
                 <p class="text-[10px] text-text-muted uppercase tracking-wider">Projetos Ativos</p>
             </div>
         </header>
@@ -190,13 +196,13 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
             
             <div class="space-y-3">
                 {finalDistribution.slice(0, 5).map((d, i) => ( // Show legend for Top slices
-                    <div class="flex items-center justify-between text-xs">
+                    <a href={`/horizon_dashboard/groups?search=${encodeURIComponent(d.name)}`} class="flex items-center justify-between text-xs group/link hover:bg-white/5 p-1 rounded transition-colors">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full" style={`background-color: ${donutData[i].color}`}></span>
-                            <span class="text-text-secondary truncate max-w-[120px]" title={d.name}>{d.name}</span>
+                            <span class="text-text-secondary group-hover/link:text-premium-accent transition-colors" title={d.name}>{d.name}</span>
                         </div>
                         <span class="font-bold text-text-main">{d.count}</span>
-                    </div>
+                    </a>
                 ))}
             </div>
         </div>
@@ -205,15 +211,17 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
              <div class="relative w-48 h-48">
                 <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
                     {donutData.map(slice => (
-                        <path 
-                            d={getPiePath(slice.startAngle, slice.endAngle, 35, 50)} 
-                            fill={slice.color}
-                            stroke="#0f172a" 
-                            stroke-width="1"
-                            class="hover:opacity-90 transition-opacity cursor-pointer group-hover:scale-105"
-                        >
-                            <title>{slice.name}: {slice.count} grupos ({Math.round(slice.percentage * 100)}%)</title>
-                        </path>
+                        <a href={`/horizon_dashboard/groups?search=${encodeURIComponent(slice.name)}`} class="group/slice">
+                            <path 
+                                d={getPiePath(slice.startAngle, slice.endAngle, 35, 50)} 
+                                fill={slice.color}
+                                stroke="#0f172a" 
+                                stroke-width="1"
+                                class="hover:opacity-90 transition-opacity cursor-pointer group-hover/slice:scale-105 origin-center"
+                            >
+                                <title>{slice.name}: {slice.count} grupos ({Math.round(slice.percentage * 100)}%)</title>
+                            </path>
+                        </a>
                     ))}
                 </svg>
                 <!-- Center Stat -->
