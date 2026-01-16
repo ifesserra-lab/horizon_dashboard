@@ -38,6 +38,14 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-025** | Dashboard de Projetos (Listagem/Busca) | **Entregue** | v1.1.6 |
 | **US-026** | Dashboard de Projetos (Gráficos/KPIs) | **Entregue** | v1.1.6 |
 | **US-027** | Visualização por Abas (Dashboard) | **Entregue** | v1.1.6 |
+| **US-028** | Evolução Temporal da Equipe (Dashboard) | **Entregue** | v1.1.7 |
+| **US-029** | Evolução dos Projetos (Starts/Ends) | **Entregue** | v1.1.7 |
+| **US-030** | Analytics Mart Migration | **Entregue** | v1.1.7 |
+| **US-031** | Bugfix: Status & Conclusão | **Entregue** | v1.1.7 |
+| **US-032** | KPI Card: Pesquisadores | **Entregue** | v1.1.7 |
+| **US-033** | Refinement: Team Evolution | **Entregue** | v1.1.7 |
+| **US-034** | Visual Standardization (Headers) | **Entregue** | v1.1.8 |
+| **US-035** | Home Page Analytics | **Backlog** | - |
 
 ---
 
