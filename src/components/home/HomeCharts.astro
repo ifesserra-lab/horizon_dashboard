@@ -1,0 +1,227 @@
+---
+import martData from '../../data/mart/initiatives_analytics_mart.json';
+import groupsData from '../../data/canonical/research_groups_canonical.json';
+
+// --- Data Preparation: Ecosystem Evolution ---
+const evolutionData = martData.evolution.map((d: any) => ({
+    year: d.year,
+    projects: d.active_total // or d.active, assuming strictly 'active' snapshot or cumulative
+}));
+
+// We only want to show history from a reasonable start, e.g., 2018
+const startYear = 2018;
+const filteredEvolution = evolutionData.filter((d: any) => d.year >= startYear);
+
+const maxProjects = Math.max(...filteredEvolution.map((d: any) => d.projects), 1);
+
+// --- Data Preparation: Groups Distribution ---
+// Count groups by their PRIMARY knowledge area (first one in the list)
+const areaCounts: Record<string, number> = {};
+groupsData.forEach((group: any) => {
+    if (group.knowledge_areas && group.knowledge_areas.length > 0) {
+        // Use the first area as primary
+        const areaName = group.knowledge_areas[0].name;
+        areaCounts[areaName] = (areaCounts[areaName] || 0) + 1;
+    } else {
+        areaCounts['Sem Área'] = (areaCounts['Sem Área'] || 0) + 1;
+    }
+});
+
+const sortedAreas = Object.entries(areaCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5) // Top 5
+    .map(([name, count]) => ({ name, count }));
+
+const totalTop5 = sortedAreas.reduce((acc, curr) => acc + curr.count, 0);
+const otherCount = groupsData.length - totalTop5;
+
+const finalDistribution = [
+    ...sortedAreas,
+    { name: 'Outras', count: otherCount }
+].filter(d => d.count > 0);
+
+const totalGroups = groupsData.length;
+
+// Donut Chart Helpers
+let accumulatedAngle = 0;
+const donutData = finalDistribution.map((d, index) => {
+    const percentage = d.count / totalGroups;
+    const angle = percentage * 360;
+    const startAngle = accumulatedAngle;
+    accumulatedAngle += angle;
+    
+    // Colors for the slices
+    const colors = [
+        '#38bdf8', // premium-accent
+        '#818cf8', 
+        '#c084fc', // premium-purple
+        '#e879f9',
+        '#f472b6',
+        '#94a3b8'  // text-muted for 'Others'
+    ];
+
+    return {
+        ...d,
+        percentage,
+        startAngle,
+        endAngle: startAngle + angle,
+        color: d.name === 'Outras' ? '#334155' : colors[index % colors.length]
+    };
+});
+
+// SVG Path for Donut Slice
+const getPiePath = (startAngle: number, endAngle: number, innerRadius: number, outerRadius: number) => {
+    const x1 = 50 + outerRadius * Math.cos(Math.PI * startAngle / 180);
+    const y1 = 50 + outerRadius * Math.sin(Math.PI * startAngle / 180);
+    const x2 = 50 + outerRadius * Math.cos(Math.PI * endAngle / 180);
+    const y2 = 50 + outerRadius * Math.sin(Math.PI * endAngle / 180);
+
+    const x3 = 50 + innerRadius * Math.cos(Math.PI * endAngle / 180);
+    const y3 = 50 + innerRadius * Math.sin(Math.PI * endAngle / 180);
+    const x4 = 50 + innerRadius * Math.cos(Math.PI * startAngle / 180);
+    const y4 = 50 + innerRadius * Math.sin(Math.PI * startAngle / 180);
+
+    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+
+    return `M ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4} Z`;
+};
+
+// Line Chart Helpers
+const padding = 20;
+const width = 500;
+const height = 200;
+const innerWidth = width - padding * 2;
+const innerHeight = height - padding * 2;
+
+const stepX = innerWidth / (filteredEvolution.length - 1);
+const points = filteredEvolution.map((d: any, i: number) => ({
+    x: padding + i * stepX,
+    y: height - padding - (d.projects / maxProjects) * innerHeight,
+    value: d.projects,
+    year: d.year
+}));
+
+const linePath = points.reduce((acc: string, p: any, i: number) => 
+    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
+
+// Smooth curve (optional, keeping linear for now like ProjectCharts)
+---
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    <!-- Chart 1: Ecosystem Evolution -->
+    <section class="glass-card p-6 flex flex-col relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-br from-premium-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <header class="relative z-10 mb-6 flex justify-between items-end">
+            <div>
+                <h3 class="text-xl font-bold font-['Outfit'] text-text-main">Evolução do Ecossistema</h3>
+                <p class="text-sm text-text-secondary mt-1">Crescimento de projetos ativos</p>
+            </div>
+            <div class="text-right">
+                <span class="text-2xl font-bold text-premium-accent">{filteredEvolution[filteredEvolution.length - 1].projects}</span>
+                <p class="text-[10px] text-text-muted uppercase tracking-wider">Projetos Ativos</p>
+            </div>
+        </header>
+
+        <div class="relative z-10 w-full h-48 mt-auto">
+            <svg viewBox={`0 0 ${width} ${height}`} class="w-full h-full overflow-visible">
+                <!-- Grid Lines -->
+                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#334155" stroke-width="1" />
+                <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="#334155" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+
+                <!-- Gradient Definition -->
+                <defs>
+                    <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="var(--color-premium-accent)" />
+                        <stop offset="100%" stop-color="var(--color-premium-purple)" />
+                    </linearGradient>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--color-premium-accent)" stop-opacity="0.2" />
+                        <stop offset="100%" stop-color="var(--color-premium-accent)" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Area Path -->
+                <path 
+                    d={`${linePath} L ${width - padding} ${height - padding} L ${padding} ${height - padding} Z`} 
+                    fill="url(#areaGradient)" 
+                />
+
+                <!-- Line Path -->
+                <path 
+                    d={linePath} 
+                    fill="none" 
+                    stroke="url(#lineGradient)" 
+                    stroke-width="3" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round"
+                    class="drop-shadow-[0_0_10px_rgba(56,189,248,0.3)]"
+                />
+
+                <!-- Points & Labels -->
+                {points.map((p, i) => (
+                    <g class="group/point hover:opacity-100 transition-opacity">
+                        <circle cx={p.x} cy={p.y} r="4" class="fill-bg-main stroke-premium-accent stroke-2" />
+                        
+                        <!-- Tooltip-like Label (only visible on hover of group/point, simplified here to typical rendering) -->
+                        <foreignObject x={p.x - 20} y={p.y - 35} width="40" height="25" class="opacity-0 group-hover/point:opacity-100 transition-opacity">
+                             <div class="bg-slate-800 text-white text-[10px] font-bold rounded px-1.5 py-0.5 text-center border border-slate-700 shadow-xl">
+                                {p.value}
+                             </div>
+                        </foreignObject>
+
+                        <!-- Year Label (every 2 years or first/last to avoid clutter) -->
+                        {(i === 0 || i === points.length - 1 || i % 2 === 0) && (
+                            <text x={p.x} y={height} text-anchor="middle" class="text-[10px] fill-text-muted font-medium">{p.year}</text>
+                        )}
+                    </g>
+                ))}
+            </svg>
+        </div>
+    </section>
+
+    <!-- Chart 2: Groups Distribution -->
+    <section class="glass-card p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-bl from-premium-purple/5 to-transparent pointer-events-none"></div>
+        
+        <div class="w-full md:w-1/2 flex flex-col justify-center">
+            <h3 class="text-xl font-bold font-['Outfit'] text-text-main mb-2">Distribuição de Grupos</h3>
+            <p class="text-sm text-text-secondary mb-6 text-balance">Concentração por grande área de conhecimento.</p>
+            
+            <div class="space-y-3">
+                {finalDistribution.slice(0, 5).map((d, i) => ( // Show legend for Top slices
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full" style={`background-color: ${donutData[i].color}`}></span>
+                            <span class="text-text-secondary truncate max-w-[120px]" title={d.name}>{d.name}</span>
+                        </div>
+                        <span class="font-bold text-text-main">{d.count}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 flex justify-center relative">
+             <div class="relative w-48 h-48">
+                <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+                    {donutData.map(slice => (
+                        <path 
+                            d={getPiePath(slice.startAngle, slice.endAngle, 35, 50)} 
+                            fill={slice.color}
+                            stroke="#0f172a" 
+                            stroke-width="1"
+                            class="hover:opacity-90 transition-opacity cursor-pointer group-hover:scale-105"
+                        >
+                            <title>{slice.name}: {slice.count} grupos ({Math.round(slice.percentage * 100)}%)</title>
+                        </path>
+                    ))}
+                </svg>
+                <!-- Center Stat -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span class="text-2xl font-bold text-text-main">{totalGroups}</span>
+                    <span class="text-[10px] text-text-muted uppercase tracking-widest">Grupos</span>
+                </div>
+             </div>
+        </div>
+    </section>
+</div>

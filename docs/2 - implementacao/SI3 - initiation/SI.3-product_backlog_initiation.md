@@ -782,3 +782,26 @@ tamanho: 3
 origem: [User Request]
 tags: [type:feature, area:ui, component:projects]
 ```
+
+### US-035 – Home Page Analytics
+```yaml
+id: US-035
+milestone: R1
+prioridade: Média
+tamanho: 5
+origem: [User Request]
+tags: [type:feature, area:ui, component:home]
+```
+
+#### Descrição
+Como gestor, quero visualizar gráficos de alto nível na Home Page sobre a evolução de Projetos (ativos/iniciados/concluídos) e distribuição de Grupos de Pesquisa, para ter uma visão macro do ecossistema de inovação da instituição.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Gráfico de Evolução de Projetos (Linha/Barra) usando dados do Mart.
+    - [ ] Gráfico de Distribuição de Grupos de Pesquisa (Pizza/Donut) por Grande Área ou Campus.
+    - [ ] Cards de estatísticas (já existentes) alinhados com os novos gráficos.
+- **UI/UX**:
+    - [ ] Manter o estilo premium (cards, glassmorphism, tipografia Outfit).
+    - [ ] Charts interativos (Recharts/Apache ECharts ou similar).
+
