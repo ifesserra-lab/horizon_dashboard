@@ -1,11 +1,11 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import projectsData from '../../data/canonical/initiatives_canonical.json';
-import martData from '../../data/mart/initiatives_analytics_mart.json';
-import ProjectKpiCards from '../../components/projects/ProjectKpiCards.astro';
-import ProjectCharts from '../../components/projects/ProjectCharts.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
-import type { Project } from '../../types/projects';
+import Layout from "../../layouts/Layout.astro";
+import projectsData from "../../data/canonical/initiatives_canonical.json";
+import martData from "../../data/mart/initiatives_analytics_mart.json";
+import ProjectKpiCards from "../../components/projects/ProjectKpiCards.astro";
+import ProjectCharts from "../../components/projects/ProjectCharts.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import type { Project } from "../../types/projects";
 
 // Cast data to Project type
 const allProjects = projectsData as unknown as Project[];
@@ -19,29 +19,20 @@ const sortedProjects = [...allProjects].sort((a, b) => {
 <Layout title="Dashboard de Projetos">
     <div class="space-y-10 pb-12">
         <!-- Header -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <header class="flex flex-col gap-6">
             <div>
-                <h1 class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main">
-                    Projetos de <span class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple">Pesquisa</span>
+                <h1
+                    class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main"
+                >
+                    Projetos de <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+                        >Pesquisa</span
+                    >
                 </h1>
                 <p class="text-text-secondary mt-2 max-w-2xl">
-                    Visão analítica e exploratória de todas as iniciativas de pesquisa, extensão e pós-graduação da instituição.
+                    Visão analítica e exploratória de todas as iniciativas de
+                    pesquisa, extensão e pós-graduação da instituição.
                 </p>
-            </div>
-
-            <div class="relative max-w-md w-full">
-                <label for="projectSearch" class="sr-only">Buscar projetos</label>
-                <input 
-                    type="text" 
-                    id="projectSearch"
-                    placeholder="Buscar por título, membro ou status..." 
-                    class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
-                />
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                
-                <button id="resetSearch" class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden" title="Limpar busca">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 9-6 6"/><path d="m9 9 6 6"/><circle cx="12" cy="12" r="10"/></svg>
-                </button>
             </div>
         </header>
 
@@ -51,29 +42,106 @@ const sortedProjects = [...allProjects].sort((a, b) => {
         <!-- Charts Dashboard -->
         <ProjectCharts martData={martData} />
 
+        <!-- Search -->
+        <div class="relative max-w-md w-full">
+            <label for="projectSearch" class="sr-only">Buscar projetos</label>
+            <input
+                type="text"
+                id="projectSearch"
+                placeholder="Buscar por título, membro ou status..."
+                class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+            />
+            <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-text-secondary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
+                ></path></svg
+            >
+
+            <button
+                id="resetSearch"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden"
+                title="Limpar busca"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="m15 9-6 6"></path><path d="m9 9 6 6"
+                    ></path><circle cx="12" cy="12" r="10"></circle></svg
+                >
+            </button>
+        </div>
+
         <!-- Projects Explorer -->
         <section class="space-y-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Explorar Projetos</h2>
-                <span class="text-xs font-bold text-text-muted uppercase tracking-widest">{allProjects.length} Projetos</span>
+            <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+            >
+                <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">
+                    Explorar Projetos
+                </h2>
+                <span
+                    class="text-xs font-bold text-text-muted uppercase tracking-widest"
+                    >{allProjects.length} Projetos</span
+                >
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
-                {sortedProjects.map((project) => (
-                    <div class="project-card-wrapper transition-all duration-300">
-                        <ProjectCard project={project} />
-                    </div>
-                ))}
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                id="projectsGrid"
+            >
+                {
+                    sortedProjects.map((project) => (
+                        <div class="project-card-wrapper transition-all duration-300">
+                            <ProjectCard project={project} />
+                        </div>
+                    ))
+                }
             </div>
 
             <!-- Empty State -->
-            <div id="emptyState" class="hidden flex-col items-center justify-center py-24 text-center glass-card border-dashed">
-                <div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>
+            <div
+                id="emptyState"
+                class="hidden flex-col items-center justify-center py-24 text-center glass-card border-dashed"
+            >
+                <div
+                    class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-10 h-10 opacity-50"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><circle cx="11" cy="11" r="8"></circle><path
+                            d="m21 21-4.3-4.3"></path><path d="M8 11h6"
+                        ></path></svg
+                    >
                 </div>
-                <h3 class="text-xl font-bold font-['Outfit'] text-text-main mb-2">Nenhum projeto encontrado</h3>
+                <h3
+                    class="text-xl font-bold font-['Outfit'] text-text-main mb-2"
+                >
+                    Nenhum projeto encontrado
+                </h3>
                 <p class="text-text-secondary max-w-sm mx-auto">
-                    Ajuste seus termos de busca ou filtros para encontrar o que procura.
+                    Ajuste seus termos de busca ou filtros para encontrar o que
+                    procura.
                 </p>
             </div>
         </section>
@@ -81,56 +149,59 @@ const sortedProjects = [...allProjects].sort((a, b) => {
 
     <!-- Client-side Logic -->
     <script>
-        const searchInput = document.getElementById('projectSearch') as HTMLInputElement;
-        const resetBtn = document.getElementById('resetSearch');
-        const emptyState = document.getElementById('emptyState');
-        const projectCards = document.querySelectorAll('.project-card-wrapper');
+        const searchInput = document.getElementById(
+            "projectSearch",
+        ) as HTMLInputElement;
+        const resetBtn = document.getElementById("resetSearch");
+        const emptyState = document.getElementById("emptyState");
+        const projectCards = document.querySelectorAll(".project-card-wrapper");
 
         function filterProjects() {
             const query = searchInput.value.toLowerCase().trim();
             let visibleCount = 0;
 
             if (query) {
-                resetBtn?.classList.remove('hidden');
+                resetBtn?.classList.remove("hidden");
             } else {
-                resetBtn?.classList.add('hidden');
+                resetBtn?.classList.add("hidden");
             }
 
-            projectCards.forEach(card => {
+            projectCards.forEach((card) => {
                 const element = card as HTMLElement;
-                const projectCard = element.querySelector('.project-card') as HTMLElement;
-                
+                const projectCard = element.querySelector(
+                    ".project-card",
+                ) as HTMLElement;
+
                 if (!projectCard) return;
 
-                const name = projectCard.dataset.name || '';
-                const status = projectCard.dataset.status || '';
+                const name = projectCard.dataset.name || "";
+                const status = projectCard.dataset.status || "";
                 // For a more complete search, we could include team members if we had them in data-attributes
-                
-                const matches = !query || 
-                    name.includes(query) || 
-                    status.includes(query);
+
+                const matches =
+                    !query || name.includes(query) || status.includes(query);
 
                 if (matches) {
-                    element.style.display = 'block';
+                    element.style.display = "block";
                     visibleCount++;
                 } else {
-                    element.style.display = 'none';
+                    element.style.display = "none";
                 }
             });
 
             if (visibleCount === 0) {
-                emptyState?.classList.remove('hidden');
-                emptyState?.classList.add('flex');
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
             } else {
-                emptyState?.classList.add('hidden');
-                emptyState?.classList.remove('flex');
+                emptyState?.classList.add("hidden");
+                emptyState?.classList.remove("flex");
             }
         }
 
-        searchInput?.addEventListener('input', filterProjects);
-        
-        resetBtn?.addEventListener('click', () => {
-            searchInput.value = '';
+        searchInput?.addEventListener("input", filterProjects);
+
+        resetBtn?.addEventListener("click", () => {
+            searchInput.value = "";
             filterProjects();
             searchInput.focus();
         });
