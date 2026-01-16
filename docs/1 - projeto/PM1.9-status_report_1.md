@@ -46,6 +46,7 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-033** | Refinement: Team Evolution | **Entregue** | v1.1.7 |
 | **US-034** | Visual Standardization (Headers) | **Entregue** | v1.2.0 |
 | **US-035** | Home Page Analytics (Refined) | **Entregue** | v1.2.1 |
+| **Bugfix** | Home Chart Clipping | **Entregue** | v1.2.2 |
 
 ---
 

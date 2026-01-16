@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
+| **v1.2.2** | 2026-01-16 | **Released** | Bugfix: Home Chart Hover Clipping |
 | **v1.2.1** | 2026-01-16 | **Released** | Refinement: Home Analytics (Interaction + Bugfix) |
 | **v1.2.0** | 2026-01-16 | **Released** | Feature: Visual Standards & Ecosystem Analytics |
 | **v1.1.7** | 2026-01-16 | **Released** | Refinement: Team Evolution data & Dashboard Polishing |
