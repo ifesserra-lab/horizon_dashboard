@@ -96,17 +96,30 @@ Maintain the following artifacts throughout the lifecycle:
 - [ ] `task.md`: For detailed task tracking.
 - [ ] `implementation_plan.md`: For technical planning and review.
     - [ ] **Test Plan**: MUST list all test cases based on requirements. **MANDATORY AND NON-NEGOTIABLE**.
-- [ ] `docs/backlog.md`: Must include **Releases** section with:
-    - PR Number & Link
-    - Description
-    - Commit SHA & Link
+- [ ] `docs/backlog.md`: **MANDATORY**. Must include:
+    - [ ] **Releases Table** with columns: Version, Date, Status, Description, **PR**, **Issues**
+    - [ ] **PR Links**: Every release MUST link to its corresponding GitHub Pull Request (e.g., `[#50](https://github.com/org/repo/pull/50)`)
+    - [ ] **Issue Links**: Link all related GitHub Issues that were closed in the release (e.g., `[#35](https://github.com/org/repo/issues/35)`)
+    - [ ] **In-Progress Items**: All user stories MUST include their GitHub issue links for traceability
+- [ ] `docs/2 - implementacao/SI3 - initiation/SI.3-product_backlog_initiation.md`: **MANDATORY**. Must include:
+    - [ ] **Backlog Refinado Table**: Add **Issue** column with links to GitHub issues
+    - [ ] **User Story Headers**: Add `**GitHub Issue**: [#XX](https://github.com/org/repo/issues/XX)` below each user story title
+    - [ ] **Consistency**: Ensure issue references match those in `docs/backlog.md`
+- [ ] **GitHub Links Format (MANDATORY)**:
+    - [ ] **Pull Requests**: Use format `[#XX](https://github.com/org/repo/pull/XX)`
+    - [ ] **Issues**: Use format `[#XX](https://github.com/org/repo/issues/XX)`
+    - [ ] **Commits**: Use format `[SHA](https://github.com/org/repo/commit/SHA)` (7-char SHA minimum)
+    - [ ] **Verification**: All links MUST point to valid GitHub artifacts
 - [ ] **Synchronization (MANDATORY)**:
     - [ ] **Trigger**: Any update to `docs/2 - implementacao/SI3 - initiation/SI.3-product_backlog_initiation.md`.
     - [ ] **Action**: You MUST immediately update:
         - [ ] `task.md` (Operational tasks).
-        - [ ] `docs/backlog.md` (Release status).
+        - [ ] `docs/backlog.md` (Release status with PR/Issue links).
         - [ ] `PM1.3 Release Plan` (only if Milestones/Dates change).
-
+    - [ ] **Post-Release Update**: After merging a release PR to `main`:
+        - [ ] Update `docs/backlog.md` releases table with PR and Issue links
+        - [ ] Update `docs/2 - implementacao/SI3 - initiation/SI.3-product_backlog_initiation.md` with issue links for completed user stories
+        - [ ] Verify all links are clickable and point to correct GitHub artifacts
 
 ## 7. Implementation Standards
 - [ ] **TDD**: Implement the test cases defined in the plan BEFORE the implementation code. **MANDATORY AND NON-NEGOTIABLE**.
@@ -163,6 +176,10 @@ Maintain the following artifacts throughout the lifecycle:
     - [ ] Update Google-style docstrings.
     - [ ] Update relevant `docs/*.md` files.
     - [ ] **PM Updates**: Check if `PM1.3 Release Plan` or `PM1.9 Status Report` needs updates.
+    - [ ] **GitHub Links (MANDATORY)**: Update `docs/backlog.md` and `docs/2 - implementacao/SI3 - initiation/SI.3-product_backlog_initiation.md` with:
+        - [ ] PR links in the releases table
+        - [ ] Issue links for all closed issues
+        - [ ] Issue references in user story sections
     - [ ] Update/Create `walkthrough.md`.
 - [ ] **Closure**:
     - [ ] Close related GitHub Issues.

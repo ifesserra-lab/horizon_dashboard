@@ -126,19 +126,21 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 
 # 3. Backlog Refinado (R1 - Entregue)
 
-| ID | Título | Status | PR/Commit |
-|----|--------|--------|-----------|
-| **US-001** | Listagem de Grupos | **Done** | v1.0.0 |
-| **US-002** | Detalhes do Grupo | **Done** | v1.0.0 |
-| **Fix** | Remoção de Avatares (Listagem) | **Done** | v1.0.3 |
-| **Task** | Dados Reais & KPIs | **Done** | v1.0.4 |
-| **US-006** | Dashboard de Áreas de Conhecimento | **Done** | v1.0.6 |
-| **US-011** | Top 10 Research Lines (Home) | **Done** | v1.0.6 |
-| **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 |
-| **US-015** | Separação de Membros | **Done** | v1.0.10 |
-| **US-015** | Separação de Membros | **Done** | v1.0.10 |
-| **US-019** | Recursos de Acessibilidade | **Ready** | - |
+| ID | Título | Status | PR/Commit | Issue |
+|----|--------|--------|-----------|-------|
+| **US-001** | Listagem de Grupos | **Done** | v1.0.0 | - |
+| **US-002** | Detalhes do Grupo | **Done** | v1.0.0 | - |
+| **Fix** | Remoção de Avatares (Listagem) | **Done** | v1.0.3 | [#6](https://github.com/ifesserra-lab/horizon_dashboard/issues/6) |
+| **Task** | Dados Reais & KPIs | **Done** | v1.0.4 | - |
+| **US-006** | Dashboard de Áreas de Conhecimento | **Done** | v1.0.6 | [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21) |
+| **US-011** | Top 10 Research Lines (Home) | **Done** | v1.0.6 | [#24](https://github.com/ifesserra-lab/horizon_dashboard/issues/24) |
+| **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 | [#22](https://github.com/ifesserra-lab/horizon_dashboard/issues/22) |
+| **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
+| **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
+| **US-019** | Recursos de Acessibilidade | **Ready** | - | [#30](https://github.com/ifesserra-lab/horizon_dashboard/issues/30) |
 ### US-006 – Dashboard de Áreas de Conhecimento
+**GitHub Issue**: [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21)
+
 ```yaml
 id: US-006
 milestone: R1
@@ -161,6 +163,8 @@ Implementar uma página dedicada para visualizar a distribuição dos grupos de 
     - [x] Estilo premium seguindo o padrão da plataforma.
 
 ### US-011 – Top 10 Linhas de Pesquisa (Dashboard Home)
+**GitHub Issue**: [#24](https://github.com/ifesserra-lab/horizon_dashboard/issues/24)
+
 ```yaml
 id: US-011
 milestone: R1
@@ -182,6 +186,8 @@ Substituir a card de "Distribuição por Área" na home pelo "Top 10 Linhas de P
     - [ ] Tooltip/Texto explicativo se necessário.
 
 ### US-012 – Top 10 Linhas de Pesquisa (Página de Áreas)
+**GitHub Issue**: [#22](https://github.com/ifesserra-lab/horizon_dashboard/issues/22)
+
 ```yaml
 id: US-012
 milestone: R1
@@ -218,6 +224,8 @@ Refatorar a seção de membros na página de detalhes do grupo (`src/pages/group
 
 
 ### US-014 – Identificação de Egressos (Detalhes do Grupo)
+**GitHub Issue**: [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) (Implemented as US-015)
+
 ```yaml
 id: US-014
 milestone: R1
@@ -568,6 +576,8 @@ Desenvolver um novo pipeline que extrai URLs de espelho de grupos do banco de da
 **Objetivo**: Garantir que a plataforma seja inclusiva para usuários com necessidades especiais.
 
 ### US-019 – Recursos de Acessibilidade (Baixa Visão e Daltonismo)
+**GitHub Issue**: [#30](https://github.com/ifesserra-lab/horizon_dashboard/issues/30)
+
 ```yaml
 id: US-019
 milestone: R1
@@ -590,6 +600,8 @@ Como um usuário com baixa visão ou daltonismo, quero poder ativar modos de vis
     - [ ] Respeitar os padrões WCAG 2.1 AA de contraste.
 
 ### US-020 – Recursos para Baixa Visão (Magnificação de Texto)
+**GitHub Issue**: [#31](https://github.com/ifesserra-lab/horizon_dashboard/issues/31)
+
 ```yaml
 id: US-020
 milestone: R1
@@ -612,6 +624,8 @@ Como um usuário com baixa visão, quero poder aumentar o tamanho da fonte e o e
     - [ ] Prover feedback visual no menu para a opção selecionada.
 
 ### US-021 – Auditoria de Qualidade (Lighthouse)
+**GitHub Issue**: [#31](https://github.com/ifesserra-lab/horizon_dashboard/issues/31)
+
 ```yaml
 id: US-021
 milestone: R1
@@ -631,6 +645,8 @@ Como um gestor de qualidade, quero realizar uma auditoria Lighthouse em páginas
     - [ ] Documentar os resultados no walkthrough.
 
 ### US-022 – SEO Social (Open Graph Tags)
+**GitHub Issue**: [#32](https://github.com/ifesserra-lab/horizon_dashboard/issues/32)
+
 ```yaml
 id: US-022
 milestone: R1
@@ -650,6 +666,8 @@ Como um produtor de conteúdo, quero que o portal tenha tags Open Graph para que
     - [ ] Garantir que o título da página seja usado dinamicamente na tag `og:title`.
 
 ### US-023 – Bugfix: Quebra de linha no Dashboard
+**GitHub Issue**: [#33](https://github.com/ifesserra-lab/horizon_dashboard/issues/33)
+
 ```yaml
 id: US-023
 milestone: R1
@@ -711,6 +729,8 @@ Página detalhada do projeto exibindo escopo, período de execução e status.
 - [x] Design consistente e responsivo.
 
 ### US-018 – Equipe nos Detalhes do Projeto
+**GitHub Issue**: [#29](https://github.com/ifesserra-lab/horizon_dashboard/issues/29)
+
 ```yaml
 id: US-018
 milestone: R1
@@ -724,6 +744,8 @@ tags: [type:feature, area:frontend, component:projects]
 Exibir a lista de pesquisadores e estudantes vinculados ao projeto.
 
 ### US-024 – Sincronização de Equipes
+**GitHub Issue**: [#34](https://github.com/ifesserra-lab/horizon_dashboard/issues/34)
+
 ```yaml
 id: US-024
 milestone: R1
