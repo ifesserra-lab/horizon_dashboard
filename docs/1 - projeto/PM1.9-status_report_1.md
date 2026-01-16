@@ -44,8 +44,8 @@ A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados rea
 | **US-031** | Bugfix: Status & Conclusão | **Entregue** | v1.1.7 |
 | **US-032** | KPI Card: Pesquisadores | **Entregue** | v1.1.7 |
 | **US-033** | Refinement: Team Evolution | **Entregue** | v1.1.7 |
-| **US-034** | Visual Standardization (Headers) | **Entregue** | v1.1.8 |
-| **US-035** | Home Page Analytics | **Backlog** | - |
+| **US-034** | Visual Standardization (Headers) | **Entregue** | v1.2.0 |
+| **US-035** | Home Page Analytics (Refined) | **Entregue** | v1.2.1 |
 
 ---
 

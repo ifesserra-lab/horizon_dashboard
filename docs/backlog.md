@@ -7,11 +7,9 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description |
 |---------|------|--------|-------------|
-<<<<<<< HEAD
+| **v1.2.1** | 2026-01-16 | **Released** | Refinement: Home Analytics (Interaction + Bugfix) |
+| **v1.2.0** | 2026-01-16 | **Released** | Feature: Visual Standards & Ecosystem Analytics |
 | **v1.1.7** | 2026-01-16 | **Released** | Refinement: Team Evolution data & Dashboard Polishing |
-=======
->>>>>>> main
-| **v1.1.6** | 2026-01-16 | **Released** | Feature: Projects Dashboard (KPIs, Charts, Search) |
 | **v1.1.5** | 2026-01-15 | **Released** | Data Fix: Initiative Team Synchronization | [8e25f79](https://github.com/ifesserra-lab/horizon_dashboard/commit/8e25f79) |
 | **v1.1.4** | 2026-01-14 | **Released** | Bugfix: Dashboard Line Break Optimization | [380b981](https://github.com/ifesserra-lab/horizon_dashboard/commit/380b981) |
 | **v1.1.3** | 2026-01-14 | **Released** | Feature: Social SEO (Open Graph Tags) | [eedb9d1](https://github.com/ifesserra-lab/horizon_dashboard/commit/eedb9d1) |
