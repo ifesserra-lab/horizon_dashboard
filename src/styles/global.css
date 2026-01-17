@@ -39,6 +39,10 @@
     }
 
     /* Text Scaling Classes */
+    :root.text-scale-sm {
+        --base-font-size: 87.5%;
+    }
+
     :root.text-scale-base {
         --base-font-size: 100%;
     }
@@ -48,7 +52,7 @@
     }
 
     :root.text-scale-xl {
-        --base-font-size: 150%;
+        --base-font-size: 175%;
     }
 
     html {
@@ -70,7 +74,20 @@
         --color-premium-accent: #38bdf8;
     }
 
-    :root.high-contrast {
+    :root.contrast-high {
+        --bg-primary: #0a0a0a;
+        --text-primary: #ffffff;
+        --text-secondary: #e0e0e0;
+        --border-primary: rgba(255, 255, 255, 0.3);
+        --glass-surface: rgba(10, 10, 10, 0.8);
+        --page-gradient: none;
+        --tag-bg: #1a1a1a;
+        --tag-bg-accent: #2a2a2a;
+        --color-premium-accent: #60d5ff;
+        --color-premium-purple: #a78bfa;
+    }
+
+    :root.contrast-maximum {
         --bg-primary: #000000;
         --text-primary: #ffffff;
         --text-secondary: #ffff00;
@@ -83,8 +100,27 @@
         --color-premium-purple: #ffffff;
     }
 
-    :root.grayscale-mode {
-        filter: grayscale(100%);
+    /* Accessibility: Reduce Motion */
+    :root.reduce-motion *,
+    :root.reduce-motion ::before,
+    :root.reduce-motion ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Accessibility: Enhanced Focus Indicators */
+    :root.enhanced-focus :focus-visible {
+        outline: 4px solid var(--color-premium-accent) !important;
+        outline-offset: 4px !important;
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2) !important;
+    }
+
+    /* Accessibility: Screen Reader Optimization */
+    :root.screen-reader-optimized [aria-hidden="true"] {
+        /* Ensure decorative elements are properly hidden */
+        pointer-events: none;
     }
 
     body {
