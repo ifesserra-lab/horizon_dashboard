@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v1.3.0** | 2026-01-16 | **Released** | Feature: Enhanced Accessibility Panel (US-030) | [#58](https://github.com/ifesserra-lab/horizon_dashboard/pull/58) | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 | **v1.2.2** | 2026-01-16 | **Released** | Bugfix: Home Chart Hover Clipping | [#50](https://github.com/ifesserra-lab/horizon_dashboard/pull/50) | - |
 | **v1.2.1** | 2026-01-16 | **Released** | Refinement: Home Analytics (Interaction + Bugfix) | [#49](https://github.com/ifesserra-lab/horizon_dashboard/pull/49) | - |
 | **v1.2.0** | 2026-01-16 | **Released** | Feature: Visual Standards & Ecosystem Analytics | [#48](https://github.com/ifesserra-lab/horizon_dashboard/pull/48) | - |
@@ -52,6 +53,8 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-021** Auditoria de Qualidade (Lighthouse) ([#31](https://github.com/ifesserra-lab/horizon_dashboard/issues/31)) (Entregue na v1.1.2)
     - [x] **US-022** SEO Social (Open Graph Tags) ([#32](https://github.com/ifesserra-lab/horizon_dashboard/issues/32)) (Entregue na v1.1.3)
     - [x] **US-023** Bugfix: Quebra de linha no Dashboard ([#33](https://github.com/ifesserra-lab/horizon_dashboard/issues/33)) (Entregue na v1.1.4)
+    - [x] **US-030** Painel de Acessibilidade Completo ([#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56)) (Entregue na v1.3.0)
+
 
 - **Epic 4: Portal de Projetos (Release 1 Extension)** _(Entregue - Refinado)_
     - [x] **US-016** Catálogo de Projetos (Entregue na v1.1.6)

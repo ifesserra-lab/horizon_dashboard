@@ -137,7 +137,7 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-012** | Top 10 Research Lines (Areas) | **Done** | v1.0.6 | [#22](https://github.com/ifesserra-lab/horizon_dashboard/issues/22) |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
-| **US-019** | Recursos de Acessibilidade | **Ready** | - | [#30](https://github.com/ifesserra-lab/horizon_dashboard/issues/30) |
+| **US-030** | Painel de Acessibilidade Completo | **Done** | v1.3.0 | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 ### US-006 – Dashboard de Áreas de Conhecimento
 **GitHub Issue**: [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21)
 
