@@ -684,6 +684,94 @@ A frase de boas-vindas no dashboard está sofrendo uma quebra de linha indesejad
 - [ ] Eliminar a quebra de linha indesejada em resoluções desktop.
 - [ ] Manter a responsividade para telas menores.
 - [ ] Usar `text-balance` ou ajuste de largura máxima para otimização tipográfica.
+
+### US-030 – Painel de Acessibilidade Completo
+**Origem**: Evolução de US-019 e US-020 baseada em design atualizado
+
+```yaml
+id: US-030
+milestone: R1
+prioridade: Alta
+tamanho: 8
+origem: [RF-27, RF-11, RNF-02]
+tags: [type:feature, area:frontend, component:accessibility]
+dependencies: [US-019, US-020]
+```
+
+#### Descrição
+Como usuário com necessidades especiais (baixa visão, daltonismo, sensibilidade a movimento), quero acessar um painel de acessibilidade completo que permita personalizar minha experiência de navegação de forma integrada, para que eu possa consumir o conteúdo do portal de forma confortável e inclusiva.
+
+#### Contexto
+Esta user story consolida e estende os recursos de acessibilidade existentes (US-019 e US-020) em um painel unificado que segue o design fornecido na imagem de referência. O painel oferece controle granular sobre tema, contraste, tamanho da fonte e opções avançadas de acessibilidade.
+
+#### Critérios de Aceitação
+- **Tema (Seletornde 3 opções)**:
+    - [x] Implementar botão "Claro" (Light mode)
+    - [x] Implementar botão "Escuro" (Dark mode)
+    - [ ] Implementar botão "Auto" (segue preferência do sistema via `prefers-color-scheme`)
+    - [ ] Exibir ícones apropriados para cada modo (sol, lua, monitor)
+    - [ ] Indicar visualmente o tema ativo com borda/background diferenciado
+
+- **Contraste (3 níveis)**:
+    - [x] "Normal" - contraste padrão atual
+    - [x] "Alto" - evolução do high-contrast existente
+    - [ ] "Máximo" - contraste extremo para WCAG AAA (preto puro #000 / branco puro #FFF)
+    - [ ] Remover modo "Escala de Cinza" (não presente no novo design)
+    - [ ] Indicar visualmente o nível ativo
+
+- **Tamanho da Fonte (4 níveis)**:
+    - [ ] "Pequena" (87.5% - novo)
+    - [x] "Normal" (100% - renomear de "Base")
+    - [x] "Grande" (125% - renomear de "Lg")
+    - [ ] "Extra" (175% - estender de 150%)
+    - [ ] Exibir exemplos visuais de tamanho (A, A+, etc.)
+
+- **Opções Adicionais (Toggles)**:
+    - [ ] **Reduzir Movimento**:
+        - Toggle switch funcional
+        - Descrição: "Minimiza animações e transições"
+        - Aplicar classe `:root.reduce-motion` que desabilita animações
+    - [ ] **Indicadores de Foco**:
+        - Toggle switch funcional
+        - Descrição: "Destaca elementos focados"
+        - Aplicar classe `:root.enhanced-focus` com outline mais visível
+    - [ ] **Otimizar para Leitor de Tela**:
+        - Toggle switch funcional
+        - Descrição: "Melhora compatibilidade com leitores de tela"
+        - Aplicar classe `:root.screen-reader-optimized` que otimiza markup
+
+- **Restaurar Padrões**:
+    - [ ] Botão "Restaurar Padrões" no final do painel
+    - [ ] Ao clicar, resetar todas as configurações para valores default
+    - [ ] Fornecer feedback visual (toast ou animação) de reset bem-sucedido
+
+- **Persistência e Performance**:
+    - [ ] Todas as configurações persistidas em `localStorage`
+    - [ ] Estado carregado antes do primeiro render (evitar FOUC)
+    - [ ] Classes aplicadas no `:root` para afeta global
+
+- **UI/UX**:
+    - [ ] Painel visualmente idêntico ao design fornecido
+    - [ ] Header "Acessibilidade" com botão de fechar (×)
+    - [ ] Seções claramente delimitadas com títulos
+    - [ ] Botões de toggle com feedback visual claro (ativo/inativo)
+    - [ ] Design responsivo (mobile-first)
+    - [ ] Acessível via teclado (Tab, Enter, ESC)
+    - [ ] Conformidade WCAG 2.1 AA no próprio painel
+
+- **Testes**:
+    - [ ] Testes unitários para lógica de toggle e persistência
+    - [ ] Testes de integração para carregamento de preferências
+    - [ ] Auditoria Lighthouse (Accessibility score \u003e 95)
+    - [ ] Teste manual com leitores de tela (NVDA/VoiceOver)
+
+#### Notas Técnicas
+- Refatorar completamente `src/components/AccessibilityToggle.astro`
+- Atualizar `src/styles/global.css` com novos níveis de contraste e classes
+- Atualizar `src/layouts/Layout.astro` inline script para carregar novas preferências
+- Manter compatibilidade retroativa com localStorage keys existentes ou migrar
+
+
 ## Epic 5: Portal de Projetos (Release 1 Extension)
 **Objetivo**: Centralizar a gestão e visualização dos projetos de pesquisa da instituição.
 
