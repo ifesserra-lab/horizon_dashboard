@@ -915,3 +915,29 @@ Como gestor, quero visualizar gráficos de alto nível na Home Page sobre a evol
     - [ ] Manter o estilo premium (cards, glassmorphism, tipografia Outfit).
     - [ ] Charts interativos (Recharts/Apache ECharts ou similar).
 
+
+## Epic 8: Dashboard de Produção Acadêmica (Release 1 Extension)
+**Objetivo**: Visualizar a produção bibliográfica da instituição.
+
+### US-031 – Dashboard de Publicações
+```yaml
+id: US-031
+milestone: R1
+prioridade: Alta
+tamanho: 8
+origem: [RF-28, RF-29]
+tags: [type:feature, area:frontend, component:dashboard]
+```
+
+#### Descrição
+Implementar um dashboard dedicado para visualização da produção acadêmica, exibindo métricas de quantidade por pesquisador e a evolução temporal das publicações.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Gráfico de Barras: Quantidade de Publicações por Pesquisador (Top 10/20).
+    - [ ] Gráfico de Linha/Área: Evolução temporal (Quantidade por Ano).
+    - [ ] Listagem tabular ou em cards das publicações (opcional para primeira versão, mas desejável).
+    - [ ] Filtro por Intervalo de Anos.
+- **UI/UX**:
+    - [ ] Design consistente com os demais dashboards (Title, KPIs, Charts).
+    - [ ] Tooltips interativos nos gráficos.
