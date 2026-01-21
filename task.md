@@ -1,0 +1,22 @@
+# Task List - Publications Dashboard
+
+- [x] Analyze Requirements and Documentation
+- [x] Update SI.1 Requirements (`RF-28`, `RF-29`)
+- [x] Update SI.3 Design (Publication Entity, Visualization Mapping)
+- [x] Update SI.3 Product Backlog (`US-031`)
+- [x] Create Implementation Plan
+- [x] **Request User Review & Data Source Confirmation** (Confirmed: Use Mock Data)
+- [/] Implement Dashboard (`US-031`)
+    - [x] **Create GitHub Issue (US-031)**
+    - [x] **Create Feature Branch (`feat/publications-dashboard`)**
+    - [x] Define `Publication` interface in `src/types`
+    - [x] Create `PublicationRepository` (Mock in `src/data/mock`)
+    - [x] Create `PublicationsBarChart` component
+    - [x] Create `PublicationsEvolutionChart` component
+    - [x] Create `src/pages/publications/index.astro`
+- [/] Verify Implementation
+    - [ ] Test Mobile Responsiveness
+    - [ ] Check Accessibility
+- [ ] Release
+    - [ ] Create Release PR
+    - [ ] Update Status Report

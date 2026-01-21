@@ -1,0 +1,141 @@
+---
+import { getPublicationsByResearcher, getPublicationsEvolution } from '../../data/mock/publications';
+
+// --- Data Preparation ---
+const topResearchers = getPublicationsByResearcher();
+const evolutionData = getPublicationsEvolution();
+
+const maxPublications = Math.max(...topResearchers.map(d => d.count), 1);
+const maxEvolution = Math.max(...evolutionData.map(d => d.count), 1);
+
+// --- Chart 1: Top Researchers (Horizontal Bar) ---
+const barHeight = 40;
+const gap = 20;
+const chartHeight = topResearchers.length * (barHeight + gap);
+const chartWidth = 600;
+const labelWidth = 200;
+const barMaxWidth = chartWidth - labelWidth - 50; // 50px buffer for value
+
+// --- Chart 2: Evolution (Area Chart) ---
+const evoWidth = 600;
+const evoHeight = 300;
+const evoPadding = 40;
+const evoInnerWidth = evoWidth - evoPadding * 2;
+const evoInnerHeight = evoHeight - evoPadding * 2;
+
+const stepX = evolutionData.length > 1 ? evoInnerWidth / (evolutionData.length - 1) : evoInnerWidth;
+const points = evolutionData.map((d, i) => ({
+    x: evoPadding + i * stepX,
+    y: evoHeight - evoPadding - (d.count / maxEvolution) * evoInnerHeight,
+    value: d.count,
+    year: d.year
+}));
+
+const linePath = points.reduce((acc, p, i) => 
+    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
+
+const areaPath = `${linePath} L ${evoWidth - evoPadding} ${evoHeight - evoPadding} L ${evoPadding} ${evoHeight - evoPadding} Z`;
+
+---
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    <!-- Chart 1: Top Researchers -->
+    <section class="glass-card p-6 flex flex-col relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-br from-premium-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <header class="relative z-10 mb-6">
+            <h3 class="text-xl font-bold font-['Outfit'] text-text-main">Top Pesquisadores</h3>
+            <p class="text-sm text-text-secondary mt-1">Quantidade de publicações cadastradas</p>
+        </header>
+
+        <div class="relative z-10 w-full overflow-x-auto">
+            <svg width={chartWidth} height={chartHeight} class="max-w-full">
+                {topResearchers.map((d, i) => {
+                    const y = i * (barHeight + gap);
+                    const barW = (d.count / maxPublications) * barMaxWidth;
+                    return (
+                        <g class="group/bar">
+                            <!-- Label -->
+                            <text x={0} y={y + barHeight / 1.5} class="text-xs fill-text-secondary font-medium" dominant-baseline="middle">
+                                {d.name.length > 25 ? d.name.slice(0, 25) + '...' : d.name}
+                                <title>{d.name}</title>
+                            </text>
+                            
+                            <!-- Bar Background -->
+                            <rect x={labelWidth} y={y} width={barMaxWidth} height={barHeight} rx="4" fill="#334155" opacity="0.2" />
+                            
+                            <!-- Active Bar -->
+                            <rect 
+                                x={labelWidth} 
+                                y={y} 
+                                width={barW} 
+                                height={barHeight} 
+                                rx="4" 
+                                fill="url(#barGradient)"
+                                class="transition-all duration-500 group-hover/bar:brightness-110"
+                            />
+                            
+                            <!-- Value -->
+                            <text x={labelWidth + barW + 10} y={y + barHeight / 1.5} class="text-sm font-bold fill-text-main" dominant-baseline="middle">
+                                {d.count}
+                            </text>
+                        </g>
+                    );
+                })}
+                <defs>
+                     <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="var(--color-premium-accent)" />
+                        <stop offset="100%" stop-color="var(--color-premium-purple)" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Chart 2: Evolution -->
+    <section class="glass-card p-6 flex flex-col relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-bl from-premium-purple/5 to-transparent pointer-events-none"></div>
+
+        <header class="relative z-10 mb-6">
+            <h3 class="text-xl font-bold font-['Outfit'] text-text-main">Evolução Temporal</h3>
+            <p class="text-sm text-text-secondary mt-1">Publicações por ano</p>
+        </header>
+
+        <div class="relative z-10 w-full h-full mt-auto min-h-[300px]">
+             <svg viewBox={`0 0 ${evoWidth} ${evoHeight}`} class="w-full h-full overflow-visible">
+                <!-- Grid -->
+                <line x1={evoPadding} y1={evoHeight - evoPadding} x2={evoWidth - evoPadding} y2={evoHeight - evoPadding} stroke="#334155" stroke-width="1" />
+                
+                <defs>
+                    <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="var(--color-premium-accent)" />
+                        <stop offset="100%" stop-color="var(--color-premium-purple)" />
+                    </linearGradient>
+                     <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--color-premium-accent)" stop-opacity="0.2" />
+                        <stop offset="100%" stop-color="var(--color-premium-accent)" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Area -->
+                <path d={areaPath} fill="url(#areaGradient)" />
+
+                <!-- Line -->
+                <path d={linePath} fill="none" stroke="url(#lineGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- Points -->
+                {points.map(p => (
+                    <g class="group/point">
+                         <circle cx={p.x} cy={p.y} r="4" class="fill-bg-main stroke-premium-accent stroke-2" />
+                         <text x={p.x} y={p.y - 15} text-anchor="middle" class="text-xs font-bold fill-text-main opacity-0 group-hover/point:opacity-100 transition-opacity">
+                            {p.value}
+                         </text>
+                         <text x={p.x} y={evoHeight - 10} text-anchor="middle" class="text-xs fill-text-muted">
+                            {p.year}
+                         </text>
+                    </g>
+                ))}
+            </svg>
+        </div>
+    </section>
+</div>
