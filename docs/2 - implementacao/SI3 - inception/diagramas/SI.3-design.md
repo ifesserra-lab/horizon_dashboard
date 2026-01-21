@@ -104,7 +104,15 @@ erDiagram
         string lattes_id UK
         string name
     }
+    PUBLICATION {
+        uuid id PK
+        string title
+        int year
+        string type
+        string venue
+    }
     PROJECT }o--|| RESEARCHER : "member"
+    RESEARCHER }o--|| PUBLICATION : "author"
 ```
 *Detalhes completos no SI.2 Análise.*
 
@@ -165,6 +173,8 @@ class IExportSink(ABC):
 | `MapComponent`| Distribuição de egressos | Mapa Coroplético |
 | `Tabs` | Alternância entre Visão Geral e Detalhes Analíticos | Tabs (Visão Geral / Temporal / Composição) |
 | `LineChart (Team)` | Evolução da Equipe (Pesquisadores vs Estudantes) | Gráfico de Linha Dupla |
+| `BarChart (Pubs)` | Quantidade de Publicações por Pesquisador | Gráfico de Barras |
+| `LineChart (Pubs)` | Linha do tempo de Publicações (Evolução) | Gráfico de Linha / Área |
 
 ---
 

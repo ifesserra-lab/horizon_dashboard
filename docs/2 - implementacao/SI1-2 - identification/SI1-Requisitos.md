@@ -58,6 +58,8 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-25** | O sistema deve exibir uma página dedicada para "Projetos de Pesquisa", listando todos os projetos e permitindo a busca/filtragem. | Catálogo de Projetos | Alta |
 | **RF-26** | O sistema deve permitir a visualização detalhada de um "Projeto de Pesquisa", exibindo todas as informações disponíveis (equipe, datas, descrição, status). | Detalhamento de Projeto | Alta |
 | **RF-27** | O sistema deve oferecer um painel de acessibilidade completo com: seletor de tema (Claro/Escuro/Auto), níveis de contraste (Normal/Alto/Máximo), escalas de fonte (Pequena/Normal/Grande/Extra), e opções adicionais (Reduzir Movimento, Indicadores de Foco, Otimizar para Leitor de Tela), com funcionalidade de restaurar padrões. | Acessibilidade | Crítica |
+| **RF-28** | O sistema deve exibir um Dashboard de Publicações contendo a quantidade de publicações por pesquisador e a evolução temporal das publicações. | Dashboard de Publicações | Alta |
+| **RF-29** | O Dashboard de Publicações deve permitir a filtragem por Intervalo de anos e Tipo de Publicação. | Dashboard de Publicações | Média |
 
 
 ---

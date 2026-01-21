@@ -1,0 +1,56 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PublicationsCharts from "../../components/charts/PublicationsCharts.astro";
+
+// --- Page Metadata ---
+const title = "Produção Acadêmica | Horizon Dashboard";
+const description =
+    "Dashboard de indicadores de publicações, artigos e congressos.";
+---
+
+<Layout title={title} description={description}>
+    <div class="space-y-8 animate-fade-in">
+        <!-- Header Section -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+        >
+            <div>
+                <Breadcrumbs
+                    items={[
+                        { label: "Home", href: "/horizon_dashboard/" },
+                        {
+                            label: "Publicações",
+                            href: "/horizon_dashboard/publications",
+                            active: true,
+                        },
+                    ]}
+                />
+                <h1
+                    class="text-4xl font-bold font-['Outfit'] text-text-main mt-4"
+                >
+                    Produção Acadêmica
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-2xl text-lg">
+                    Indicadores de publicações, artigos em periódicos e
+                    participações em congressos.
+                </p>
+            </div>
+        </header>
+
+        <hr class="border-white/10" />
+
+        <!-- Main Dashboard Content -->
+        <main>
+            <PublicationsCharts />
+
+            <!-- Future: List of Publications -->
+            <div class="glass-card p-8 text-center text-text-secondary italic">
+                <p>
+                    A listagem detalhada de publicações estará disponível em
+                    breve.
+                </p>
+            </div>
+        </main>
+    </div>
+</Layout>
