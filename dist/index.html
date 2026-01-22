@@ -1,76 +1,78 @@
 <!DOCTYPE html><html lang="pt-BR" class="dark"> <head><meta charset="UTF-8"><meta name="description" content="Horizon - Portal de Pesquisa, Extensão e Pós-Graduação"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/horizon_dashboard/favicon.svg"><meta name="generator" content="Astro v5.16.8"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://ifesserra-lab.github.io/horizon_dashboard/"><meta property="og:title" content="Dashboard Overview | Horizon"><meta property="og:description" content="Horizon - Portal de Pesquisa, Extensão e Pós-Graduação"><meta property="og:image" content="https://ifesserra-lab.github.io/horizon_dashboard/og-image.png"><meta property="og:site_name" content="Horizon"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://ifesserra-lab.github.io/horizon_dashboard/"><meta property="twitter:title" content="Dashboard Overview | Horizon"><meta property="twitter:description" content="Horizon - Portal de Pesquisa, Extensão e Pós-Graduação"><meta property="twitter:image" content="https://ifesserra-lab.github.io/horizon_dashboard/og-image.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"><title>Dashboard Overview | Horizon</title><script>
-			// Theme detection with Auto mode support
-			const themePreference = (() => {
-				if (
-					typeof localStorage !== "undefined" &&
-					localStorage.getItem("theme-preference")
-				) {
-					return localStorage.getItem("theme-preference");
+			// Function to apply all settings from localStorage
+			function applyThemeSettings() {
+				if (typeof localStorage === "undefined") return;
+
+				// 1. Theme
+				const themePreference =
+					localStorage.getItem("theme-preference") || "auto";
+				let theme = themePreference;
+
+				if (theme === "auto") {
+					theme = window.matchMedia("(prefers-color-scheme: dark)")
+						.matches
+						? "dark"
+						: "light";
 				}
-				return "auto";
-			})();
 
-			let theme = themePreference;
-			if (theme === "auto") {
-				theme = window.matchMedia("(prefers-color-scheme: dark)")
-					.matches
-					? "dark"
-					: "light";
-			}
+				if (theme === "light") {
+					document.documentElement.classList.remove("dark");
+				} else {
+					document.documentElement.classList.add("dark");
+				}
 
-			if (theme === "light") {
-				document.documentElement.classList.remove("dark");
-			} else {
-				document.documentElement.classList.add("dark");
-			}
+				// 2. Contrast
+				const contrast = localStorage.getItem("contrast") || "normal";
+				document.documentElement.classList.remove(
+					"contrast-high",
+					"contrast-maximum",
+				);
+				if (contrast === "high") {
+					document.documentElement.classList.add("contrast-high");
+				} else if (contrast === "maximum") {
+					document.documentElement.classList.add("contrast-maximum");
+				}
 
-			// Store the preference (not the resolved theme)
-			if (typeof localStorage !== "undefined") {
-				localStorage.setItem("theme-preference", themePreference);
-				// Also keep legacy 'theme' for backwards compatibility
-				localStorage.setItem("theme", theme);
-			}
+				// Legacy migration
+				if (
+					localStorage.getItem("high-contrast") === "true" &&
+					!localStorage.getItem("contrast")
+				) {
+					document.documentElement.classList.add("contrast-high");
+					localStorage.setItem("contrast", "high");
+				}
 
-			// Contrast Level (replaces old high-contrast boolean)
-			const contrast = localStorage.getItem("contrast") || "normal";
-			if (contrast === "high") {
-				document.documentElement.classList.add("contrast-high");
-			} else if (contrast === "maximum") {
-				document.documentElement.classList.add("contrast-maximum");
-			}
+				// 3. Font Scale
+				const textScale = localStorage.getItem("text-scale") || "base";
+				const scales = ["sm", "base", "lg", "xl"];
+				scales.forEach((s) => {
+					document.documentElement.classList.toggle(
+						`text-scale-${s}`,
+						textScale === s,
+					);
+				});
 
-			// Legacy high-contrast migration
-			if (
-				localStorage.getItem("high-contrast") === "true" &&
-				!localStorage.getItem("contrast")
-			) {
-				document.documentElement.classList.add("contrast-high");
-				localStorage.setItem("contrast", "high");
-			}
-
-			// Font Scaling
-			const textScale = localStorage.getItem("text-scale") || "base";
-			const scales = ["sm", "base", "lg", "xl"];
-			scales.forEach((s) => {
+				// 4. Additional Options
 				document.documentElement.classList.toggle(
-					`text-scale-${s}`,
-					textScale === s,
+					"reduce-motion",
+					localStorage.getItem("reduce-motion") === "true",
 				);
-			});
-
-			// Additional Accessibility Options
-			if (localStorage.getItem("reduce-motion") === "true") {
-				document.documentElement.classList.add("reduce-motion");
-			}
-			if (localStorage.getItem("enhanced-focus") === "true") {
-				document.documentElement.classList.add("enhanced-focus");
-			}
-			if (localStorage.getItem("screen-reader-optimized") === "true") {
-				document.documentElement.classList.add(
+				document.documentElement.classList.toggle(
+					"enhanced-focus",
+					localStorage.getItem("enhanced-focus") === "true",
+				);
+				document.documentElement.classList.toggle(
 					"screen-reader-optimized",
+					localStorage.getItem("screen-reader-optimized") === "true",
 				);
 			}
-		</script><link rel="stylesheet" href="/horizon_dashboard/_astro/_id_.CvhXe4Jt.css"></head> <body class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-premium-accent focus:text-white rounded-br-xl shadow-xl">
+
+			// Apply on initial load
+			applyThemeSettings();
+
+			// Re-apply on View Transitions navigation (astro:after-swap)
+			document.addEventListener("astro:after-swap", applyThemeSettings);
+		</script><link rel="stylesheet" href="/horizon_dashboard/_astro/_id_.Cbdq2Lma.css"></head> <body class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-premium-accent focus:text-white rounded-br-xl shadow-xl">
 Pular para o conteúdo principal
 </a> <div class="flex flex-col md:flex-row min-h-screen"> <!-- Mobile Header --> <header class="md:hidden h-16 glass-card rounded-none border-x-0 border-t-0 flex items-center justify-between px-6 z-30 sticky top-0"> <div class="flex items-center gap-3"> <div class="w-8 h-8 bg-gradient-to-br from-premium-accent to-premium-purple rounded-lg shadow-lg flex items-center justify-center overflow-hidden" aria-hidden="true"> <span class="text-white font-['Outfit'] font-bold text-lg">H</span> </div> <h1 class="text-lg font-['Outfit'] font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-main to-slate-400">
 Horizon

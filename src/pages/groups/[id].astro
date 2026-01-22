@@ -1,27 +1,50 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import groupsData from '../../data/canonical/research_groups_canonical.json';
-import type { ResearchGroup } from '../../types/groups';
+import Layout from "../../layouts/Layout.astro";
+import groupsData from "../../data/canonical/research_groups_canonical.json";
+import projectsData from "../../data/canonical/initiatives_canonical.json";
+import type { ResearchGroup } from "../../types/groups";
+import type { Project } from "../../types/projects";
 
 export function getStaticPaths() {
-  const groups = groupsData as ResearchGroup[];
-  return groups.map(group => ({
-    params: { id: group.id.toString() },
-    props: { group },
-  }));
+	const groups = groupsData as ResearchGroup[];
+	return groups.map((group) => ({
+		params: { id: group.id.toString() },
+		props: { group },
+	}));
 }
 
 interface Props {
-  group: ResearchGroup;
+	group: ResearchGroup;
 }
 
 const { group } = Astro.props;
+const groupProjects = (projectsData as Project[]).filter(
+	(p) => p.research_group?.id === group.id,
+);
+const formatDate = (dateStr: string) => {
+	if (!dateStr) return "N/A";
+	const date = new Date(dateStr);
+	return date.toLocaleDateString("pt-BR", { year: "numeric" });
+};
 ---
 
 <Layout title={group.name} breadcrumbReplacements={{ [group.id]: group.name }}>
 	<nav class="mb-8" aria-label="Navegação secundária">
-		<a href={`${import.meta.env.BASE_URL}groups`} class="text-sm font-bold text-text-secondary hover:text-premium-accent flex items-center gap-2 transition-colors focus:ring-2 focus:ring-premium-accent rounded px-1">
-			<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+		<a
+			href={`${import.meta.env.BASE_URL}groups`}
+			class="text-sm font-bold text-text-secondary hover:text-premium-accent flex items-center gap-2 transition-colors focus:ring-2 focus:ring-premium-accent rounded px-1"
+		>
+			<svg
+				aria-hidden="true"
+				xmlns="http://www.w3.org/2000/svg"
+				class="w-4 h-4"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg
+			>
 			Voltar para lista
 		</a>
 	</nav>
@@ -30,46 +53,106 @@ const { group } = Astro.props;
 		<!-- Main Details -->
 		<div class="flex-1 space-y-8">
 			<article class="glass-card p-8" aria-labelledby="group-title">
-				<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+				<div
+					class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8"
+				>
 					<div class="flex items-center gap-6">
-						<div aria-hidden="true" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-premium-accent to-premium-purple flex items-center justify-center text-white text-3xl font-bold font-['Outfit'] shadow-xl shadow-premium-accent/10">
-							{group.short_name?.charAt(0) || group.name.charAt(0)}
+						<div
+							aria-hidden="true"
+							class="w-20 h-20 rounded-2xl bg-gradient-to-br from-premium-accent to-premium-purple flex items-center justify-center text-white text-3xl font-bold font-['Outfit'] shadow-xl shadow-premium-accent/10"
+						>
+							{
+								group.short_name?.charAt(0) ||
+									group.name.charAt(0)
+							}
 						</div>
 						<div>
 							<div class="flex flex-wrap gap-2 mb-2">
-								<span class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-widest border border-premium-accent/20">
+								<span
+									class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-widest border border-premium-accent/20"
+								>
 									{group.organization.name}
 								</span>
-								<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-text-secondary text-[10px] font-bold uppercase tracking-widest border border-border-main">
+								<span
+									class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-text-secondary text-[10px] font-bold uppercase tracking-widest border border-border-main"
+								>
 									{group.campus.name}
 								</span>
 							</div>
-							<h1 id="group-title" class="text-3xl font-bold font-['Outfit'] text-text-main leading-tight">{group.name}</h1>
+							<h1
+								id="group-title"
+								class="text-3xl font-bold font-['Outfit'] text-text-main leading-tight"
+							>
+								{group.name}
+							</h1>
 						</div>
 					</div>
-					{group.cnpq_url && (
-						<a href={group.cnpq_url} target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-[var(--tag-bg)] hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent">
-							Espelho CNPq
-							<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-						</a>
-					)}
+					{
+						group.cnpq_url && (
+							<a
+								href={group.cnpq_url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="px-6 py-3 bg-[var(--tag-bg)] hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent"
+							>
+								Espelho CNPq
+								<svg
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									class="w-4 h-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<>
+										<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+										<polyline points="15 3 21 3 21 9" />
+										<line x1="10" y1="14" x2="21" y2="3" />
+									</>
+								</svg>
+							</a>
+						)
+					}
 				</div>
 
 				<div class="prose dark:prose-invert max-w-none mb-10">
-					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">Sobre o Grupo</h4>
+					<h4
+						class="text-text-main text-sm font-bold uppercase tracking-wider mb-3"
+					>
+						Sobre o Grupo
+					</h4>
 					<p class="text-text-secondary leading-relaxed">
-						{group.description || "Este grupo de pesquisa foca em estudos avançados e desenvolvimento científico na sua respectiva área, contribuindo para o ecossistema acadêmico da instituição."}
+						{
+							group.description ||
+								"Este grupo de pesquisa foca em estudos avançados e desenvolvimento científico na sua respectiva área, contribuindo para o ecossistema acadêmico da instituição."
+						}
 					</p>
 				</div>
 
 				<div>
-					<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-4">Áreas de Conhecimento</h4>
-					<div class="flex flex-wrap gap-3" role="list" aria-label="Áreas de atuação">
-						{group.knowledge_areas.map(area => (
-							<div role="listitem" class="px-4 py-2 bg-[var(--tag-bg)] border border-border-main rounded-xl text-xs text-text-main font-bold">
-								{area.name}
-							</div>
-						))}
+					<h4
+						class="text-text-main text-sm font-bold uppercase tracking-wider mb-4"
+					>
+						Áreas de Conhecimento
+					</h4>
+					<div
+						class="flex flex-wrap gap-3"
+						role="list"
+						aria-label="Áreas de atuação"
+					>
+						{
+							group.knowledge_areas.map((area) => (
+								<div
+									role="listitem"
+									class="px-4 py-2 bg-[var(--tag-bg)] border border-border-main rounded-xl text-xs text-text-main font-bold"
+								>
+									{area.name}
+								</div>
+							))
+						}
 					</div>
 				</div>
 			</article>
@@ -77,237 +160,734 @@ const { group } = Astro.props;
 			<!-- Members Section -->
 			<section aria-labelledby="members-title" class="space-y-10">
 				<div>
-					<h3 id="members-title" class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">Membros do Grupo</h3>
-					
+					<h3
+						id="members-title"
+						class="text-2xl font-bold font-['Outfit'] text-text-main mb-6"
+					>
+						Membros do Grupo
+					</h3>
+
 					{/* Researchers Section */}
-					{(group.members.filter(m => ['Leader', 'Pesquisador'].includes(m.role))).length > 0 && (
-						<div class="mb-12">
-							<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
-								<span class="w-1.5 h-6 bg-premium-accent rounded-full"></span>
-								Pesquisadores
-							</h4>
+					{
+						group.members.filter((m) =>
+							["Leader", "Pesquisador"].includes(m.role),
+						).length > 0 && (
+							<div class="mb-12">
+								<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+									<span class="w-1.5 h-6 bg-premium-accent rounded-full" />
+									Pesquisadores
+								</h4>
 
-							{/* Current Researchers */}
-							{group.members.filter(m => ['Leader', 'Pesquisador'].includes(m.role) && !m.end_date).length > 0 && (
-								<div class="mb-8">
-									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Atuais</h5>
-									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{group.members
-											.filter(m => ['Leader', 'Pesquisador'].includes(m.role) && !m.end_date)
-											.map(member => (
-											<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
-												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
-													{member.name.charAt(0)}
-												</div>
-												<div class="flex-1 overflow-hidden">
-													<div class="flex items-center gap-2">
-														<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
+								{/* Current Researchers */}
+								{group.members.filter(
+									(m) =>
+										["Leader", "Pesquisador"].includes(
+											m.role,
+										) && !m.end_date,
+								).length > 0 && (
+									<div class="mb-8">
+										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+											Atuais
+										</h5>
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+											{group.members
+												.filter(
+													(m) =>
+														[
+															"Leader",
+															"Pesquisador",
+														].includes(m.role) &&
+														!m.end_date,
+												)
+												.map((member) => (
+													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
+														<div
+															aria-hidden="true"
+															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+														>
+															{member.name.charAt(
+																0,
+															)}
+														</div>
+														<div class="flex-1 overflow-hidden">
+															<div class="flex items-center gap-2">
+																<h5 class="text-sm font-bold text-text-main truncate">
+																	{
+																		member.name
+																	}
+																</h5>
+															</div>
+															<p
+																class={`text-[10px] font-bold uppercase tracking-tight ${member.role === "Leader" ? "text-premium-accent" : "text-text-secondary"}`}
+															>
+																{member.role ===
+																"Leader"
+																	? "Líder / Pesquisador"
+																	: "Pesquisador"}
+															</p>
+														</div>
+														{member.lattes_url && (
+															<a
+																href={
+																	member.lattes_url
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent"
+																aria-label={`Currículo Lattes de ${member.name}`}
+															>
+																<svg
+																	aria-hidden="true"
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-4 h-4"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="2"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+																	<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+																</svg>
+															</a>
+														)}
 													</div>
-													<p class={`text-[10px] font-bold uppercase tracking-tight ${member.role === 'Leader' ? 'text-premium-accent' : 'text-text-secondary'}`}>
-														{member.role === 'Leader' ? 'Líder / Pesquisador' : 'Pesquisador'}
-													</p>
-												</div>
-												{member.lattes_url && (
-													<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent" aria-label={`Currículo Lattes de ${member.name}`}>
-														<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-													</a>
-												)}
-											</div>
-										))}
+												))}
+										</div>
 									</div>
-								</div>
-							)}
+								)}
 
-							{/* Alumni Researchers */}
-							{group.members.filter(m => ['Leader', 'Pesquisador'].includes(m.role) && m.end_date).length > 0 && (
-								<div>
-									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Egressos</h5>
-									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{group.members
-											.filter(m => ['Leader', 'Pesquisador'].includes(m.role) && m.end_date)
-											.map(member => (
-											<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
-												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
-													{member.name.charAt(0)}
-													<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center" title="Egresso">
-														<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-													</span>
-												</div>
-												<div class="flex-1 overflow-hidden">
-													<div class="flex items-center gap-2">
-														<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
-														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">Egresso</span>
+								{/* Alumni Researchers */}
+								{group.members.filter(
+									(m) =>
+										["Leader", "Pesquisador"].includes(
+											m.role,
+										) && m.end_date,
+								).length > 0 && (
+									<div>
+										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+											Egressos
+										</h5>
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+											{group.members
+												.filter(
+													(m) =>
+														[
+															"Leader",
+															"Pesquisador",
+														].includes(m.role) &&
+														m.end_date,
+												)
+												.map((member) => (
+													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
+														<div
+															aria-hidden="true"
+															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+														>
+															{member.name.charAt(
+																0,
+															)}
+															<span
+																class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+																title="Egresso"
+															>
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-2.5 h-2.5 text-white"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="3"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M5 12h14" />
+																	<path d="m12 5 7 7-7 7" />
+																</svg>
+															</span>
+														</div>
+														<div class="flex-1 overflow-hidden">
+															<div class="flex items-center gap-2">
+																<h5 class="text-sm font-bold text-text-main truncate">
+																	{
+																		member.name
+																	}
+																</h5>
+																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																	Egresso
+																</span>
+															</div>
+															<p
+																class={`text-[10px] font-bold uppercase tracking-tight text-text-secondary`}
+															>
+																Pesquisador
+															</p>
+														</div>
+														{member.lattes_url && (
+															<a
+																href={
+																	member.lattes_url
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent"
+																aria-label={`Currículo Lattes de ${member.name}`}
+															>
+																<svg
+																	aria-hidden="true"
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-4 h-4"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="2"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+																	<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+																</svg>
+															</a>
+														)}
 													</div>
-													<p class={`text-[10px] font-bold uppercase tracking-tight text-text-secondary`}>
-														Pesquisador
-													</p>
-												</div>
-												{member.lattes_url && (
-													<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent/10 text-text-secondary hover:text-premium-accent transition-all focus:ring-2 focus:ring-premium-accent" aria-label={`Currículo Lattes de ${member.name}`}>
-														<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-													</a>
-												)}
-											</div>
-										))}
+												))}
+										</div>
 									</div>
-								</div>
-							)}
-						</div>
-					)}
+								)}
+							</div>
+						)
+					}
 
 					{/* Students Section */}
-					{group.members.filter(m => m.role === 'Estudante').length > 0 && (
-						<div class="mb-12">
-							<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
-								<span class="w-1.5 h-6 bg-premium-purple rounded-full"></span>
-								Estudantes
-							</h4>
+					{
+						group.members.filter((m) => m.role === "Estudante")
+							.length > 0 && (
+							<div class="mb-12">
+								<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+									<span class="w-1.5 h-6 bg-premium-purple rounded-full" />
+									Estudantes
+								</h4>
 
-							{/* Current Students */}
-							{group.members.filter(m => m.role === 'Estudante' && !m.end_date).length > 0 && (
-								<div class="mb-8">
-									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Atuais</h5>
-									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{group.members
-											.filter(m => m.role === 'Estudante' && !m.end_date)
-											.map(member => (
-											<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
-												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
-													{member.name.charAt(0)}
-												</div>
-												<div class="flex-1 overflow-hidden">
-													<div class="flex items-center gap-2">
-														<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
+								{/* Current Students */}
+								{group.members.filter(
+									(m) =>
+										m.role === "Estudante" && !m.end_date,
+								).length > 0 && (
+									<div class="mb-8">
+										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+											Atuais
+										</h5>
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+											{group.members
+												.filter(
+													(m) =>
+														m.role ===
+															"Estudante" &&
+														!m.end_date,
+												)
+												.map((member) => (
+													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
+														<div
+															aria-hidden="true"
+															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+														>
+															{member.name.charAt(
+																0,
+															)}
+														</div>
+														<div class="flex-1 overflow-hidden">
+															<div class="flex items-center gap-2">
+																<h5 class="text-sm font-bold text-text-main truncate">
+																	{
+																		member.name
+																	}
+																</h5>
+															</div>
+															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																Estudante
+															</p>
+														</div>
+														{member.lattes_url && (
+															<a
+																href={
+																	member.lattes_url
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-purple/10 text-text-secondary hover:text-premium-purple transition-all focus:ring-2 focus:ring-premium-purple"
+																aria-label={`Currículo Lattes de ${member.name}`}
+															>
+																<svg
+																	aria-hidden="true"
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-4 h-4"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="2"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+																	<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+																</svg>
+															</a>
+														)}
 													</div>
-													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-														Estudante
-													</p>
-												</div>
-												{member.lattes_url && (
-													<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-purple/10 text-text-secondary hover:text-premium-purple transition-all focus:ring-2 focus:ring-premium-purple" aria-label={`Currículo Lattes de ${member.name}`}>
-														<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-													</a>
-												)}
-											</div>
-										))}
+												))}
+										</div>
 									</div>
-								</div>
-							)}
+								)}
 
-							{/* Alumni Students */}
-							{group.members.filter(m => m.role === 'Estudante' && m.end_date).length > 0 && (
-								<div>
-									<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">Egressos</h5>
-									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{group.members
-											.filter(m => m.role === 'Estudante' && m.end_date)
-											.map(member => (
-											<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
-												<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
-													{member.name.charAt(0)}
-													<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center" title="Egresso">
-														<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-													</span>
-												</div>
-												<div class="flex-1 overflow-hidden">
-													<div class="flex items-center gap-2">
-														<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
-														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">Egresso</span>
+								{/* Alumni Students */}
+								{group.members.filter(
+									(m) => m.role === "Estudante" && m.end_date,
+								).length > 0 && (
+									<div>
+										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+											Egressos
+										</h5>
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+											{group.members
+												.filter(
+													(m) =>
+														m.role ===
+															"Estudante" &&
+														m.end_date,
+												)
+												.map((member) => (
+													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
+														<div
+															aria-hidden="true"
+															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+														>
+															{member.name.charAt(
+																0,
+															)}
+															<span
+																class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+																title="Egresso"
+															>
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-2.5 h-2.5 text-white"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="3"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M5 12h14" />
+																	<path d="m12 5 7 7-7 7" />
+																</svg>
+															</span>
+														</div>
+														<div class="flex-1 overflow-hidden">
+															<div class="flex items-center gap-2">
+																<h5 class="text-sm font-bold text-text-main truncate">
+																	{
+																		member.name
+																	}
+																</h5>
+																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																	Egresso
+																</span>
+															</div>
+															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																Estudante
+															</p>
+														</div>
+														{member.lattes_url && (
+															<a
+																href={
+																	member.lattes_url
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-purple/10 text-text-secondary hover:text-premium-purple transition-all focus:ring-2 focus:ring-premium-purple"
+																aria-label={`Currículo Lattes de ${member.name}`}
+															>
+																<svg
+																	aria-hidden="true"
+																	xmlns="http://www.w3.org/2000/svg"
+																	class="w-4 h-4"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	stroke="currentColor"
+																	stroke-width="2"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																>
+																	<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+																	<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+																</svg>
+															</a>
+														)}
 													</div>
-													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-														Estudante
-													</p>
-												</div>
-												{member.lattes_url && (
-													<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-purple/10 text-text-secondary hover:text-premium-purple transition-all focus:ring-2 focus:ring-premium-purple" aria-label={`Currículo Lattes de ${member.name}`}>
-														<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-													</a>
-												)}
-											</div>
-										))}
+												))}
+										</div>
 									</div>
-								</div>
-							)}
-						</div>
-					)}
+								)}
+							</div>
+						)
+					}
 
 					{/* Technicians / Others Section */}
-					{group.members.filter(m => !['Leader', 'Pesquisador', 'Estudante'].includes(m.role)).length > 0 && (
-						<div>
-							<h4 class="text-lg font-bold text-text-main mb-4 flex items-center gap-2">
-								<span class="w-1.5 h-6 bg-slate-400 rounded-full"></span>
-								Técnicos e Colaboradores
-							</h4>
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								{group.members
-									.filter(m => !['Leader', 'Pesquisador', 'Estudante'].includes(m.role))
-									.map(member => (
-									<div class={`glass-card p-4 flex items-center gap-4 transition-all ${member.end_date ? 'opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400' : 'hover:border-border-main/80'}`}>
-										<div aria-hidden="true" class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative">
-											{member.name.charAt(0)}
-											{member.end_date && (
-												<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center" title="Egresso">
-													<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-												</span>
-											)}
-										</div>
-										<div class="flex-1 overflow-hidden">
-											<div class="flex items-center gap-2">
-												<h5 class="text-sm font-bold text-text-main truncate">{member.name}</h5>
-												{member.end_date && (
-													<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">Egresso</span>
+					{
+						group.members.filter(
+							(m) =>
+								![
+									"Leader",
+									"Pesquisador",
+									"Estudante",
+								].includes(m.role),
+						).length > 0 && (
+							<div>
+								<h4 class="text-lg font-bold text-text-main mb-4 flex items-center gap-2">
+									<span class="w-1.5 h-6 bg-slate-400 rounded-full" />
+									Técnicos e Colaboradores
+								</h4>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									{group.members
+										.filter(
+											(m) =>
+												![
+													"Leader",
+													"Pesquisador",
+													"Estudante",
+												].includes(m.role),
+										)
+										.map((member) => (
+											<div
+												class={`glass-card p-4 flex items-center gap-4 transition-all ${member.end_date ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400" : "hover:border-border-main/80"}`}
+											>
+												<div
+													aria-hidden="true"
+													class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+												>
+													{member.name.charAt(0)}
+													{member.end_date && (
+														<span
+															class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+															title="Egresso"
+														>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																class="w-2.5 h-2.5 text-white"
+																viewBox="0 0 24 24"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="3"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															>
+																<path d="M5 12h14" />
+																<path d="m12 5 7 7-7 7" />
+															</svg>
+														</span>
+													)}
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">
+															{member.name}
+														</h5>
+														{member.end_date && (
+															<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																Egresso
+															</span>
+														)}
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														{member.role ||
+															"Colaborador"}
+													</p>
+												</div>
+												{member.lattes_url && (
+													<a
+														href={member.lattes_url}
+														target="_blank"
+														rel="noopener noreferrer"
+														class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-slate-500/10 text-text-secondary hover:text-slate-500 transition-all"
+														aria-label={`Currículo Lattes de ${member.name}`}
+													>
+														<svg
+															aria-hidden="true"
+															xmlns="http://www.w3.org/2000/svg"
+															class="w-4 h-4"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														>
+															<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+															<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+														</svg>
+													</a>
 												)}
 											</div>
-											<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-												{member.role || 'Colaborador'}
-											</p>
-										</div>
-										{member.lattes_url && (
-											<a href={member.lattes_url} target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--tag-bg)] hover:bg-slate-500/10 text-text-secondary hover:text-slate-500 transition-all" aria-label={`Currículo Lattes de ${member.name}`}>
-												<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-											</a>
-										)}
-									</div>
-								))}
+										))}
+								</div>
 							</div>
-						</div>
-					)}
+						)
+					}
 				</div>
 			</section>
 		</div>
 
 		<!-- Sidebar Info -->
 		<aside class="w-full lg:w-80 space-y-6">
-			<section class="bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-premium-accent/20 rounded-3xl p-6 backdrop-blur-md" aria-labelledby="leadership-title">
-				<h4 id="leadership-title" class="text-text-main font-bold mb-4">Liderança</h4>
+			<section
+				class="bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-premium-accent/20 rounded-3xl p-6 backdrop-blur-md"
+				aria-labelledby="leadership-title"
+			>
+				<h4 id="leadership-title" class="text-text-main font-bold mb-4">
+					Liderança
+				</h4>
 				<div class="space-y-4">
-					{group.leaders.map(leader => (
-						<div class="flex items-center gap-3 p-3 bg-white/30 dark:bg-white/5 rounded-2xl border border-border-main">
-							<div aria-hidden="true" class="w-10 h-10 rounded-full bg-premium-accent flex items-center justify-center text-white font-bold text-sm">
-								{leader.name.charAt(0)}
+					{
+						group.leaders.map((leader) => (
+							<div class="flex items-center gap-3 p-3 bg-white/30 dark:bg-white/5 rounded-2xl border border-border-main">
+								<div
+									aria-hidden="true"
+									class="w-10 h-10 rounded-full bg-premium-accent flex items-center justify-center text-white font-bold text-sm"
+								>
+									{leader.name.charAt(0)}
+								</div>
+								<div class="overflow-hidden">
+									<p class="text-xs font-bold text-text-main truncate">
+										{leader.name}
+									</p>
+									<p class="text-[10px] text-premium-accent font-bold">
+										Coordenador
+									</p>
+								</div>
 							</div>
-							<div class="overflow-hidden">
-								<p class="text-xs font-bold text-text-main truncate">{leader.name}</p>
-								<p class="text-[10px] text-premium-accent font-bold">Coordenador</p>
-							</div>
-						</div>
-					))}
+						))
+					}
 				</div>
 			</section>
 
-			<section class="glass-card p-6" aria-labelledby="additional-info-title">
-				<h4 id="additional-info-title" class="text-text-main font-bold mb-4">Informações Adicionais</h4>
+			<section
+				class="glass-card p-6"
+				aria-labelledby="additional-info-title"
+			>
+				<h4
+					id="additional-info-title"
+					class="text-text-main font-bold mb-4"
+				>
+					Informações Adicionais
+				</h4>
 				<div class="space-y-4">
 					<div class="flex justify-between text-xs">
-						<span class="text-text-secondary font-bold">Site Oficial</span>
-						<span class="text-text-main truncate ml-4">{group.site || "Não informado"}</span>
+						<span class="text-text-secondary font-bold"
+							>Site Oficial</span
+						>
+						<span class="text-text-main truncate ml-4"
+							>{group.site || "Não informado"}</span
+						>
 					</div>
 					<div class="flex justify-between text-xs">
-						<span class="text-text-secondary font-bold">Ano de Início</span>
-						<span class="text-text-main font-bold">2023 (Exemplo)</span>
+						<span class="text-text-secondary font-bold"
+							>Ano de Início</span
+						>
+						<span class="text-text-main font-bold"
+							>2023 (Exemplo)</span
+						>
 					</div>
 				</div>
 			</section>
 		</aside>
 	</div>
+
+	<!-- Projects Section -->
+	<section
+		aria-labelledby="projects-title"
+		class="space-y-10 mb-12 border-t border-border-main pt-10"
+	>
+		<div>
+			<h3
+				id="projects-title"
+				class="text-2xl font-bold font-['Outfit'] text-text-main mb-6"
+			>
+				Projetos
+			</h3>
+
+			{
+				groupProjects.length > 0 ? (
+					<div class="mb-12">
+						<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+							<span class="w-1.5 h-6 bg-emerald-500 rounded-full" />
+							Em Andamento
+						</h4>
+
+						{groupProjects.filter(
+							(p) =>
+								p.status === "active" || p.status === "ativo",
+						).length > 0 ? (
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								{groupProjects
+									.filter(
+										(p) =>
+											p.status === "active" ||
+											p.status === "ativo",
+									)
+									.map((project) => (
+										<a
+											href={`${import.meta.env.BASE_URL}projects/${project.id}`}
+											class="glass-card p-4 flex items-center gap-4 transition-all hover:border-emerald-500/30"
+										>
+											<div
+												aria-hidden="true"
+												class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="w-5 h-5"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<rect
+														x="3"
+														y="4"
+														width="18"
+														height="18"
+														rx="2"
+														ry="2"
+													/>
+													<line
+														x1="16"
+														y1="2"
+														x2="16"
+														y2="6"
+													/>
+													<line
+														x1="8"
+														y1="2"
+														x2="8"
+														y2="6"
+													/>
+													<line
+														x1="3"
+														y1="10"
+														x2="21"
+														y2="10"
+													/>
+												</svg>
+											</div>
+											<div class="flex-1 overflow-hidden">
+												<div class="flex items-center gap-2">
+													<h5 class="text-sm font-bold text-text-main truncate">
+														{project.name}
+													</h5>
+												</div>
+												<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+													{project.initiative_type
+														?.name || "Projeto"}
+												</p>
+											</div>
+										</a>
+									))}
+							</div>
+						) : (
+							<p class="text-sm text-text-secondary italic">
+								Nenhum projeto em andamento.
+							</p>
+						)}
+
+						{groupProjects.filter(
+							(p) =>
+								p.status === "concluded" ||
+								p.status === "concluído",
+						).length > 0 && (
+							<div class="mt-8">
+								<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+									Concluídos
+								</h5>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									{groupProjects
+										.filter(
+											(p) =>
+												p.status === "concluded" ||
+												p.status === "concluído",
+										)
+										.map((project) => (
+											<a
+												href={`${import.meta.env.BASE_URL}projects/${project.id}`}
+												class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400"
+											>
+												<div
+													aria-hidden="true"
+													class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+												>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														class="w-5 h-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													>
+														<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+														<polyline points="22 4 12 14.01 9 11.01" />
+													</svg>
+													<span
+														class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+														title="Concluído"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="w-2.5 h-2.5 text-white"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="3"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														>
+															<path d="M5 12h14" />
+															<path d="m12 5 7 7-7 7" />
+														</svg>
+													</span>
+												</div>
+												<div class="flex-1 overflow-hidden">
+													<div class="flex items-center gap-2">
+														<h5 class="text-sm font-bold text-text-main truncate">
+															{project.name}
+														</h5>
+														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+															Concluído
+														</span>
+													</div>
+													<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+														{project.initiative_type
+															?.name || "Projeto"}
+													</p>
+												</div>
+											</a>
+										))}
+								</div>
+							</div>
+						)}
+					</div>
+				) : (
+					<div class="p-6 rounded-2xl bg-slate-500/5 border border-dashed border-border-main text-center">
+						<p class="text-sm text-text-secondary">
+							Nenhum projeto registrado para este grupo ainda.
+						</p>
+					</div>
+				)
+			}
+		</div>
+	</section>
 </Layout>

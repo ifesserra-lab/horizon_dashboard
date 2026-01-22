@@ -23,5 +23,9 @@ export interface Project {
     initiative_type?: InitiativeType;
     organization_id: number | null;
     parent_id: number | null;
+    research_group?: {
+        id: number;
+        name: string;
+    } | null;
     team?: TeamMember[];
 }

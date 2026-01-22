@@ -4,6 +4,8 @@ export interface Member {
     role: string;
     lattes_url: string | null;
     emails: string[];
+    start_date: string;
+    end_date: string | null;
 }
 
 export interface KnowledgeArea {
