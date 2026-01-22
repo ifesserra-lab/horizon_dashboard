@@ -69,77 +69,79 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 		<title>{title} | Horizon</title>
 
 		<script is:inline>
-			// Theme detection with Auto mode support
-			const themePreference = (() => {
-				if (
-					typeof localStorage !== "undefined" &&
-					localStorage.getItem("theme-preference")
-				) {
-					return localStorage.getItem("theme-preference");
+			// Function to apply all settings from localStorage
+			function applyThemeSettings() {
+				if (typeof localStorage === "undefined") return;
+
+				// 1. Theme
+				const themePreference =
+					localStorage.getItem("theme-preference") || "auto";
+				let theme = themePreference;
+
+				if (theme === "auto") {
+					theme = window.matchMedia("(prefers-color-scheme: dark)")
+						.matches
+						? "dark"
+						: "light";
 				}
-				return "auto";
-			})();
 
-			let theme = themePreference;
-			if (theme === "auto") {
-				theme = window.matchMedia("(prefers-color-scheme: dark)")
-					.matches
-					? "dark"
-					: "light";
-			}
+				if (theme === "light") {
+					document.documentElement.classList.remove("dark");
+				} else {
+					document.documentElement.classList.add("dark");
+				}
 
-			if (theme === "light") {
-				document.documentElement.classList.remove("dark");
-			} else {
-				document.documentElement.classList.add("dark");
-			}
+				// 2. Contrast
+				const contrast = localStorage.getItem("contrast") || "normal";
+				document.documentElement.classList.remove(
+					"contrast-high",
+					"contrast-maximum",
+				);
+				if (contrast === "high") {
+					document.documentElement.classList.add("contrast-high");
+				} else if (contrast === "maximum") {
+					document.documentElement.classList.add("contrast-maximum");
+				}
 
-			// Store the preference (not the resolved theme)
-			if (typeof localStorage !== "undefined") {
-				localStorage.setItem("theme-preference", themePreference);
-				// Also keep legacy 'theme' for backwards compatibility
-				localStorage.setItem("theme", theme);
-			}
+				// Legacy migration
+				if (
+					localStorage.getItem("high-contrast") === "true" &&
+					!localStorage.getItem("contrast")
+				) {
+					document.documentElement.classList.add("contrast-high");
+					localStorage.setItem("contrast", "high");
+				}
 
-			// Contrast Level (replaces old high-contrast boolean)
-			const contrast = localStorage.getItem("contrast") || "normal";
-			if (contrast === "high") {
-				document.documentElement.classList.add("contrast-high");
-			} else if (contrast === "maximum") {
-				document.documentElement.classList.add("contrast-maximum");
-			}
+				// 3. Font Scale
+				const textScale = localStorage.getItem("text-scale") || "base";
+				const scales = ["sm", "base", "lg", "xl"];
+				scales.forEach((s) => {
+					document.documentElement.classList.toggle(
+						`text-scale-${s}`,
+						textScale === s,
+					);
+				});
 
-			// Legacy high-contrast migration
-			if (
-				localStorage.getItem("high-contrast") === "true" &&
-				!localStorage.getItem("contrast")
-			) {
-				document.documentElement.classList.add("contrast-high");
-				localStorage.setItem("contrast", "high");
-			}
-
-			// Font Scaling
-			const textScale = localStorage.getItem("text-scale") || "base";
-			const scales = ["sm", "base", "lg", "xl"];
-			scales.forEach((s) => {
+				// 4. Additional Options
 				document.documentElement.classList.toggle(
-					`text-scale-${s}`,
-					textScale === s,
+					"reduce-motion",
+					localStorage.getItem("reduce-motion") === "true",
 				);
-			});
-
-			// Additional Accessibility Options
-			if (localStorage.getItem("reduce-motion") === "true") {
-				document.documentElement.classList.add("reduce-motion");
-			}
-			if (localStorage.getItem("enhanced-focus") === "true") {
-				document.documentElement.classList.add("enhanced-focus");
-			}
-			if (localStorage.getItem("screen-reader-optimized") === "true") {
-				document.documentElement.classList.add(
+				document.documentElement.classList.toggle(
+					"enhanced-focus",
+					localStorage.getItem("enhanced-focus") === "true",
+				);
+				document.documentElement.classList.toggle(
 					"screen-reader-optimized",
+					localStorage.getItem("screen-reader-optimized") === "true",
 				);
 			}
+
+			// Apply on initial load
+			applyThemeSettings();
+
+			// Re-apply on View Transitions navigation (astro:after-swap)
+			document.addEventListener("astro:after-swap", applyThemeSettings);
 		</script>
 	</head>
 	<body

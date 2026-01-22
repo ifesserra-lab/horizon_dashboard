@@ -257,6 +257,56 @@ Como usuário, quero identificar facilmente quais membros são egressos (ex-memb
 - Ícone do menu lateral idêntico ao do card "Áreas de Conhecimento" da home.
 - RF Relacionado: RF-21.
 
+### US-032 – Exibir Grupo de Pesquisa no Projeto
+**GitHub Issue**: TBD
+```yaml
+id: US-032
+milestone: R1
+prioridade: Média
+tamanho: 2
+origem: [User Request]
+tags: [type:feature, area:frontend, component:projects]
+```
+
+#### Descrição
+Adicionar o nome do Grupo de Pesquisa na seção "Informações Adicionais" da página de detalhes do projeto, para que o usuário saiba a qual grupo a iniciativa está vinculada.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Exibir campo "Grupo de Pesquisa" na seção "Informações Adicionais".
+    - [ ] Mostrar o nome do grupo se disponível.
+    - [ ] Ocultar o campo se o projeto não tiver grupo vinculado.
+- **UI/UX**:
+    - [ ] Seguir o mesmo estilo de "Status" e "Tipo".
+
+### US-033 – Listar Projetos no Grupo de Pesquisa
+**GitHub Issue**: TBD
+```yaml
+id: US-033
+milestone: R1
+prioridade: Média
+tamanho: 3
+origem: [User Request]
+tags: [type:feature, area:frontend, component:groups]
+```
+
+#### Descrição
+Listar todos os projetos vinculados a um grupo de pesquisa na página de detalhes do grupo (`/groups/[id]`), para que os usuários possam ver as iniciativas em andamento de cada grupo.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Criar nova seção "Projetos" na página de detalhes do grupo.
+    - [ ] Listar projetos onde `research_group.id` corresponde ao ID do grupo visitado.
+    - [ ] Exibir cards resumidos dos projetos (Título, Status, Datas).
+    - [ ] Linkar cards para detalhes do projeto (`/projects/[id]`).
+- **UI/UX**:
+    - [ ] Manter consistência visual com os cards de membros.
+    - [ ] Se não houver projetos, exibir mensagem informativa ou ocultar a seção.
+
+
+
+
+
 ## Epic 1: Extração SigPesq (Release 1)
 **Objetivo**: Coletar dados de projetos da base SigPesq.
 
