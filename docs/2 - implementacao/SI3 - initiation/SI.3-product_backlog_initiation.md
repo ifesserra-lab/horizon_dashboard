@@ -280,7 +280,7 @@ Adicionar o nome do Grupo de Pesquisa na seção "Informações Adicionais" da p
     - [ ] Seguir o mesmo estilo de "Status" e "Tipo".
 
 ### US-033 – Listar Projetos no Grupo de Pesquisa
-**GitHub Issue**: TBD
+**GitHub Issue**: [#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62)
 ```yaml
 id: US-033
 milestone: R1

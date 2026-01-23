@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v1.3.1** | 2026-01-22 | **Released** | Feature: Projects in Group Details (US-033) | TBD | [#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62) |
 | **v1.3.0** | 2026-01-16 | **Released** | Feature: Enhanced Accessibility Panel (US-030) | [#58](https://github.com/ifesserra-lab/horizon_dashboard/pull/58) | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 | **v1.2.2** | 2026-01-16 | **Released** | Bugfix: Home Chart Hover Clipping | [#50](https://github.com/ifesserra-lab/horizon_dashboard/pull/50) | - |
 | **v1.2.1** | 2026-01-16 | **Released** | Refinement: Home Analytics (Interaction + Bugfix) | [#49](https://github.com/ifesserra-lab/horizon_dashboard/pull/49) | - |
@@ -59,6 +60,7 @@ Reflecting active work from `SI.3 Product Backlog`.
 - **Epic 4: Portal de Projetos (Release 1 Extension)** _(Entregue - Refinado)_
     - [x] **US-016** Catálogo de Projetos (Entregue na v1.1.6)
     - [x] **US-017** Detalhes do Projeto (Ready)
+    - [x] **US-033** Listar Projetos no Grupo de Pesquisa ([#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62)) (Entregue na v1.3.1)
     - [x] **US-018** Equipe nos Detalhes do Projeto ([#29](https://github.com/ifesserra-lab/horizon_dashboard/issues/29)) (Entregue na v1.1.0)
     - [x] **US-024** Sincronização de Equipes ([#34](https://github.com/ifesserra-lab/horizon_dashboard/issues/34)) (Entregue na v1.1.5)
     - [x] **US-025** Dashboard de Projetos (Listagem/Busca) (Entregue na v1.1.6)
