@@ -175,6 +175,10 @@ class IExportSink(ABC):
 | `LineChart (Team)` | Evolução da Equipe (Pesquisadores vs Estudantes) | Gráfico de Linha Dupla |
 | `BarChart (Pubs)` | Quantidade de Publicações por Pesquisador | Gráfico de Barras |
 | `LineChart (Pubs)` | Linha do tempo de Publicações (Evolução) | Gráfico de Linha / Área |
+| `BarChart (Researchers)` | Top 10 Áreas de Conhecimento (Qtd Pesquisadores) | Barras Horizontais |
+| `DonutChart (Roles)` | Distribuição de Papéis em Iniciativas | Donut |
+| `Histogram (Engagement)` | Distribuição de Engajamento (Projetos/Pesquisador) | Histograma / Barras |
+| `RankingList` | Top 5 Grupos e Linhas de Pesquisa | Lista Ordenada com Barras de Progresso |
 
 ---
 
@@ -205,6 +209,8 @@ flowchart TD
         Index[index.astro\n(Lista de Grupos)]
         Detail[[id].astro\n(Detalhes do Grupo)]
         KnowledgeAreas[knowledge-areas/index.astro\n(Dashboard de Áreas)]
+        ResearchersIndex[researchers/index.astro\n(Lista de Pesquisadores)]
+        ResearcherDetail[researchers/[id].astro\n(Detalhes do Pesquisador)]
     end
 
     subgraph Layouts [src/layouts]
@@ -226,6 +232,8 @@ flowchart TD
     Index --> MainLayout
     Detail --> MainLayout
     KnowledgeAreas --> MainLayout
+    ResearchersIndex --> MainLayout
+    ResearcherDetail --> MainLayout
     MainLayout --> Header
     MainLayout --> Sidebar
     MainLayout --> Breadcrumbs
@@ -249,6 +257,9 @@ src/
 ├── pages/             # Routing (File-based)
 │   ├── groups/
 │   │   ├── [id].astro # Dynamic Route
+│   │   └── index.astro
+│   ├── researchers/
+│   │   ├── [id].astro
 │   │   └── index.astro
 │   └── index.astro    # Redirect or Home
 ├── styles/

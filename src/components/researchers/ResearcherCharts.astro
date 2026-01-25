@@ -1,0 +1,308 @@
+---
+import type { Researcher } from "../../types/researchers";
+
+interface Props {
+    researchers: Researcher[];
+}
+
+const { researchers } = Astro.props;
+
+// Groups and Areas map creation (needed for charts)
+const areasMap = new Map<string, number>();
+researchers.forEach((r) => {
+    r.knowledge_areas.forEach((a) => {
+        areasMap.set(a.name, (areasMap.get(a.name) || 0) + 1);
+    });
+});
+
+// --- Chart Data Preparation ---
+
+// 1. Top 10 Knowledge Areas
+const topAreas = Array.from(areasMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([name, count]) => ({ name, count }));
+const maxAreaCount = topAreas.length > 0 ? topAreas[0].count : 1;
+
+// 2. Roles Distribution
+let coordinators = 0;
+let members = 0;
+researchers.forEach((r) => {
+    let isCoord = false;
+    r.initiatives.forEach((i) => {
+        if (
+            ["Leader", "Líder", "Coordenador", "Coordinator"].includes(i.role)
+        ) {
+            isCoord = true;
+        }
+    });
+    if (isCoord) coordinators++;
+    else members++;
+});
+if (coordinators === 0 && members === 0 && researchers.length > 0)
+    members = researchers.length;
+const totalRoles = coordinators + members;
+const roleData = [
+    { label: "Coordenadores", value: coordinators, color: "#38bdf8" }, // sky-400
+    { label: "Pesquisadores", value: members, color: "#818cf8" }, // indigo-400
+];
+
+// 3. Engagement Data
+const engagementCounts = { 0: 0, 1: 0, 2: 0, "3+": 0 };
+researchers.forEach((r) => {
+    const activeCount = r.initiatives.filter((i) =>
+        ["active", "ativo", "Active"].includes(i.status),
+    ).length;
+    if (activeCount === 0) engagementCounts[0]++;
+    else if (activeCount === 1) engagementCounts[1]++;
+    else if (activeCount === 2) engagementCounts[2]++;
+    else engagementCounts["3+"]++;
+});
+const engagementData = [
+    { label: "0 Projetos", value: engagementCounts[0], color: "#94a3b8" },
+    { label: "1 Projeto", value: engagementCounts[1], color: "#38bdf8" },
+    { label: "2 Projetos", value: engagementCounts[2], color: "#818cf8" },
+    { label: "3+ Projetos", value: engagementCounts["3+"], color: "#c084fc" },
+];
+const maxEngagement = Math.max(...Object.values(engagementCounts), 1);
+
+// 4. Top Groups
+const groupsMap = new Map<number, { name: string; count: number }>();
+researchers.forEach((r) => {
+    r.research_groups.forEach((g) => {
+        if (!groupsMap.has(g.id)) {
+            groupsMap.set(g.id, { name: g.name, count: 0 });
+        }
+        groupsMap.get(g.id)!.count++;
+    });
+});
+const topGroups = Array.from(groupsMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+const maxGroupCount = topGroups.length > 0 ? topGroups[0].count : 1;
+---
+
+<div class="space-y-8 mb-12">
+    <!-- Tabs Standard (Text + Bottom Border) -->
+    <div>
+        <div
+            class="flex items-center gap-8 border-b border-border-main/50 overflow-x-auto no-scrollbar"
+            role="tablist"
+        >
+            <button
+                role="tab"
+                aria-selected="true"
+                aria-controls="panel-overview"
+                id="tab-overview"
+                class="pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent"
+            >
+                Visão Geral
+            </button>
+            <button
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-areas"
+                id="tab-areas"
+                class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
+            >
+                Áreas do Conhecimento
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Panels -->
+    <div class="relative min-h-[400px]">
+        <!-- Panel 1: Overview -->
+        <div
+            id="panel-overview"
+            role="tabpanel"
+            aria-labelledby="tab-overview"
+            class="transition-all duration-300 opacity-100 scale-100"
+        >
+            <div
+                class="glass-card border border-border-main rounded-3xl p-8 mt-6"
+            >
+                <!-- Content omitted for brevity, same as before -->
+                <div
+                    class="flex flex-col lg:flex-row items-center justify-around gap-12"
+                >
+                    <div class="relative w-64 h-64 flex-shrink-0">
+                        <svg
+                            viewBox="0 0 36 36"
+                            class="w-full h-full -rotate-90"
+                        >
+                            {
+                                (() => {
+                                    let currentOffset = 0;
+                                    return roleData.map((item) => {
+                                        const percentage =
+                                            totalRoles > 0
+                                                ? (item.value / totalRoles) *
+                                                  100
+                                                : 0;
+                                        const dashArray = `${percentage} ${100 - percentage}`;
+                                        const offset = -currentOffset;
+                                        currentOffset += percentage;
+                                        return (
+                                            <circle
+                                                cx="18"
+                                                cy="18"
+                                                r="15.915"
+                                                fill="transparent"
+                                                stroke={item.color}
+                                                stroke-width="3"
+                                                stroke-dasharray={dashArray}
+                                                stroke-dashoffset={offset}
+                                                class="transition-all duration-1000 ease-out hover:stroke-[4]"
+                                            />
+                                        );
+                                    });
+                                })()
+                            }
+                        </svg>
+                        <div
+                            class="absolute inset-0 flex flex-col items-center justify-center text-center"
+                        >
+                            <span
+                                class="text-5xl font-bold font-['Outfit'] text-text-main"
+                                >{totalRoles}</span
+                            >
+                            <span
+                                class="text-[10px] text-text-muted uppercase tracking-widest font-bold mt-1"
+                                >VÍNCULOS</span
+                            >
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        {
+                            roleData.map((item) => (
+                                <div class="bg-glass-overlay border border-border-main rounded-xl p-5 w-64 shadow-sm flex items-center gap-4">
+                                    <div
+                                        class="w-3 h-3 rounded-full"
+                                        style={`background-color: ${item.color}`}
+                                    />
+                                    <div>
+                                        <h4 class="text-sm font-bold text-text-main">
+                                            {item.label}
+                                        </h4>
+                                        <p class="text-xs text-text-muted">
+                                            {item.value} (
+                                            {totalRoles > 0
+                                                ? Math.round(
+                                                      (item.value /
+                                                          totalRoles) *
+                                                          100,
+                                                  )
+                                                : 0}
+                                            %)
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 2: Knowledge Areas -->
+        <div
+            id="panel-areas"
+            role="tabpanel"
+            aria-labelledby="tab-areas"
+            class="hidden transition-all duration-300 opacity-0 scale-95"
+        >
+            <div
+                class="glass-card border border-border-main rounded-3xl p-8 mt-6"
+            >
+                <div class="space-y-4">
+                    {
+                        topAreas.map((area, index) => {
+                            const percentage =
+                                (area.count / maxAreaCount) * 100;
+                            return (
+                                <div class="group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white" : "bg-slate-100 dark:bg-white/10 text-text-muted"}`}
+                                            >
+                                                {index + 1}
+                                            </span>
+                                            <span class="text-sm font-medium text-text-main truncate max-w-[200px] md:max-w-md">
+                                                {area.name}
+                                            </span>
+                                        </div>
+                                        <span class="text-sm font-bold text-text-main">
+                                            {area.count}
+                                        </span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                                        <div
+                                            class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full"
+                                            style={`width: ${percentage}%`}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const setupTabs = () => {
+        const tabs = document.querySelectorAll('[role="tab"]');
+        const panels = document.querySelectorAll('[role="tabpanel"]');
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const targetId = tab.getAttribute("aria-controls");
+
+                tabs.forEach((t) => {
+                    t.setAttribute("aria-selected", "false");
+                    t.className =
+                        "pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent";
+                });
+                tab.setAttribute("aria-selected", "true");
+                tab.className =
+                    "pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent";
+
+                panels.forEach((panel) => {
+                    if (panel.id === targetId) {
+                        panel.classList.remove("hidden");
+                        requestAnimationFrame(() => {
+                            panel.classList.add("opacity-100", "scale-100");
+                            panel.classList.remove("opacity-0", "scale-95");
+                        });
+                    } else {
+                        panel.classList.add("hidden", "opacity-0", "scale-95");
+                        panel.classList.remove("opacity-100", "scale-100");
+                    }
+                });
+            });
+        });
+    };
+
+    setupTabs();
+    document.addEventListener("astro:after-swap", setupTabs);
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .bg-glass-overlay {
+        background: rgba(255, 255, 255, 0.5);
+    }
+    :global(.dark) .bg-glass-overlay {
+        background: rgba(255, 255, 255, 0.05);
+    }
+</style>

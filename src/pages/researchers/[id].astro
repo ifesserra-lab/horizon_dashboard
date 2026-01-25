@@ -1,0 +1,291 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import researchersData from "../../data/canonical/researchers_canonical.json";
+import type { Researcher } from "../../types/researchers";
+
+export function getStaticPaths() {
+    const researchers = researchersData as Researcher[];
+    return researchers.map((researcher) => ({
+        params: { id: researcher.id.toString() },
+        props: { researcher },
+    }));
+}
+
+interface Props {
+    researcher: Researcher;
+}
+
+const { researcher } = Astro.props;
+---
+
+<Layout
+    title={researcher.name}
+    breadcrumbReplacements={{ [researcher.id]: researcher.name }}
+>
+    <nav class="mb-8" aria-label="Navegação secundária">
+        <a
+            href={`${import.meta.env.BASE_URL}researchers`}
+            class="text-sm font-bold text-text-secondary hover:text-premium-accent flex items-center gap-2 transition-colors focus:ring-2 focus:ring-premium-accent rounded px-1"
+        >
+            <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg
+            >
+            Voltar para lista
+        </a>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+        <!-- Main Details -->
+        <div class="flex-1 space-y-8 w-full">
+            <article class="glass-card p-8" aria-labelledby="researcher-title">
+                <div
+                    class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8"
+                >
+                    <div class="flex items-center gap-6">
+                        <div
+                            aria-hidden="true"
+                            class="w-20 h-20 rounded-full bg-gradient-to-br from-premium-accent to-premium-purple flex items-center justify-center text-white text-3xl font-bold font-['Outfit'] shadow-xl shadow-premium-accent/10"
+                        >
+                            {researcher.name.charAt(0)}
+                        </div>
+                        <div>
+                            <h1
+                                id="researcher-title"
+                                class="text-3xl font-bold font-['Outfit'] text-text-main leading-tight mb-2"
+                            >
+                                {researcher.name}
+                            </h1>
+                            {
+                                researcher.identification_id && (
+                                    <p class="text-sm text-text-secondary flex items-center gap-2">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="w-4 h-4"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <>
+                                                <rect
+                                                    width="20"
+                                                    height="16"
+                                                    x="2"
+                                                    y="4"
+                                                    rx="2"
+                                                />
+                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                            </>
+                                        </svg>
+                                        <a
+                                            href={`mailto:${researcher.identification_id}`}
+                                            class="hover:text-premium-accent transition-colors"
+                                        >
+                                            {researcher.identification_id}
+                                        </a>
+                                    </p>
+                                )
+                            }
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        {
+                            researcher.cnpq_url && (
+                                <a
+                                    href={researcher.cnpq_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="px-4 py-2 bg-[var(--tag-bg)] hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent"
+                                >
+                                    Currículo Lattes
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="w-4 h-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <>
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                            <polyline points="15 3 21 3 21 9" />
+                                            <line
+                                                x1="10"
+                                                y1="14"
+                                                x2="21"
+                                                y2="3"
+                                            />
+                                        </>
+                                    </svg>
+                                </a>
+                            )
+                        }
+                        {
+                            researcher.google_scholar_url && (
+                                <a
+                                    href={researcher.google_scholar_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="px-4 py-2 bg-[var(--tag-bg)] hover:bg-premium-purple/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-purple"
+                                >
+                                    Google Scholar
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="w-4 h-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <>
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                            <polyline points="15 3 21 3 21 9" />
+                                            <line
+                                                x1="10"
+                                                y1="14"
+                                                x2="21"
+                                                y2="3"
+                                            />
+                                        </>
+                                    </svg>
+                                </a>
+                            )
+                        }
+                    </div>
+                </div>
+
+                <div>
+                    <h4
+                        class="text-text-main text-sm font-bold uppercase tracking-wider mb-4"
+                    >
+                        Áreas de Conhecimento
+                    </h4>
+                    <div
+                        class="flex flex-wrap gap-3"
+                        role="list"
+                        aria-label="Áreas de atuação"
+                    >
+                        {
+                            researcher.knowledge_areas.map((area) => (
+                                <div
+                                    role="listitem"
+                                    class="px-4 py-2 bg-[var(--tag-bg)] border border-border-main rounded-xl text-xs text-text-main font-bold"
+                                >
+                                    {area.name}
+                                </div>
+                            ))
+                        }
+                        {
+                            researcher.knowledge_areas.length === 0 && (
+                                <p class="text-text-secondary text-sm italic">
+                                    Nenhuma área registrada.
+                                </p>
+                            )
+                        }
+                    </div>
+                </div>
+            </article>
+
+            <!-- Research Groups -->
+            <section aria-labelledby="groups-title" class="space-y-6">
+                <h3
+                    id="groups-title"
+                    class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+                >
+                    Grupos de Pesquisa
+                </h3>
+
+                {
+                    researcher.research_groups.length > 0 ? (
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {researcher.research_groups.map((group) => (
+                                <a
+                                    href={`${import.meta.env.BASE_URL}groups/${group.id}`}
+                                    class="glass-card p-5 group hover:border-premium-accent/40 transition-all flex items-center gap-4"
+                                >
+                                    <div class="w-12 h-12 rounded-xl bg-[var(--tag-bg)] flex items-center justify-center text-premium-accent font-bold group-hover:bg-premium-accent group-hover:text-white transition-colors shrink-0">
+                                        {group.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-text-main group-hover:text-premium-accent transition-colors line-clamp-2 text-sm">
+                                            {group.name}
+                                        </h4>
+                                        <span class="text-[10px] text-text-secondary uppercase tracking-wider font-bold">
+                                            Ver grupo
+                                        </span>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-text-secondary italic">
+                            Não está vinculado a nenhum grupo de pesquisa
+                            registrado.
+                        </p>
+                    )
+                }
+            </section>
+
+            <!-- Initiatives -->
+            <section aria-labelledby="projects-title" class="space-y-6">
+                <h3
+                    id="projects-title"
+                    class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+                >
+                    Projetos e Iniciativas
+                </h3>
+
+                {
+                    researcher.initiatives.length > 0 ? (
+                        <div class="grid grid-cols-1 gap-4">
+                            {researcher.initiatives.map((initiative) => (
+                                <div class="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-premium-accent/20 transition-all">
+                                    <div>
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <span
+                                                class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${initiative.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-slate-100 text-slate-500 border-slate-200"}`}
+                                            >
+                                                {initiative.status}
+                                            </span>
+                                            <span class="text-[10px] text-text-secondary font-bold uppercase tracking-wider">
+                                                {initiative.role}
+                                            </span>
+                                        </div>
+                                        <h4 class="font-bold text-text-main text-lg">
+                                            {initiative.name}
+                                        </h4>
+                                    </div>
+                                    <a
+                                        href={`${import.meta.env.BASE_URL}projects/${initiative.id}`}
+                                        class="px-4 py-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent text-text-secondary hover:text-white text-xs font-bold transition-all text-center self-start md:self-center shrink-0"
+                                    >
+                                        Ver Projeto
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-text-secondary italic">
+                            Nenhum projeto registrado.
+                        </p>
+                    )
+                }
+            </section>
+        </div>
+    </div>
+</Layout>

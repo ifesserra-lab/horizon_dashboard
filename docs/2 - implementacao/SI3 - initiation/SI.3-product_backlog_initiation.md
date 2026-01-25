@@ -75,12 +75,65 @@ tags: [type:feature, area:frontend]
 ```
 
 #### Descrição
-Página individual do pesquisador consolidando dados do Lattes (Resumo, Formação, Produções).
+Página individual do pesquisador exibindo informações detalhadas extraídas do arquivo canônico (`researchers_canonical.json`), incluindo iniciativas, grupos de pesquisa e áreas de conhecimento.
 
 #### Critérios de Aceitação
-- [ ] Foto, Nome, Bio e Instituição de vínculo.
-- [ ] Timeline de Formação Acadêmica.
-- [ ] Lista de Artigos e Orientações recentes.
+- **Funcional**:
+    - [ ] Dados Pessoais: Nome, Email (ofuscado/link), Links (Lattes, Google Scholar).
+    - [ ] Listagem de **Initiatives** (Projetos) vinculados com Role e Status.
+    - [ ] Listagem de **Research Groups** vinculados.
+    - [ ] Listagem de **Knowledge Areas** vinculadas.
+- **UI/UX**:
+    - [ ] Design limpo e organizado em seções.
+    - [ ] Links para as páginas de detalhes de Grupos e Projetos.
+
+### US-034 – Listagem de Pesquisadores
+```yaml
+id: US-034
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [RF-30]
+tags: [type:feature, area:frontend, component:list]
+```
+
+#### Descrição
+Página dedicada para listar todos os pesquisadores disponíveis no sistema, com capacidade de busca para facilitar a localização.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Listagem paginada ou infinita (virtualizada se muitos itens) de pesquisadores.
+    - [ ] Cards contendo: Nome, e-mail (opcional), e principais áreas de conhecimento (se couber).
+    - [ ] Busca textual por Nome.
+- **UI/UX**:
+    - [ ] Grid responsivo de cards.
+    - [ ] Feedback visual para "Nenhum pesquisador encontrado".
+
+- [ ] Feedback visual para "Nenhum pesquisador encontrado".
+
+### US-035 – Dashboard Analytics de Pesquisadores
+```yaml
+id: US-035
+milestone: R1
+prioridade: Média
+tamanho: 8
+origem: [RF-32, RF-33, RF-34, RF-35, RF-36]
+tags: [type:feature, area:frontend, component:charts]
+```
+
+#### Descrição
+Implementar uma seção de indicadores na página de listagem de pesquisadores (`/researchers`), fornecendo uma visão macro da distribuição de competências e engajamento da equipe.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] **Chart 1 (Requisitado)**: Barra horizontal - Pesquisadores por Área de Conhecimento (Top 10).
+    - [ ] **Chart 2 (Requisitado)**: Barra vertical/Lista - Top 10 Linhas de Pesquisa por Qtd de Pesquisadores.
+    - [ ] **Metric 3 (Sugerida)**: Gráfico de Donut - Distribuição de Papéis (Coordenador vs Pesquisador).
+    - [ ] **Metric 4 (Sugerida)**: Histograma - Pesquisadores por Qtd de Projetos Ativos (Engajamento).
+    - [ ] **Metric 5 (Sugerida)**: Ranking - Top 5 Grupos com mais pesquisadores.
+- **UI/UX**:
+    - [ ] Componentes gráficos consistentes com o tema (ECharts ou similar via Astro).
+    - [ ] Responsividade para mobile (stacking dos gráficos).
 
 ---
 

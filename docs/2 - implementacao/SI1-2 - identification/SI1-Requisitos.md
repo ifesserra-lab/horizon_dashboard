@@ -60,6 +60,13 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-27** | O sistema deve oferecer um painel de acessibilidade completo com: seletor de tema (Claro/Escuro/Auto), níveis de contraste (Normal/Alto/Máximo), escalas de fonte (Pequena/Normal/Grande/Extra), e opções adicionais (Reduzir Movimento, Indicadores de Foco, Otimizar para Leitor de Tela), com funcionalidade de restaurar padrões. | Acessibilidade | Crítica |
 | **RF-28** | O sistema deve exibir um Dashboard de Publicações contendo a quantidade de publicações por pesquisador e a evolução temporal das publicações. | Dashboard de Publicações | Alta |
 | **RF-29** | O Dashboard de Publicações deve permitir a filtragem por Intervalo de anos e Tipo de Publicação. | Dashboard de Publicações | Média |
+| **RF-30** | O sistema deve exibir uma página dedicada para "Pesquisadores", permitindo busca textual por nome e filtros (se aplicável). | Listagem de Pesquisadores | Alta |
+| **RF-31** | O sistema deve exibir uma página de detalhes do pesquisador, mostrando suas iniciativas, grupos de pesquisa e áreas de conhecimento. | Detalhes do Pesquisador | Alta |
+| **RF-32** | O sistema deve exibir um gráfico de barras com a quantidade de pesquisadores por Área de Conhecimento (Top 10 ou Geral). | Analytics de Pesquisadores | Média |
+| **RF-33** | O sistema deve exibir um ranking (Top 10) das Linhas de Pesquisa com maior número de pesquisadores vinculados. | Analytics de Pesquisadores | Média |
+| **RF-34** | O sistema deve exibir métricas de distribuição de pesquisadores por Papel em Iniciativas (Coordenador vs Pesquisador). | Analytics de Pesquisadores | Média |
+| **RF-35** | O sistema deve exibir um histograma de engajamento (distribuição de pesquisadores por quantidade de iniciativas ativas). | Analytics de Pesquisadores | Média |
+| **RF-36** | O sistema deve exibir o Top 5 Grupos de Pesquisa com maior número de membros. | Analytics de Pesquisadores | Média |
 
 
 ---

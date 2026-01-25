@@ -1,0 +1,213 @@
+---
+import type { Researcher } from "../../types/researchers";
+
+interface Props {
+    researchers: Researcher[];
+}
+
+const { researchers } = Astro.props;
+
+// --- KPI Calculations ---
+const totalResearchers = researchers.length;
+
+// Initiatives (Projects)
+let totalProjects = 0;
+let activeProjects = 0;
+const uniqueProjectIds = new Set<number>();
+
+researchers.forEach((r) => {
+    r.initiatives.forEach((i) => {
+        if (!uniqueProjectIds.has(i.id)) {
+            uniqueProjectIds.add(i.id);
+            totalProjects++;
+            if (["active", "ativo", "Active"].includes(i.status)) {
+                activeProjects++;
+            }
+        }
+    });
+});
+
+// Groups
+const uniqueGroups = new Set<number>();
+researchers.forEach((r) => {
+    r.research_groups.forEach((g) => uniqueGroups.add(g.id));
+});
+const totalGroups = uniqueGroups.size;
+
+// Knowledge Areas
+const uniqueAreas = new Set<string>();
+researchers.forEach((r) => {
+    r.knowledge_areas.forEach((a) => {
+        uniqueAreas.add(a.name);
+    });
+});
+const totalAreas = uniqueAreas.size;
+---
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <!-- Card 1: Pesquisadores -->
+    <div
+        class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
+    >
+        <div
+            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                ></path><circle cx="9" cy="7" r="4"></circle><path
+                    d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path
+                    d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >
+        </div>
+        <div>
+            <p
+                class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
+            >
+                Pesquisadores
+            </p>
+            <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
+                {totalResearchers}
+            </h3>
+        </div>
+    </div>
+
+    <!-- Card 2: Projetos Totais -->
+    <div
+        class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
+    >
+        <div
+            class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M12 2v20"></path><path
+                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                ></path></svg
+            >
+        </div>
+        <div>
+            <p
+                class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
+            >
+                Total de Projetos
+            </p>
+            <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
+                {totalProjects}
+            </h3>
+        </div>
+    </div>
+
+    <!-- Card 3: Projetos Ativos -->
+    <div
+        class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
+    >
+        <div
+            class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M12 2v20"></path><path d="M2 12h20"></path><path
+                    d="m17 7 5 5-5 5"></path><path d="m7 17-5-5 5-5"
+                ></path></svg
+            >
+        </div>
+        <div>
+            <p
+                class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
+            >
+                Projetos Ativos
+            </p>
+            <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
+                {activeProjects}
+            </h3>
+        </div>
+    </div>
+
+    <!-- Card 4: Grupos -->
+    <div
+        class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
+    >
+        <div
+            class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                ></path><circle cx="9" cy="7" r="4"></circle><path
+                    d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
+                    d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >
+        </div>
+        <div>
+            <p
+                class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
+            >
+                Grupos
+            </p>
+            <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
+                {totalGroups}
+            </h3>
+        </div>
+    </div>
+
+    <!-- Card 5: Áreas -->
+    <div
+        class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
+    >
+        <div
+            class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="m12 14 4-4"></path><path
+                    d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg
+            >
+        </div>
+        <div>
+            <p
+                class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
+            >
+                Áreas
+            </p>
+            <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
+                {totalAreas}
+            </h3>
+        </div>
+    </div>
+</div>
