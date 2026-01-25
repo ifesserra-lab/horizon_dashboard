@@ -1044,3 +1044,25 @@ Implementar um dashboard dedicado para visualização da produção acadêmica, 
 - **UI/UX**:
     - [ ] Design consistente com os demais dashboards (Title, KPIs, Charts).
     - [ ] Tooltips interativos nos gráficos.
+
+### US-036 – Página de Download de Dados
+```yaml
+id: US-036
+milestone: R1
+prioridade: Média
+tamanho: 5
+origem: [User Request]
+tags: [type:feature, area:frontend, component:download]
+```
+
+#### Descrição
+Criar uma página (`/download`) que permita a qualquer pessoa baixar os arquivos de dados brutos e processados (Canonical e Mart) que alimentam o dashboard. A página deve listar cada arquivo com uma explicação clara do seu conteúdo.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Listar arquivos de `src/data/canonical` e `src/data/mart`.
+    - [ ] Exibir nome do arquivo, descrição do conteúdo e contagem de registros (se aplicável).
+    - [ ] Botão de "Download" que baixa o arquivo JSON.
+- **UI/UX**:
+    - [ ] Design consistente com o restante da plataforma (Cards/Grid).
+    - [ ] Explicações claras e amigáveis para cada dataset.

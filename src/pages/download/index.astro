@@ -1,0 +1,265 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+// Import Data Files
+import initiativesCanonical from "../../data/canonical/initiatives_canonical.json";
+import researchersCanonical from "../../data/canonical/researchers_canonical.json";
+import researchGroupsCanonical from "../../data/canonical/research_groups_canonical.json";
+import initiativesMart from "../../data/mart/initiatives_analytics_mart.json";
+import knowledgeAreasMart from "../../data/mart/knowledge_areas_mart.json";
+
+// Define Metadata for each file
+const datasets = [
+    {
+        id: "researchers",
+        name: "researchers_canonical.json",
+        description: "Base canônica de pesquisadores, contendo dados do perfil, áreas de atuação e vínculos.",
+        type: "Canonical",
+        count: (researchersCanonical as any[]).length,
+        data: researchersCanonical,
+        icon: "User",
+        structure: `{
+  "id": number,             // ID único do pesquisador
+  "name": string,           // Nome completo
+  "identification_id": string, // Identificador textual (ex: email ou nome)
+  "email": string | null,   // E-mail institucional (pode ser nulo)
+  "initiatives": [          // Lista de projetos vinculados
+    {
+      "id": number,
+      "name": string,       // Título do projeto
+      "role": string,       // Papel (Coordenador, Pesquisador, Estudante)
+      "status": string      // Status (active, closed)
+    }
+  ],
+  "research_groups": [      // Grupos de pesquisa vinculados
+    { "id": number, "name": string }
+  ],
+  "knowledge_areas": [      // Áreas de conhecimento (CNPq)
+    { "id": number, "name": string }
+  ]
+}`
+    },
+    {
+        id: "groups",
+        name: "research_groups_canonical.json",
+        description: "Base canônica de grupos de pesquisa, incluindo líderes, membros, linhas de pesquisa e status.",
+        type: "Canonical",
+        count: (researchGroupsCanonical as any[]).length,
+        data: researchGroupsCanonical,
+        icon: "Users",
+        structure: `{
+  "id": number,             // ID único do grupo
+  "name": string,           // Nome do grupo de pesquisa
+  "short_name": string,     // Sigla do grupo
+  "description": string,    // Descrição ou repercussão
+  "campus": {               // Campus de origem
+    "id": number,
+    "name": string
+  },
+  "leaders": [              // Lista de líderes
+    { "id": number, "name": string }
+  ],
+  "members": [              // Membros do grupo
+    {
+      "id": number,
+      "name": string,
+      "role": string        // researcher, student, technician
+    }
+  ],
+  "knowledge_areas": [      // Áreas de atuação
+    { "id": number, "name": string }
+  ]
+}`
+    },
+    {
+        id: "initiatives",
+        name: "initiatives_canonical.json",
+        description: "Base canônica de projetos e iniciativas, com detalhes de vigência, fomento e equipe.",
+        type: "Canonical",
+        count: (initiativesCanonical as any[]).length,
+        data: initiativesCanonical,
+        icon: "FileText",
+        structure: `{
+  "id": number,             // ID único do projeto
+  "name": string,           // Título do projeto
+  "status": string,         // active, inactive
+  "start_date": string,     // Data de início (ISO 8601)
+  "end_date": string,       // Data de término (ISO 8601)
+  "initiative_type": {      // Tipo de iniciativa
+    "id": number,
+    "name": string          // Ex: "Research Project"
+  },
+  "team": [                 // Equipe do projeto
+    {
+      "id": number,
+      "name": string,
+      "role": string        // Papel no projeto
+    }
+  ]
+}`
+    },
+    {
+        id: "analytics",
+        name: "initiatives_analytics_mart.json",
+        description: "Data Mart processado com agregações de projetos para analytics (Evolução, Status, Equipe).",
+        type: "Mart",
+        count: "N/A", // Object structure
+        data: initiativesMart,
+        icon: "BarChart",
+        structure: `{
+  "summary": {              // Totais gerais
+    "total_projects": number,
+    "active_projects": number,
+    "total_participants": number
+  },
+  "evolution": [            // Série histórica
+    {
+      "year": string,       // Ano de referência
+      "start": number,      // Projetos iniciados
+      "end": number         // Projetos concluídos
+    }
+  ],
+  "team_composition": {     // Distribuição da equipe
+    "researchers": number,  // Qtd. Pesquisadores
+    "students": number      // Qtd. Estudantes
+  }
+}`
+    },
+    {
+        id: "knowledge",
+        name: "knowledge_areas_mart.json",
+        description: "Data Mart de áreas do conhecimento, agragando contagens de projetos e grupos por grande área.",
+        type: "Mart",
+        count: (knowledgeAreasMart as any[]).length,
+        data: knowledgeAreasMart,
+        icon: "Book",
+        structure: `[
+  {
+    "area_id": number,      // ID da área (CNPq)
+    "area_name": string,    // Nome da área
+    "groups_count": number, // Qtd. de grupos vinculados
+    "groups": [             // Lista simplificada de grupos
+      {
+        "id": number,
+        "name": string,
+        "campus": string
+      }
+    ]
+  }
+]`
+    }
+];
+---
+
+<Layout title="Dados Abertos">
+    <div class="space-y-10 pb-12">
+        <!-- Header -->
+        <header class="flex flex-col gap-6">
+            <div>
+                <h1 class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main">
+                    Dados <span class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple">Abertos</span>
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-2xl">
+                    Transparência total. Baixe os dados brutos e processados que alimentam nossos dashboards para suas próprias análises entenda nossa metodologia.
+                </p>
+            </div>
+        </header>
+
+        <!-- Datasets Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {datasets.map(dataset => (
+                <article class="glass-card p-6 flex flex-col gap-4 group h-full hover:border-premium-accent/40 transition-all duration-300">
+                    <div class="flex items-start justify-between">
+                        <div class="p-3 rounded-xl bg-premium-accent/10 text-premium-accent group-hover:scale-110 transition-transform duration-300">
+                            <!-- Icons (Lucide implementation via SVG) -->
+                            {dataset.icon === "User" && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            )}
+                            {dataset.icon === "Users" && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            )}
+                            {dataset.icon === "FileText" && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            )}
+                            {dataset.icon === "BarChart" && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+                            )}
+                            {dataset.icon === "Book" && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            )}
+                        </div>
+                        <span class={`px-3 py-1 rounded-full text-xs font-bold border ${dataset.type === 'Canonical' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
+                            {dataset.type}
+                        </span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-text-main font-['Outfit'] mb-1 break-all">{dataset.name}</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed h-10 line-clamp-2" title={dataset.description}>
+                            {dataset.description}
+                        </p>
+                    </div>
+
+                    <div class="my-4">
+                        <details class="group/details">
+                            <summary class="cursor-pointer text-xs font-bold text-premium-accent uppercase tracking-wider hover:text-premium-purple transition-colors list-none flex items-center gap-2">
+                                <span class="group-open/details:hidden">Ver Estrutura JSON</span>
+                                <span class="hidden group-open/details:inline">Ocultar Estrutura</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </summary>
+                            <div class="mt-3 bg-slate-900 rounded-lg p-3 border border-white/10 overflow-hidden">
+                                <pre class="text-[10px] text-slate-300 font-mono overflow-x-auto whitespace-pre no-scrollbar"><code>{dataset.structure}</code></pre>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between">
+                        <span class="text-xs text-text-muted font-medium">
+                            {dataset.count !== "N/A" ? `${dataset.count} registros` : "Agregado"}
+                        </span>
+                        
+                        <button
+                            class="download-btn flex items-center gap-2 text-sm font-bold text-premium-accent hover:text-white hover:bg-premium-accent px-3 py-1.5 rounded-lg transition-all duration-300"
+                            data-filename={dataset.name}
+                            data-blob={JSON.stringify(dataset.data)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Download
+                        </button>
+                    </div>
+                </article>
+            ))}
+        </div>
+    </div>
+</Layout>
+
+<script>
+    function setupDownloads() {
+        const buttons = document.querySelectorAll('.download-btn');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filename = btn.getAttribute('data-filename');
+                const content = btn.getAttribute('data-blob');
+                
+                if (!content || !filename) return;
+
+                const blob = new Blob([content], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            });
+        });
+    }
+
+    setupDownloads();
+    document.addEventListener('astro:after-swap', setupDownloads);
+</script>

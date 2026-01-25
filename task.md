@@ -26,3 +26,10 @@
     - [x] Update SI.3 Product Backlog
     - [x] Update Project Type Definition
     - [x] Update Project Details Page
+    
+- [x] Implement Download Page (US-036)
+    - [x] Create Implementation Plan
+    - [x] Create Page `src/pages/download/index.astro`
+    - [x] Implement Download Logic (Blob)
+    - [x] Verify Downloads
+
