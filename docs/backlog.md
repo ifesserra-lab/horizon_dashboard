@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v1.5.0** | 2026-01-25 | **Released** | Feature: Redesign Researchers Page & Analytics (US-003) | - | - |
 | **v1.3.1** | 2026-01-22 | **Released** | Feature: Projects in Group Details (US-033) | TBD | [#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62) |
 | **v1.3.0** | 2026-01-16 | **Released** | Feature: Enhanced Accessibility Panel (US-030) | [#58](https://github.com/ifesserra-lab/horizon_dashboard/pull/58) | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 | **v1.2.2** | 2026-01-16 | **Released** | Bugfix: Home Chart Hover Clipping | [#50](https://github.com/ifesserra-lab/horizon_dashboard/pull/50) | - |
@@ -70,7 +71,7 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-029** Evolução dos Projetos (Início vs Conclusão) (Entregue na v1.1.6)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
-    - [ ] **US-003** Perfil do Pesquisador (Lattes UI)
+    - [x] **US-003** Perfil do Pesquisador (Lattes UI) (Done na v1.5.0)
     - [ ] **Task** Design do Componente de Timeline
 
 - **Epic 3: Transparência (Release 3)** _(Planejado)_
