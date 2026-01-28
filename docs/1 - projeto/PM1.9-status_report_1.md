@@ -1,20 +1,21 @@
 # Status Report 1
 **Projeto:** Horizon Dashboard
 **Período:** 01/01/2026 a 15/01/2026
-**Versão Relatada:** v1.1.5 (US-024: Data Sync & Teams)
-| **US-024** | Sincronização de Equipes e Dados | **Entregue** | v1.1.5 |
+**Versão Relatada:** v1.6.0 (US-036: Advisorships Module)
+| **US-036** | Catálogo e Dashboard de Orientações | **Entregue** | v1.6.0 |
 **Responsável:** Antigravity (Senior PM)
 
 ---
 
 # 1. Resumo Executivo
-A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados reais (canonical) e melhorias na visualização da distribuição por área. A interface agora consome dados de 332 grupos de pesquisa.
+A **Release R1 (Portal de Grupos)** foi refinada com a integração de dados reais (canonical) e melhorias na visualização da distribuição por área. A **v1.6.0** entregou o novo módulo de **Orientações (Advisorships)** com KPIs e Analytics.
 
 ---
 
 # 2. Progresso da Sprint / Iteração
 | Item | Descrição | Status | PR/Versão |
 |------|-----------|--------|-----------|
+| **US-036** | Catálogo e Dashboard de Orientações | **Entregue** | v1.6.0 |
 | **US-001** | Listagem e Busca de Grupos | **Entregue** | v1.0.0 |
 | **US-002** | Detalhes do Grupo | **Entregue** | v1.0.0 |
 | **Fix** | Contraste e Tema Light (Acessibilidade) | **Entregue** | v1.0.2 |
