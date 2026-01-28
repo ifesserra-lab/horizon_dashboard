@@ -7,7 +7,6 @@ interface Props {
         active_advisorships: number;
         concluded_advisorships: number;
         total_fellowships: number;
-        total_value: number;
         unique_students: number;
         unique_supervisors: number;
     };
@@ -22,16 +21,10 @@ const fellowshipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" heigh
 const valueIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
 const studentIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
 const archiveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>`;
-
-const formattedValue = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0,
-}).format(summary.total_value);
 ---
 
 <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6"
 >
     <KpiCard
         title="Total"
@@ -56,12 +49,6 @@ const formattedValue = new Intl.NumberFormat("pt-BR", {
         value={summary.total_fellowships}
         icon={fellowshipIcon}
         color="sky-500"
-    />
-    <KpiCard
-        title="Investimento Mensal"
-        value={formattedValue}
-        icon={valueIcon}
-        color="amber-500"
     />
     <KpiCard
         title="Estudantes Únicos"
