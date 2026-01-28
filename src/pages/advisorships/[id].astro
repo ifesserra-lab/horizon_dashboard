@@ -1,0 +1,268 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
+import type { ProjectAdvisorship } from "../../types/advisorships";
+
+export function getStaticPaths() {
+    const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
+    // Flatten all advisorships to generate paths for each one
+    const allAdvisorships = allProjects.flatMap((project) =>
+        project.advisorships.map((adv) => ({
+            params: { id: adv.id.toString() },
+            props: {
+                advisorship: adv,
+                projectName: project.name,
+                projectId: project.id,
+            },
+        })),
+    );
+    return allAdvisorships;
+}
+
+const { advisorship, projectName, projectId } = Astro.props;
+
+const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    });
+};
+
+const statusStyles = {
+    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+    Concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+};
+
+const currentStatusStyle =
+    statusStyles[advisorship.status as keyof typeof statusStyles] ||
+    "bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+---
+
+<Layout
+    title={`Orientação: ${advisorship.name}`}
+    breadcrumbReplacements={{ [advisorship.id]: "Detalhes da Orientação" }}
+>
+    <nav class="mb-8" aria-label="Navegação secundária">
+        <a
+            href={`${import.meta.env.BASE_URL}advisorships`}
+            class="text-sm font-bold text-text-secondary hover:text-premium-accent flex items-center gap-2 transition-colors focus:ring-2 focus:ring-premium-accent rounded px-1"
+        >
+            <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg
+            >
+            Voltar para lista
+        </a>
+    </nav>
+
+    <div class="max-w-4xl mx-auto space-y-8">
+        <!-- Header Card -->
+        <header class="glass-card p-8 border-t-4 border-t-premium-accent">
+            <div
+                class="flex flex-col md:flex-row md:items-start justify-between gap-6"
+            >
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span
+                            class={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${currentStatusStyle}`}
+                        >
+                            {advisorship.status}
+                        </span>
+                        {
+                            advisorship.fellowship && (
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-premium-purple/10 text-premium-purple border border-premium-purple/20">
+                                    Bolsa: {advisorship.fellowship.name}
+                                </span>
+                            )
+                        }
+                    </div>
+                    <h1
+                        class="text-3xl font-bold font-['Outfit'] text-text-main leading-tight"
+                    >
+                        {advisorship.name}
+                    </h1>
+                    {
+                        projectName &&
+                            projectName !== "Sem Projeto Associado" && (
+                                <div class="flex items-center gap-2 text-text-secondary">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-text-muted">
+                                        Projeto Vinculado:
+                                    </span>
+                                    <a
+                                        href={`${import.meta.env.BASE_URL}projects/${projectId}`}
+                                        class="font-medium hover:text-premium-accent transition-colors"
+                                    >
+                                        {projectName}
+                                    </a>
+                                </div>
+                            )
+                    }
+                </div>
+            </div>
+        </header>
+
+        <!-- Details Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Student -->
+            <article
+                class="glass-card p-6 flex items-center gap-4 hover:border-premium-accent/30 transition-all"
+            >
+                <div
+                    class="w-14 h-14 rounded-full bg-premium-accent/10 flex items-center justify-center text-premium-accent shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-7 h-7"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+                        ></path><circle cx="12" cy="7" r="4"></circle></svg
+                    >
+                </div>
+                <div>
+                    <span
+                        class="text-xs font-bold text-text-muted uppercase tracking-wider"
+                        >Estudante</span
+                    >
+                    <h3 class="text-lg font-bold text-text-main">
+                        {advisorship.student_name}
+                    </h3>
+                    <a
+                        href={`${import.meta.env.BASE_URL}researchers/${advisorship.student_id}`}
+                        class="text-xs font-bold text-premium-accent hover:underline mt-1 inline-block"
+                    >
+                        Ver Perfil
+                    </a>
+                </div>
+            </article>
+
+            <!-- Supervisor -->
+            <article
+                class="glass-card p-6 flex items-center gap-4 hover:border-premium-purple/30 transition-all"
+            >
+                <div
+                    class="w-14 h-14 rounded-full bg-premium-purple/10 flex items-center justify-center text-premium-purple shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-7 h-7"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"></path><path
+                            d="M7 3.34V5a3 3 0 0 0 3 3v0a2 2 0 0 1 2 2v0c0 1.1.9 2 2 2v0a2 2 0 0 0 2-2v0c0-1.1.9-2 2-2h3.17"
+                        ></path><path
+                            d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"
+                        ></path></svg
+                    >
+                </div>
+                <div>
+                    <span
+                        class="text-xs font-bold text-text-muted uppercase tracking-wider"
+                        >Orientador</span
+                    >
+                    <h3 class="text-lg font-bold text-text-main">
+                        {advisorship.supervisor_name}
+                    </h3>
+                    <a
+                        href={`${import.meta.env.BASE_URL}researchers/${advisorship.supervisor_id}`}
+                        class="text-xs font-bold text-premium-purple hover:underline mt-1 inline-block"
+                    >
+                        Ver Perfil
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <!-- Timeline & Fellowship -->
+        <section class="glass-card p-8 space-y-6">
+            <h3
+                class="text-xl font-bold font-['Outfit'] text-text-main pb-4 border-b border-border-main"
+            >
+                Detalhes da Execução
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                    <span
+                        class="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 block"
+                        >Período de Vigência</span
+                    >
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded bg-emerald-500/10 flex items-center justify-center text-emerald-500"
+                            >
+                                <span class="text-xs font-bold">INÍCIO</span>
+                            </div>
+                            <span class="font-medium text-text-main"
+                                >{formatDate(advisorship.start_date)}</span
+                            >
+                        </div>
+                        <div
+                            class="absolute h-4 w-px bg-border-main ml-4 -my-2"
+                        >
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded bg-slate-500/10 flex items-center justify-center text-slate-500"
+                            >
+                                <span class="text-xs font-bold">FIM</span>
+                            </div>
+                            <span class="font-medium text-text-main"
+                                >{formatDate(advisorship.end_date)}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                {
+                    advisorship.fellowship && (
+                        <div>
+                            <span class="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 block">
+                                Dados da Bolsa
+                            </span>
+                            <div class="bg-premium-accent/5 rounded-xl p-4 border border-premium-accent/10">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-sm font-bold text-premium-accent">
+                                        {advisorship.fellowship.name}
+                                    </span>
+                                    <span class="text-xs bg-premium-accent/10 text-premium-accent px-2 py-0.5 rounded font-bold">
+                                        {new Intl.NumberFormat("pt-BR", {
+                                            style: "currency",
+                                            currency: "BRL",
+                                        }).format(advisorship.fellowship.value)}
+                                        /mês
+                                    </span>
+                                </div>
+                                <p class="text-xs text-text-secondary leading-relaxed">
+                                    {advisorship.fellowship.description ||
+                                        "Descrição não disponível."}
+                                </p>
+                            </div>
+                        </div>
+                    )
+                }
+            </div>
+        </section>
+    </div>
+</Layout>

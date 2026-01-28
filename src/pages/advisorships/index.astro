@@ -1,0 +1,507 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
+import AdvisorshipKpiCards from "../../components/advisorships/AdvisorshipKpiCards.astro";
+import AdvisorshipCharts from "../../components/advisorships/AdvisorshipCharts.astro";
+import AdvisorshipCard from "../../components/AdvisorshipCard.astro";
+import type {
+    ProjectAdvisorship,
+    AdvisorshipItem,
+} from "../../types/advisorships";
+
+// Cast data
+const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
+
+// Flatten all advisorships for the explorer
+const allAdvisorships = allProjects.flatMap((project) =>
+    project.advisorships.map((adv) => ({
+        ...adv,
+        projectName: project.name,
+    })),
+);
+
+// Sort by start date (if available)
+const sortedAdvisorships = [...allAdvisorships].sort((a, b) => {
+    if (!a.start_date) return 1;
+    if (!b.start_date) return -1;
+    return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+});
+
+// Extract Filters Data
+const uniqueFellowships = [
+    ...new Set(
+        allAdvisorships
+            .map((a) => a.fellowship?.name)
+            .filter(Boolean) as string[],
+    ),
+].sort();
+
+const uniqueYears = [
+    ...new Set(
+        allAdvisorships
+            .map((a) =>
+                a.start_date
+                    ? new Date(a.start_date.replace(" ", "T"))
+                          .getFullYear()
+                          .toString()
+                    : null,
+            )
+            .filter(Boolean) as string[],
+    ),
+].sort((a, b) => b.localeCompare(a)); // Descending years
+
+// Calculate Summary Data
+const uniqueStudents = new Set(allAdvisorships.map((a) => a.student_id)).size;
+const uniqueSupervisors = new Set(allAdvisorships.map((a) => a.supervisor_id))
+    .size;
+
+const activeAdvisorships = allAdvisorships.filter(
+    (a) => a.status.toLowerCase() === "active",
+).length;
+
+const concludedAdvisorships = allAdvisorships.filter(
+    (a) => a.status.toLowerCase() === "concluded",
+).length;
+
+const fellowshipsCount = allAdvisorships.filter(
+    (a) => a.fellowship && a.fellowship.name,
+).length;
+
+const totalMonthlyValue = allAdvisorships
+    .filter((a) => a.status.toLowerCase() === "active" && a.fellowship)
+    .reduce((acc, curr) => acc + (curr.fellowship?.value || 0), 0);
+
+const summary = {
+    total_advisorships: allAdvisorships.length,
+    active_advisorships: activeAdvisorships,
+    concluded_advisorships: concludedAdvisorships, // Added this field
+    total_fellowships: fellowshipsCount,
+    total_value: totalMonthlyValue,
+    unique_students: uniqueStudents,
+    unique_supervisors: uniqueSupervisors,
+};
+
+// Calculate Analytics
+const statusColors = {
+    active: "var(--color-premium-accent, #38bdf8)",
+    concluded: "var(--color-text-muted, #94a3b8)",
+    unknown: "#f59e0b",
+};
+
+const statusCounts = allAdvisorships.reduce((acc: any, curr) => {
+    const status = curr.status.toLowerCase();
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+}, {});
+
+const statusDistribution = Object.entries(statusCounts).map(
+    ([label, value]) => ({
+        label: label.charAt(0).toUpperCase() + label.slice(1),
+        value: value as number,
+        color: statusColors[label as keyof typeof statusColors] || "#e2e8f0",
+    }),
+);
+
+const fellowshipCounts = allAdvisorships
+    .filter((a) => a.fellowship)
+    .reduce((acc: any, curr) => {
+        const name = curr.fellowship?.name || "Outras";
+        acc[name] = (acc[name] || 0) + 1;
+        return acc;
+    }, {});
+
+const fellowshipColors = [
+    "#0ea5e9",
+    "#8b5cf6",
+    "#ec4899",
+    "#f59e0b",
+    "#10b981",
+    "#6366f1",
+];
+const fellowshipDistribution = Object.entries(fellowshipCounts)
+    .sort((a: any, b: any) => b[1] - a[1])
+    .map(([label, value], i) => ({
+        label,
+        value: value as number,
+        color: fellowshipColors[i % fellowshipColors.length],
+    }));
+
+const supervisorCounts = allAdvisorships.reduce((acc: any, curr) => {
+    const name = curr.supervisor_name;
+    acc[name] = (acc[name] || 0) + 1;
+    return acc;
+}, {});
+
+const topSupervisors = Object.entries(supervisorCounts)
+    .sort((a: any, b: any) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([name, count]) => ({
+        name,
+        count: count as number,
+    }));
+
+// Fellowship Evolution (Line Chart Data)
+const minYear = Math.min(
+    ...allAdvisorships.map((a) =>
+        a.start_date ? new Date(a.start_date).getFullYear() : 9999,
+    ),
+);
+const maxYear = Math.max(
+    ...allAdvisorships.map((a) =>
+        a.end_date ? new Date(a.end_date).getFullYear() : 0,
+    ),
+);
+const yearsRange = Array.from(
+    { length: maxYear - minYear + 1 },
+    (_, i) => minYear + i,
+);
+
+// Get unique fellowship names
+const uniqueFellowshipNames = [
+    ...new Set(
+        allAdvisorships
+            .map((a) => a.fellowship?.name)
+            .filter(Boolean) as string[],
+    ),
+].sort();
+
+// Define colors for known fellowships or distinct colors
+// Define colors for known fellowships or distinct colors
+const fellowshipColorsMap: Record<string, string> = {
+    PIBIC: "#38bdf8", // sky-400
+    PIBITI: "#fbbf24", // amber-400
+    "PIBIC-JR": "#a855f7", // purple-500
+    PIVIC: "#94a3b8", // slate-400
+    PROBIC: "#f472b6", // pink-400
+    Voluntário: "#cbd5e1", // slate-300
+};
+const fallbackColors = [
+    "#ef4444",
+    "#22c55e",
+    "#3b82f6",
+    "#eab308",
+    "#ec4899",
+    "#8b5cf6",
+];
+
+const fellowshipEvolution = uniqueFellowshipNames
+    .map((name, index) => {
+        const data = yearsRange.map((year) => {
+            const count = allAdvisorships.filter((a) => {
+                if (a.fellowship?.name !== name) return false;
+                // Use date parsing with replace for robustness
+                const start = a.start_date
+                    ? new Date(a.start_date.replace(" ", "T")).getFullYear()
+                    : 9999;
+                const end = a.end_date
+                    ? new Date(a.end_date.replace(" ", "T")).getFullYear()
+                    : 0;
+                return start <= year && end >= year;
+            }).length;
+            return { year, value: count };
+        });
+
+        // Check if series has any data
+        if (data.every((d) => d.value === 0)) return null;
+
+        return {
+            label: name,
+            data: data,
+            color:
+                fellowshipColorsMap[name] ||
+                fallbackColors[index % fallbackColors.length],
+        };
+    })
+    .filter(Boolean) as {
+    label: string;
+    data: { year: number; value: number }[];
+    color: string;
+}[];
+
+const analytics = {
+    status_distribution: statusDistribution,
+    fellowship_distribution: fellowshipDistribution, // Keeping for backup or other uses if needed, but UI will change
+    fellowship_evolution: fellowshipEvolution,
+    top_supervisors: topSupervisors,
+};
+---
+
+<Layout title="Dashboard de Orientações">
+    <div class="space-y-10 pb-12">
+        <!-- Header -->
+        <header class="flex flex-col gap-6">
+            <div>
+                <h1
+                    class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main"
+                >
+                    Gestão de <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+                        >Orientações</span
+                    >
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-2xl">
+                    Acompanhamento de orientações de pesquisa, bolsas
+                    (fellowships) e relação entre orientadores e estudantes.
+                </p>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <AdvisorshipKpiCards summary={summary} />
+
+        <!-- Charts Dashboard -->
+        <AdvisorshipCharts analytics={analytics} />
+
+        <!-- Controls Section: Search & Filters -->
+        <div
+            class="glass-card p-4 rounded-2xl border border-border-main space-y-4"
+        >
+            <div class="flex flex-col lg:flex-row gap-4">
+                <!-- Search -->
+                <div class="relative flex-1">
+                    <label for="advisorshipSearch" class="sr-only"
+                        >Buscar orientações</label
+                    >
+                    <input
+                        type="text"
+                        id="advisorshipSearch"
+                        placeholder="Buscar por estudante, orientador, projeto..."
+                        class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main"
+                    />
+                    <svg
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </div>
+
+                <!-- Filters Group -->
+                <div class="flex flex-wrap gap-2">
+                    <!-- Status Filter -->
+                    <select
+                        id="statusFilter"
+                        class="bg-glass-bg border border-border-main rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/50 cursor-pointer hover:border-premium-accent/50 transition-colors"
+                    >
+                        <option value="">Todos os Status</option>
+                        <option value="active">Active</option>
+                        <option value="concluded">Concluded</option>
+                    </select>
+
+                    <!-- Fellowship Filter -->
+                    <select
+                        id="fellowshipFilter"
+                        class="bg-glass-bg border border-border-main rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/50 cursor-pointer hover:border-premium-accent/50 transition-colors"
+                    >
+                        <option value="">Todas as Bolsas</option>
+                        <option value="none">Sem Bolsa</option>
+                        {
+                            uniqueFellowships.map((f) => (
+                                <option value={f.toLowerCase()}>{f}</option>
+                            ))
+                        }
+                    </select>
+
+                    <!-- Year Filter -->
+                    <select
+                        id="yearFilter"
+                        class="bg-glass-bg border border-border-main rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/50 cursor-pointer hover:border-premium-accent/50 transition-colors"
+                    >
+                        <option value="">Todos os Anos</option>
+                        {
+                            uniqueYears.map((year) => (
+                                <option value={year}>{year}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Active Filters Tags (Hidden by default, shown via JS if needed or just kept simple) -->
+            <div
+                class="flex items-center justify-between text-xs text-text-secondary"
+            >
+                <span id="resultsCount" class="font-medium"
+                    >{sortedAdvisorships.length} resultados encontrados</span
+                >
+                <button
+                    id="resetFilters"
+                    class="text-premium-accent hover:underline hidden"
+                >
+                    Limpar filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Advisorships Explorer -->
+        <section>
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                id="advisorshipsGrid"
+            >
+                {
+                    sortedAdvisorships.map((adv) => (
+                        <div class="advisorship-card-wrapper transition-all duration-300">
+                            <AdvisorshipCard
+                                advisorship={adv}
+                                projectName={adv.projectName}
+                            />
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Empty State -->
+            <div
+                id="emptyState"
+                class="hidden flex-col items-center justify-center py-24 text-center glass-card border-dashed mt-6"
+            >
+                <div
+                    class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-10 h-10 opacity-50"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><circle cx="11" cy="11" r="8"></circle><path
+                            d="m21 21-4.3-4.3"></path><path d="M8 11h6"
+                        ></path></svg
+                    >
+                </div>
+                <h3
+                    class="text-xl font-bold font-['Outfit'] text-text-main mb-2"
+                >
+                    Nenhuma orientação encontrada
+                </h3>
+                <p class="text-text-secondary max-w-sm mx-auto">
+                    Ajuste seus termos de busca ou filtros para encontrar o que
+                    procura.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Client-side Logic -->
+    <script>
+        const searchInput = document.getElementById(
+            "advisorshipSearch",
+        ) as HTMLInputElement;
+        const statusFilter = document.getElementById(
+            "statusFilter",
+        ) as HTMLSelectElement;
+        const fellowshipFilter = document.getElementById(
+            "fellowshipFilter",
+        ) as HTMLSelectElement;
+        const yearFilter = document.getElementById(
+            "yearFilter",
+        ) as HTMLSelectElement;
+        const resetBtn = document.getElementById("resetFilters");
+        const emptyState = document.getElementById("emptyState");
+        const resultsCount = document.getElementById("resultsCount");
+        const cards = document.querySelectorAll(".advisorship-card-wrapper");
+
+        function filterItems() {
+            const query = searchInput.value.toLowerCase().trim();
+            const status = statusFilter.value.toLowerCase();
+            const fellowship = fellowshipFilter.value.toLowerCase();
+            const year = yearFilter.value;
+
+            let visibleCount = 0;
+            const hasActiveFilters = query || status || fellowship || year;
+
+            if (hasActiveFilters) {
+                resetBtn?.classList.remove("hidden");
+            } else {
+                resetBtn?.classList.add("hidden");
+            }
+
+            cards.forEach((card) => {
+                const element = card as HTMLElement;
+                const innerCard = element.querySelector(
+                    ".advisorship-card",
+                ) as HTMLElement;
+
+                if (!innerCard) return;
+
+                const cardStudent = innerCard.dataset.student || "";
+                const cardSupervisor = innerCard.dataset.supervisor || "";
+                const cardProject = innerCard.dataset.project || "";
+                const cardStatus = innerCard.dataset.status || "";
+                const cardFellowship = innerCard.dataset.fellowship || "";
+                const cardYear = innerCard.dataset.year || "";
+
+                // Search Logic
+                const matchesSearch =
+                    !query ||
+                    cardStudent.includes(query) ||
+                    cardSupervisor.includes(query) ||
+                    cardProject.includes(query);
+
+                // Filter Logic
+                const matchesStatus = !status || cardStatus === status;
+
+                let matchesFellowship = true;
+                if (fellowship === "none") {
+                    matchesFellowship = cardFellowship === "sem bolsa";
+                } else if (fellowship) {
+                    matchesFellowship = cardFellowship.includes(fellowship); // Relaxed matching for fellowships
+                }
+
+                const matchesYear = !year || cardYear === year;
+
+                const isVisible =
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesFellowship &&
+                    matchesYear;
+
+                if (isVisible) {
+                    element.style.display = "block";
+                    visibleCount++;
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+            // Update UI State
+            if (resultsCount) {
+                resultsCount.textContent = `${visibleCount} resultados encontrados`;
+            }
+
+            if (visibleCount === 0) {
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
+            } else {
+                emptyState?.classList.add("hidden");
+                emptyState?.classList.remove("flex");
+            }
+        }
+
+        // Event Listeners
+        searchInput?.addEventListener("input", filterItems);
+        statusFilter?.addEventListener("change", filterItems);
+        fellowshipFilter?.addEventListener("change", filterItems);
+        yearFilter?.addEventListener("change", filterItems);
+
+        resetBtn?.addEventListener("click", () => {
+            searchInput.value = "";
+            statusFilter.value = "";
+            fellowshipFilter.value = "";
+            yearFilter.value = "";
+            filterItems();
+        });
+    </script>
+</Layout>

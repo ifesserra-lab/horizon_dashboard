@@ -1,0 +1,72 @@
+---
+import KpiCard from "../KpiCard.astro";
+
+interface Props {
+    summary: {
+        total_advisorships: number;
+        active_advisorships: number;
+        concluded_advisorships: number;
+        total_fellowships: number;
+        total_value: number;
+        unique_students: number;
+        unique_supervisors: number;
+    };
+}
+
+const { summary } = Astro.props;
+
+// Icons
+const advisorshipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`;
+const activeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+const fellowshipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>`;
+const valueIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+const studentIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
+const archiveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>`;
+
+const formattedValue = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+}).format(summary.total_value);
+---
+
+<div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6"
+>
+    <KpiCard
+        title="Total"
+        value={summary.total_advisorships}
+        icon={advisorshipIcon}
+        color="premium-accent"
+    />
+    <KpiCard
+        title="Ativas"
+        value={summary.active_advisorships}
+        icon={activeIcon}
+        color="emerald-500"
+    />
+    <KpiCard
+        title="Concluídas"
+        value={summary.concluded_advisorships}
+        icon={archiveIcon}
+        color="slate-500"
+    />
+    <KpiCard
+        title="Bolsas Ativas"
+        value={summary.total_fellowships}
+        icon={fellowshipIcon}
+        color="sky-500"
+    />
+    <KpiCard
+        title="Investimento Mensal"
+        value={formattedValue}
+        icon={valueIcon}
+        color="amber-500"
+    />
+    <KpiCard
+        title="Estudantes Únicos"
+        value={summary.unique_students}
+        icon={studentIcon}
+        color="premium-purple"
+    />
+</div>

@@ -191,6 +191,7 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
 | **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
 | **US-030** | Painel de Acessibilidade Completo | **Done** | v1.3.0 | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
+| **US-036** | Catálogo e Dashboard de Orientações | **Done** | v1.3.2 | [#51](https://github.com/ifesserra-lab/horizon_dashboard/pull/51) |
 ### US-006 – Dashboard de Áreas de Conhecimento
 **GitHub Issue**: [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21)
 
@@ -357,6 +358,29 @@ Listar todos os projetos vinculados a um grupo de pesquisa na página de detalhe
     - [ ] Se não houver projetos, exibir mensagem informativa ou ocultar a seção.
 
 
+
+### US-036 – Catálogo e Dashboard de Orientações
+```yaml
+id: US-036
+milestone: R1
+prioridade: Alta
+tamanho: 8
+origem: [User Request]
+tags: [type:feature, area:frontend, component:advisorships]
+```
+
+#### Descrição
+Implementar uma página dedicada para visualizar e explorar as orientações (advisorships) da instituição, incluindo KPIs, gráficos analíticos e um catálogo buscável de estudantes e orientadores.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] KPIs: Total de Orientações, Bolsas Ativas, Valor Total Investido.
+    - [ ] Gráficos: Orientações por Orientador (Top 10), Distribuição por Tipo de Bolsa (Fellowship).
+    - [ ] Listagem em Cards contendo: Nome do Estudante, Orientador, Projeto Vinculado e Detalhes da Bolsa.
+    - [ ] Busca em tempo real por estudante, orientador ou projeto.
+- **UI/UX**:
+    - [ ] Seguir o padrão visual da página de Projetos (`/projects`).
+    - [ ] Design responsivo e acessível (WCAG).
 
 
 
