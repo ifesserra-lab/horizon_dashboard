@@ -19,9 +19,10 @@ interface Props {
        }[];
         top_supervisors: { name: string; count: number }[];
     };
+    visibleTabs?: ('general' | 'fellowships' | 'financial' | 'supervisors')[];
 }
 
-const { analytics } = Astro.props;
+const { analytics, visibleTabs = ['general', 'fellowships', 'financial', 'supervisors'] } = Astro.props;
 
 const totalStatus = analytics.status_distribution.reduce(
     (acc, curr) => acc + curr.value,
@@ -47,57 +48,69 @@ const maxSupervisorCount =
             role="tablist"
             aria-label="Visualizações analíticas"
         >
+            {visibleTabs.includes('general') && (
             <button
                 role="tab"
-                aria-selected="true"
+                aria-selected={visibleTabs[0] === 'general' ? "true" : "false"}
                 aria-controls="panel-general"
                 id="tab-general"
-                class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-premium-accent border-b-2 border-premium-accent whitespace-nowrap"
+                class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'general' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Visão Geral</span>
                 <span class="sm:hidden">Geral</span>
             </button>
+            )}
+
+            {visibleTabs.includes('fellowships') && (
             <button
                 role="tab"
-                aria-selected="false"
+                aria-selected={visibleTabs[0] === 'fellowships' ? "true" : "false"}
                 aria-controls="panel-fellowships"
                 id="tab-fellowships"
-                class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
+                class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'fellowships' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Evolução de Bolsas</span>
                 <span class="sm:hidden">Bolsas</span>
             </button>
+            )}
+
+            {visibleTabs.includes('financial') && (
             <button
                 role="tab"
-                aria-selected="false"
+                aria-selected={visibleTabs[0] === 'financial' ? "true" : "false"}
                 aria-controls="panel-financial"
                 id="tab-financial"
-                class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
+                class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'financial' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Investimento</span>
                 <span class="sm:hidden">Invest.</span>
             </button>
+            )}
+
+            {visibleTabs.includes('supervisors') && (
             <button
                 role="tab"
-                aria-selected="false"
+                aria-selected={visibleTabs[0] === 'supervisors' ? "true" : "false"}
                 aria-controls="panel-supervisors"
                 id="tab-supervisors"
-                class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
+                class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'supervisors' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Top Orientadores</span>
                 <span class="sm:hidden">Orientadores</span>
             </button>
+            )}
         </div>
     </div>
 
     <!-- Tab Panels Container -->
     <div class="relative min-h-[400px]">
         <!-- 1. General Status Panel -->
+        {visibleTabs.includes('general') && (
         <div
             id="panel-general"
             role="tabpanel"
             aria-labelledby="tab-general"
-            class="transition-all duration-300 opacity-100 scale-100"
+            class={`transition-all duration-300 ${visibleTabs[0] === 'general' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
             <div
                 class="glass-card p-8 flex flex-col md:flex-row items-center justify-center gap-12 min-h-[350px]"
@@ -157,7 +170,7 @@ const maxSupervisorCount =
                                 <div
                                     class="w-4 h-4 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2)]"
                                     style={`background-color: ${item.color}`}
-                                />
+                                ></div>
                                 <div class="flex flex-col">
                                     <span class="text-sm font-bold text-text-main leading-none mb-1">
                                         {item.label}
@@ -179,13 +192,15 @@ const maxSupervisorCount =
                 </div>
             </div>
         </div>
+        )}
 
         <!-- 2. Fellowships Panel (Evolution) -->
+        {visibleTabs.includes('fellowships') && (
         <div
             id="panel-fellowships"
             role="tabpanel"
             aria-labelledby="tab-fellowships"
-            class="hidden transition-all duration-300 opacity-0 scale-95"
+            class={`transition-all duration-300 ${visibleTabs[0] === 'fellowships' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
                 <div class="flex items-center gap-3 mb-8">
@@ -313,13 +328,15 @@ const maxSupervisorCount =
                 </div>
             </div>
         </div>
+        )}
 
         <!-- 3. Financial Evolution Panel -->
+        {visibleTabs.includes('financial') && (
         <div
             id="panel-financial"
             role="tabpanel"
             aria-labelledby="tab-financial"
-            class="hidden transition-all duration-300 opacity-0 scale-95"
+            class={`transition-all duration-300 ${visibleTabs[0] === 'financial' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
                 <div class="flex items-center gap-3 mb-8">
@@ -472,13 +489,15 @@ const maxSupervisorCount =
                 </div>
             </div>
         </div>
+        )}
 
         <!-- 4. Top Supervisors Panel -->
+        {visibleTabs.includes('supervisors') && (
         <div
             id="panel-supervisors"
             role="tabpanel"
             aria-labelledby="tab-supervisors"
-            class="hidden transition-all duration-300 opacity-0 scale-95"
+            class={`transition-all duration-300 ${visibleTabs[0] === 'supervisors' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
             <div class="glass-card p-8 flex flex-col min-h-[450px]">
                 <div class="flex items-center gap-3 mb-8">
@@ -554,6 +573,7 @@ const maxSupervisorCount =
                 </div>
             </div>
         </div>
+        )}
     </div>
 </div>
 

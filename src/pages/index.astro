@@ -1,42 +1,243 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import KpiCard from '../components/KpiCard.astro';
-import HomeCharts from '../components/home/HomeCharts.astro';
-import groupsData from '../data/canonical/research_groups_canonical.json';
-import type { ResearchGroup } from '../types/groups';
+import Layout from "../layouts/Layout.astro";
+import KpiCard from "../components/KpiCard.astro";
+import HomeCharts from "../components/home/HomeCharts.astro";
+import groupsData from "../data/canonical/research_groups_canonical.json";
+import advisorshipsData from "../data/canonical/advisorships_canonical.json";
+import AdvisorshipCharts from "../components/advisorships/AdvisorshipCharts.astro";
+import type { ResearchGroup } from "../types/groups";
+import type { ProjectAdvisorship } from "../types/advisorships";
 
 const groups = groupsData as ResearchGroup[];
-
 const totalGroups = groups.length;
-const totalMembers = groups.reduce((acc, g) => acc + (g.members?.length || 0), 0);
-const totalCampus = new Set(groups.map(g => g.campus.id)).size;
-const totalKnowledgeAreas = new Set(groups.flatMap(g => g.knowledge_areas.map(ka => ka.id))).size;
+const totalMembers = groups.reduce(
+	(acc, g) => acc + (g.members?.length || 0),
+	0,
+);
+const totalCampus = new Set(groups.map((g) => g.campus.id)).size;
+const totalKnowledgeAreas = new Set(
+	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
+).size;
+
+const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
+
+// Flatten all advisorships
+const allAdvisorships = allProjects.flatMap((project) =>
+	project.advisorships.map((adv) => ({
+		...adv,
+		projectName: project.name,
+	})),
+);
+
+// --- Chart Data Calculation (Logic Duplicated from advisorships/index.astro for Home Page reuse) ---
+const minYear = Math.min(
+	...allAdvisorships.map((a) =>
+		a.start_date ? new Date(a.start_date).getFullYear() : 9999,
+	),
+);
+const maxYear = Math.max(
+	...allAdvisorships.map((a) =>
+		a.end_date ? new Date(a.end_date).getFullYear() : 0,
+	),
+);
+const yearsRange = Array.from(
+	{ length: maxYear - minYear + 1 },
+	(_, i) => minYear + i,
+);
+
+const uniqueFellowshipNames = [
+	...new Set(
+		allAdvisorships
+			.map((a) => a.fellowship?.name)
+			.filter(Boolean) as string[],
+	),
+].sort();
+
+const fellowshipColorsMap: Record<string, string> = {
+	PIBIC: "#38bdf8",
+	PIBITI: "#fbbf24",
+	"PIBIC-JR": "#a855f7",
+	PIVIC: "#94a3b8",
+	PROBIC: "#f472b6",
+	Voluntário: "#cbd5e1",
+};
+const fallbackColors = [
+	"#ef4444",
+	"#22c55e",
+	"#3b82f6",
+	"#eab308",
+	"#ec4899",
+	"#8b5cf6",
+];
+
+const fellowshipEvolution = uniqueFellowshipNames
+	.map((name, index) => {
+		const data = yearsRange.map((year) => {
+			const count = allAdvisorships.filter((a) => {
+				if (a.fellowship?.name !== name) return false;
+				const start = a.start_date
+					? new Date(a.start_date.replace(" ", "T")).getFullYear()
+					: 9999;
+				const end = a.end_date
+					? new Date(a.end_date.replace(" ", "T")).getFullYear()
+					: 0;
+				return start <= year && end >= year;
+			}).length;
+			return { year, value: count };
+		});
+		if (data.every((d) => d.value === 0)) return null;
+		return {
+			label: name,
+			data: data,
+			color:
+				fellowshipColorsMap[name] ||
+				fallbackColors[index % fallbackColors.length],
+		};
+	})
+	.filter(Boolean) as {
+	label: string;
+	data: { year: number; value: number }[];
+	color: string;
+}[];
+
+const uniqueSponsors = [
+	...new Set(
+		allAdvisorships
+			.map((a) => a.fellowship?.sponsor_name)
+			.filter(Boolean) as string[],
+	),
+].sort();
+const sponsorColorsMap: Record<string, string> = {
+	Fapes: "#10b981",
+	CNPq: "#3b82f6",
+	Capes: "#ef4444",
+	Facitec: "#f59e0b",
+	Ifes: "#8b5cf6",
+	MEC: "#06b6d4",
+};
+const fallbackSponsorColors = ["#ec4899", "#6366f1", "#84cc16"];
+
+const fellowshipFinancialEvolution = uniqueSponsors
+	.map((sponsor, index) => {
+		const data = yearsRange.map((year) => {
+			const totalValue = allAdvisorships.reduce((acc, curr) => {
+				if (!curr.fellowship || !curr.fellowship.value) return acc;
+				if (curr.fellowship.sponsor_name !== sponsor) return acc;
+				const start = curr.start_date
+					? new Date(curr.start_date.replace(" ", "T"))
+					: new Date(year, 0, 1);
+				const end = curr.end_date
+					? new Date(curr.end_date.replace(" ", "T"))
+					: new Date(year, 11, 31);
+				const yearStart = new Date(year, 0, 1);
+				const yearEnd = new Date(year, 11, 31);
+				const effectiveStart = start > yearStart ? start : yearStart;
+				const effectiveEnd = end < yearEnd ? end : yearEnd;
+				if (effectiveStart > effectiveEnd) return acc;
+				const monthsActive = Math.max(
+					0,
+					effectiveEnd.getFullYear() * 12 +
+						effectiveEnd.getMonth() -
+						(effectiveStart.getFullYear() * 12 +
+							effectiveStart.getMonth()) +
+						1,
+				);
+				return acc + curr.fellowship.value * monthsActive;
+			}, 0);
+			return { year, value: totalValue };
+		});
+		if (data.every((d) => d.value === 0)) return null;
+		return {
+			label: sponsor,
+			color:
+				sponsorColorsMap[sponsor] ||
+				fallbackSponsorColors[index % fallbackSponsorColors.length],
+			data,
+		};
+	})
+	.filter(Boolean) as {
+	label: string;
+	data: { year: number; value: number }[];
+	color: string;
+}[];
+
+// Mock other analytics to satisfy prop types (unused tabs)
+const analytics = {
+	status_distribution: [],
+	fellowship_distribution: [],
+	fellowship_evolution: fellowshipEvolution,
+	fellowship_financial_evolution: fellowshipFinancialEvolution,
+	top_supervisors: [],
+};
 
 const icons = {
-  groups: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-  members: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-  campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
-  areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
+	groups: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+	members:
+		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+	campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+	areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
 };
 ---
 
 <Layout title="Dashboard Overview">
 	<header class="mb-10">
-		<h1 class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main text-balance">
-			Bem-vindo ao <span class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple">Horizon</span>
+		<h1
+			class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main text-balance"
+		>
+			Bem-vindo ao <span
+				class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+				>Horizon</span
+			>
 		</h1>
 		<p class="text-text-secondary mt-2 max-w-2xl text-balance">
-			Sua plataforma central para explorar o horizonte de <strong>pesquisa</strong>, <strong>extensão</strong> e <strong>pós-graduação</strong> da nossa instituição.
+			Sua plataforma central para explorar o horizonte de <strong
+				>pesquisa</strong
+			>, <strong>extensão</strong> e <strong>pós-graduação</strong> da nossa
+			instituição.
 		</p>
 	</header>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" role="region" aria-label="Métricas principais">
-		<KpiCard title="Total de Grupos" value={totalGroups} icon={icons.groups} />
-		<KpiCard title="Pesquisadores" value={totalMembers} icon={icons.members} color="premium-purple" />
-		<KpiCard title="Campus" value={totalCampus} icon={icons.campus} color="text-secondary" />
-		<KpiCard title="Áreas de Conhecimento" value={totalKnowledgeAreas} icon={icons.areas} color="premium-accent" />
+	<div
+		class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+		role="region"
+		aria-label="Métricas principais"
+	>
+		<KpiCard
+			title="Total de Grupos"
+			value={totalGroups}
+			icon={icons.groups}
+		/>
+		<KpiCard
+			title="Pesquisadores"
+			value={totalMembers}
+			icon={icons.members}
+			color="premium-purple"
+		/>
+		<KpiCard
+			title="Campus"
+			value={totalCampus}
+			icon={icons.campus}
+			color="text-secondary"
+		/>
+		<KpiCard
+			title="Áreas de Conhecimento"
+			value={totalKnowledgeAreas}
+			icon={icons.areas}
+			color="premium-accent"
+		/>
 	</div>
 
 	<!-- Analytics Charts (US-035) -->
 	<HomeCharts />
+
+	<!-- Fellowship & Investment Charts (Home Integration) -->
+	<section class="mt-12 mb-12">
+		<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
+			Investimento e Bolsas
+		</h2>
+		<AdvisorshipCharts
+			analytics={analytics}
+			visibleTabs={["financial", "fellowships"]}
+		/>
+	</section>
 </Layout>
