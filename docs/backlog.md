@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v1.8.0** | 2026-01-28 | **Released** | Refinement: Fellowship Chart Visualization (Line Chart) | TBD | - |
 | **v1.7.0** | 2026-01-28 | **Released** | Feature: Researcher Profiles Enhancement & Data Update | [#65](https://github.com/ifesserra-lab/horizon_dashboard/pull/65) | - |
 | **v1.6.0** | 2026-01-28 | **Released** | Feature: Advisorship Dashboard & Layout Refinement | [#63](https://github.com/ifesserra-lab/horizon_dashboard/pull/63) | [#74](https://github.com/ifesserra-lab/horizon_dashboard/issues/74) |
 | **v1.5.0** | 2026-01-25 | **Released** | Feature: Redesign Researchers Page & Analytics (US-003) | - | - |
@@ -74,6 +75,7 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-029** Evolução dos Projetos (Início vs Conclusão) (Entregue na v1.1.6)
 - **Epic 5: Dashboard de Orientações (Release 1 Extension)** _(Planejado)_
     - [x] **US-036** Catálogo e Dashboard de Orientações (Entregue na v1.6.0)
+    - [x] **Refinement** Fellowship Chart to Line Chart (Entregue na v1.8.0)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [x] **US-003** Perfil do Pesquisador (Lattes UI) (Done na v1.5.0)
