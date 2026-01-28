@@ -7,7 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
-| **v1.6.0** | 2026-01-28 | **Released** | Feature: Advisorship Dashboard & Layout Refinement | [#63](https://github.com/ifesserra-lab/horizon_dashboard/pull/63) | [#74](https://github.com/ifesserra-lab/horizon_dashboard/issues/74) |
+| **v1.6.0** | 2026-01-28 | **Released** | Feature: Researcher Profiles Enhancement & Data Update | [#64](https://github.com/ifesserra-lab/horizon_dashboard/pull/64) | - |
 | **v1.5.0** | 2026-01-25 | **Released** | Feature: Redesign Researchers Page & Analytics (US-003) | - | - |
 | **v1.3.2** | 2026-01-28 | **Released** | Feature: Advisorship Dashboard & Analytics (US-036) | [#51](https://github.com/ifesserra-lab/horizon_dashboard/pull/51) | - |
 | **v1.3.1** | 2026-01-22 | **Released** | Feature: Projects in Group Details (US-033) | TBD | [#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62) |
