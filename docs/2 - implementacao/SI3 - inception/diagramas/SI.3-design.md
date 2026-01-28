@@ -179,6 +179,7 @@ class IExportSink(ABC):
 | `DonutChart (Roles)` | Distribuição de Papéis em Iniciativas | Donut |
 | `Histogram (Engagement)` | Distribuição de Engajamento (Projetos/Pesquisador) | Histograma / Barras |
 | `RankingList` | Top 5 Grupos e Linhas de Pesquisa | Lista Ordenada com Barras de Progresso |
+| `AreaChart (Investment)` | Evolução do Valor Total de Bolsas/Ano | Gráfico de Área / Linha (Financeiro) |
 
 ---
 

@@ -12,6 +12,11 @@ interface Props {
              data: { year: number; value: number }[];
              color: string;
         }[]; 
+        fellowship_financial_evolution: {
+            label: string;
+            data: { year: number; value: number }[];
+            color: string;
+       }[];
         top_supervisors: { name: string; count: number }[];
     };
 }
@@ -61,6 +66,16 @@ const maxSupervisorCount =
             >
                 <span class="hidden sm:inline">Evolução de Bolsas</span>
                 <span class="sm:hidden">Bolsas</span>
+            </button>
+            <button
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-financial"
+                id="tab-financial"
+                class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
+            >
+                <span class="hidden sm:inline">Investimento</span>
+                <span class="sm:hidden">Invest.</span>
             </button>
             <button
                 role="tab"
@@ -212,8 +227,11 @@ const maxSupervisorCount =
                             <div class="w-full h-full flex flex-col">
                                 <!-- Legend -->
                                 <div class="flex flex-wrap justify-center gap-4 mb-4">
-                                    {seriesList.map(s => (
-                                        <div class="flex items-center gap-2">
+                                    {seriesList.map((s, i) => (
+                                        <div 
+                                            class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity chart-legend-toggle"
+                                            data-target={`series-fellowship-${i}`}
+                                        >
                                             <div class="w-3 h-3 rounded-full" style={`background-color: ${s!.color}`}></div>
                                             <span class="text-xs font-bold text-text-secondary">{s!.label}</span>
                                         </div>
@@ -233,7 +251,7 @@ const maxSupervisorCount =
                                      })}
 
                                      <!-- Series -->
-                                     {seriesList.map((series) => {
+                                     {seriesList.map((series, i) => {
                                          if (!series) return null;
                                          const points = series.data.map((d, i) => {
                                             const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
@@ -242,7 +260,7 @@ const maxSupervisorCount =
                                          }).join(" ");
 
                                          return (
-                                            <g>
+                                            <g id={`series-fellowship-${i}`} class="transition-opacity duration-300">
                                                 <!-- Line -->
                                                 <polyline 
                                                     points={points} 
@@ -296,7 +314,166 @@ const maxSupervisorCount =
             </div>
         </div>
 
-        <!-- 3. Top Supervisors Panel -->
+        <!-- 3. Financial Evolution Panel -->
+        <div
+            id="panel-financial"
+            role="tabpanel"
+            aria-labelledby="tab-financial"
+            class="hidden transition-all duration-300 opacity-0 scale-95"
+        >
+             <div class="glass-card p-8 flex flex-col min-h-[450px]">
+                <div class="flex items-center gap-3 mb-8">
+                     <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                     </div>
+                     <div>
+                        <h2 class="text-xl font-bold font-['Outfit'] text-text-main">
+                            Investimento em Bolsas
+                        </h2>
+                        <p class="text-sm text-text-muted">
+                            Evolução do valor total investido em bolsas por ano
+                        </p>
+                     </div>
+                </div>
+
+                <div class="flex-1 w-full h-[350px] relative">
+                    {(() => {
+                        const seriesList = analytics.fellowship_financial_evolution;
+                        if (!seriesList || seriesList.length === 0) return <p class="text-center text-text-muted mt-12">Sem dados financeiros disponíveis.</p>;
+                        
+                        // Calculate max value across all series to normalize Y axis
+                        const allValues = seriesList.flatMap(s => s?.data?.map(d => d.value) || []);
+                        const maxValue = Math.max(...allValues, 1); 
+                        
+                        const sampleData = seriesList[0]?.data || [];
+                        if (sampleData.length === 0) return <p class="text-center text-text-muted mt-12">Dados insuficientes para gerar o gráfico.</p>;
+                        
+                        const paddingX = 60; // Increased padding for currency labels
+                        const paddingY = 30;
+                        const width = 800; // viewBox width
+                        const height = 350; // viewBox height
+                        const graphHeight = height - paddingY * 2;
+                        const graphWidth = width - paddingX * 2;
+
+                        const formatCurrency = (value: number) => {
+                            if (value >= 1000000) return `R$ ${(value / 1000000).toFixed(1)}M`;
+                            if (value >= 1000) return `R$ ${(value / 1000).toFixed(0)}k`;
+                            return `R$ ${value}`;
+                        };
+
+                        const formatFullCurrency = (value: number) => {
+                            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+                        };
+
+                        return (
+                            <div class="w-full h-full flex flex-col">
+                                <!-- Legend -->
+                                <div class="flex flex-wrap justify-center gap-4 mb-4">
+                                    {seriesList.map((s, i) => (
+                                        <div 
+                                            class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity chart-legend-toggle"
+                                            data-target={`series-financial-${i}`}
+                                        >
+                                            <div class="w-3 h-3 rounded-full" style={`background-color: ${s.color}`}></div>
+                                            <span class="text-xs font-bold text-text-secondary">{s.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <svg viewBox={`0 0 ${width} ${height}`} class="w-full h-full overflow-visible">
+                                     <!-- Grid Lines (Horizontal) -->
+                                     {[0, 0.25, 0.5, 0.75, 1].map((tick) => {
+                                        const y = height - paddingY - tick * graphHeight;
+                                        return (
+                                            <g>
+                                                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="currentColor" class="text-border-main" stroke-dasharray="4 4" opacity="0.3" />
+                                                <text x={paddingX - 10} y={y + 4} text-anchor="end" class="text-[10px] fill-text-muted font-mono">{formatCurrency(tick * maxValue)}</text>
+                                            </g>
+                                        );
+                                     })}
+
+                                     <!-- Series -->
+                                     {seriesList.map((series, i) => {
+                                         if (!series) return null;
+                                         
+                                         const points = series.data.map((d, i) => {
+                                            const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                            const y = height - paddingY - (d.value / maxValue) * graphHeight;
+                                            return `${x},${y}`;
+                                         }).join(" ");
+
+                                         return (
+                                            <g id={`series-financial-${i}`} class="transition-opacity duration-300">
+                                                <!-- Line -->
+                                                <polyline 
+                                                    points={points} 
+                                                    fill="none" 
+                                                    stroke={series.color} 
+                                                    stroke-width="3" 
+                                                    stroke-linecap="round" 
+                                                    stroke-linejoin="round"
+                                                    class="transition-all duration-300"
+                                                />
+                                                
+                                                <!-- Points and Labels -->
+                                                {series.data.map((d, i) => {
+                                                     if(d.value === 0) return null; // Hide 0 values to reduce clutter
+
+                                                     const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                                     const y = height - paddingY - (d.value / maxValue) * graphHeight;
+                                                     return (
+                                                         <g class="group relative">
+                                                            <!-- Visible Dot -->
+                                                            <circle cx={x} cy={y} r="3" fill={series.color} class="stroke-glass-bg stroke-2" />
+                                                            
+                                                            <!-- Always Visible Value Label -->
+                                                            <text 
+                                                                x={x} 
+                                                                y={y - 12} 
+                                                                text-anchor="middle" 
+                                                                fill={series.color} 
+                                                                class="text-[10px] font-bold font-mono drop-shadow-md"
+                                                            >
+                                                                {formatCurrency(d.value)}
+                                                            </text>
+
+                                                            <!-- Hit Area & Tooltip -->
+                                                            <circle cx={x} cy={y} r="8" fill="transparent" class="cursor-pointer" />
+                                                            <g class="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                                <foreignObject x={x - 60} y={y - 50} width="120" height="50">
+                                                                    <div xmlns="http://www.w3.org/1999/xhtml" class="flex flex-col items-center justify-center">
+                                                                        <div class="bg-glass-bg border border-border-main text-text-main text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap backdrop-blur-md">
+                                                                             <span class="font-bold block text-center mb-0.5 text-[10px] text-text-muted">{series.label} - {d.year}</span>
+                                                                             <span class="text-premium-accent font-mono block text-center">{formatFullCurrency(d.value)}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </foreignObject>
+                                                            </g>
+                                                         </g>
+                                                     );
+                                                })}
+                                            </g>
+                                         );
+                                     })}
+
+                                     <!-- X Axis Labels (Years) -->
+                                     {sampleData.map((d, i) => {
+                                         const x = paddingX + (i / (sampleData.length - 1)) * graphWidth;
+                                         return (
+                                             <text x={x} y={height - paddingY + 20} text-anchor="middle" class="text-[10px] fill-text-muted font-bold">
+                                                 {d.year}
+                                             </text>
+                                         );
+                                     })}
+                                </svg>
+                            </div>
+                        );
+                    })()}
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Top Supervisors Panel -->
         <div
             id="panel-supervisors"
             role="tabpanel"
@@ -422,8 +599,33 @@ const maxSupervisorCount =
         });
     };
 
+    const setupChartToggles = () => {
+        const toggles = document.querySelectorAll('.chart-legend-toggle');
+        
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const targetId = toggle.getAttribute('data-target');
+                const seriesElement = document.getElementById(targetId || '');
+                
+                if (seriesElement) {
+                    const isHidden = seriesElement.classList.contains('opacity-0');
+                    if (isHidden) {
+                        // Show
+                        seriesElement.classList.remove('opacity-0');
+                        toggle.classList.remove('opacity-50', 'grayscale');
+                    } else {
+                        // Hide
+                        seriesElement.classList.add('opacity-0');
+                        toggle.classList.add('opacity-50', 'grayscale');
+                    }
+                }
+            });
+        });
+    };
+
     // Run on first load
     setupTabs();
+    setupChartToggles();
 </script>
 
 <style>
@@ -441,5 +643,9 @@ const maxSupervisorCount =
 
     circle {
         transition: stroke-dashoffset 0.8s ease-in-out;
+    }
+    
+    .chart-legend-toggle {
+        user-select: none;
     }
 </style>
