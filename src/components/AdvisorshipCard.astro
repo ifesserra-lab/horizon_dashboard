@@ -1,0 +1,245 @@
+---
+import type { AdvisorshipItem } from "../types/advisorships.ts";
+
+interface Props {
+    advisorship: AdvisorshipItem;
+    projectName: string;
+}
+
+const { advisorship, projectName } = Astro.props;
+
+const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("pt-BR", {
+        month: "short",
+        year: "numeric",
+    });
+};
+
+const statusColors = {
+    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+    Concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+    unknown: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+};
+
+const currentStatusStyle =
+    statusColors[advisorship.status as keyof typeof statusColors] ||
+    statusColors.unknown;
+
+const fellowshipColor = advisorship.fellowship
+    ? "bg-premium-accent/10 text-premium-accent border-premium-accent/20"
+    : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700";
+
+const studentName = advisorship.student_name || "Estudante Desconhecido";
+const supervisorName = advisorship.supervisor_name || "Supervisor Desconhecido";
+const fellowshipName = advisorship.fellowship?.name || "Sem Bolsa";
+const hasFellowship = !!advisorship.fellowship;
+---
+
+<article
+    class="advisorship-card glass-card p-5 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col h-full group relative overflow-hidden"
+    data-student={studentName.toLowerCase()}
+    data-supervisor={supervisorName.toLowerCase()}
+    data-project={projectName.toLowerCase()}
+    data-status={advisorship.status.toLowerCase()}
+    data-fellowship={fellowshipName.toLowerCase()}
+    data-year={advisorship.start_date
+        ? new Date(advisorship.start_date).getFullYear()
+        : "unknown"}
+>
+    <!-- Card Header: Title & Status -->
+    <div class="flex items-start justify-between gap-3 mb-4">
+        <h3
+            class="text-base font-bold text-text-main leading-snug line-clamp-2 group-hover:text-premium-accent transition-colors"
+            title={advisorship.name}
+        >
+            {advisorship.name}
+        </h3>
+        <span
+            class={`shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${currentStatusStyle}`}
+        >
+            {advisorship.status}
+        </span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="space-y-4 flex-1">
+        <!-- Persons -->
+        <div class="space-y-3">
+            <!-- Student -->
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-premium-accent/10 flex items-center justify-center shrink-0 border border-premium-accent/20"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-premium-accent"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+                        ></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div>
+                    <span
+                        class="text-[10px] font-bold text-text-muted uppercase tracking-wider block"
+                        >Estudante</span
+                    >
+                    <span
+                        class="text-sm font-medium text-text-main line-clamp-1"
+                        title={studentName}
+                    >
+                        {studentName}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Supervisor -->
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-premium-purple/10 flex items-center justify-center shrink-0 border border-premium-purple/20"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-premium-purple"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"></path>
+                        <path
+                            d="M7 3.34V5a3 3 0 0 0 3 3v0a2 2 0 0 1 2 2v0c0 1.1.9 2 2 2v0a2 2 0 0 0 2-2v0c0-1.1.9-2 2-2h3.17"
+                        ></path>
+                        <path
+                            d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"
+                        ></path>
+                    </svg>
+                </div>
+                <div>
+                    <span
+                        class="text-[10px] font-bold text-text-muted uppercase tracking-wider block"
+                        >Orientador</span
+                    >
+                    <span
+                        class="text-sm font-medium text-text-main line-clamp-1"
+                        title={supervisorName}
+                    >
+                        {supervisorName}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Grid -->
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-border-main/50">
+            <!-- Fellowship Badge -->
+            <div class="col-span-2">
+                <div
+                    class={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${fellowshipColor} transition-colors w-full sm:w-auto`}
+                >
+                    {
+                        hasFellowship ? (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-3.5 h-3.5 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M12 2v8" />
+                                <path d="m4.93 10.93 1.41 1.41" />
+                                <path d="M2 18h2" />
+                                <path d="M20 18h2" />
+                                <path d="m19.07 10.93-1.41 1.41" />
+                                <path d="M22 22H2" />
+                                <path d="m8 22 4-10 4 10" />
+                            </svg>
+                        ) : (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-3.5 h-3.5 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <>
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line
+                                        x1="4.93"
+                                        y1="4.93"
+                                        x2="19.07"
+                                        y2="19.07"
+                                    />
+                                </>
+                            </svg>
+                        )
+                    }
+                    <span class="text-xs font-semibold truncate"
+                        >{fellowshipName}</span
+                    >
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div>
+                <span
+                    class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5"
+                    >Início</span
+                >
+                <span class="text-xs font-medium text-text-secondary">
+                    {formatDate(advisorship.start_date)}
+                </span>
+            </div>
+            <div>
+                <span
+                    class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5"
+                    >Fim</span
+                >
+                <span class="text-xs font-medium text-text-secondary">
+                    {formatDate(advisorship.end_date)}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Action (Appears separate or enhances clickable area) -->
+    <div class="mt-5 pt-3 border-t border-border-main flex justify-end">
+        <a
+            href={`${import.meta.env.BASE_URL}advisorships/${advisorship.id}`}
+            class="text-xs font-bold text-premium-accent flex items-center gap-1.5 hover:gap-2 transition-all group-hover:translate-x-0.5 focus:outline-none focus:ring-2 focus:ring-premium-accent/50 rounded-md px-2 py-1 -mr-2"
+        >
+            Ver detalhes da bolsa e do projeto
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+            </svg>
+        </a>
+    </div>
+</article>
