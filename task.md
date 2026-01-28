@@ -17,12 +17,13 @@
 - [x] Verify Implementation
     - [x] Test Mobile Responsiveness (Verified via Code & Build)
     - [x] Check Accessibility (Code review of contrast/labels)
-- [/] Release v1.6.0
-    - [ ] Commit changes to `feat/researcher-enhancements`
-    - [ ] Create and merge PR to `developing`
-    - [ ] Update documentation (Backlog, Status Report)
-    - [ ] Create and merge PR to `main`
-    - [ ] Tag release `v1.6.0`
+- [x] Release v1.7.0
+    - [x] Commit changes to `feat/researcher-enhancements`
+    - [x] Create and merge PR to `developing`
+    - [x] Update documentation (Backlog, Status Report)
+    - [x] Create and merge PR to `main`
+    - [x] Tag release `v1.7.0`
+
 
 
 - [x] Implement Research Group Display (US-032)
