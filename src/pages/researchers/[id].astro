@@ -1,7 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import researchersData from "../../data/canonical/researchers_canonical.json";
+import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
 import type { Researcher } from "../../types/researchers";
+import type {
+    ProjectAdvisorship,
+    AdvisorshipItem,
+} from "../../types/advisorships";
 
 export function getStaticPaths() {
     const researchers = researchersData as Researcher[];
@@ -16,6 +21,35 @@ interface Props {
 }
 
 const { researcher } = Astro.props;
+
+// Load and filter advisorships
+const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
+const researcherAdvisorships = allProjects
+    .flatMap((p) =>
+        p.advisorships.map((a) => ({
+            ...a,
+            projectName: p.name,
+            projectId: p.id,
+        })),
+    )
+    .filter(
+        (a) =>
+            a.supervisor_id === researcher.id || a.student_id === researcher.id,
+    )
+    .sort((a, b) => {
+        if (!a.start_date) return 1;
+        if (!b.start_date) return -1;
+        return (
+            new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+        );
+    });
+
+const asSupervisor = researcherAdvisorships.filter(
+    (a) => a.supervisor_id === researcher.id,
+);
+const asStudent = researcherAdvisorships.filter(
+    (a) => a.student_id === researcher.id,
+);
 ---
 
 <Layout
@@ -282,6 +316,139 @@ const { researcher } = Astro.props;
                     ) : (
                         <p class="text-text-secondary italic">
                             Nenhum projeto registrado.
+                        </p>
+                    )
+                }
+            </section>
+
+            <!-- Advisorships -->
+            <section
+                aria-labelledby="advisorships-title"
+                class="space-y-8 pb-10"
+            >
+                <h3
+                    id="advisorships-title"
+                    class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+                >
+                    Orientações
+                </h3>
+
+                {
+                    researcherAdvisorships.length > 0 ? (
+                        <div class="space-y-10">
+                            {asSupervisor.length > 0 && (
+                                <div class="space-y-4">
+                                    <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="w-4 h-4"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        </svg>
+                                        Como Orientador
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {asSupervisor.map((adv) => (
+                                            <div class="glass-card p-5 border-l-4 border-l-premium-accent group hover:bg-premium-accent/[0.02] transition-all">
+                                                <div class="flex justify-between items-start mb-3">
+                                                    <span class="text-[10px] font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded">
+                                                        {adv.fellowship?.name ||
+                                                            "Sem Bolsa"}
+                                                    </span>
+                                                    <span class="text-[10px] font-medium text-text-secondary">
+                                                        {adv.start_date
+                                                            ? new Date(
+                                                                  adv.start_date,
+                                                              ).getFullYear()
+                                                            : "N/A"}
+                                                    </span>
+                                                </div>
+                                                <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-accent transition-colors">
+                                                    {adv.name}
+                                                </h5>
+                                                <div class="flex flex-col gap-1">
+                                                    <p class="text-xs text-text-secondary">
+                                                        <span class="font-bold text-text-main">
+                                                            Estudante:
+                                                        </span>{" "}
+                                                        {adv.student_name}
+                                                    </p>
+                                                    <p class="text-xs text-text-secondary italic">
+                                                        {adv.projectName}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {asStudent.length > 0 && (
+                                <div class="space-y-4">
+                                    <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="w-4 h-4"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                        </svg>
+                                        Como Orientando
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {asStudent.map((adv) => (
+                                            <div class="glass-card p-5 border-l-4 border-l-premium-purple group hover:bg-premium-purple/[0.02] transition-all">
+                                                <div class="flex justify-between items-start mb-3">
+                                                    <span class="text-[10px] font-bold text-premium-purple uppercase tracking-wider bg-premium-purple/10 px-2 py-0.5 rounded">
+                                                        {adv.fellowship?.name ||
+                                                            "Sem Bolsa"}
+                                                    </span>
+                                                    <span class="text-[10px] font-medium text-text-secondary">
+                                                        {adv.start_date
+                                                            ? new Date(
+                                                                  adv.start_date,
+                                                              ).getFullYear()
+                                                            : "N/A"}
+                                                    </span>
+                                                </div>
+                                                <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-purple transition-colors">
+                                                    {adv.name}
+                                                </h5>
+                                                <div class="flex flex-col gap-1">
+                                                    <p class="text-xs text-text-secondary">
+                                                        <span class="font-bold text-text-main">
+                                                            Orientador:
+                                                        </span>{" "}
+                                                        {adv.supervisor_name}
+                                                    </p>
+                                                    <p class="text-xs text-text-secondary italic">
+                                                        {adv.projectName}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <p class="text-text-secondary italic">
+                            Nenhuma orientação registrada.
                         </p>
                     )
                 }

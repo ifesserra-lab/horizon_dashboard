@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v1.6.0** | 2026-01-28 | **Released** | Feature: Advisorship Dashboard & Layout Refinement | [#63](https://github.com/ifesserra-lab/horizon_dashboard/pull/63) | [#74](https://github.com/ifesserra-lab/horizon_dashboard/issues/74) |
 | **v1.5.0** | 2026-01-25 | **Released** | Feature: Redesign Researchers Page & Analytics (US-003) | - | - |
 | **v1.3.2** | 2026-01-28 | **Released** | Feature: Advisorship Dashboard & Analytics (US-036) | [#51](https://github.com/ifesserra-lab/horizon_dashboard/pull/51) | - |
 | **v1.3.1** | 2026-01-22 | **Released** | Feature: Projects in Group Details (US-033) | TBD | [#62](https://github.com/ifesserra-lab/horizon_dashboard/issues/62) |
@@ -71,7 +72,7 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-028** Evolução Temporal da Equipe (Entregue na v1.1.6)
     - [x] **US-029** Evolução dos Projetos (Início vs Conclusão) (Entregue na v1.1.6)
 - **Epic 5: Dashboard de Orientações (Release 1 Extension)** _(Planejado)_
-    - [ ] **US-036** Catálogo e Dashboard de Orientações (Ready)
+    - [x] **US-036** Catálogo e Dashboard de Orientações (Entregue na v1.6.0)
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [x] **US-003** Perfil do Pesquisador (Lattes UI) (Done na v1.5.0)

@@ -17,10 +17,13 @@
 - [x] Verify Implementation
     - [x] Test Mobile Responsiveness (Verified via Code & Build)
     - [x] Check Accessibility (Code review of contrast/labels)
-- [/] Release
-    - [x] Create Release PR ([PR #60](https://github.com/ifesserra-lab/horizon_dashboard/pull/60))
-    - [ ] Update Status Report
-    - [ ] Update Backlog Artifacts
+- [/] Release v1.6.0
+    - [ ] Commit changes to `feat/researcher-enhancements`
+    - [ ] Create and merge PR to `developing`
+    - [ ] Update documentation (Backlog, Status Report)
+    - [ ] Create and merge PR to `main`
+    - [ ] Tag release `v1.6.0`
+
 
 - [x] Implement Research Group Display (US-032)
     - [x] Update SI.3 Product Backlog
