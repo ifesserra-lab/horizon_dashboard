@@ -1,8 +1,8 @@
 # Status Report 2
 **Projeto:** Horizon Dashboard
 **Período:** 16/01/2026 a 30/01/2026
-**Versão Relatada:** v1.6.0 (Researcher Profiles & Data Update)
-| **v1.6.0** | Researcher Profiles Enhancement & Canonical Data | **Entregue** | v1.6.0 |
+**Versão Relatada:** v1.7.0 (Researcher Profiles & Data Update)
+| **v1.7.0** | Researcher Profiles Enhancement & Canonical Data | **Entregue** | v1.7.0 |
 **Responsável:** Antigravity (Senior PM)
 
 ---
