@@ -3,6 +3,7 @@ export interface Fellowship {
     name: string;
     description: string | null;
     value: number;
+    sponsor_name: string;
 }
 
 export interface AdvisorshipItem {

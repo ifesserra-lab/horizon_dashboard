@@ -144,10 +144,10 @@ const hasFellowship = !!advisorship.fellowship;
 
         <!-- Meta Grid -->
         <div class="grid grid-cols-2 gap-3 pt-3 border-t border-border-main/50">
-            <!-- Fellowship Badge -->
-            <div class="col-span-2">
+            <!-- Fellowship & Sponsor Badges -->
+            <div class="col-span-2 flex flex-wrap gap-2">
                 <div
-                    class={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${fellowshipColor} transition-colors w-full sm:w-auto`}
+                    class={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${fellowshipColor} transition-colors`}
                 >
                     {
                         hasFellowship ? (
@@ -196,6 +196,33 @@ const hasFellowship = !!advisorship.fellowship;
                         >{fellowshipName}</span
                     >
                 </div>
+
+                {
+                    hasFellowship && advisorship.fellowship?.sponsor_name && (
+                        <div
+                            class={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${fellowshipColor} transition-colors`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-3.5 h-3.5 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <>
+                                    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+                                    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+                                </>
+                            </svg>
+                            <span class="text-xs font-semibold truncate">
+                                {advisorship.fellowship.sponsor_name}
+                            </span>
+                        </div>
+                    )
+                }
             </div>
 
             <!-- Dates -->

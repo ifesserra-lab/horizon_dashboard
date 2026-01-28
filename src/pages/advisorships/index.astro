@@ -217,10 +217,87 @@ const fellowshipEvolution = uniqueFellowshipNames
     color: string;
 }[];
 
+// Fellowship Financial Evolution (Total Value per Year) by Sponsor
+const uniqueSponsors = [
+    ...new Set(
+        allAdvisorships
+            .map((a) => a.fellowship?.sponsor_name)
+            .filter(Boolean) as string[],
+    ),
+].sort();
+
+const sponsorColorsMap: Record<string, string> = {
+    Fapes: "#10b981", // emerald-500
+    CNPq: "#3b82f6", // blue-500
+    Capes: "#ef4444", // red-500
+    Facitec: "#f59e0b", // amber-500
+    Ifes: "#8b5cf6", // violet-500
+    MEC: "#06b6d4", // cyan-500
+};
+const fallbackSponsorColors = [
+    "#ec4899", // pink-500
+    "#6366f1", // indigo-500
+    "#84cc16", // lime-500
+];
+
+const fellowshipFinancialEvolution = uniqueSponsors
+    .map((sponsor, index) => {
+        const data = yearsRange.map((year) => {
+            const totalValue = allAdvisorships.reduce((acc, curr) => {
+                if (!curr.fellowship || !curr.fellowship.value) return acc;
+                if (curr.fellowship.sponsor_name !== sponsor) return acc;
+
+                const start = curr.start_date
+                    ? new Date(curr.start_date.replace(" ", "T"))
+                    : new Date(year, 0, 1);
+                const end = curr.end_date
+                    ? new Date(curr.end_date.replace(" ", "T"))
+                    : new Date(year, 11, 31);
+
+                // Calculate overlap months in current year
+                const yearStart = new Date(year, 0, 1);
+                const yearEnd = new Date(year, 11, 31);
+
+                const effectiveStart = start > yearStart ? start : yearStart;
+                const effectiveEnd = end < yearEnd ? end : yearEnd;
+
+                if (effectiveStart > effectiveEnd) return acc;
+
+                const startMonth =
+                    effectiveStart.getFullYear() * 12 +
+                    effectiveStart.getMonth();
+                const endMonth =
+                    effectiveEnd.getFullYear() * 12 + effectiveEnd.getMonth();
+                const monthsActive = Math.max(0, endMonth - startMonth + 1);
+
+                return acc + curr.fellowship.value * monthsActive;
+            }, 0);
+
+            return { year, value: totalValue };
+        });
+
+        // Filter out series with no value
+        if (data.every((d) => d.value === 0)) return null;
+
+        return {
+            label: sponsor,
+            color:
+                sponsorColorsMap[sponsor] ||
+                fallbackSponsorColors[index % fallbackSponsorColors.length],
+            data,
+        };
+    })
+    .filter(Boolean) as {
+    label: string;
+    data: { year: number; value: number }[];
+    color: string;
+}[];
+
 const analytics = {
     status_distribution: statusDistribution,
     fellowship_distribution: fellowshipDistribution, // Keeping for backup or other uses if needed, but UI will change
     fellowship_evolution: fellowshipEvolution,
+    fellowship_financial_evolution: fellowshipFinancialEvolution,
     top_supervisors: topSupervisors,
 };
 ---

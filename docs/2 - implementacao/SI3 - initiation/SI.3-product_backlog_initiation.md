@@ -382,6 +382,28 @@ Implementar uma página dedicada para visualizar e explorar as orientações (ad
     - [ ] Seguir o padrão visual da página de Projetos (`/projects`).
     - [ ] Design responsivo e acessível (WCAG).
 
+### US-037 – Gráfico de Investimento em Bolsas
+```yaml
+id: US-037
+milestone: R1
+prioridade: Alta
+tamanho: 5
+origem: [User Request, RF-38]
+tags: [type:feature, area:frontend, component:chart]
+```
+
+#### Descrição
+Como gestor, quero visualizar a evolução do investimento financeiro em bolsas de pesquisa ao longo dos anos, para acompanhar o volume de recursos aplicados.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Calcular o valor total investido por ano (Soma de `valor da bolsa * meses ativos no ano`).
+    - [ ] Exibir gráfico de Linha ou Área com a evolução temporal.
+    - [ ] Formatar valores em Reais (R$).
+- **UI/UX**:
+    - [ ] Nova aba "Investimento" no componente de gráficos de orientações.
+    - [ ] Tooltip com valor exato ao passar o mouse.
+
 
 
 ## Epic 1: Extração SigPesq (Release 1)
