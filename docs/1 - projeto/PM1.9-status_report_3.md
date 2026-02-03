@@ -1,8 +1,8 @@
 # Status Report 3
 **Projeto:** Horizon Dashboard
 **Período:** 01/02/2026 a 03/02/2026
-**Versão Relatada:** v1.8.0 (Data Refactor & Canonical Integration)
-| **v1.8.0** | Elimination of Lattes JSON dependency | **Entregue** | v1.8.0 |
+**Versão Relatada:** v1.10.0 (Data Refactor & Canonical Integration)
+| **v1.10.0** | Elimination of Lattes JSON dependency | **Entregue** | v1.10.0 |
 **Responsável:** Antigravity (Senior PM)
 
 ---
@@ -15,8 +15,8 @@ A **v1.8.0** marcou a conclusão da transição dos perfis de pesquisadores para
 # 2. Progresso da Sprint / Iteração
 | Item | Descrição | Status | PR/Versão |
 |------|-----------|--------|-----------|
-| **US-040** | Refatoração de Dados do Perfil (Canonical) | **Entregue** | v1.8.0 |
-| **Cleanup** | Remoção de `lattesLoader.ts` e tipos legados | **Entregue** | v1.8.0 |
+| **US-040** | Refatoração de Dados do Perfil (Canonical) | **Entregue** | v1.10.0 |
+| **Cleanup** | Remoção de `lattesLoader.ts` e tipos legados | **Entregue** | v1.10.0 |
 
 ---
 
@@ -38,6 +38,8 @@ A **v1.8.0** marcou a conclusão da transição dos perfis de pesquisadores para
 | ID | Risco | Status | Mitigação |
 |----|-------|--------|-----------|
 | **RISK-04** | Sincronização do ETL com Canonical | **Controlado** | O Dashboard agora reflete exatamente o que o ETL produz no arquivo canônico. |
+
+**Deployment**: ✅ Automated via tag v1.10.0
 
 ---
 

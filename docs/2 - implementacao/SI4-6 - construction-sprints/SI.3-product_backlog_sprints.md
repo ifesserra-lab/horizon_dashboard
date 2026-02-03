@@ -207,13 +207,12 @@ Esta user story evolui os recursos básicos de acessibilidade implementados ante
 
 | ID | Título | Milestone | Tamanho | Prioridade | Status | Versão | Issue |
 |----|--------|-----------|---------|------------|--------|--------|-------|
-| **US-030** | Painel de Acessibilidade Completo | R1 | 8 | Crítica | **Done** | v1.3.0 | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
-| **US-040** | Refatoração de Dados do Perfil de Pesquisador | R2 | 5 | Alta | **Done** | v1.8.0 | - |
+| **US-040** | Refatoração de Dados do Perfil de Pesquisador | R2 | 5 | Alta | **Done** | v1.10.0 | - |
 
 **Velocity**: 13 pontos  
 **Testes**: 26/26 passing (100%)  
 **Build**: ✅ Successful  
-**Deployment**: ✅ Automated via tag v1.8.0
+**Deployment**: ✅ Automated via tag v1.10.0
 
 ---
 
