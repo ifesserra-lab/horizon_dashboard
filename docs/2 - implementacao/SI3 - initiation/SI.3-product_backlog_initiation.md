@@ -1112,3 +1112,49 @@ Criar uma página (`/download`) que permita a qualquer pessoa baixar os arquivos
 - **UI/UX**:
     - [ ] Design consistente com o restante da plataforma (Cards/Grid).
     - [ ] Explicações claras e amigáveis para cada dataset.
+
+### US-038 – Ingestão de Projetos Lattes
+```yaml
+id: US-038
+milestone: R2
+prioridade: Alta
+tamanho: 8
+origem: [User Request, RF-02]
+tags: [type:feature, area:backend, source:lattes]
+```
+
+#### Descrição
+Implementar o pipeline de ingestão de projetos a partir do CV Lattes, abrangendo:
+1.  **Projetos de Pesquisa**
+2.  **Projetos de Extensão**
+3.  **Projetos de Desenvolvimento**
+
+Esses projetos devem ser normalizados e inseridos como iniciativas no banco de dados.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Parser extrai os 3 tipos de projetos do JSON do Lattes.
+    - [ ] Mapeamento correto para entidade `Initiative`.
+    - [ ] Tipos de Iniciativa criados/mapeados (Research, Extension, Development).
+    - [ ] Link com o Pesquisador (Coordenador/Integrante).
+- **Dados**:
+    - [ ] `description`, `start_year`, `end_year` preenchidos.
+    - [ ] `status` inferido (Active/Concluded).
+
+### US-039 – Visualização de Projetos Lattes
+```yaml
+id: US-039
+milestone: R2
+prioridade: Alta
+tamanho: 5
+origem: [User Request]
+tags: [type:feature, area:frontend]
+dependencias: [US-038]
+```
+
+#### Descrição
+Garantir que os projetos importados do Lattes sejam exibidos corretamente no perfil do pesquisador e na listagem geral.
+
+#### Critérios de Aceitação
+- [ ] Perfil do pesquisador lista projetos de Extensão e Desenvolvimento separadamente ou com labels claros.
+- [ ] Filtros na página de projetos permitem selecionar "Extensão", "Desenvolvimento".

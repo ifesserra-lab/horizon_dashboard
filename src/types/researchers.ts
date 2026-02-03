@@ -15,14 +15,28 @@ export interface ResearcherKnowledgeArea {
     name: string;
 }
 
+export interface AcademicEducation {
+    institution: string;
+    degree: string;
+    course_name: string;
+    start_year: number;
+    end_year: number;
+    thesis_title: string;
+    advisor_name: string;
+    co_advisor_name: string | null;
+}
+
 export interface Researcher {
     id: number;
     name: string;
-    identification_id?: string;
+    identification_id?: string | null;
     birthday?: string | null;
     cnpq_url?: string | null;
     google_scholar_url?: string | null;
+    resume?: string | null;
+    citation_names?: string | null;
     initiatives: ResearcherInitiative[];
     research_groups: ResearcherGroup[];
     knowledge_areas: ResearcherKnowledgeArea[];
+    academic_education: AcademicEducation[];
 }
