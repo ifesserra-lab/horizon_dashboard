@@ -19,6 +19,7 @@ A estrutura analítica do projeto (EAP/WBS) foca na entrega progressiva da inter
     2.1. Perfil do Pesquisador (Integração Lattes).
     2.2. Lista de Produções Bibliográficas.
     2.3. Visualização de Rede de Co-autoria.
+    2.4. Ingestão de Projetos (Pesquisa, Extensão, Desenvolvimento).
 3.  **Transparência e Fomento** (Mês 3)
     3.1. Dashboard de Editais e Fomentos (FAPES).
     3.2. Visualização de Execução Financeira de Projetos.
