@@ -68,6 +68,7 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-35** | O sistema deve exibir um histograma de engajamento (distribuição de pesquisadores por quantidade de iniciativas ativas). | Analytics de Pesquisadores | Média |
 | **RF-36** | O sistema deve exibir o Top 5 Grupos de Pesquisa com maior número de membros. | Analytics de Pesquisadores | Média |
 | **RF-38** | O sistema deve exibir um gráfico de "Investimento em Bolsas" calculado pela soma anual dos valores das bolsas ativas. | Dashboard de Orientações | Alta |
+| **RF-39** | A página de perfil do pesquisador deve consumir dados exclusivamente de `researchers_canonical.json`, eliminando dependências de arquivos Lattes externos e utilities de carregamento legados. | Data Refactor | Alta |
 
 
 ---

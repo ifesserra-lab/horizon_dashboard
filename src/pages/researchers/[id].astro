@@ -9,7 +9,7 @@ import type {
 } from "../../types/advisorships";
 
 export function getStaticPaths() {
-    const researchers = researchersData as Researcher[];
+    const researchers = researchersData as unknown as Researcher[];
     return researchers.map((researcher) => ({
         params: { id: researcher.id.toString() },
         props: { researcher },
@@ -110,16 +110,14 @@ const asStudent = researcherAdvisorships.filter(
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                         >
-                                            <>
-                                                <rect
-                                                    width="20"
-                                                    height="16"
-                                                    x="2"
-                                                    y="4"
-                                                    rx="2"
-                                                />
-                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                                            </>
+                                            <rect
+                                                width="20"
+                                                height="16"
+                                                x="2"
+                                                y="4"
+                                                rx="2"
+                                            />
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                                         </svg>
                                         <a
                                             href={`mailto:${researcher.identification_id}`}
@@ -153,16 +151,9 @@ const asStudent = researcherAdvisorships.filter(
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
-                                        <>
-                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                            <polyline points="15 3 21 3 21 9" />
-                                            <line
-                                                x1="10"
-                                                y1="14"
-                                                x2="21"
-                                                y2="3"
-                                            />
-                                        </>
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <line x1="10" y1="14" x2="21" y2="3" />
                                     </svg>
                                 </a>
                             )
@@ -186,16 +177,9 @@ const asStudent = researcherAdvisorships.filter(
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
-                                        <>
-                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                            <polyline points="15 3 21 3 21 9" />
-                                            <line
-                                                x1="10"
-                                                y1="14"
-                                                x2="21"
-                                                y2="3"
-                                            />
-                                        </>
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <line x1="10" y1="14" x2="21" y2="3" />
                                     </svg>
                                 </a>
                             )
@@ -234,6 +218,150 @@ const asStudent = researcherAdvisorships.filter(
                     </div>
                 </div>
             </article>
+
+            {/* Resume Section */}
+            {
+                researcher.resume && (
+                    <section
+                        aria-labelledby="cv-summary-title"
+                        class="space-y-6"
+                    >
+                        <h3
+                            id="cv-summary-title"
+                            class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+                        >
+                            Resumo do Currículo
+                        </h3>
+                        <div class="glass-card p-6">
+                            <p class="text-text-main text-sm leading-relaxed">
+                                {researcher.resume}
+                            </p>
+                        </div>
+                    </section>
+                )
+            }
+
+            {/* Academic Education Section */}
+            {
+                researcher.academic_education &&
+                    researcher.academic_education.length > 0 && (
+                        <section
+                            aria-labelledby="education-title"
+                            class="space-y-6"
+                        >
+                            <h3
+                                id="education-title"
+                                class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+                            >
+                                Formação Acadêmica
+                            </h3>
+                            <div class="space-y-4">
+                                {researcher.academic_education.map((edu) => (
+                                    <div class="glass-card p-5 border-l-4 border-l-premium-accent hover:bg-premium-accent/[0.02] transition-all">
+                                        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-4">
+                                            <span class="text-xs font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded w-fit">
+                                                {edu.degree}
+                                            </span>
+                                            <div class="flex items-center gap-2 text-xs text-text-secondary">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="w-3.5 h-3.5"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                >
+                                                    <rect
+                                                        width="18"
+                                                        height="18"
+                                                        x="3"
+                                                        y="4"
+                                                        rx="2"
+                                                        ry="2"
+                                                    />
+                                                    <line
+                                                        x1="16"
+                                                        x2="16"
+                                                        y1="2"
+                                                        y2="6"
+                                                    />
+                                                    <line
+                                                        x1="8"
+                                                        x2="8"
+                                                        y1="2"
+                                                        y2="6"
+                                                    />
+                                                    <line
+                                                        x1="3"
+                                                        x2="21"
+                                                        y1="10"
+                                                        y2="10"
+                                                    />
+                                                </svg>
+                                                <span class="font-medium">
+                                                    {edu.start_year} -{" "}
+                                                    {edu.end_year}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-start gap-2 mb-3">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4 text-text-secondary mt-0.5 shrink-0"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            >
+                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                                            </svg>
+                                            <h4 class="font-bold text-text-main">
+                                                {edu.institution}
+                                            </h4>
+                                        </div>
+
+                                        <div class="space-y-2 text-sm">
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-xs font-bold text-text-secondary uppercase tracking-wide min-w-[70px]">
+                                                    Curso:
+                                                </span>
+                                                <span class="text-text-main">
+                                                    {edu.course_name}
+                                                </span>
+                                            </div>
+                                            {edu.thesis_title && (
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-xs font-bold text-text-secondary uppercase tracking-wide min-w-[70px]">
+                                                        Título:
+                                                    </span>
+                                                    <span class="text-text-main italic">
+                                                        {edu.thesis_title}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {edu.advisor_name && (
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-xs font-bold text-text-secondary uppercase tracking-wide min-w-[70px]">
+                                                        Orientador:
+                                                    </span>
+                                                    <span class="text-text-main">
+                                                        {edu.advisor_name}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )
+            }
 
             <!-- Research Groups -->
             <section aria-labelledby="groups-title" class="space-y-6">
@@ -456,3 +584,9 @@ const asStudent = researcherAdvisorships.filter(
         </div>
     </div>
 </Layout>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Scripts can be added here if needed
+    });
+</script>
