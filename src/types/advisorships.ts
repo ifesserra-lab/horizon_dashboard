@@ -1,5 +1,5 @@
 export interface Fellowship {
-    id: number;
+    id: string;
     name: string;
     description: string | null;
     value: number;
@@ -7,15 +7,15 @@ export interface Fellowship {
 }
 
 export interface AdvisorshipItem {
-    id: number;
+    id: string;
     name: string;
     status: string;
     description: string | null;
     start_date: string | null;
     end_date: string | null;
-    student_id: number;
+    student_id: string;
     student_name: string;
-    supervisor_id: number;
+    supervisor_id: string;
     supervisor_name: string;
     fellowship: Fellowship | null;
 }
@@ -26,7 +26,7 @@ export interface TeamMember {
 }
 
 export interface ProjectAdvisorship {
-    id: number;
+    id: string;
     name: string;
     status: string;
     description: string | null;

@@ -18,7 +18,7 @@ const researcherStats = researchers.reduce(
         const initiativesCount = researcher.initiatives.length;
         const articlesCount = researcher.articles.length;
         const advisorships = allProjects
-            .flatMap((p) => p.advisorships)
+            .flatMap((p) => p.advisorships || [])
             .filter(
                 (a) =>
                     a.supervisor_id === researcher.id ||
@@ -37,7 +37,7 @@ const researcherStats = researchers.reduce(
         return acc;
     },
     {} as Record<
-        number,
+        string,
         {
             projects: number;
             articles: number;
@@ -47,6 +47,21 @@ const researcherStats = researchers.reduce(
         }
     >,
 );
+
+function getHighestDegree(education: any[]) {
+    if (!education || education.length === 0) return null;
+    const hierarchy = {
+        Doutorado: 4,
+        Mestrado: 3,
+        Especialização: 2,
+        Graduação: 1,
+    };
+    return [...education].sort(
+        (a, b) =>
+            (hierarchy[b.degree as keyof typeof hierarchy] || 0) -
+            (hierarchy[a.degree as keyof typeof hierarchy] || 0),
+    )[0].degree;
+}
 ---
 
 <Layout title="Pesquisadores">
@@ -142,6 +157,16 @@ const researcherStats = researchers.reduce(
                                 {researcher.name}
                             </h3>
 
+                            {getHighestDegree(
+                                researcher.academic_education,
+                            ) && (
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-premium-purple bg-premium-purple/5 px-2 py-0.5 rounded-full mb-2">
+                                    {getHighestDegree(
+                                        researcher.academic_education,
+                                    )}
+                                </p>
+                            )}
+
                             {researcher.identification_id && (
                                 <p class="text-xs text-text-secondary mb-4 flex items-center justify-center gap-1.5 opacity-80">
                                     <svg
@@ -167,6 +192,20 @@ const researcherStats = researchers.reduce(
                                     ...
                                 </p>
                             )}
+
+                            {researcher.citation_names &&
+                                researcher.citation_names !== "None" && (
+                                    <p
+                                        class="text-[9px] text-text-secondary italic mb-4 opacity-70 truncate max-w-full px-4"
+                                        title={researcher.citation_names}
+                                    >
+                                        {
+                                            researcher.citation_names.split(
+                                                ";",
+                                            )[0]
+                                        }
+                                    </p>
+                                )}
 
                             <div class="flex flex-wrap justify-center gap-2 mb-4 w-full">
                                 {researcher.knowledge_areas
@@ -311,13 +350,39 @@ const researcherStats = researchers.reduce(
                                                 </svg>
                                             </a>
                                         )}
+                                        {researcher.google_scholar_url &&
+                                            researcher.google_scholar_url !==
+                                                "None" && (
+                                                <a
+                                                    href={
+                                                        researcher.google_scholar_url
+                                                    }
+                                                    target="_blank"
+                                                    class="text-text-secondary hover:text-premium-purple transition-colors p-1"
+                                                    title="Google Scholar"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-4 h-4"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    >
+                                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                                    </svg>
+                                                </a>
+                                            )}
                                     </div>
                                     <button
                                         class="view-articles-btn text-xs font-bold text-premium-purple flex items-center gap-1 hover:translate-x-1 transition-transform focus:ring-2 focus:ring-premium-purple rounded px-1"
                                         data-researcher-id={researcher.id}
                                         data-researcher-name={researcher.name}
                                     >
-                                        Ver Artigos (
+                                        Perfil / Artigos (
                                         {
                                             researcherStats[researcher.id]
                                                 .articles
@@ -419,14 +484,22 @@ const researcherStats = researchers.reduce(
                         class="text-2xl font-bold text-text-main font-['Outfit']"
                         id="modalResearcherName"
                     >
-                        Artigos do Pesquisador
+                        Pesquisador
                     </h2>
-                    <p
-                        class="text-sm text-text-secondary mt-1"
-                        id="modalArticlesCountLabel"
-                    >
-                        0 artigos encontrados
-                    </p>
+                    <div class="flex gap-4 mt-2" id="modalTabs">
+                        <button
+                            class="modal-tab-btn active text-sm font-bold border-b-2 border-premium-purple pb-1 text-premium-purple transition-all"
+                            data-tab="about"
+                        >
+                            Sobre
+                        </button>
+                        <button
+                            class="modal-tab-btn text-sm font-bold border-b-2 border-transparent pb-1 text-text-secondary hover:text-text-main transition-all"
+                            data-tab="articles"
+                        >
+                            Artigos
+                        </button>
+                    </div>
                 </div>
                 <button
                     id="closeModal"
@@ -448,55 +521,81 @@ const researcherStats = researchers.reduce(
                 </button>
             </div>
 
-            <!-- Search bar in modal -->
-            <div class="p-4 border-b border-border-main bg-background-main/50">
-                <div class="relative">
-                    <input
-                        type="text"
-                        id="articleSearch"
-                        placeholder="Filtrar artigos por título..."
-                        class="w-full bg-glass-bg border border-border-main rounded-xl px-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
-                    />
-                    <svg
-                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <circle cx="11" cy="11" r="8"></circle><path
-                            d="m21 21-4.3-4.3"></path>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Articles List -->
+            <!-- Tab Content: About -->
             <div
-                class="flex-1 overflow-y-auto p-6 space-y-4"
-                id="articlesListContainer"
+                class="flex-1 overflow-y-auto p-8 space-y-6"
+                id="aboutTabContent"
             >
-                <div id="articlesList" class="space-y-4"></div>
-                <!-- Load More indicator -->
-                <div
-                    id="loadMoreSentinel"
-                    class="h-10 w-full flex items-center justify-center"
-                >
+                <div>
+                    <h3
+                        class="text-xs uppercase tracking-widest font-bold text-premium-purple mb-4"
+                    >
+                        Resumo Profissional
+                    </h3>
                     <div
-                        id="loadingSpinner"
-                        class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+                        id="modalResearcherResume"
+                        class="text-sm text-text-main leading-relaxed text-justify opacity-90"
                     >
                     </div>
                 </div>
+            </div>
+
+            <!-- Tab Content: Articles -->
+            <div
+                class="flex-1 hidden flex-col overflow-hidden"
+                id="articlesTabContent"
+            >
                 <div
-                    id="allLoadedMessage"
-                    class="hidden text-center text-text-secondary text-sm py-4 italic"
+                    class="p-4 border-b border-border-main bg-background-main/50"
                 >
-                    Todos os artigos foram carregados.
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="articleSearch"
+                            placeholder="Filtrar artigos por título..."
+                            class="w-full bg-glass-bg border border-border-main rounded-xl px-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
+                        />
+                        <svg
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle><path
+                                d="m21 21-4.3-4.3"></path>
+                        </svg>
+                    </div>
                 </div>
-                <div id="noArticlesFound" class="hidden text-center py-12">
-                    <p class="text-text-secondary">
-                        Nenhum artigo encontrado para esta busca.
-                    </p>
+
+                <!-- Articles List -->
+                <div
+                    class="flex-1 overflow-y-auto p-6 space-y-4"
+                    id="articlesListContainer"
+                >
+                    <div id="articlesList" class="space-y-4"></div>
+                    <!-- Load More indicator -->
+                    <div
+                        id="loadMoreSentinel"
+                        class="h-10 w-full flex items-center justify-center"
+                    >
+                        <div
+                            id="loadingSpinner"
+                            class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+                        >
+                        </div>
+                    </div>
+                    <div
+                        id="allLoadedMessage"
+                        class="hidden text-center text-text-secondary text-sm py-4 italic"
+                    >
+                        Todos os artigos foram carregados.
+                    </div>
+                    <div id="noArticlesFound" class="hidden text-center py-12">
+                        <p class="text-text-secondary">
+                            Nenhum artigo encontrado para esta busca.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -577,16 +676,27 @@ const researcherStats = researchers.reduce(
 
         function openModal(id: number, name: string) {
             currentResearcherId = id;
-            document.getElementById("modalResearcherName")!.textContent =
-                `Artigos de ${name}`;
+            document.getElementById("modalResearcherName")!.textContent = name;
 
             const researcher = (window as any).researchersData.find(
                 (r: any) => r.id === id,
             );
             if (!researcher) return;
 
+            // Update Resume
+            const resumeEl = document.getElementById("modalResearcherResume");
+            if (resumeEl) {
+                resumeEl.textContent =
+                    researcher.resume && researcher.resume !== "None"
+                        ? researcher.resume
+                        : "Resumo profissional não disponível.";
+            }
+
+            // Reset tabs
+            switchTab("about");
+
             filteredArticles = researcher.articles || [];
-            updateArticlesCountLabel(filteredArticles.length);
+            // updateArticlesCountLabel(filteredArticles.length); // REMOVED as label is gone
 
             displayedCount = 0;
             articlesList!.innerHTML = "";
@@ -605,6 +715,50 @@ const researcherStats = researchers.reduce(
             setupInfiniteScroll();
 
             document.body.style.overflow = "hidden";
+        }
+
+        function switchTab(tab: string) {
+            const aboutContent = document.getElementById("aboutTabContent");
+            const articlesContent =
+                document.getElementById("articlesTabContent");
+            const tabBtns = document.querySelectorAll(".modal-tab-btn");
+
+            tabBtns.forEach((btn) => {
+                const element = btn as HTMLElement;
+                if (element.dataset.tab === tab) {
+                    element.classList.add(
+                        "active",
+                        "border-premium-purple",
+                        "text-premium-purple",
+                    );
+                    element.classList.remove(
+                        "border-transparent",
+                        "text-text-secondary",
+                    );
+                } else {
+                    element.classList.remove(
+                        "active",
+                        "border-premium-purple",
+                        "text-premium-purple",
+                    );
+                    element.classList.add(
+                        "border-transparent",
+                        "text-text-secondary",
+                    );
+                }
+            });
+
+            if (tab === "about") {
+                aboutContent?.classList.remove("hidden");
+                aboutContent?.classList.add("flex");
+                articlesContent?.classList.add("hidden");
+                articlesContent?.classList.remove("flex");
+            } else {
+                aboutContent?.classList.add("hidden");
+                aboutContent?.classList.remove("flex");
+                articlesContent?.classList.remove("hidden");
+                articlesContent?.classList.add("flex");
+            }
         }
 
         function closeModalFunc() {
@@ -740,6 +894,13 @@ const researcherStats = researchers.reduce(
         closeBtn?.addEventListener("click", closeModalFunc);
         overlay?.addEventListener("click", closeModalFunc);
         articleSearch?.addEventListener("input", handleArticleSearch);
+
+        document.querySelectorAll(".modal-tab-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                const target = e.currentTarget as HTMLElement;
+                switchTab(target.dataset.tab!);
+            });
+        });
 
         window.addEventListener("keydown", (e) => {
             if (e.key === "Escape" && !modal?.classList.contains("hidden")) {
