@@ -1,0 +1,52 @@
+---
+import type { Researcher } from "../../types/researchers";
+
+interface Props {
+    researcher: Researcher;
+}
+
+const { researcher } = Astro.props;
+---
+
+<section aria-labelledby="projects-title" class="space-y-6">
+    <h3
+        id="projects-title"
+        class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+    >
+        Projetos e Iniciativas
+    </h3>
+
+    {
+        researcher.initiatives.length > 0 ? (
+            <div class="grid grid-cols-1 gap-4">
+                {researcher.initiatives.map((initiative) => (
+                    <div class="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-premium-accent/20 transition-all">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${initiative.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-slate-100 text-slate-500 border-slate-200"}`}
+                                >
+                                    {initiative.status}
+                                </span>
+                                <span class="text-[10px] text-text-secondary font-bold uppercase tracking-wider">
+                                    {initiative.role}
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-text-main text-lg">
+                                {initiative.name}
+                            </h4>
+                        </div>
+                        <a
+                            href={`${import.meta.env.BASE_URL}projects/${initiative.id}`}
+                            class="px-4 py-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent text-text-secondary hover:text-white text-xs font-bold transition-all text-center self-start md:self-center shrink-0"
+                        >
+                            Ver Projeto
+                        </a>
+                    </div>
+                ))}
+            </div>
+        ) : (
+            <p class="text-text-secondary italic">Nenhum projeto registrado.</p>
+        )
+    }
+</section>

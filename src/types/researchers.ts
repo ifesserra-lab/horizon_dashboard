@@ -3,6 +3,8 @@ export interface ResearcherInitiative {
     name: string;
     status: string;
     role: string;
+    start_date?: string | null;
+    end_date?: string | null;
 }
 
 export interface ResearcherGroup {
