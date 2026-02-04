@@ -5,6 +5,10 @@ export interface ResearcherInitiative {
     role: string;
     start_date?: string | null;
     end_date?: string | null;
+    initiative_type?: {
+        id: string;
+        name: string;
+    };
 }
 
 export interface ResearcherGroup {

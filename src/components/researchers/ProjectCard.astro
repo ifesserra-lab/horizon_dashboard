@@ -1,0 +1,79 @@
+---
+import type { ResearcherInitiative } from "../../types/researchers";
+
+interface Props {
+    initiative: ResearcherInitiative;
+}
+
+const { initiative } = Astro.props;
+---
+
+<div
+    class="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-premium-accent/20 transition-all"
+>
+    <div>
+        <div class="flex items-center gap-3 mb-2">
+            <span
+                class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${initiative.status.toLowerCase() === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-slate-100 text-slate-500 border-slate-200"}`}
+            >
+                {initiative.status}
+            </span>
+            <span
+                class="text-[10px] text-text-secondary font-bold uppercase tracking-wider"
+            >
+                {initiative.role}
+            </span>
+        </div>
+        <h4 class="font-bold text-text-main text-lg mb-1">
+            {initiative.name}
+        </h4>
+        <p
+            class="text-xs text-text-secondary font-medium flex items-center gap-2"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-3.5 h-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            {
+                (() => {
+                    const formatDate = (dateStr: string | undefined | null) => {
+                        if (!dateStr || dateStr === "None") return "Presente";
+                        try {
+                            const date = new Date(dateStr);
+                            if (isNaN(date.getTime())) return "N/A";
+                            return date.toLocaleDateString("pt-BR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                            });
+                        } catch (e) {
+                            return "N/A";
+                        }
+                    };
+
+                    const start = formatDate(initiative.start_date);
+                    const end = formatDate(initiative.end_date);
+
+                    return `${start} - ${end}`;
+                })()
+            }
+        </p>
+    </div>
+    <a
+        href={`${import.meta.env.BASE_URL}projects/${initiative.id}`}
+        class="px-4 py-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent text-text-secondary hover:text-white text-xs font-bold transition-all text-center self-start md:self-center shrink-0"
+    >
+        Ver Projeto
+    </a>
+</div>

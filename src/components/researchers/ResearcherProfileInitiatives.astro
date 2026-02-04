@@ -1,5 +1,6 @@
 ---
-import type { Researcher } from "../../types/researchers";
+import type { Researcher, ResearcherInitiative } from "../../types/researchers";
+import ProjectCard from "./ProjectCard.astro";
 
 interface Props {
     researcher: Researcher;
@@ -17,36 +18,153 @@ const { researcher } = Astro.props;
     </h3>
 
     {
-        researcher.initiatives.length > 0 ? (
-            <div class="grid grid-cols-1 gap-4">
-                {researcher.initiatives.map((initiative) => (
-                    <div class="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-premium-accent/20 transition-all">
-                        <div>
-                            <div class="flex items-center gap-3 mb-2">
-                                <span
-                                    class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${initiative.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-slate-100 text-slate-500 border-slate-200"}`}
+        (() => {
+            // Helper Sort Function
+            const sortProjects = (projects: ResearcherInitiative[]) => {
+                return projects.sort((a, b) => {
+                    // 1. Status: Active comes first
+                    const aActive = a.status.toLowerCase() === "active";
+                    const bActive = b.status.toLowerCase() === "active";
+                    if (aActive && !bActive) return -1;
+                    if (!aActive && bActive) return 1;
+
+                    // 2. Date: Newest first
+                    const aDate = a.start_date
+                        ? new Date(a.start_date).getTime()
+                        : 0;
+                    const bDate = b.start_date
+                        ? new Date(b.start_date).getTime()
+                        : 0;
+                    return bDate - aDate;
+                });
+            };
+
+            const researchProjects = sortProjects(
+                researcher.initiatives.filter(
+                    (i) => i.initiative_type?.name === "Research Project",
+                ),
+            );
+            const extensionProjects = sortProjects(
+                researcher.initiatives.filter(
+                    (i) => i.initiative_type?.name === "Extension Project",
+                ),
+            );
+            const developmentProjects = sortProjects(
+                researcher.initiatives.filter(
+                    (i) => i.initiative_type?.name === "Development Project",
+                ),
+            );
+
+            const hasProjects =
+                researchProjects.length > 0 ||
+                extensionProjects.length > 0 ||
+                developmentProjects.length > 0;
+
+            if (!hasProjects) {
+                return (
+                    <p class="text-text-secondary italic">
+                        Nenhum projeto registrado.
+                    </p>
+                );
+            }
+
+            return (
+                <div class="space-y-10">
+                    {/* Research Projects */}
+                    {researchProjects.length > 0 && (
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4 text-emerald-500"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
                                 >
-                                    {initiative.status}
-                                </span>
-                                <span class="text-[10px] text-text-secondary font-bold uppercase tracking-wider">
-                                    {initiative.role}
-                                </span>
-                            </div>
-                            <h4 class="font-bold text-text-main text-lg">
-                                {initiative.name}
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                </svg>
+                                Pesquisa
                             </h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                {researchProjects.map((initiative) => (
+                                    <ProjectCard initiative={initiative} />
+                                ))}
+                            </div>
                         </div>
-                        <a
-                            href={`${import.meta.env.BASE_URL}projects/${initiative.id}`}
-                            class="px-4 py-2 rounded-lg bg-[var(--tag-bg)] hover:bg-premium-accent text-text-secondary hover:text-white text-xs font-bold transition-all text-center self-start md:self-center shrink-0"
-                        >
-                            Ver Projeto
-                        </a>
-                    </div>
-                ))}
-            </div>
-        ) : (
-            <p class="text-text-secondary italic">Nenhum projeto registrado.</p>
-        )
+                    )}
+
+                    {/* Extension Projects */}
+                    {extensionProjects.length > 0 && (
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4 text-purple-500"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Extensão
+                            </h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                {extensionProjects.map((initiative) => (
+                                    <ProjectCard initiative={initiative} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Development Projects */}
+                    {developmentProjects.length > 0 && (
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4 text-blue-500"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <polyline points="16 18 22 12 16 6" />
+                                    <polyline points="8 6 2 12 8 18" />
+                                </svg>
+                                Desenvolvimento
+                            </h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                {developmentProjects.map((initiative) => (
+                                    <ProjectCard initiative={initiative} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        })()
     }
 </section>
+
+{/* Extracted Card Component for reuse within this file contexts */}
+{
+    /* 
+    Ideally this should be a separate component file, but preventing scope creep for now. 
+    Definning it here as a variable for render function usage isn't possible in Astro directly inside JSX like React.
+    So I duplicated the card above. Wait, I should better duplicate the code or extract a component.
+    To avoid duplication in the replace block, I'll assume ProjectCard is not available and I should inline or create it.
+    Creating a separate component is cleaner.
+    */
+}
