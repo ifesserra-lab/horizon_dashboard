@@ -1,0 +1,201 @@
+---
+import type { Researcher } from "../../types/researchers";
+
+interface Props {
+    researcher: Researcher;
+}
+
+const { researcher } = Astro.props;
+---
+
+<section aria-labelledby="articles-title" class="space-y-6 pb-20">
+    <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-border-main"
+    >
+        <h3
+            id="articles-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Artigos Científicos ({researcher.articles?.length || 0})
+        </h3>
+        <div class="relative w-full md:w-80">
+            <input
+                type="text"
+                id="articleSearch"
+                placeholder="Buscar artigos..."
+                class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
+            />
+            <svg
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
+                ></path>
+            </svg>
+        </div>
+    </div>
+
+    <div id="articlesList" class="space-y-4">
+        {/* Articles will be injected here by client-side script */}
+    </div>
+
+    {/* Infinite Scroll Indicators */}
+    <div
+        id="loadMoreSentinel"
+        class="h-10 w-full flex items-center justify-center"
+    >
+        <div
+            id="loadingSpinner"
+            class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+        >
+        </div>
+    </div>
+    <div
+        id="allLoadedMessage"
+        class="hidden text-center text-text-secondary text-sm py-4 italic"
+    >
+        Todos os artigos foram carregados.
+    </div>
+    <div id="noArticlesFound" class="hidden text-center py-12">
+        <p class="text-text-secondary italic">
+            Nenhum artigo encontrado para esta busca.
+        </p>
+    </div>
+</section>
+
+<script define:vars={{ researcher }}>
+    // Provide articles data to client-side
+    window.researcherArticles = researcher.articles || [];
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const articlesList = document.getElementById("articlesList");
+        const articleSearch = document.getElementById(
+            "articleSearch",
+        ) as HTMLInputElement;
+        const spinner = document.getElementById("loadingSpinner");
+        const sentinel = document.getElementById("loadMoreSentinel");
+        const allLoadedMsg = document.getElementById("allLoadedMessage");
+        const noArticlesMsg = document.getElementById("noArticlesFound");
+
+        let allArticles = (window as any).researcherArticles || [];
+        let filteredArticles = [...allArticles];
+        let displayedCount = 0;
+        const BATCH_SIZE = 30;
+        let observer: IntersectionObserver | null = null;
+
+        function updateUI() {
+            if (
+                filteredArticles.length === 0 &&
+                (articleSearch.value.trim() !== "" || allArticles.length === 0)
+            ) {
+                noArticlesMsg?.classList.remove("hidden");
+                allLoadedMsg?.classList.add("hidden");
+            } else {
+                noArticlesMsg?.classList.add("hidden");
+            }
+        }
+
+        function loadMoreArticles() {
+            const nextBatch = filteredArticles.slice(
+                displayedCount,
+                displayedCount + BATCH_SIZE,
+            );
+
+            nextBatch.forEach((article) => {
+                const articleEl = document.createElement("div");
+                articleEl.className =
+                    "glass-card p-5 border border-border-main hover:border-premium-purple/30 transition-all";
+
+                const doiLink = article.doi
+                    ? `<a href="${article.doi.startsWith("http") ? article.doi : "https://doi.org/" + article.doi}" 
+                          target="_blank" 
+                          class="flex-shrink-0 p-2 bg-premium-purple/5 hover:bg-premium-purple/10 rounded-lg text-premium-purple transition-colors"
+                          title="Ver DOI">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                       </a>`
+                    : "";
+
+                articleEl.innerHTML = `
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="space-y-2">
+                             <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md bg-premium-purple/10 text-premium-purple text-[10px] font-bold uppercase tracking-wider">
+                                    ${article.type || "ARTIGO"}
+                                </span>
+                                <span class="text-xs font-bold text-text-secondary">${article.year}</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-text-main leading-snug">${article.title}</h4>
+                            <p class="text-xs text-text-secondary flex items-center gap-1.5 italic">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                ${article.journal_conference}
+                            </p>
+                        </div>
+                        ${doiLink}
+                    </div>
+                `;
+                articlesList?.appendChild(articleEl);
+            });
+
+            displayedCount += nextBatch.length;
+
+            if (
+                displayedCount >= filteredArticles.length &&
+                filteredArticles.length > 0
+            ) {
+                allLoadedMsg?.classList.remove("hidden");
+                if (observer) observer.disconnect();
+            } else {
+                allLoadedMsg?.classList.add("hidden");
+            }
+        }
+
+        function setupInfiniteScroll() {
+            if (observer) observer.disconnect();
+
+            observer = new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries[0].isIntersecting &&
+                        displayedCount < filteredArticles.length
+                    ) {
+                        spinner?.classList.remove("hidden");
+                        setTimeout(() => {
+                            loadMoreArticles();
+                            spinner?.classList.add("hidden");
+                        }, 400);
+                    }
+                },
+                { threshold: 0.1 },
+            );
+
+            if (sentinel) observer.observe(sentinel);
+        }
+
+        function handleSearch() {
+            const query = articleSearch.value.toLowerCase().trim();
+            filteredArticles = allArticles.filter(
+                (a: any) =>
+                    a.title.toLowerCase().includes(query) ||
+                    a.journal_conference.toLowerCase().includes(query),
+            );
+
+            displayedCount = 0;
+            articlesList!.innerHTML = "";
+            updateUI();
+            loadMoreArticles();
+            setupInfiniteScroll();
+        }
+
+        articleSearch?.addEventListener("input", handleSearch);
+
+        // Initial Load
+        updateUI();
+        loadMoreArticles();
+        setupInfiniteScroll();
+    });
+</script>

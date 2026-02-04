@@ -406,6 +406,72 @@ Como gestor, quero visualizar a evolução do investimento financeiro em bolsas 
 
 
 
+
+### US-038 – Gráfico de Projetos por Ano (Perfil)
+```yaml
+id: US-038
+milestone: R1
+prioridade: Média
+tamanho: 3
+origim: [RF-43]
+tags: [type:feature, area:frontend, component:chart]
+```
+
+#### Descrição
+Exibir um gráfico de barras na seção de Iniciativas do pesquisador mostrando a quantidade de projetos ativos/concluídos distribuídos por ano.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Agrupar projetos por ano (baseado em `start_date` ou `end_date`).
+    - [ ] Preencher anos vazios para continuidade.
+- **UI/UX**:
+    - [ ] Componente visual consistente com o gráfico de publicações.
+    - [ ] Tooltip com quantidade exata.
+
+### US-039 – Gráfico de Orientações por Ano (Perfil)
+```yaml
+id: US-039
+milestone: R1
+prioridade: Média
+tamanho: 3
+origim: [RF-44]
+tags: [type:feature, area:frontend, component:chart]
+```
+
+#### Descrição
+Exibir um gráfico de barras na seção de Orientações do pesquisador mostrando a quantidade de orientações em andamento/concluídas por ano.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Agrupar orientações por ano de início (`start_date`).
+    - [ ] Preencher anos vazios para continuidade.
+- **UI/UX**:
+    - [ ] Componente visual consistente com o gráfico de publicações.
+
+
+### US-040 – KPIs do Pesquisador (Totalizadores)
+```yaml
+id: US-040
+milestone: R1
+prioridade: Alta
+tamanho: 2
+origim: [RF-45]
+tags: [type:feature, area:frontend, component:kpi]
+```
+
+#### Descrição
+Exibir badges ou cards contendo os totalizadores de Artigos, Orientações e Projetos no topo do perfil do pesquisador, para fornecer uma visão rápida da produtividade.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Calcular total de Artigos.
+    - [ ] Calcular total de Projetos (Iniciativas).
+    - [ ] Calcular total de Orientações.
+- **UI/UX**:
+    - [ ] Ícones distintos para cada métrica.
+    - [ ] Layout responsivo (Stack no mobile).
+
+
 ## Epic 1: Extração SigPesq (Release 1)
 **Objetivo**: Coletar dados de projetos da base SigPesq.
 

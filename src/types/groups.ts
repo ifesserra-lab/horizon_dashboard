@@ -1,5 +1,5 @@
 export interface Member {
-    id: number;
+    id: string;
     name: string;
     role: string;
     lattes_url: string | null;
@@ -9,27 +9,27 @@ export interface Member {
 }
 
 export interface KnowledgeArea {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface Organization {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface Campus {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface ResearchGroup {
-    id: number;
+    id: string;
     name: string;
     description: string | null;
     short_name: string | null;
-    organization_id: number;
-    campus_id: number;
+    organization_id: string;
+    campus_id: string;
     cnpq_url: string | null;
     site: string | null;
     organization: Organization;

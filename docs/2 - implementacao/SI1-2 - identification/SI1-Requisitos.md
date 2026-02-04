@@ -72,6 +72,9 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-40** | O sistema deve listar artigos científicos na página de pesquisadores com scroll infinito e busca. | Artigos exibidos em lotes de 30 com carregamento sob demanda e filtro de busca. | User Req. |
 | **RF-41** | O sistema deve permitir a carga de artigos científicos via Lattes JSON para o arquivo canônico. | Ingestão de artigos implementada nos pipelines de dados. | User Req. |
 | **RF-42** | O sistema deve exibir um gráfico de publicações por ano na listagem e no detalhe do pesquisador. | Gráfico de barras ou linha mostrando a evolução temporal das publicações. | User Req. |
+| **RF-43** | O sistema deve exibir um gráfico de barras com a quantidade de "Projetos por Ano" no perfil do pesquisador. | Visualização temporal de iniciativas ativas/concluídas. | User Req. |
+| **RF-44** | O sistema deve exibir um gráfico de barras com a quantidade de "Orientações por Ano" no perfil do pesquisador. | Visualização temporal de orientações em andamento/concluídas. | User Req. |
+| **RF-45** | O sistema deve exibir KPIs (Cards) sumarizando o total de Artigos, Orientações e Projetos no perfil do pesquisador. | 3 Cards com ícones e valores numéricos (Badges). | User Req. |
 
 
 ---

@@ -1,0 +1,52 @@
+---
+interface Props {
+    placeholder?: string;
+}
+
+const { placeholder = "Buscar por nome..." } = Astro.props;
+---
+
+<div class="relative max-w-md w-full">
+    <label for="researcherSearch" class="sr-only">Buscar pesquisadores</label>
+    <input
+        type="text"
+        id="researcherSearch"
+        placeholder={placeholder}
+        class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+    />
+    <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-text-secondary"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+    </svg>
+
+    <button
+        id="resetFilters"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden"
+        title="Limpar busca"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="m15 9-6 6"></path>
+            <path d="m9 9 6 6"></path>
+            <circle cx="12" cy="12" r="10"></circle>
+        </svg>
+    </button>
+</div>

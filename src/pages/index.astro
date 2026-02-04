@@ -23,7 +23,7 @@ const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
 // Flatten all advisorships
 const allAdvisorships = allProjects.flatMap((project) =>
-	project.advisorships.map((adv) => ({
+	project.advisorships?.map((adv) => ({
 		...adv,
 		projectName: project.name,
 	})),
