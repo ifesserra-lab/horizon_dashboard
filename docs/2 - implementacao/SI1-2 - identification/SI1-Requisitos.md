@@ -69,6 +69,9 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-36** | O sistema deve exibir o Top 5 Grupos de Pesquisa com maior número de membros. | Analytics de Pesquisadores | Média |
 | **RF-38** | O sistema deve exibir um gráfico de "Investimento em Bolsas" calculado pela soma anual dos valores das bolsas ativas. | Dashboard de Orientações | Alta |
 | **RF-39** | A página de perfil do pesquisador deve consumir dados exclusivamente de `researchers_canonical.json`, eliminando dependências de arquivos Lattes externos e utilities de carregamento legados. | Data Refactor | Alta |
+| **RF-40** | O sistema deve listar artigos científicos na página de pesquisadores com scroll infinito e busca. | Artigos exibidos em lotes de 30 com carregamento sob demanda e filtro de busca. | User Req. |
+| **RF-41** | O sistema deve permitir a carga de artigos científicos via Lattes JSON para o arquivo canônico. | Ingestão de artigos implementada nos pipelines de dados. | User Req. |
+| **RF-42** | O sistema deve exibir um gráfico de publicações por ano na listagem e no detalhe do pesquisador. | Gráfico de barras ou linha mostrando a evolução temporal das publicações. | User Req. |
 
 
 ---

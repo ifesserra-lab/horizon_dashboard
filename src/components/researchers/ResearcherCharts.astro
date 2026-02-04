@@ -1,5 +1,6 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import ArticleYearChart from "./ArticleYearChart.astro";
 
 interface Props {
     researchers: Researcher[];
@@ -80,6 +81,9 @@ const topGroups = Array.from(groupsMap.values())
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 const maxGroupCount = topGroups.length > 0 ? topGroups[0].count : 1;
+
+// 5. Aggregated Articles
+const allArticles = researchers.flatMap((r) => r.articles || []);
 ---
 
 <div class="space-y-8 mb-12">
@@ -106,6 +110,15 @@ const maxGroupCount = topGroups.length > 0 ? topGroups[0].count : 1;
                 class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
             >
                 Áreas do Conhecimento
+            </button>
+            <button
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-production"
+                id="tab-production"
+                class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
+            >
+                Produção Científica
             </button>
         </div>
     </div>
@@ -248,6 +261,17 @@ const maxGroupCount = topGroups.length > 0 ? topGroups[0].count : 1;
                         })
                     }
                 </div>
+            </div>
+        </div>
+        <!-- Panel 3: Production -->
+        <div
+            id="panel-production"
+            role="tabpanel"
+            aria-labelledby="tab-production"
+            class="hidden transition-all duration-300 opacity-0 scale-95"
+        >
+            <div class="mt-6 h-[400px]">
+                <ArticleYearChart articles={allArticles} showTitle={false} />
             </div>
         </div>
     </div>

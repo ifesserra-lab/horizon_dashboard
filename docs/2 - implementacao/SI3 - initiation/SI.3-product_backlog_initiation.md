@@ -1158,3 +1158,47 @@ Garantir que os projetos importados do Lattes sejam exibidos corretamente no per
 #### Critérios de Aceitação
 - [ ] Perfil do pesquisador lista projetos de Extensão e Desenvolvimento separadamente ou com labels claros.
 - [ ] Filtros na página de projetos permitem selecionar "Extensão", "Desenvolvimento".
+
+### US-040 – Listagem de Artigos Científicos do Pesquisador
+```yaml
+id: US-040
+milestone: R2
+prioridade: Alta
+tamanho: 5
+origem: [RF-40]
+tags: [type:feature, area:frontend, component:articles]
+```
+
+#### Descrição
+Implementar a visualização de artigos científicos na página de detalhes do pesquisador, com suporte a scroll infinito (30 em 30) e busca textual por título, para lidar com grandes volumes de publicações.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Carregar artigos em lotes de 30 utilizando scroll infinito.
+    - [ ] Permitir busca em tempo real por título do artigo.
+    - [ ] Exibir metadados do artigo: Título, Ano, Journal/Conference, DOI (se disponível).
+- **UI/UX**:
+    - [ ] Notificar o usuário quando não houver resultados na busca.
+    - [ ] Design responsivo e acessível.
+
+### US-041 – Gráfico de Evolução de Publicações por Ano
+```yaml
+id: US-041
+milestone: R2
+prioridade: Alta
+tamanho: 5
+origem: [RF-42]
+tags: [type:feature, area:frontend, component:charts]
+```
+
+#### Descrição
+Implementar gráficos de barras ou linha que mostrem a evolução temporal das publicações científicas do pesquisador, permitindo uma análise rápida da produtividade ao longo dos anos. O gráfico deve estar presente tanto na modal da listagem quanto na página de detalhes.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [ ] Gerar dados agregados de artigos por ano a partir do arquivo canônico.
+    - [ ] Exibir gráfico interativo na página de detalhes do pesquisador.
+    - [ ] Exibir gráfico na modal de artigos na listagem geral.
+- **UI/UX**:
+    - [ ] Cores consistentes com o design system da plataforma.
+    - [ ] Tooltips com valores exatos ao passar o mouse.

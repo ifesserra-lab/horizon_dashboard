@@ -1,0 +1,116 @@
+---
+import type { Article } from "../../types/researchers";
+
+interface Props {
+    articles: Article[];
+    title?: string;
+    showTitle?: boolean;
+}
+
+const {
+    articles,
+    title = "Produção Científica por Ano",
+    showTitle = true,
+} = Astro.props;
+
+// Aggregate articles by year
+const yearMap = new Map<number, number>();
+articles.forEach((a) => {
+    const year = typeof a.year === "string" ? parseInt(a.year) : a.year;
+    if (year && year > 0) {
+        yearMap.set(year, (yearMap.get(year) || 0) + 1);
+    }
+});
+
+// Convert to sorted array
+const yearData = Array.from(yearMap.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, count]) => ({ year, count }));
+
+// Fill gaps between min and max year to show a continuous timeline
+let continuousData = yearData;
+if (yearData.length > 0) {
+    const minYear = yearData[0].year;
+    const maxYear = yearData[yearData.length - 1].year;
+    const fullData = [];
+    for (let y = minYear; y <= maxYear; y++) {
+        fullData.push({
+            year: y,
+            count: yearMap.get(y) || 0,
+        });
+    }
+    continuousData = fullData;
+}
+
+const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
+---
+
+<div
+    class="glass-card border border-border-main rounded-3xl p-6 h-full flex flex-col"
+>
+    {
+        showTitle && (
+            <h4 class="text-sm font-bold text-text-main uppercase tracking-wider mb-6 flex items-center gap-2">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-premium-purple"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <>
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </>
+                </svg>
+                {title}
+            </h4>
+        )
+    }
+
+    {
+        continuousData.length > 0 ? (
+            <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex items-end gap-1 min-h-[150px] mb-4 group/chart">
+                    {continuousData.map((data) => {
+                        const height = (data.count / maxCount) * 100;
+                        return (
+                            <div class="flex-1 flex flex-col items-center group/bar relative">
+                                {/* Tooltip */}
+                                <div class="absolute bottom-full mb-2 bg-text-main text-background-main text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                    {data.year}: {data.count}{" "}
+                                    {data.count === 1 ? "artigo" : "artigos"}
+                                </div>
+
+                                {/* Bar */}
+                                <div
+                                    class="w-full bg-gradient-to-t from-premium-purple/40 to-premium-purple rounded-t-sm transition-all duration-500 hover:to-premium-accent"
+                                    style={`height: ${height}%`}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Legend - Years */}
+                <div class="flex justify-between text-[8px] font-bold text-text-secondary uppercase tracking-tighter">
+                    <span>{continuousData[0].year}</span>
+                    <span class="text-[10px] text-text-muted normal-case font-medium">
+                        Histórico de Publicações
+                    </span>
+                    <span>
+                        {continuousData[continuousData.length - 1].year}
+                    </span>
+                </div>
+            </div>
+        ) : (
+            <div class="flex-1 flex items-center justify-center text-text-secondary italic text-sm">
+                Nenhuma publicação registrada para gerar o gráfico.
+            </div>
+        )
+    }
+</div>

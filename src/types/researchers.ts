@@ -26,6 +26,15 @@ export interface AcademicEducation {
     co_advisor_name: string | null;
 }
 
+export interface Article {
+    id: number;
+    title: string;
+    year: number;
+    type: string;
+    doi: string | null;
+    journal_conference: string;
+}
+
 export interface Researcher {
     id: number;
     name: string;
@@ -39,4 +48,5 @@ export interface Researcher {
     research_groups: ResearcherGroup[];
     knowledge_areas: ResearcherKnowledgeArea[];
     academic_education: AcademicEducation[];
+    articles: Article[];
 }
