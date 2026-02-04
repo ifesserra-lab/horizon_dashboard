@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v2.0.0** | 2026-02-04 | **Released** | Feature: Articles Integration (Modal, Detail, Charts, Search) | TBD | [#US-040](https://github.com/ifesserra-lab/horizon_dashboard/issues/40), [#US-041](https://github.com/ifesserra-lab/horizon_dashboard/issues/41) |
 | **v1.9.0** | 2026-01-28 | **Released** | Feature: Home Page Fellowship Charts | [#49](https://github.com/ifesserra-lab/horizon_dashboard/pull/49) | [#22](https://github.com/ifesserra-lab/horizon_dashboard/issues/22) |
 | **v1.8.0** | 2026-01-28 | **Released** | Refinement: Fellowship Chart Visualization (Line Chart) | TBD | - |
 | **v1.7.0** | 2026-01-28 | **Released** | Feature: Researcher Profiles Enhancement & Data Update | [#65](https://github.com/ifesserra-lab/horizon_dashboard/pull/65) | - |
@@ -81,6 +82,8 @@ Reflecting active work from `SI.3 Product Backlog`.
 
 - **Epic 2: Perfis de Pesquisadores (Release 2)** _(Planejado)_
     - [x] **US-003** Perfil do Pesquisador (Lattes UI) (Done na v1.5.0)
+    - [x] **US-040** Artigos Científicos (Modal + Detalhe + Scroll Infinito) (Done na v2.0.0)
+    - [x] **US-041** Gráfico de Evolução de Publicações (Done na v2.0.0)
     - [ ] **Task** Design do Componente de Timeline
 
 - **Epic 3: Transparência (Release 3)** _(Planejado)_
