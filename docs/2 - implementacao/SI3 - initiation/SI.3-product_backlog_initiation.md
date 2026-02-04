@@ -1159,7 +1159,7 @@ Garantir que os projetos importados do Lattes sejam exibidos corretamente no per
 - [ ] Perfil do pesquisador lista projetos de Extensão e Desenvolvimento separadamente ou com labels claros.
 - [ ] Filtros na página de projetos permitem selecionar "Extensão", "Desenvolvimento".
 
-### US-040 – Listagem de Artigos Científicos do Pesquisador
+### US-040 – Listagem de Artigos Científicos do Pesquisador (Done na v2.0.0)
 ```yaml
 id: US-040
 milestone: R2
@@ -1181,7 +1181,7 @@ Implementar a visualização de artigos científicos na página de detalhes do p
     - [ ] Notificar o usuário quando não houver resultados na busca.
     - [ ] Design responsivo e acessível.
 
-### US-041 – Gráfico de Evolução de Publicações por Ano
+### US-041 – Gráfico de Evolução de Publicações por Ano (Done na v2.0.0)
 ```yaml
 id: US-041
 milestone: R2
