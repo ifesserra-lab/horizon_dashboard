@@ -16,8 +16,12 @@ const {
 // Aggregate articles by year
 const yearMap = new Map<number, number>();
 articles.forEach((a) => {
-    const year = typeof a.year === "string" ? parseInt(a.year) : a.year;
-    if (year && year > 0) {
+    // Robust parsing: handle string, number, and potential garbage
+    const yearStr = String(a.year).trim();
+    const year = parseInt(yearStr, 10);
+
+    // Filter reasonable years (e.g., 1900-2100) to avoid noise
+    if (!isNaN(year) && year > 1900 && year < 2100) {
         yearMap.set(year, (yearMap.get(year) || 0) + 1);
     }
 });
@@ -32,8 +36,13 @@ let continuousData = yearData;
 if (yearData.length > 0) {
     const minYear = yearData[0].year;
     const maxYear = yearData[yearData.length - 1].year;
+
+    // Add 1 year padding if single year
+    const start = minYear;
+    const end = minYear === maxYear ? maxYear + 1 : maxYear;
+
     const fullData = [];
-    for (let y = minYear; y <= maxYear; y++) {
+    for (let y = start; y <= end; y++) {
         fullData.push({
             year: y,
             count: yearMap.get(y) || 0,
@@ -53,7 +62,7 @@ const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
             <h4 class="text-sm font-bold text-text-main uppercase tracking-wider mb-6 flex items-center gap-2">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-premium-purple"
+                    class="w-4 h-4 text-blue-500"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -75,21 +84,27 @@ const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
     {
         continuousData.length > 0 ? (
             <div class="flex-1 flex flex-col">
-                <div class="flex-1 flex items-end gap-1 min-h-[150px] mb-4 group/chart">
+                <div class="flex-1 flex items-end gap-1 min-h-[150px] mb-4 mt-8 group/chart">
                     {continuousData.map((data) => {
                         const height = (data.count / maxCount) * 100;
                         return (
-                            <div class="flex-1 flex flex-col items-center group/bar relative">
+                            <div class="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
+                                {/* Bar Label (Visible always) */}
+                                <span class="absolute -top-6 text-[10px] font-bold text-blue-500 opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                    {data.count}
+                                </span>
+
                                 {/* Tooltip */}
-                                <div class="absolute bottom-full mb-2 bg-text-main text-background-main text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                <div class="absolute bottom-full mb-2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-xl border border-white/10">
                                     {data.year}: {data.count}{" "}
                                     {data.count === 1 ? "artigo" : "artigos"}
+                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45" />
                                 </div>
 
                                 {/* Bar */}
                                 <div
-                                    class="w-full bg-gradient-to-t from-premium-purple/40 to-premium-purple rounded-t-sm transition-all duration-500 hover:to-premium-accent"
-                                    style={`height: ${height}%`}
+                                    class="w-full bg-gradient-to-t from-blue-500/40 to-blue-500 hover:to-blue-400 transition-all duration-500 rounded-t-sm shadow-sm opacity-90 hover:!opacity-100"
+                                    style={`height: ${Math.max(height, 4)}%`}
                                 />
                             </div>
                         );
@@ -97,14 +112,52 @@ const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
                 </div>
 
                 {/* Legend - Years */}
-                <div class="flex justify-between text-[8px] font-bold text-text-secondary uppercase tracking-tighter">
-                    <span>{continuousData[0].year}</span>
-                    <span class="text-[10px] text-text-muted normal-case font-medium">
-                        Histórico de Publicações
-                    </span>
-                    <span>
-                        {continuousData[continuousData.length - 1].year}
-                    </span>
+                <div class="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-tight border-t border-border-main pt-2">
+                    {(() => {
+                        // Calculate years to show (First, Last, and ~3 intermediates)
+                        const years = continuousData.map((d) => d.year);
+                        const first = years[0];
+                        const last = years[years.length - 1];
+                        const count = years.length;
+
+                        // We always show first and last.
+                        // If we have enough range, we show intermediates.
+                        const checkpoints = [first];
+
+                        if (count > 5) {
+                            const step = Math.floor(count / 4);
+                            for (let i = 1; i < 4; i++) {
+                                const idx = i * step;
+                                if (idx < count - 1) {
+                                    checkpoints.push(years[idx]);
+                                }
+                            }
+                        }
+
+                        checkpoints.push(last);
+                        // Deduplicate just in case
+                        const uniquePoints = [...new Set(checkpoints)].sort(
+                            (a, b) => a - b,
+                        );
+
+                        return (
+                            <>
+                                {uniquePoints.map((year, idx) => {
+                                    // Align first to left, last to right, others center
+                                    let alignClass = "";
+                                    if (idx === 0)
+                                        alignClass = ""; // default left
+                                    else if (idx === uniquePoints.length - 1)
+                                        alignClass = ""; // handled by justify-between, but wrapper needs care
+                                    else alignClass = "hidden sm:block"; // Hide intermediates on very small screens if needed
+
+                                    return (
+                                        <span class={alignClass}>{year}</span>
+                                    );
+                                })}
+                            </>
+                        );
+                    })()}
                 </div>
             </div>
         ) : (

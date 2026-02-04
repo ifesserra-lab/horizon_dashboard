@@ -173,7 +173,10 @@ class IExportSink(ABC):
 | `MapComponent`| Distribuição de egressos | Mapa Coroplético |
 | `Tabs` | Alternância entre Visão Geral e Detalhes Analíticos | Tabs (Visão Geral / Temporal / Composição) |
 | `LineChart (Team)` | Evolução da Equipe (Pesquisadores vs Estudantes) | Gráfico de Linha Dupla |
+| `KpiRow (Researcher)` | Total de Artigos, Orientações, Projetos | Cards Numéricos / Badges |
 | `BarChart (Pubs)` | Quantidade de Publicações por Pesquisador | Gráfico de Barras |
+| `BarChart (Projects)` | Quantidade de Projetos por Ano | Gráfico de Barras |
+| `BarChart (Advisorships)` | Quantidade de Orientações por Ano | Gráfico de Barras |
 | `LineChart (Pubs)` | Linha do tempo de Publicações (Evolução) | Gráfico de Linha / Área |
 | `BarChart (Researchers)` | Top 10 Áreas de Conhecimento (Qtd Pesquisadores) | Barras Horizontais |
 | `DonutChart (Roles)` | Distribuição de Papéis em Iniciativas | Donut |
