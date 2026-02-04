@@ -1,17 +1,17 @@
 export interface ResearcherInitiative {
-    id: number;
+    id: string;
     name: string;
     status: string;
     role: string;
 }
 
 export interface ResearcherGroup {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface ResearcherKnowledgeArea {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -19,24 +19,24 @@ export interface AcademicEducation {
     institution: string;
     degree: string;
     course_name: string;
-    start_year: number;
-    end_year: number;
+    start_year: string;
+    end_year: string;
     thesis_title: string;
     advisor_name: string;
     co_advisor_name: string | null;
 }
 
 export interface Article {
-    id: number;
+    id: string;
     title: string;
-    year: number;
+    year: string;
     type: string;
     doi: string | null;
     journal_conference: string;
 }
 
 export interface Researcher {
-    id: number;
+    id: string;
     name: string;
     identification_id?: string | null;
     birthday?: string | null;

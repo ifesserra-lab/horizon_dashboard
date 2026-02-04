@@ -224,6 +224,7 @@ flowchart TD
         Sidebar[Sidebar.astro]
         Breadcrumbs[Breadcrumbs.astro]
         Footer[Footer.astro]
+        ArticleYearChart[ArticleYearChart.astro]
     end
 
     subgraph StaticAssets [public/]
