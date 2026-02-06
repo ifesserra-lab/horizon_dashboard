@@ -1,10 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import researchersData from "../../data/canonical/researchers_canonical.json";
-import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
 import initiativesData from "../../data/canonical/initiatives_canonical.json";
 import type { Researcher } from "../../types/researchers";
-import type { ProjectAdvisorship } from "../../types/advisorships";
 
 // Profile Components
 import ResearcherProfileHeader from "../../components/researchers/ResearcherProfileHeader.astro";
@@ -47,35 +45,6 @@ const enrichedResearcher = {
     ...researcher,
     initiatives: enrichedInitiatives,
 };
-
-// Load and filter advisorships
-const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
-const researcherAdvisorships = allProjects
-    .flatMap((p) =>
-        p.advisorships.map((a) => ({
-            ...a,
-            projectName: p.name,
-            projectId: p.id,
-        })),
-    )
-    .filter(
-        (a) =>
-            a.supervisor_id === researcher.id || a.student_id === researcher.id,
-    )
-    .sort((a, b) => {
-        if (!a.start_date) return 1;
-        if (!b.start_date) return -1;
-        return (
-            new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
-        );
-    });
-
-const asSupervisor = researcherAdvisorships.filter(
-    (a) => a.supervisor_id === researcher.id,
-);
-const asStudent = researcherAdvisorships.filter(
-    (a) => a.student_id === researcher.id,
-);
 ---
 
 <Layout
@@ -94,20 +63,19 @@ const asStudent = researcherAdvisorships.filter(
             <ResearcherProfileStats
                 totalArticles={enrichedResearcher.articles.length}
                 totalProjects={enrichedResearcher.initiatives.length}
-                totalAdvisorships={asSupervisor.length}
+                totalAdvisorships={researcher.advisorships?.length || 0}
             />
 
             <ResearcherProfileDashboard
                 researcher={enrichedResearcher}
-                advisorships={asSupervisor}
+                advisorships={researcher.advisorships || []}
             />
 
             <ResearcherProfileEducation researcher={enrichedResearcher} />
             <ResearcherProfileGroups researcher={enrichedResearcher} />
             <ResearcherProfileInitiatives researcher={enrichedResearcher} />
             <ResearcherProfileAdvisorships
-                asSupervisor={asSupervisor}
-                asStudent={asStudent}
+                advisorships={researcher.advisorships || []}
             />
 
             <ResearcherProfileArticles researcher={enrichedResearcher} />
