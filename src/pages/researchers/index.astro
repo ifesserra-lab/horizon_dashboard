@@ -1,9 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import researchersData from "../../data/canonical/researchers_canonical.json";
-import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
 import type { Researcher } from "../../types/researchers";
-import type { ProjectAdvisorship } from "../../types/advisorships";
 import ResearcherFilters from "../../components/researchers/ResearcherFilters.astro";
 import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
 import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
@@ -15,27 +13,32 @@ const researchers = (researchersData as Researcher[]).sort((a, b) =>
 );
 
 // Calculate counts for each researcher
-const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 const researcherStats = researchers.reduce(
     (acc, researcher) => {
         const initiativesCount = researcher.initiatives.length;
         const articlesCount = researcher.articles.length;
-        const advisorships = allProjects
-            .flatMap((p) => p.advisorships || [])
-            .filter(
-                (a) =>
-                    a.supervisor_id === researcher.id ||
-                    a.student_id === researcher.id,
-            );
+
+        // Use local advisorships from the researcher object
+        const advisorships = researcher.advisorships || [];
+
+        // Separate by type
+        const advisorshipsByType = advisorships.reduce(
+            (types, adv) => {
+                const t = adv.type || "Other";
+                types[t] = (types[t] || 0) + 1;
+                return types;
+            },
+            {} as Record<string, number>,
+        );
 
         acc[researcher.id] = {
             projects: initiativesCount,
             articles: articlesCount,
             advisorships: advisorships.length,
-            isSupervisor: advisorships.some(
-                (a) => a.supervisor_id === researcher.id,
-            ),
-            isStudent: advisorships.some((a) => a.student_id === researcher.id),
+            advisorshipsByType,
+            // Assuming the list contains supervisions
+            isSupervisor: advisorships.length > 0,
+            isStudent: false, // Cannot distinguish with current data structure
         };
         return acc;
     },
@@ -45,6 +48,7 @@ const researcherStats = researchers.reduce(
             projects: number;
             articles: number;
             advisorships: number;
+            advisorshipsByType: Record<string, number>;
             isSupervisor: boolean;
             isStudent: boolean;
         }

@@ -55,4 +55,16 @@ export interface Researcher {
     knowledge_areas: ResearcherKnowledgeArea[];
     academic_education: AcademicEducation[];
     articles: Article[];
+    advisorships: ResearcherAdvisorship[];
+}
+
+export interface ResearcherAdvisorship {
+    id: string;
+    name: string;
+    status: string;
+    start_year: string;
+    end_year: string;
+    type: string;
+    initiative_type: string;
+    student_name: string;
 }

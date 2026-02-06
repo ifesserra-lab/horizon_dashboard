@@ -7,6 +7,7 @@ interface Props {
         projects: number;
         articles: number;
         advisorships: number;
+        advisorshipsByType: Record<string, number>;
         isSupervisor: boolean;
         isStudent: boolean;
     };
@@ -132,7 +133,12 @@ const highestDegree = getHighestDegree(researcher.academic_education);
             </span>
         </div>
         <div class="w-px h-6 bg-border-main"></div>
-        <div class="flex flex-col items-center">
+        <div
+            class="flex flex-col items-center cursor-help"
+            title={Object.entries(stats.advisorshipsByType || {})
+                .map(([type, count]) => `${type}: ${count}`)
+                .join("\n")}
+        >
             <span class="text-xs font-bold text-text-main">
                 {stats.advisorships}
             </span>
