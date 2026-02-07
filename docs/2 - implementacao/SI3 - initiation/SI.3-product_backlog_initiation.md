@@ -192,6 +192,8 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-015** | Separação de Membros | **Done** | v1.0.10 | [#35](https://github.com/ifesserra-lab/horizon_dashboard/issues/35) |
 | **US-030** | Painel de Acessibilidade Completo | **Done** | v1.3.0 | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 | **US-036** | Catálogo e Dashboard de Orientações | **Done** | v1.3.2 | [#51](https://github.com/ifesserra-lab/horizon_dashboard/pull/51) |
+| **US-042** | Segmentação de Gráfico de Orientações por Tipo | **Done** | v2.1.0 | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75) |
+| US-043 | Busca e Scroll nos Projetos | Média | Facilitar navegação em listas longas de projetos | OK | [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
 ### US-006 – Dashboard de Áreas de Conhecimento
 **GitHub Issue**: [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21)
 
@@ -447,6 +449,29 @@ Exibir um gráfico de barras na seção de Orientações do pesquisador mostrand
     - [ ] Preencher anos vazios para continuidade.
 - **UI/UX**:
     - [ ] Componente visual consistente com o gráfico de publicações.
+
+### US-042 – Segmentação de Gráfico de Orientações por Tipo
+**GitHub Issue**: [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75)
+
+```yaml
+id: US-042
+milestone: R2
+prioridade: Alta
+tamanho: 3
+origem: [RF-46]
+tags: [type:feature, area:frontend, component:chart]
+```
+
+#### Descrição
+Separar o gráfico de orientações por tipo (Mestrado, Iniciação Científica, etc.) no detalhe do pesquisador, permitindo visualizar a distribuição anual.
+
+#### Critérios de Aceitação
+- **Funcional**:
+    - [x] Implementar gráfico de barras empilhadas (stacked) por ano e tipo.
+    - [x] Agrupar tipos "None" como "Outros".
+- **UI/UX**:
+    - [x] Adicionar legenda de cores por tipo.
+    - [x] Tooltip detalhado por segmento.
 
 
 ### US-040 – KPIs do Pesquisador (Totalizadores)

@@ -2,6 +2,7 @@
 import type { Researcher } from "../../types/researchers";
 import BarChart from "../shared/BarChart.astro";
 import ArticleYearChart from "./ArticleYearChart.astro";
+import AdvisorshipTypeChart from "./AdvisorshipTypeChart.astro";
 
 interface Props {
     researcher: Researcher;
@@ -37,24 +38,6 @@ if (researcher.initiatives) {
     });
 }
 const projectData = Array.from(projectYearMap.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([year, count]) => ({ label: year.toString(), value: count }));
-
-// Advisorships Data Aggregation
-const advisorshipYearMap = new Map<number, number>();
-if (advisorships) {
-    advisorships.forEach((a) => {
-        // Use start_year directly as it's already a year string in the new data
-        const year = parseInt(a.start_year);
-        if (!isNaN(year) && year > 1900 && year < 2100) {
-            advisorshipYearMap.set(
-                year,
-                (advisorshipYearMap.get(year) || 0) + 1,
-            );
-        }
-    });
-}
-const advisorshipData = Array.from(advisorshipYearMap.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([year, count]) => ({ label: year.toString(), value: count }));
 ---
@@ -121,13 +104,9 @@ const advisorshipData = Array.from(advisorshipYearMap.entries())
 
     <!-- Tab Content: Advisorships -->
     <div id="tab-advisorships" class="tab-content hidden space-y-6">
-        <div class="glass-card p-6 border border-border-main rounded-3xl">
-            <BarChart
-                data={advisorshipData}
-                color="purple-500"
-                height="h-80"
-                title="Orientações por Ano"
-                valueLabel="Orientações"
+        <div class="h-96 w-full">
+            <AdvisorshipTypeChart
+                advisorships={advisorships}
                 showTitle={false}
             />
         </div>

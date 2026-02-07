@@ -1,0 +1,187 @@
+---
+import type { ResearcherAdvisorship } from "../../types/researchers";
+
+interface Props {
+    advisorships: ResearcherAdvisorship[];
+    title?: string;
+    showTitle?: boolean;
+}
+
+const {
+    advisorships,
+    title = "Orientações por Ano e Tipo",
+    showTitle = true,
+} = Astro.props;
+
+// Aggregate advisorships by year and type
+const dataMap = new Map<number, Record<string, number>>();
+const types = new Set<string>();
+
+advisorships.forEach((a) => {
+    const year = parseInt(a.start_year, 10);
+    if (!isNaN(year) && year > 1900 && year < 2100) {
+        if (!dataMap.has(year)) {
+            dataMap.set(year, {});
+        }
+        const type = a.type && a.type !== "None" ? a.type : "Outros";
+        types.add(type);
+        const yearData = dataMap.get(year)!;
+        yearData[type] = (yearData[type] || 0) + 1;
+    }
+});
+
+const sortedYears = Array.from(dataMap.keys()).sort((a, b) => a - b);
+const sortedTypes = Array.from(types).sort();
+
+// Fill gaps
+let continuousData = [];
+if (sortedYears.length > 0) {
+    const minYear = sortedYears[0];
+    const maxYear = sortedYears[sortedYears.length - 1];
+    const start = minYear;
+    const end = minYear === maxYear ? maxYear + 1 : maxYear;
+
+    for (let y = start; y <= end; y++) {
+        continuousData.push({
+            year: y,
+            values: dataMap.get(y) || {},
+            total: Object.values(dataMap.get(y) || {}).reduce(
+                (a, b) => a + b,
+                0,
+            ),
+        });
+    }
+}
+
+const maxTotal = Math.max(...continuousData.map((d) => d.total), 1);
+
+// Color palette for types
+const colorPalette = [
+    { bg: "bg-premium-accent", text: "text-premium-accent" },
+    { bg: "bg-premium-purple", text: "text-premium-purple" },
+    { bg: "bg-blue-500", text: "text-blue-500" },
+    { bg: "bg-emerald-500", text: "text-emerald-500" },
+    { bg: "bg-orange-500", text: "text-orange-500" },
+    { bg: "bg-rose-500", text: "text-rose-500" },
+    { bg: "bg-slate-400", text: "text-slate-400" },
+];
+
+const typeColors = sortedTypes.reduce(
+    (acc, type, i) => {
+        acc[type] = colorPalette[i % colorPalette.length];
+        return acc;
+    },
+    {} as Record<string, { bg: string; text: string }>,
+);
+---
+
+<div
+    class="glass-card border border-border-main rounded-3xl p-6 h-full flex flex-col"
+>
+    {
+        showTitle && (
+            <h4 class="text-sm font-bold text-text-main uppercase tracking-wider mb-6 flex items-center gap-2">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-premium-purple"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                {title}
+            </h4>
+        )
+    }
+
+    {
+        continuousData.length > 0 ? (
+            <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex items-end gap-1 min-h-[200px] mb-6 mt-8 group/chart">
+                    {continuousData.map((data) => (
+                        <div class="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
+                            {/* Bar Label Total */}
+                            <span class="absolute -top-6 text-[10px] font-bold text-text-secondary transition-opacity pointer-events-none whitespace-nowrap z-20 mt-1">
+                                {data.total}
+                            </span>
+
+                            {/* Stacked Bar Parts */}
+                            <div class="w-full flex flex-col-reverse items-center justify-start h-full max-h-full">
+                                {sortedTypes.map((type) => {
+                                    const count = data.values[type] || 0;
+                                    if (count === 0) return null;
+                                    const height = (count / maxTotal) * 100;
+                                    return (
+                                        <div
+                                            class={`w-full ${typeColors[type].bg} opacity-90 hover:opacity-100 transition-all cursor-help relative group/segment flex items-center justify-center`}
+                                            style={`height: ${height}%`}
+                                        >
+                                            {height > 10 && (
+                                                <span class="text-[8px] font-bold text-white/90 pointer-events-none drop-shadow-sm">
+                                                    {count}
+                                                </span>
+                                            )}
+                                            {/* Tooltip for segment */}
+                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none shadow-xl border border-white/10">
+                                                {data.year} - {type}: {count}
+                                                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45" />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Legend - Years */}
+                <div class="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-tight border-t border-border-main pt-2 mb-6">
+                    {(() => {
+                        const years = continuousData.map((d) => d.year);
+                        const first = years[0];
+                        const last = years[years.length - 1];
+                        const count = years.length;
+                        const checkpoints = [first];
+                        if (count > 5) {
+                            const step = Math.floor(count / 4);
+                            for (let i = 1; i < 4; i++) {
+                                const idx = i * step;
+                                if (idx < count - 1)
+                                    checkpoints.push(years[idx]);
+                            }
+                        }
+                        checkpoints.push(last);
+                        const uniquePoints = [...new Set(checkpoints)].sort(
+                            (a, b) => a - b,
+                        );
+                        return uniquePoints.map((year) => <span>{year}</span>);
+                    })()}
+                </div>
+
+                {/* Type Legend */}
+                <div class="flex flex-wrap gap-4 pt-4 border-t border-border-main/50">
+                    {sortedTypes.map((type) => (
+                        <div class="flex items-center gap-2">
+                            <div
+                                class={`w-2.5 h-2.5 rounded-full ${typeColors[type].bg}`}
+                            />
+                            <span class="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                                {type}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ) : (
+            <div class="flex-1 flex items-center justify-center text-text-secondary italic text-sm">
+                Nenhuma orientação registrada para gerar o gráfico.
+            </div>
+        )
+    }
+</div>

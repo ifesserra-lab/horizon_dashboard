@@ -9,154 +9,295 @@ interface Props {
 const { researcher } = Astro.props;
 ---
 
-<section aria-labelledby="projects-title" class="space-y-6">
-    <h3
-        id="projects-title"
-        class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+<section aria-labelledby="projects-title" class="space-y-6 pb-20">
+    <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-border-main"
     >
-        Projetos e Iniciativas
-    </h3>
+        <h3
+            id="projects-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Projetos e Iniciativas ({researcher.initiatives.length})
+        </h3>
+        <div class="relative w-full md:w-80">
+            <input
+                type="text"
+                id="projectSearch"
+                placeholder="Buscar projetos..."
+                class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
+            />
+            <svg
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
+                ></path>
+            </svg>
+        </div>
+    </div>
 
-    {
-        (() => {
-            // Helper Sort Function
-            const sortProjects = (projects: ResearcherInitiative[]) => {
-                return projects.sort((a, b) => {
-                    // 1. Status: Active comes first
-                    const aActive = a.status.toLowerCase() === "active";
-                    const bActive = b.status.toLowerCase() === "active";
-                    if (aActive && !bActive) return -1;
-                    if (!aActive && bActive) return 1;
+    <div id="projectsContent" class="space-y-10">
+        {/* Dynamic content will be injected here */}
+    </div>
 
-                    // 2. Date: Newest first
-                    const aDate = a.start_date
-                        ? new Date(a.start_date).getTime()
-                        : 0;
-                    const bDate = b.start_date
-                        ? new Date(b.start_date).getTime()
-                        : 0;
-                    return bDate - aDate;
-                });
-            };
-
-            const researchProjects = sortProjects(
-                researcher.initiatives.filter(
-                    (i) => i.initiative_type?.name === "Research Project",
-                ),
-            );
-            const extensionProjects = sortProjects(
-                researcher.initiatives.filter(
-                    (i) => i.initiative_type?.name === "Extension Project",
-                ),
-            );
-            const developmentProjects = sortProjects(
-                researcher.initiatives.filter(
-                    (i) => i.initiative_type?.name === "Development Project",
-                ),
-            );
-
-            const hasProjects =
-                researchProjects.length > 0 ||
-                extensionProjects.length > 0 ||
-                developmentProjects.length > 0;
-
-            if (!hasProjects) {
-                return (
-                    <p class="text-text-secondary italic">
-                        Nenhum projeto registrado.
-                    </p>
-                );
-            }
-
-            return (
-                <div class="space-y-10">
-                    {/* Research Projects */}
-                    {researchProjects.length > 0 && (
-                        <div class="space-y-4">
-                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="w-4 h-4 text-emerald-500"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                Pesquisa
-                            </h4>
-                            <div class="grid grid-cols-1 gap-4">
-                                {researchProjects.map((initiative) => (
-                                    <ProjectCard initiative={initiative} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Extension Projects */}
-                    {extensionProjects.length > 0 && (
-                        <div class="space-y-4">
-                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="w-4 h-4 text-purple-500"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                </svg>
-                                Extensão
-                            </h4>
-                            <div class="grid grid-cols-1 gap-4">
-                                {extensionProjects.map((initiative) => (
-                                    <ProjectCard initiative={initiative} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Development Projects */}
-                    {developmentProjects.length > 0 && (
-                        <div class="space-y-4">
-                            <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="w-4 h-4 text-blue-500"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <polyline points="16 18 22 12 16 6" />
-                                    <polyline points="8 6 2 12 8 18" />
-                                </svg>
-                                Desenvolvimento
-                            </h4>
-                            <div class="grid grid-cols-1 gap-4">
-                                {developmentProjects.map((initiative) => (
-                                    <ProjectCard initiative={initiative} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        })()
-    }
+    {/* Infinite Scroll Indicators */}
+    <div
+        id="projLoadMoreSentinel"
+        class="h-10 w-full flex items-center justify-center"
+    >
+        <div
+            id="projLoadingSpinner"
+            class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+        >
+        </div>
+    </div>
+    <div
+        id="projAllLoadedMessage"
+        class="hidden text-center text-text-secondary text-sm py-4 italic"
+    >
+        Todos os projetos foram carregados.
+    </div>
+    <div id="noProjectsFound" class="hidden text-center py-12">
+        <p class="text-text-secondary italic">
+            Nenhum projeto encontrado para esta busca.
+        </p>
+    </div>
 </section>
+
+<script define:vars={{ researcher, baseUrl: import.meta.env.BASE_URL }}>
+    // Provide data to client-side
+    window.researcherInitiatives = researcher.initiatives || [];
+    window.baseUrl = baseUrl;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const contentContainer = document.getElementById("projectsContent");
+        const searchInput = document.getElementById(
+            "projectSearch",
+        ) as HTMLInputElement;
+        const spinner = document.getElementById("projLoadingSpinner");
+        const sentinel = document.getElementById("projLoadMoreSentinel");
+        const allLoadedMsg = document.getElementById("projAllLoadedMessage");
+        const noResultsMsg = document.getElementById("noProjectsFound");
+
+        let allInitiatives = (window as any).researcherInitiatives || [];
+
+        // Initial Sort: Active first, then by date desc
+        function sortInitiatives(items: any[]) {
+            return items.sort((a, b) => {
+                const aActive = a.status.toLowerCase() === "active";
+                const bActive = b.status.toLowerCase() === "active";
+                if (aActive && !bActive) return -1;
+                if (!aActive && bActive) return 1;
+
+                const aDate = a.start_date
+                    ? new Date(a.start_date).getTime()
+                    : 0;
+                const bDate = b.start_date
+                    ? new Date(b.start_date).getTime()
+                    : 0;
+                return bDate - aDate;
+            });
+        }
+
+        let filteredInitiatives = sortInitiatives([...allInitiatives]);
+        let displayedCount = 0;
+        const BATCH_SIZE = 20;
+        let observer: IntersectionObserver | null = null;
+
+        function createCard(init: any) {
+            const statusClass =
+                init.status.toLowerCase() === "active"
+                    ? "bg-emerald-500/10 text-emerald-600"
+                    : "bg-slate-500/10 text-slate-600";
+
+            const startDate = init.start_date
+                ? new Date(init.start_date).toLocaleDateString("pt-BR")
+                : "N/A";
+            const endDate = init.end_date
+                ? new Date(init.end_date).toLocaleDateString("pt-BR")
+                : "Atual";
+
+            const card = document.createElement("div");
+            card.className =
+                "glass-card p-6 border border-border-main hover:border-premium-purple/30 transition-all space-y-4";
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-md ${statusClass} text-[10px] font-bold uppercase tracking-wider">
+                        ${init.status}
+                    </span>
+                    <span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest bg-glass-accent/5 px-2 py-0.5 rounded-md">
+                        ${init.role || "RESEARCHER"}
+                    </span>
+                </div>
+                
+                <h4 class="text-xl font-bold text-text-main leading-tight group-hover:text-premium-purple transition-colors">
+                    ${init.name}
+                </h4>
+
+                <div class="flex items-center gap-4 text-xs text-text-secondary">
+                    <div class="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        ${startDate} - ${endDate}
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end items-center border-t border-border-main/50">
+                    <a href="${(window as any).baseUrl}projects/${init.id}" class="inline-flex items-center gap-2 px-4 py-2 bg-glass-accent/5 hover:bg-premium-purple/10 text-text-main font-bold text-xs rounded-xl transition-all border border-border-main/50 group/btn">
+                        Ver Projeto
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+            `;
+            return card;
+        }
+
+        function createCategoryHeader(
+            title: string,
+            colorClass: string,
+            iconPaths: string,
+        ) {
+            const header = document.createElement("div");
+            header.className = "space-y-4";
+            header.innerHTML = `
+                <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        ${iconPaths}
+                    </svg>
+                    ${title}
+                </h4>
+                <div class="grid grid-cols-1 gap-4 list-container"></div>
+            `;
+            return header;
+        }
+
+        const categories = [
+            {
+                id: "research",
+                name: "Pesquisa",
+                color: "text-emerald-500",
+                icon: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+                filter: (i: any) =>
+                    i.initiative_type?.name === "Research Project",
+            },
+            {
+                id: "extension",
+                name: "Extensão",
+                color: "text-purple-500",
+                icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+                filter: (i: any) =>
+                    i.initiative_type?.name === "Extension Project",
+            },
+            {
+                id: "dev",
+                name: "Desenvolvimento",
+                color: "text-blue-500",
+                icon: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+                filter: (i: any) =>
+                    i.initiative_type?.name === "Development Project",
+            },
+        ];
+
+        function loadMore() {
+            const nextBatch = filteredInitiatives.slice(
+                displayedCount,
+                displayedCount + BATCH_SIZE,
+            );
+            if (nextBatch.length === 0) return;
+
+            // Group the batch into categories
+            categories.forEach((cat) => {
+                const catBatch = nextBatch.filter(cat.filter);
+                if (catBatch.length > 0) {
+                    let catSection = contentContainer?.querySelector(
+                        `[data-category="${cat.id}"]`,
+                    );
+                    if (!catSection) {
+                        catSection = createCategoryHeader(
+                            cat.name,
+                            cat.color,
+                            cat.icon,
+                        );
+                        catSection.setAttribute("data-category", cat.id);
+                        contentContainer?.appendChild(catSection);
+                    }
+                    const list = catSection.querySelector(".list-container");
+                    catBatch.forEach((init) => {
+                        list?.appendChild(createCard(init));
+                    });
+                }
+            });
+
+            displayedCount += nextBatch.length;
+
+            if (
+                displayedCount >= filteredInitiatives.length &&
+                filteredInitiatives.length > 0
+            ) {
+                allLoadedMsg?.classList.remove("hidden");
+                if (observer) observer.disconnect();
+            } else {
+                allLoadedMsg?.classList.add("hidden");
+            }
+        }
+
+        function setupInfiniteScroll() {
+            if (observer) observer.disconnect();
+            observer = new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries[0].isIntersecting &&
+                        displayedCount < filteredInitiatives.length
+                    ) {
+                        spinner?.classList.remove("hidden");
+                        setTimeout(() => {
+                            loadMore();
+                            spinner?.classList.add("hidden");
+                        }, 400);
+                    }
+                },
+                { threshold: 0.1 },
+            );
+            if (sentinel) observer.observe(sentinel);
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            filteredInitiatives = sortInitiatives(
+                allInitiatives.filter(
+                    (i: any) =>
+                        i.name.toLowerCase().includes(query) ||
+                        (i.status && i.status.toLowerCase().includes(query)) ||
+                        (i.initiative_type?.name &&
+                            i.initiative_type.name
+                                .toLowerCase()
+                                .includes(query)),
+                ),
+            );
+
+            displayedCount = 0;
+            if (contentContainer) contentContainer.innerHTML = "";
+            if (filteredInitiatives.length === 0) {
+                noResultsMsg?.classList.remove("hidden");
+                allLoadedMsg?.classList.add("hidden");
+            } else {
+                noResultsMsg?.classList.add("hidden");
+                loadMore();
+                setupInfiniteScroll();
+            }
+        }
+
+        searchInput?.addEventListener("input", handleSearch);
+
+        // Initial Load
+        loadMore();
+        setupInfiniteScroll();
+    });
+</script>
 
 {/* Extracted Card Component for reuse within this file contexts */}
 {
