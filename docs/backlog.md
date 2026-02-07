@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v2.1.0** | 2026-02-06 | **Released** | Feature: Advisorship Chart Segmentation by Type, Project Search/Scroll | TBD | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75), [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
 | **v2.0.1** | 2026-02-04 | **Released** | Refinement: Project Categorization & UI Fixes (Dates, Tooltip) | [#73](https://github.com/ifesserra-lab/horizon_dashboard/pull/73) | [#71](https://github.com/ifesserra-lab/horizon_dashboard/issues/71) |
 | **v2.0.0** | 2026-02-04 | **Released** | Feature: Articles Integration (Modal, Detail, Charts, Search) | TBD | [#US-040](https://github.com/ifesserra-lab/horizon_dashboard/issues/40), [#US-041](https://github.com/ifesserra-lab/horizon_dashboard/issues/41) |
 | **v1.9.0** | 2026-01-28 | **Released** | Feature: Home Page Fellowship Charts | [#49](https://github.com/ifesserra-lab/horizon_dashboard/pull/49) | [#22](https://github.com/ifesserra-lab/horizon_dashboard/issues/22) |
@@ -85,10 +86,9 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-003** Perfil do Pesquisador (Lattes UI) (Done na v1.5.0)
     - [x] **US-040** Artigos Científicos (Modal + Detalhe + Scroll Infinito) (Done na v2.0.0)
     - [x] **US-041** Gráfico de Evolução de Publicações (Done na v2.0.0)
+    - [x] **US-042** Segmentação de Gráfico de Orientações por Tipo ([#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75)) (Done na v2.1.0)
+    - [x] **US-043** Busca e Scroll nos Projetos ([#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77)) (Done na v2.1.0)
     - [ ] **Task** Design do Componente de Timeline
 
 - **Epic 3: Transparência (Release 3)** _(Planejado)_
-    - [ ] **US-004** Dashboard de Fomento (Charts)
-
-
 

@@ -75,6 +75,9 @@ O **Horizon Dashboard** é uma interface de visualização que automatiza a apre
 | **RF-43** | O sistema deve exibir um gráfico de barras com a quantidade de "Projetos por Ano" no perfil do pesquisador. | Visualização temporal de iniciativas ativas/concluídas. | User Req. |
 | **RF-44** | O sistema deve exibir um gráfico de barras com a quantidade de "Orientações por Ano" no perfil do pesquisador. | Visualização temporal de orientações em andamento/concluídas. | User Req. |
 | **RF-45** | O sistema deve exibir KPIs (Cards) sumarizando o total de Artigos, Orientações e Projetos no perfil do pesquisador. | 3 Cards com ícones e valores numéricos (Badges). | User Req. |
+| **RF-46** | O sistema deve permitir a visualização segmentada de "Orientações por Ano" por Tipo de Orientação no perfil do pesquisador. | Gráfico de barras segmentado mostrando a distribuição de tipos por ano. | User Req. |
+| **RF-47** | O sistema deve exibir os valores numéricos (totais e/ou parciais) nas barras do gráfico de orientações. | Rótulos de dados visíveis no gráfico de barras. | User Req. |
+| **RF-48** | O sistema deve permitir a busca e o carregamento via scroll infinito para a lista de "Projetos e Iniciativas" no perfil do pesquisador. | Listagem dinâmica com busca por termo e carregamento sob demanda. | User Req. |
 
 
 ---
