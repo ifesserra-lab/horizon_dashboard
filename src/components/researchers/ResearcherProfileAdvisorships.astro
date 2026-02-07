@@ -1,137 +1,225 @@
 ---
+import type { ResearcherAdvisorship } from "../../types/researchers";
+
 interface Props {
-    asSupervisor: any[];
-    asStudent: any[];
+    advisorships: ResearcherAdvisorship[];
 }
 
-const { asSupervisor, asStudent } = Astro.props;
+const { advisorships } = Astro.props;
 ---
 
-<section aria-labelledby="advisorships-title" class="space-y-8 pb-10">
-    <h3
-        id="advisorships-title"
-        class="text-2xl font-bold font-['Outfit'] text-text-main py-4 border-b border-border-main"
+<section aria-labelledby="advisorships-title" class="space-y-6 pb-20">
+    <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-border-main"
     >
-        Orientações
-    </h3>
+        <h3
+            id="advisorships-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Orientações ({advisorships.length})
+        </h3>
+        <div class="relative w-full md:w-80">
+            <input
+                type="text"
+                id="advisorshipSearch"
+                placeholder="Buscar orientações..."
+                class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
+            />
+            <svg
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
+                ></path>
+            </svg>
+        </div>
+    </div>
 
-    {
-        asSupervisor.length > 0 || asStudent.length > 0 ? (
-            <div class="space-y-10">
-                {asSupervisor.length > 0 && (
-                    <div class="space-y-4">
-                        <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                <circle cx="9" cy="7" r="4" />
-                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                            </svg>
-                            Como Orientador
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {asSupervisor.map((adv) => (
-                                <div class="glass-card p-5 border-l-4 border-l-premium-accent group hover:bg-premium-accent/[0.02] transition-all">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span class="text-[10px] font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded">
-                                            {adv.fellowship?.name ||
-                                                "Sem Bolsa"}
-                                        </span>
-                                        <span class="text-[10px] font-medium text-text-secondary">
-                                            {adv.start_date
-                                                ? new Date(
-                                                      adv.start_date,
-                                                  ).getFullYear()
-                                                : "N/A"}
-                                        </span>
-                                    </div>
-                                    <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-accent transition-colors">
-                                        {adv.name}
-                                    </h5>
-                                    <div class="flex flex-col gap-1">
-                                        <p class="text-xs text-text-secondary">
-                                            <span class="font-bold text-text-main">
-                                                Estudante:
-                                            </span>{" "}
-                                            {adv.student_name}
-                                        </p>
-                                        <p class="text-xs text-text-secondary italic">
-                                            {adv.projectName}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+    <div id="advisorshipsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Advisorships will be injected here by client-side script */}
+    </div>
 
-                {asStudent.length > 0 && (
-                    <div class="space-y-4">
-                        <h4 class="text-sm font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                            </svg>
-                            Como Orientando
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {asStudent.map((adv) => (
-                                <div class="glass-card p-5 border-l-4 border-l-premium-purple group hover:bg-premium-purple/[0.02] transition-all">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span class="text-[10px] font-bold text-premium-purple uppercase tracking-wider bg-premium-purple/10 px-2 py-0.5 rounded">
-                                            {adv.fellowship?.name ||
-                                                "Sem Bolsa"}
-                                        </span>
-                                        <span class="text-[10px] font-medium text-text-secondary">
-                                            {adv.start_date
-                                                ? new Date(
-                                                      adv.start_date,
-                                                  ).getFullYear()
-                                                : "N/A"}
-                                        </span>
-                                    </div>
-                                    <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-purple transition-colors">
-                                        {adv.name}
-                                    </h5>
-                                    <div class="flex flex-col gap-1">
-                                        <p class="text-xs text-text-secondary">
-                                            <span class="font-bold text-text-main">
-                                                Orientador:
-                                            </span>{" "}
-                                            {adv.supervisor_name}
-                                        </p>
-                                        <p class="text-xs text-text-secondary italic">
-                                            {adv.projectName}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        ) : (
-            <p class="text-text-secondary italic">
-                Nenhuma orientação registrada.
-            </p>
-        )
-    }
+    {/* Infinite Scroll Indicators */}
+    <div
+        id="advLoadMoreSentinel"
+        class="h-10 w-full flex items-center justify-center"
+    >
+        <div
+            id="advLoadingSpinner"
+            class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+        >
+        </div>
+    </div>
+    <div
+        id="advAllLoadedMessage"
+        class="hidden text-center text-text-secondary text-sm py-4 italic"
+    >
+        Todas as orientações foram carregadas.
+    </div>
+    <div id="noAdvisorshipsFound" class="hidden text-center py-12">
+        <p class="text-text-secondary italic">
+            Nenhuma orientação encontrada para esta busca.
+        </p>
+    </div>
 </section>
+
+<script define:vars={{ advisorships }}>
+    // Provide data to client-side
+    window.researcherAdvisorships = advisorships || [];
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const listContainer = document.getElementById("advisorshipsList");
+        const searchInput = document.getElementById(
+            "advisorshipSearch",
+        ) as HTMLInputElement;
+        const spinner = document.getElementById("advLoadingSpinner");
+        const sentinel = document.getElementById("advLoadMoreSentinel");
+        const allLoadedMsg = document.getElementById("advAllLoadedMessage");
+        const noResultsMsg = document.getElementById("noAdvisorshipsFound");
+
+        let allItems = (window as any).researcherAdvisorships || [];
+        // Sort by year desc
+        allItems.sort((a: any, b: any) => {
+            const yearA = parseInt(a.end_year) || parseInt(a.start_year) || 0;
+            const yearB = parseInt(b.end_year) || parseInt(b.start_year) || 0;
+            return yearB - yearA;
+        });
+
+        let filteredItems = [...allItems];
+        let displayedCount = 0;
+        const BATCH_SIZE = 20;
+        let observer: IntersectionObserver | null = null;
+
+        function updateUI() {
+            if (
+                filteredItems.length === 0 &&
+                (searchInput.value.trim() !== "" || allItems.length === 0)
+            ) {
+                noResultsMsg?.classList.remove("hidden");
+                allLoadedMsg?.classList.add("hidden");
+            } else {
+                noResultsMsg?.classList.add("hidden");
+            }
+        }
+
+        function createCard(adv: any) {
+            const card = document.createElement("div");
+            card.className =
+                "glass-card p-5 border-l-4 border-l-premium-accent group hover:bg-premium-accent/[0.02] transition-all";
+
+            const statusClass =
+                adv.status && adv.status === "Concluded"
+                    ? "bg-emerald-500/10 text-emerald-600"
+                    : "bg-blue-500/10 text-blue-600";
+
+            const statusText =
+                adv.status === "Concluded" ? "Concluído" : "Em Andamento";
+            const type = adv.type || "Orientação";
+            const startYear = adv.start_year || "N/A";
+            const endYear = adv.end_year === "None" ? "Atual" : adv.end_year;
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-[10px] font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded">
+                        ${type}
+                    </span>
+                    <span class="text-[10px] font-medium text-text-secondary">
+                        ${startYear} - ${endYear}
+                    </span>
+                </div>
+                <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-accent transition-colors">
+                    ${adv.name}
+                </h5>
+                <div class="flex flex-col gap-1">
+                    <p class="text-xs text-text-secondary">
+                        <span class="font-bold text-text-main">
+                            Estudante:
+                        </span>
+                        ${adv.student_name}
+                    </p>
+                    <div class="flex items-center gap-2 mt-1">
+                         <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${statusClass}">
+                            ${statusText}
+                         </span>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function loadMore() {
+            const nextBatch = filteredItems.slice(
+                displayedCount,
+                displayedCount + BATCH_SIZE,
+            );
+
+            nextBatch.forEach((item) => {
+                const card = createCard(item);
+                listContainer?.appendChild(card);
+            });
+
+            displayedCount += nextBatch.length;
+
+            if (
+                displayedCount >= filteredItems.length &&
+                filteredItems.length > 0
+            ) {
+                allLoadedMsg?.classList.remove("hidden");
+                if (observer) observer.disconnect();
+            } else {
+                allLoadedMsg?.classList.add("hidden");
+            }
+        }
+
+        function setupInfiniteScroll() {
+            if (observer) observer.disconnect();
+
+            observer = new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries[0].isIntersecting &&
+                        displayedCount < filteredItems.length
+                    ) {
+                        spinner?.classList.remove("hidden");
+                        setTimeout(() => {
+                            loadMore();
+                            spinner?.classList.add("hidden");
+                        }, 400); // Small delay for UX
+                    }
+                },
+                { threshold: 0.1 },
+            );
+
+            if (sentinel) observer.observe(sentinel);
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            filteredItems = allItems.filter(
+                (a: any) =>
+                    (a.name && a.name.toLowerCase().includes(query)) ||
+                    (a.student_name &&
+                        a.student_name.toLowerCase().includes(query)) ||
+                    (a.type && a.type.toLowerCase().includes(query)),
+            );
+
+            displayedCount = 0;
+            if (listContainer) listContainer.innerHTML = "";
+            updateUI();
+            loadMore();
+            setupInfiniteScroll();
+        }
+
+        searchInput?.addEventListener("input", handleSearch);
+
+        // Initial Load
+        updateUI();
+        loadMore();
+        setupInfiniteScroll();
+    });
+</script>

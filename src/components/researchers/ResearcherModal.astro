@@ -39,6 +39,12 @@
                     >
                         Artigos
                     </button>
+                    <button
+                        class="modal-tab-btn text-sm font-bold border-b-2 border-transparent pb-1 text-text-secondary hover:text-text-main transition-all"
+                        data-tab="advisorships"
+                    >
+                        Orientações
+                    </button>
                 </div>
             </div>
             <button
@@ -148,6 +154,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tab Content: Advisorships -->
+        <div
+            class="flex-1 hidden flex-col overflow-hidden p-6"
+            id="advisorshipsTabContent"
+        >
+            <div
+                class="overflow-y-auto space-y-4 h-full pr-2"
+                id="advisorshipsList"
+            >
+                <!-- Javascript will populate this -->
+            </div>
+            <div id="noAdvisorshipsFound" class="hidden text-center py-12">
+                <p class="text-text-secondary">
+                    Nenhuma orientação encontrada.
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -158,6 +182,7 @@
     const overlay = document.getElementById("modalOverlay");
     const closeBtn = document.getElementById("closeModal");
     const articlesList = document.getElementById("articlesList");
+    const advisorshipsList = document.getElementById("advisorshipsList");
     const articleSearch = document.getElementById(
         "articleSearch",
     ) as HTMLInputElement;
@@ -165,6 +190,7 @@
     const sentinel = document.getElementById("loadMoreSentinel");
     const allLoadedMsg = document.getElementById("allLoadedMessage");
     const noArticlesMsg = document.getElementById("noArticlesFound");
+    const noAdvisorshipsMsg = document.getElementById("noAdvisorshipsFound");
 
     let currentResearcherId: string | null = null; // Changed to string for consistency
     let filteredArticles: any[] = [];
@@ -193,6 +219,9 @@
         // Render Chart
         renderModalChart(researcher.articles || []);
 
+        // Render Advisorships
+        renderAdvisorships(researcher.advisorships || []);
+
         // Reset tabs
         switchTab("about");
 
@@ -220,6 +249,9 @@
     function switchTab(tab: string) {
         const aboutContent = document.getElementById("aboutTabContent");
         const articlesContent = document.getElementById("articlesTabContent");
+        const advisorshipsContent = document.getElementById(
+            "advisorshipsTabContent",
+        );
         const tabBtns = document.querySelectorAll(".modal-tab-btn");
 
         tabBtns.forEach((btn) => {
@@ -247,17 +279,94 @@
             }
         });
 
+        // Hide all first
+        aboutContent?.classList.add("hidden");
+        aboutContent?.classList.remove("flex");
+        articlesContent?.classList.add("hidden");
+        articlesContent?.classList.remove("flex");
+        advisorshipsContent?.classList.add("hidden");
+        advisorshipsContent?.classList.remove("flex");
+
+        // Show active
         if (tab === "about") {
             aboutContent?.classList.remove("hidden");
             aboutContent?.classList.add("flex");
-            articlesContent?.classList.add("hidden");
-            articlesContent?.classList.remove("flex");
-        } else {
-            aboutContent?.classList.add("hidden");
-            aboutContent?.classList.remove("flex");
+        } else if (tab === "articles") {
             articlesContent?.classList.remove("hidden");
             articlesContent?.classList.add("flex");
+        } else if (tab === "advisorships") {
+            advisorshipsContent?.classList.remove("hidden");
+            advisorshipsContent?.classList.add("flex");
         }
+    }
+
+    function renderAdvisorships(advisorships: any[]) {
+        if (!advisorshipsList) return;
+        advisorshipsList.innerHTML = "";
+
+        if (!advisorships || advisorships.length === 0) {
+            noAdvisorshipsMsg?.classList.remove("hidden");
+            return;
+        } else {
+            noAdvisorshipsMsg?.classList.add("hidden");
+        }
+
+        // Sort by year desc (assuming end_year or start_year presence)
+        const sorted = [...advisorships].sort((a, b) => {
+            const yearA = parseInt(a.end_year) || parseInt(a.start_year) || 0;
+            const yearB = parseInt(b.end_year) || parseInt(b.start_year) || 0;
+            return yearB - yearA;
+        });
+
+        sorted.forEach((adv) => {
+            const card = document.createElement("div");
+            card.className =
+                "p-5 rounded-2xl bg-glass-bg border border-border-main hover:border-premium-purple/30 transition-all group/adv flex flex-col gap-2";
+
+            const statusClass =
+                adv.status && adv.status.toLowerCase().includes("concluded")
+                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                    : "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+
+            const statusText =
+                adv.status === "Concluded" ? "Concluído" : "Em Andamento";
+            const type =
+                adv.type && adv.type !== "None" ? adv.type : "Orientação";
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2">
+                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClass}">
+                            ${statusText}
+                        </span>
+                        <span class="text-xs font-bold text-premium-purple uppercase tracking-wider">
+                            ${type}
+                        </span>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-text-secondary opacity-70">
+                        ${adv.start_year} - ${adv.end_year === "None" ? "Atual" : adv.end_year}
+                    </span>
+                </div>
+                
+                <h4 class="text-sm font-bold text-text-main leading-snug">
+                    ${adv.name}
+                </h4>
+
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-6 h-6 rounded-full bg-premium-purple/10 flex items-center justify-center text-premium-purple shrink-0">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Estudante</span>
+                        <span class="text-xs font-medium text-text-main">${adv.student_name}</span>
+                    </div>
+                </div>
+            `;
+            advisorshipsList.appendChild(card);
+        });
     }
 
     function closeModalFunc() {

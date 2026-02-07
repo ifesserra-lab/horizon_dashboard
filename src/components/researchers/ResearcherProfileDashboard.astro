@@ -44,8 +44,9 @@ const projectData = Array.from(projectYearMap.entries())
 const advisorshipYearMap = new Map<number, number>();
 if (advisorships) {
     advisorships.forEach((a) => {
-        const year = getYearFromDate(a.start_date);
-        if (year) {
+        // Use start_year directly as it's already a year string in the new data
+        const year = parseInt(a.start_year);
+        if (!isNaN(year) && year > 1900 && year < 2100) {
             advisorshipYearMap.set(
                 year,
                 (advisorshipYearMap.get(year) || 0) + 1,
