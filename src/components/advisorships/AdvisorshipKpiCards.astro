@@ -9,6 +9,7 @@ interface Props {
         total_fellowships: number;
         unique_students: number;
         unique_supervisors: number;
+        total_monthly_investment: number;
     };
 }
 
@@ -24,7 +25,7 @@ const archiveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
 ---
 
 <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6"
 >
     <KpiCard
         title="Total"
@@ -55,5 +56,14 @@ const archiveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
         value={summary.unique_students}
         icon={studentIcon}
         color="premium-purple"
+    />
+    <KpiCard
+        title="Investimento Mensal"
+        value={new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        }).format(summary.total_monthly_investment)}
+        icon={valueIcon}
+        color="emerald-500"
     />
 </div>
