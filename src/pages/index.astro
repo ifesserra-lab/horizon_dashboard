@@ -21,29 +21,44 @@ const totalKnowledgeAreas = new Set(
 
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
-// Flatten all advisorships
-const allAdvisorships = allProjects.flatMap((project) =>
-	project.advisorships?.map((adv) => ({
-		...adv,
-		projectName: project.name,
-	})),
-);
+// Flatten all advisorships with safeguards
+const allAdvisorships = allProjects
+	.flatMap((project) =>
+		(project.advisorships || []).map((adv) => ({
+			...adv,
+			projectName: project.name,
+		})),
+	)
+	.filter(Boolean);
 
 // --- Chart Data Calculation (Logic Duplicated from advisorships/index.astro for Home Page reuse) ---
-const minYear = Math.min(
-	...allAdvisorships.map((a) =>
-		a.start_date ? new Date(a.start_date).getFullYear() : 9999,
-	),
+const minYearCalculated = Math.min(
+	...allAdvisorships
+		.map((a) => {
+			const dateStr = a.start_date;
+			if (!dateStr || dateStr === "None") return null;
+			return new Date(dateStr.replace(" ", "T")).getFullYear();
+		})
+		.filter((y): y is number => y !== null),
 );
-const maxYear = Math.max(
-	...allAdvisorships.map((a) =>
-		a.end_date ? new Date(a.end_date).getFullYear() : 0,
-	),
+const maxYearCalculated = Math.max(
+	...allAdvisorships
+		.map((a) => {
+			const dateStr = a.end_date;
+			if (!dateStr || dateStr === "None") return null;
+			return new Date(dateStr.replace(" ", "T")).getFullYear();
+		})
+		.filter((y): y is number => y !== null),
 );
-const yearsRange = Array.from(
-	{ length: maxYear - minYear + 1 },
-	(_, i) => minYear + i,
-);
+
+// Limit range to last 10 years for better readability as requested
+const maxYear = maxYearCalculated;
+const minYear = Math.max(minYearCalculated, maxYear - 9);
+
+const yearsRange =
+	minYear <= maxYear
+		? Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i)
+		: [];
 
 const uniqueFellowshipNames = [
 	...new Set(
@@ -142,7 +157,10 @@ const fellowshipFinancialEvolution = uniqueSponsors
 							effectiveStart.getMonth()) +
 						1,
 				);
-				return acc + curr.fellowship.value * monthsActive;
+				return (
+					acc +
+					parseFloat(String(curr.fellowship.value)) * monthsActive
+				);
 			}, 0);
 			return { year, value: totalValue };
 		});
