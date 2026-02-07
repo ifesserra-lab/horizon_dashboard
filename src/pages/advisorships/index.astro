@@ -13,12 +13,14 @@ import type {
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
 // Flatten all advisorships for the explorer
-const allAdvisorships = allProjects.flatMap((project) =>
-    project.advisorships.map((adv) => ({
-        ...adv,
-        projectName: project.name,
-    })),
-);
+const allAdvisorships = allProjects
+    .flatMap((project) =>
+        (project.advisorships || []).map((adv) => ({
+            ...adv,
+            projectName: project.name,
+        })),
+    )
+    .filter(Boolean);
 
 // Sort by start date (if available)
 const sortedAdvisorships = [...allAdvisorships].sort((a, b) => {
@@ -69,7 +71,10 @@ const fellowshipsCount = allAdvisorships.filter(
 
 const totalMonthlyValue = allAdvisorships
     .filter((a) => a.status.toLowerCase() === "active" && a.fellowship)
-    .reduce((acc, curr) => acc + (curr.fellowship?.value || 0), 0);
+    .reduce(
+        (acc, curr) => acc + parseFloat(String(curr.fellowship?.value || "0")),
+        0,
+    );
 
 const summary = {
     total_advisorships: allAdvisorships.length,
@@ -78,6 +83,7 @@ const summary = {
     total_fellowships: fellowshipsCount,
     unique_students: uniqueStudents,
     unique_supervisors: uniqueSupervisors,
+    total_monthly_investment: totalMonthlyValue,
 };
 
 // Calculate Analytics
@@ -140,20 +146,33 @@ const topSupervisors = Object.entries(supervisorCounts)
     }));
 
 // Fellowship Evolution (Line Chart Data)
-const minYear = Math.min(
-    ...allAdvisorships.map((a) =>
-        a.start_date ? new Date(a.start_date).getFullYear() : 9999,
-    ),
+const minYearCalculated = Math.min(
+    ...allAdvisorships
+        .map((a) => {
+            const dateStr = a.start_date;
+            if (!dateStr || dateStr === "None") return null;
+            return new Date(dateStr.replace(" ", "T")).getFullYear();
+        })
+        .filter((y): y is number => y !== null),
 );
-const maxYear = Math.max(
-    ...allAdvisorships.map((a) =>
-        a.end_date ? new Date(a.end_date).getFullYear() : 0,
-    ),
+const maxYearCalculated = Math.max(
+    ...allAdvisorships
+        .map((a) => {
+            const dateStr = a.end_date;
+            if (!dateStr || dateStr === "None") return null;
+            return new Date(dateStr.replace(" ", "T")).getFullYear();
+        })
+        .filter((y): y is number => y !== null),
 );
-const yearsRange = Array.from(
-    { length: maxYear - minYear + 1 },
-    (_, i) => minYear + i,
-);
+
+// Limit range to last 10 years for better readability as requested
+const maxYear = maxYearCalculated;
+const minYear = Math.max(minYearCalculated, maxYear - 9);
+
+const yearsRange =
+    minYear <= maxYear
+        ? Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i)
+        : [];
 
 // Get unique fellowship names
 const uniqueFellowshipNames = [
@@ -270,7 +289,10 @@ const fellowshipFinancialEvolution = uniqueSponsors
                     effectiveEnd.getFullYear() * 12 + effectiveEnd.getMonth();
                 const monthsActive = Math.max(0, endMonth - startMonth + 1);
 
-                return acc + curr.fellowship.value * monthsActive;
+                return (
+                    acc +
+                    parseFloat(String(curr.fellowship.value)) * monthsActive
+                );
             }, 0);
 
             return { year, value: totalValue };
