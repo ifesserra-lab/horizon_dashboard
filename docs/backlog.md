@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+| **v2.1.1** | 2026-02-07 | **Released** | Quickfix: CI/CD Deployment & Advisorship Dashboard Refinements | [#83](https://github.com/ifesserra-lab/horizon_dashboard/pull/83), [#84](https://github.com/ifesserra-lab/horizon_dashboard/pull/84), [#85](https://github.com/ifesserra-lab/horizon_dashboard/pull/85) | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
 | **v2.1.0** | 2026-02-06 | **Released** | Feature: Advisorship Chart Segmentation by Type, Project Search/Scroll | TBD | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75), [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
 | **v2.0.1** | 2026-02-04 | **Released** | Refinement: Project Categorization & UI Fixes (Dates, Tooltip) | [#73](https://github.com/ifesserra-lab/horizon_dashboard/pull/73) | [#71](https://github.com/ifesserra-lab/horizon_dashboard/issues/71) |
 | **v2.0.0** | 2026-02-04 | **Released** | Feature: Articles Integration (Modal, Detail, Charts, Search) | TBD | [#US-040](https://github.com/ifesserra-lab/horizon_dashboard/issues/40), [#US-041](https://github.com/ifesserra-lab/horizon_dashboard/issues/41) |
@@ -91,4 +92,3 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [ ] **Task** Design do Componente de Timeline
 
 - **Epic 3: Transparência (Release 3)** _(Planejado)_
-
