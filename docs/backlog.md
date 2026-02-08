@@ -7,6 +7,7 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
+<<<<<<< HEAD
 | **v2.2.0** | 2026-02-08 | **Released** | Feature: Researcher Profile Timeline & Career Badges | TBD | [#US-003](https://github.com/ifesserra-lab/horizon_dashboard/issues/3) |
 | **v2.1.1** | 2026-02-08 | **Released** | Quickfix: CI/CD Deployment & Advisorship Dashboard Refinements | [#88](https://github.com/ifesserra-lab/horizon_dashboard/pull/88), [#83](https://github.com/ifesserra-lab/horizon_dashboard/pull/83), [#84](https://github.com/ifesserra-lab/horizon_dashboard/pull/84), [#85](https://github.com/ifesserra-lab/horizon_dashboard/pull/85) | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
 | **v2.1.0** | 2026-02-06 | **Released** | Feature: Advisorship Chart Segmentation by Type, Project Search/Scroll | TBD | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75), [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
