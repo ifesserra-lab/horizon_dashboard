@@ -1,28 +1,28 @@
 # Status Report 6
 **Projeto:** Horizon Dashboard
 **Período:** 07/02/2026
-**Versão Relatada:** v2.2.0-draft (Timeline & Profile Refinements)
+# Versão Relatada: v2.2.0 (Timeline & Profile Refinements)
 
 | Versão | Descrição | Status | PR/Versão |
 |--------|-----------|--------|-----------|
-| **v2.2.0** | Linha do tempo do pesquisador e refinamentos de perfil | **Em Execução** | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
+| **v2.2.0** | Linha do tempo do pesquisador e refinamentos de perfil | **Concluído** | v2.2.0 |
 
 **Responsável:** Antigravity (Senior PM)
 
 ---
 
 # 1. Resumo Executivo
-Esta iteração foca na implementação da **Linha do Tempo (Timeline)** do pesquisador, agregando dados de educação, projetos e orientações em uma visualização cronológica. Além disso, a modal de pesquisador está sendo refinada com links externos (Lattes, Google Scholar, Email) e badges de KPIs (Artigos, Projetos, Orientações) para uma experiência de usuário mais rica e informativa.
+Esta iteração entregou a **Linha do Tempo (Timeline)** do pesquisador, agregando dados de educação, projetos e orientações em uma visualização cronológica dinâmica. A modal de pesquisador foi refinada com links externos (Lattes, Email) e badges de KPIs (Artigos, Projetos, Orientações).
 
 ---
 
 # 2. Progresso da Sprint / Iteração
 | Item | Descrição | Status | PR/Versão |
 |------|-----------|--------|-----------|
-| **US-044** | Linha do Tempo e Refinamentos do Perfil | **Em Execução** | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
+| **US-044** | Linha do Tempo e Refinamentos do Perfil | **Concluído** | v2.2.0 |
 | **Task** | Implementação do componente Timeline.astro | **Concluído** | - |
 | **Task** | Implementação do componente ResearcherSmallKpis.astro | **Concluído** | - |
-| **Task** | Integração na ResearcherModal.astro | **Em Andamento** | - |
+| **Task** | Integração na ResearcherModal.astro | **Concluído** | - |
 
 ---
 
