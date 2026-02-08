@@ -26,6 +26,10 @@
                 >
                     Pesquisador
                 </h2>
+                <!-- Small KPIs Container -->
+                <div id="modalResearcherKpis" class="flex flex-wrap gap-2 mt-2">
+                    <!-- Javascript will populate this -->
+                </div>
                 <div class="flex gap-4 mt-2" id="modalTabs">
                     <button
                         class="modal-tab-btn active text-sm font-bold border-b-2 border-premium-purple pb-1 text-premium-purple transition-all"
@@ -47,24 +51,29 @@
                     </button>
                 </div>
             </div>
-            <button
-                id="closeModal"
-                class="p-2 hover:bg-premium-purple/10 rounded-xl transition-colors text-text-secondary hover:text-premium-purple"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+            <div class="flex items-center gap-3">
+                <div id="modalExternalLinks" class="flex gap-2">
+                    <!-- Javascript will populate this -->
+                </div>
+                <button
+                    id="closeModal"
+                    class="p-2 hover:bg-premium-purple/10 rounded-xl transition-colors text-text-secondary hover:text-premium-purple"
                 >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Tab Content: About -->
@@ -94,6 +103,20 @@
                     <div id="modalChartWrapper" class="h-40 w-full relative">
                         <!-- SVG Chart will be injected here -->
                     </div>
+                </div>
+            </div>
+
+            <div
+                id="modalTimelineContainer"
+                class="mt-8 pt-8 border-t border-border-main hidden"
+            >
+                <h3
+                    class="text-xs uppercase tracking-widest font-bold text-premium-purple mb-4"
+                >
+                    Trajetória Profissional
+                </h3>
+                <div id="modalTimeline" class="space-y-6">
+                    <!-- Javascript will populate this -->
                 </div>
             </div>
         </div>
@@ -219,6 +242,12 @@
         // Render Chart
         renderModalChart(researcher.articles || []);
 
+        // Update KPIs & External Links
+        updateHeaderInfo(researcher);
+
+        // Render Timeline
+        renderTimeline(researcher);
+
         // Render Advisorships
         renderAdvisorships(researcher.advisorships || []);
 
@@ -298,6 +327,150 @@
             advisorshipsContent?.classList.remove("hidden");
             advisorshipsContent?.classList.add("flex");
         }
+    }
+
+    function updateHeaderInfo(researcher: any) {
+        const kpisContainer = document.getElementById("modalResearcherKpis");
+        const linksContainer = document.getElementById("modalExternalLinks");
+        if (!kpisContainer || !linksContainer) return;
+
+        // Render KPIs
+        const articlesCount = researcher.articles?.length || 0;
+        const projectsCount = researcher.initiatives?.length || 0;
+        const advisorshipsCount = researcher.advisorships?.length || 0;
+
+        kpisContainer.innerHTML = `
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-premium-purple/5 border border-premium-purple/10 text-[11px] font-bold text-text-main transition-all group">
+                <div class="w-1.5 h-1.5 rounded-full bg-premium-purple shadow-[0_0_6px_rgba(124,58,237,0.4)] group-hover:scale-125 transition-transform"></div>
+                ${articlesCount} <span class="text-text-secondary font-medium opacity-60">Artigos</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-premium-accent/5 border border-premium-accent/10 text-[11px] font-bold text-text-main transition-all group">
+                <div class="w-1.5 h-1.5 rounded-full bg-premium-accent shadow-[0_0_6px_rgba(2,132,199,0.4)] group-hover:scale-125 transition-transform"></div>
+                ${projectsCount} <span class="text-text-secondary font-medium opacity-60">Projetos</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/5 border border-amber-500/10 text-[11px] font-bold text-text-main transition-all group">
+                <div class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)] group-hover:scale-125 transition-transform"></div>
+                ${advisorshipsCount} <span class="text-text-secondary font-medium opacity-60">Orientações</span>
+            </div>
+        `;
+
+        // Render Links
+        linksContainer.innerHTML = "";
+        if (researcher.lattes_url && researcher.lattes_url !== "None") {
+            linksContainer.innerHTML += `
+                <a href="${researcher.lattes_url}" target="_blank" class="p-2 bg-slate-500/5 hover:bg-slate-500/10 rounded-xl text-text-secondary hover:text-text-main transition-all" title="Ver Currículo Lattes">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 2v20"/></svg>
+                </a>
+            `;
+        }
+        if (researcher.email && researcher.email !== "None") {
+            linksContainer.innerHTML += `
+                <a href="mailto:${researcher.email}" class="p-2 bg-slate-500/5 hover:bg-slate-500/10 rounded-xl text-text-secondary hover:text-text-main transition-all" title="Enviar Email">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </a>
+            `;
+        }
+    }
+
+    function renderTimeline(researcher: any) {
+        const container = document.getElementById("modalTimelineContainer");
+        const timelineEl = document.getElementById("modalTimeline");
+        if (!container || !timelineEl) return;
+
+        const events: any[] = [];
+
+        // Add Education
+        if (researcher.education && Array.isArray(researcher.education)) {
+            researcher.education.forEach((edu: any) => {
+                events.push({
+                    year: edu.year || edu.end_year,
+                    title: edu.degree || edu.title,
+                    description: edu.institution,
+                    type: "education",
+                });
+            });
+        }
+
+        // Add Projects
+        if (researcher.initiatives && Array.isArray(researcher.initiatives)) {
+            researcher.initiatives.forEach((proj: any) => {
+                events.push({
+                    year: proj.start_date
+                        ? proj.start_date.split("-")[0]
+                        : null,
+                    title: proj.title,
+                    description: proj.nature,
+                    type: "project",
+                    status: proj.status,
+                });
+            });
+        }
+
+        // Add Advisorships
+        if (researcher.advisorships && Array.isArray(researcher.advisorships)) {
+            researcher.advisorships.forEach((adv: any) => {
+                events.push({
+                    year: adv.start_year,
+                    title: `Orientação: ${adv.student_name}`,
+                    description: adv.type,
+                    type: "advisorship",
+                    status: adv.status,
+                });
+            });
+        }
+
+        if (events.length === 0) {
+            container.classList.add("hidden");
+            return;
+        }
+
+        container.classList.remove("hidden");
+
+        // Sort by year desc
+        const sortedEvents = events
+            .filter((e) => e.year && e.year !== "None")
+            .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+        timelineEl.innerHTML = "";
+
+        sortedEvents.forEach((event) => {
+            const eventDiv = document.createElement("div");
+            eventDiv.className =
+                "relative pl-8 pb-8 last:pb-0 border-l border-border-main ml-2";
+
+            let icon = "";
+            if (event.type === "education") {
+                icon = `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>`;
+            } else if (event.type === "project") {
+                icon = `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`;
+            } else {
+                icon = `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
+            }
+
+            const statusHtml =
+                event.status && event.status !== "None"
+                    ? `<div class="mt-2 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full ${event.status.toLowerCase().includes("active") || event.status.toLowerCase().includes("progress") || event.status.toLowerCase().includes("running") ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400"}"></span>
+                    <span class="text-[9px] uppercase tracking-widest font-bold text-text-secondary opacity-70">${event.status === "Concluded" ? "Concluído" : "Em Andamento"}</span>
+                  </div>`
+                    : "";
+
+            eventDiv.innerHTML = `
+                <div class="absolute -left-[1.05rem] top-0 w-8 h-8 rounded-full border-4 border-background-main bg-glass-bg flex items-center justify-center text-premium-purple z-10 shadow-sm">
+                    ${icon}
+                </div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-lg font-black font-['Outfit'] text-text-main">${event.year}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-premium-purple/10 text-premium-purple text-[9px] font-bold uppercase tracking-wider">
+                        ${event.type === "education" ? "Formação" : event.type === "project" ? "Projeto" : "Orientação"}
+                    </span>
+                </div>
+                <h4 class="text-sm font-bold text-text-main leading-snug">${event.title}</h4>
+                ${event.description && event.description !== "None" ? `<p class="text-xs text-text-secondary mt-1 opacity-80 italic">${event.description}</p>` : ""}
+                ${statusHtml}
+            `;
+            timelineEl.appendChild(eventDiv);
+        });
     }
 
     function renderAdvisorships(advisorships: any[]) {
