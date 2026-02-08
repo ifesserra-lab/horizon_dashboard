@@ -1,0 +1,117 @@
+---
+interface Props {
+    events: {
+        year: string;
+        title: string;
+        description?: string;
+        type: "project" | "advisorship" | "education";
+        status?: string | null;
+    }[];
+}
+
+const { events } = Astro.props;
+
+// Sort events by year descending
+const sortedEvents = [...events].sort((a, b) => {
+    const yearA = parseInt(a.year) || 0;
+    const yearB = parseInt(b.year) || 0;
+    return yearB - yearA;
+});
+---
+
+<div
+    class="relative space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border-main before:to-transparent overflow-hidden py-4"
+>
+    {
+        sortedEvents.map((event) => (
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                {/* Dot */}
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border border-border-main bg-glass-bg backdrop-blur-md text-premium-purple shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 group-hover:scale-110 transition-transform duration-300 z-10">
+                    {event.type === "education" && (
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        </svg>
+                    )}
+                    {event.type === "project" && (
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                            />
+                        </svg>
+                    )}
+                    {event.type === "advisorship" && (
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                            />
+                        </svg>
+                    )}
+                </div>
+                {/* Content */}
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-glass-bg border border-border-main shadow-sm group-hover:border-premium-purple/30 transition-all duration-300">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <div class="font-black text-text-main font-['Outfit'] text-lg">
+                            {event.year && event.year !== "None"
+                                ? event.year
+                                : "Ano N/I"}
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full bg-premium-purple/10 text-premium-purple text-[10px] font-bold uppercase tracking-wider">
+                            {event.type === "education"
+                                ? "Formação"
+                                : event.type === "project"
+                                  ? "Projeto"
+                                  : "Orientação"}
+                        </span>
+                    </div>
+                    <div class="text-sm font-bold text-text-main leading-snug">
+                        {event.title}
+                    </div>
+                    {event.description && event.description !== "None" && (
+                        <div class="text-xs text-text-secondary mt-2 line-clamp-2 italic opacity-80">
+                            {event.description}
+                        </div>
+                    )}
+
+                    {event.status && event.status !== "None" && (
+                        <div class="mt-3 flex items-center gap-1.5">
+                            <span
+                                class={`w-1.5 h-1.5 rounded-full ${event.status.toLowerCase().includes("active") || event.status.toLowerCase().includes("progress") || event.status.toLowerCase().includes("running") ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
+                            />
+                            <span class="text-[10px] uppercase tracking-widest font-bold text-text-secondary">
+                                {event.status.toLowerCase() === "active" ||
+                                event.status.toLowerCase() === "running"
+                                    ? "Em Andamento"
+                                    : event.status.toLowerCase() === "concluded"
+                                      ? "Concluído"
+                                      : event.status}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        ))
+    }
+</div>

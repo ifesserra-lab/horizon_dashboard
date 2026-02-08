@@ -1,0 +1,54 @@
+---
+interface Props {
+    articlesCount: number;
+    projectsCount: number;
+    advisorshipsCount: number;
+}
+
+const { articlesCount, projectsCount, advisorshipsCount } = Astro.props;
+---
+
+<div class="flex flex-wrap gap-2 sm:gap-3">
+    <div
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-premium-purple/5 border border-premium-purple/20 hover:bg-premium-purple/10 transition-colors group"
+    >
+        <div
+            class="w-1.5 h-1.5 rounded-full bg-premium-purple shadow-[0_0_8px_rgba(124,58,237,0.5)] group-hover:scale-125 transition-transform"
+        >
+        </div>
+        <span class="text-xs font-bold text-text-main font-['Outfit']"
+            >{articlesCount}
+            <span class="text-text-secondary font-medium opacity-60"
+                >Artigos</span
+            ></span
+        >
+    </div>
+    <div
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-premium-accent/5 border border-premium-accent/20 hover:bg-premium-accent/10 transition-colors group"
+    >
+        <div
+            class="w-1.5 h-1.5 rounded-full bg-premium-accent shadow-[0_0_8px_rgba(2,132,199,0.5)] group-hover:scale-125 transition-transform"
+        >
+        </div>
+        <span class="text-xs font-bold text-text-main font-['Outfit']"
+            >{projectsCount}
+            <span class="text-text-secondary font-medium opacity-60"
+                >Projetos</span
+            ></span
+        >
+    </div>
+    <div
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/5 border border-amber-500/20 hover:bg-amber-500/10 transition-colors group"
+    >
+        <div
+            class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] group-hover:scale-125 transition-transform"
+        >
+        </div>
+        <span class="text-xs font-bold text-text-main font-['Outfit']"
+            >{advisorshipsCount}
+            <span class="text-text-secondary font-medium opacity-60"
+                >Orientações</span
+            ></span
+        >
+    </div>
+</div>
