@@ -69,13 +69,6 @@ const fellowshipsCount = allAdvisorships.filter(
     (a) => a.fellowship && a.fellowship.name,
 ).length;
 
-const totalMonthlyValue = allAdvisorships
-    .filter((a) => a.status.toLowerCase() === "active" && a.fellowship)
-    .reduce(
-        (acc, curr) => acc + parseFloat(String(curr.fellowship?.value || "0")),
-        0,
-    );
-
 const summary = {
     total_advisorships: allAdvisorships.length,
     active_advisorships: activeAdvisorships,
@@ -83,7 +76,6 @@ const summary = {
     total_fellowships: fellowshipsCount,
     unique_students: uniqueStudents,
     unique_supervisors: uniqueSupervisors,
-    total_monthly_investment: totalMonthlyValue,
 };
 
 // Calculate Analytics
@@ -133,6 +125,7 @@ const fellowshipDistribution = Object.entries(fellowshipCounts)
 
 const supervisorCounts = allAdvisorships.reduce((acc: any, curr) => {
     const name = curr.supervisor_name;
+    if (!name || name === "None") return acc;
     acc[name] = (acc[name] || 0) + 1;
     return acc;
 }, {});
@@ -141,7 +134,7 @@ const topSupervisors = Object.entries(supervisorCounts)
     .sort((a: any, b: any) => b[1] - a[1])
     .slice(0, 10)
     .map(([name, count]) => ({
-        name,
+        name: name as string,
         count: count as number,
     }));
 
