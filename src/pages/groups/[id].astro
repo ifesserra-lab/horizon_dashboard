@@ -26,6 +26,12 @@ const formatDate = (dateStr: string) => {
 	const date = new Date(dateStr);
 	return date.toLocaleDateString("pt-BR", { year: "numeric" });
 };
+
+// Helper function to check if a member is alumni (egresso)
+// Handles both null/undefined and the string "None" from Python exports
+const isAlumni = (endDate: string | null | undefined) => {
+	return endDate && endDate !== "None" && endDate !== "null";
+};
 ---
 
 <Layout title={group.name} breadcrumbReplacements={{ [group.id]: group.name }}>
@@ -183,7 +189,7 @@ const formatDate = (dateStr: string) => {
 									(m) =>
 										["Leader", "Pesquisador"].includes(
 											m.role,
-										) && !m.end_date,
+										) && !isAlumni(m.end_date),
 								).length > 0 && (
 									<div class="mb-8">
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -197,7 +203,7 @@ const formatDate = (dateStr: string) => {
 															"Leader",
 															"Pesquisador",
 														].includes(m.role) &&
-														!m.end_date,
+														!isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
@@ -263,7 +269,7 @@ const formatDate = (dateStr: string) => {
 									(m) =>
 										["Leader", "Pesquisador"].includes(
 											m.role,
-										) && m.end_date,
+										) && isAlumni(m.end_date),
 								).length > 0 && (
 									<div>
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -277,7 +283,7 @@ const formatDate = (dateStr: string) => {
 															"Leader",
 															"Pesquisador",
 														].includes(m.role) &&
-														m.end_date,
+														isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
@@ -372,7 +378,8 @@ const formatDate = (dateStr: string) => {
 								{/* Current Students */}
 								{group.members.filter(
 									(m) =>
-										m.role === "Estudante" && !m.end_date,
+										m.role === "Estudante" &&
+										!isAlumni(m.end_date),
 								).length > 0 && (
 									<div class="mb-8">
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -384,7 +391,7 @@ const formatDate = (dateStr: string) => {
 													(m) =>
 														m.role ===
 															"Estudante" &&
-														!m.end_date,
+														!isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
@@ -442,7 +449,9 @@ const formatDate = (dateStr: string) => {
 
 								{/* Alumni Students */}
 								{group.members.filter(
-									(m) => m.role === "Estudante" && m.end_date,
+									(m) =>
+										m.role === "Estudante" &&
+										isAlumni(m.end_date),
 								).length > 0 && (
 									<div>
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -454,7 +463,7 @@ const formatDate = (dateStr: string) => {
 													(m) =>
 														m.role ===
 															"Estudante" &&
-														m.end_date,
+														isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
@@ -561,14 +570,16 @@ const formatDate = (dateStr: string) => {
 										)
 										.map((member) => (
 											<div
-												class={`glass-card p-4 flex items-center gap-4 transition-all ${member.end_date ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400" : "hover:border-border-main/80"}`}
+												class={`glass-card p-4 flex items-center gap-4 transition-all ${isAlumni(member.end_date) ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400" : "hover:border-border-main/80"}`}
 											>
 												<div
 													aria-hidden="true"
 													class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
 												>
 													{member.name.charAt(0)}
-													{member.end_date && (
+													{isAlumni(
+														member.end_date,
+													) && (
 														<span
 															class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
 															title="Egresso"
@@ -594,7 +605,9 @@ const formatDate = (dateStr: string) => {
 														<h5 class="text-sm font-bold text-text-main truncate">
 															{member.name}
 														</h5>
-														{member.end_date && (
+														{isAlumni(
+															member.end_date,
+														) && (
 															<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
 																Egresso
 															</span>

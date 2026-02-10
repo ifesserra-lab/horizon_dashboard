@@ -35,6 +35,12 @@ const statusStyles = {
 const currentStatusStyle =
 	statusStyles[project.status as keyof typeof statusStyles] ||
 	"bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+
+// Helper function to check if a member is alumni (egresso)
+// Handles both null/undefined and the string "None" from Python exports
+const isAlumni = (endDate: string | null | undefined) => {
+	return endDate && endDate !== "None" && endDate !== "null";
+};
 ---
 
 <Layout
@@ -206,7 +212,7 @@ const currentStatusStyle =
 									(m) =>
 										m.roles.includes("Researcher") &&
 										!m.roles.includes("Coordinator") &&
-										!m.end_date,
+										!isAlumni(m.end_date),
 								).length > 0 && (
 									<div class="mb-8">
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -222,7 +228,7 @@ const currentStatusStyle =
 														!m.roles.includes(
 															"Coordinator",
 														) &&
-														!m.end_date,
+														!isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
@@ -257,7 +263,7 @@ const currentStatusStyle =
 									(m) =>
 										m.roles.includes("Researcher") &&
 										!m.roles.includes("Coordinator") &&
-										m.end_date,
+										isAlumni(m.end_date),
 								).length > 0 && (
 									<div>
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -273,7 +279,7 @@ const currentStatusStyle =
 														!m.roles.includes(
 															"Coordinator",
 														) &&
-														m.end_date,
+														isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
@@ -344,7 +350,7 @@ const currentStatusStyle =
 								{project.team?.filter(
 									(m) =>
 										m.roles.includes("Student") &&
-										!m.end_date,
+										!isAlumni(m.end_date),
 								).length > 0 && (
 									<div class="mb-8">
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -356,7 +362,8 @@ const currentStatusStyle =
 													(m) =>
 														m.roles.includes(
 															"Student",
-														) && !m.end_date,
+														) &&
+														!isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
@@ -390,7 +397,7 @@ const currentStatusStyle =
 								{project.team?.filter(
 									(m) =>
 										m.roles.includes("Student") &&
-										m.end_date,
+										isAlumni(m.end_date),
 								).length > 0 && (
 									<div>
 										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
@@ -402,7 +409,8 @@ const currentStatusStyle =
 													(m) =>
 														m.roles.includes(
 															"Student",
-														) && m.end_date,
+														) &&
+														isAlumni(m.end_date),
 												)
 												.map((member) => (
 													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
