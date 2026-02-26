@@ -1,6 +1,16 @@
 ---
+/**
+ * src/components/AdvisorshipCard.astro
+ *
+ * This component displays an individual advisorship as a card within the UI.
+ * It visualizes the status, the student and supervisor names, the associated
+ * fellowship details (if any), and the duration of the advisorship.
+ */
 import type { AdvisorshipItem } from "../types/advisorships.ts";
 
+/**
+ * Props expected by the AdvisorshipCard component.
+ */
 interface Props {
     advisorship: AdvisorshipItem;
     projectName: string;
@@ -8,6 +18,12 @@ interface Props {
 
 const { advisorship, projectName } = Astro.props;
 
+/**
+ * Formats a given date string into a localized Brazilian Portuguese string (Month Year).
+ *
+ * @param {string | null} dateStr - The ISO date string to format.
+ * @returns {string} The formatted date string, or "N/A" if the input is missing.
+ */
 const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "N/A";
     const date = new Date(dateStr);
@@ -17,6 +33,10 @@ const formatDate = (dateStr: string | null) => {
     });
 };
 
+/**
+ * A mapping of expected advisorship status strings to their corresponding CSS utility classes.
+ * These are used to style the status badge.
+ */
 const statusColors = {
     active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",

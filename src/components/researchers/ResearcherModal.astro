@@ -1,5 +1,12 @@
 ---
-
+/**
+ * ResearcherModal.astro
+ *
+ * This component renders a modal dialog displaying detailed information about a researcher.
+ * It contains tabs for the researcher's professional summary, timeline of activities,
+ * published articles (with search and infinite scroll), and advisorships.
+ * It listens for custom events (`open-researcher-modal`) to populate and show the modal.
+ */
 ---
 
 <div
@@ -221,6 +228,14 @@
     const BATCH_SIZE = 30;
     let observer: IntersectionObserver | null = null;
 
+    /**
+     * Opens the modal with the specified researcher's data.
+     * Fetches researcher details, updates the UI components (resume, charts, KPIs, timeline, advisorships),
+     * and resets the view to the 'About' tab.
+     *
+     * @param {string} id - The unique identifier of the researcher.
+     * @param {string} name - The name of the researcher to display in the header.
+     */
     function openModal(id: string, name: string) {
         currentResearcherId = id;
         document.getElementById("modalResearcherName")!.textContent = name;
@@ -275,6 +290,11 @@
         document.body.style.overflow = "hidden";
     }
 
+    /**
+     * Switches the active tab in the modal and updates visibility of the content sections.
+     *
+     * @param {string} tab - The identifier of the tab to activate ('about', 'articles', or 'advisorships').
+     */
     function switchTab(tab: string) {
         const aboutContent = document.getElementById("aboutTabContent");
         const articlesContent = document.getElementById("articlesTabContent");
@@ -329,6 +349,12 @@
         }
     }
 
+    /**
+     * Updates the header of the modal with Key Performance Indicators (KPIs)
+     * and external links (e.g., Lattes curriculum, email) for the researcher.
+     *
+     * @param {any} researcher - The researcher data object containing total articles, initiatives, advisorships, and URLs.
+     */
     function updateHeaderInfo(researcher: any) {
         const kpisContainer = document.getElementById("modalResearcherKpis");
         const linksContainer = document.getElementById("modalExternalLinks");
@@ -372,6 +398,12 @@
         }
     }
 
+    /**
+     * Renders a chronological timeline of the researcher's professional trajectory,
+     * including education, projects, and advisorships.
+     *
+     * @param {any} researcher - The researcher data object containing education, initiatives, and advisorship history.
+     */
     function renderTimeline(researcher: any) {
         const container = document.getElementById("modalTimelineContainer");
         const timelineEl = document.getElementById("modalTimeline");
@@ -473,6 +505,12 @@
         });
     }
 
+    /**
+     * Renders the list of advisorships associated with the researcher in the 'Advisorships' tab.
+     * Sorts advisorships by year (descending) and creates HTML elements for each entry.
+     *
+     * @param {any[]} advisorships - An array of advisorship data objects.
+     */
     function renderAdvisorships(advisorships: any[]) {
         if (!advisorshipsList) return;
         advisorshipsList.innerHTML = "";
@@ -542,6 +580,10 @@
         });
     }
 
+    /**
+     * Closes the modal, hides the backdrop, scales down the content, and restores body scroll.
+     * Also disconnects any active IntersectionObserver used for infinite scrolling.
+     */
     function closeModalFunc() {
         modalContent?.classList.add("scale-95", "opacity-0");
         modalContent?.classList.remove("scale-100", "opacity-100");
@@ -554,6 +596,11 @@
         }, 300);
     }
 
+    /**
+     * Renders a bar chart showing the historical distribution of the researcher's published articles over the years.
+     *
+     * @param {any[]} articles - An array of article data objects to compute annual counts.
+     */
     function renderModalChart(articles: any[]) {
         const container = document.getElementById("modalResumeChartContainer");
         const wrapper = document.getElementById("modalChartWrapper");
@@ -622,6 +669,10 @@
         `;
     }
 
+    /**
+     * Loads and appends the next batch of articles to the articles list container.
+     * Uses the 'BATCH_SIZE' to implement lazy loading.
+     */
     function loadMoreArticles() {
         if (!articlesList) return;
         const nextBatch = filteredArticles.slice(
@@ -679,6 +730,10 @@
         }
     }
 
+    /**
+     * Sets up an IntersectionObserver to detect when the user scrolls near the bottom of the articles list,
+     * triggering the loading of the next batch of articles (Infinite Scroll).
+     */
     function setupInfiniteScroll() {
         if (observer) observer.disconnect();
 
@@ -701,6 +756,10 @@
         if (sentinel) observer.observe(sentinel);
     }
 
+    /**
+     * Filters the researcher's articles based on the search input query in the 'Articles' tab.
+     * Re-renders the list of articles matching the title or journal/conference name.
+     */
     function handleArticleSearch() {
         const query = articleSearch.value.toLowerCase().trim();
         const researcher = (window as any).researchersData.find(

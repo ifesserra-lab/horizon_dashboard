@@ -1,8 +1,21 @@
 ---
+/**
+ * src/pages/projects/[id].astro
+ *
+ * Automatically generates static pages for each project using data from `initiatives_canonical.json`.
+ * Displays detailed information about a specific project, including its execution period,
+ * identification, description, leadership, team members (current and alumni), and additional metadata.
+ */
 import Layout from "../../layouts/Layout.astro";
 import projectsData from "../../data/canonical/initiatives_canonical.json";
 import type { Project } from "../../types/projects";
 
+/**
+ * Generates the static paths for all projects available in the canonical JSON data.
+ * Astro will pre-render a page for each project ID returned here.
+ *
+ * @returns {Array<{params: {id: string}, props: {project: Project}}>} Static paths and corresponding project props.
+ */
 export function getStaticPaths() {
 	const projects = projectsData as Project[];
 	return projects.map((project) => ({
@@ -11,12 +24,22 @@ export function getStaticPaths() {
 	}));
 }
 
+/**
+ * Props expected by this page component.
+ */
 interface Props {
+	/** The specific project data passed from getStaticPaths */
 	project: Project;
 }
 
 const { project } = Astro.props;
 
+/**
+ * Formats a date string into a localized Brazilian Portuguese format (DD/MM/YYYY).
+ *
+ * @param {string} dateStr - The ISO date string to format.
+ * @returns {string} The formatted date string, or "N/A" if the input is invalid or missing.
+ */
 const formatDate = (dateStr: string) => {
 	if (!dateStr) return "N/A";
 	const date = new Date(dateStr);
@@ -36,8 +59,13 @@ const currentStatusStyle =
 	statusStyles[project.status as keyof typeof statusStyles] ||
 	"bg-premium-accent/10 text-premium-accent border-premium-accent/20";
 
-// Helper function to check if a member is alumni (egresso)
-// Handles both null/undefined and the string "None" from Python exports
+/**
+ * Helper function to check if a team member is an alumni (egresso).
+ * Handles both null/undefined and the string "None" from Python exports.
+ *
+ * @param {string | null | undefined} endDate - The end date of the member's participation in the project.
+ * @returns {boolean} True if the member is an alumni (has a valid end date), false otherwise.
+ */
 const isAlumni = (endDate: string | null | undefined) => {
 	return endDate && endDate !== "None" && endDate !== "null";
 };
