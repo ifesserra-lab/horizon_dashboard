@@ -99,6 +99,22 @@ const normalizeType = (type: string) => {
     return type || "Other";
 };
 
+const isValidVenue = (venue: string) => {
+    const normalized = String(venue || "").trim().toUpperCase();
+
+    if (!normalized) {
+        return false;
+    }
+
+    return ![
+        "PEER REVIEW",
+        "AVALIAÇÃO POR PARES",
+        "EM AVALIAÇÃO",
+        "UNDER REVIEW",
+        "REVIEW",
+    ].includes(normalized);
+};
+
 const articleKey = (article: Article) =>
     String(article.id || `${article.title}-${article.year}-${article.type}`);
 
@@ -239,7 +255,7 @@ export const buildPublicationsMart = (
         }
 
         const venue = String(publication.journal_conference || "").trim();
-        if (venue) {
+        if (isValidVenue(venue)) {
             venuesMap.set(venue, (venuesMap.get(venue) || 0) + 1);
         }
 
