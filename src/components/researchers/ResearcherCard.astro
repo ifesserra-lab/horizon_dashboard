@@ -12,9 +12,10 @@ interface Props {
         isStudent: boolean;
     };
     baseUrl: string;
+    campusSlugs?: string[];
 }
 
-const { researcher, stats, baseUrl } = Astro.props;
+const { researcher, stats, baseUrl, campusSlugs = [] } = Astro.props;
 
 function getHighestDegree(education: any[]) {
     if (!education || education.length === 0) return null;
@@ -37,6 +38,7 @@ const highestDegree = getHighestDegree(researcher.academic_education);
 <article
     class="researcher-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col items-center text-center group"
     data-name={researcher.name.toLowerCase()}
+    data-campus-slugs={campusSlugs.join("|")}
 >
     <div
         class="w-24 h-24 rounded-full bg-gradient-to-br from-premium-accent/20 to-premium-purple/20 border-2 border-border-main flex items-center justify-center text-premium-accent font-bold text-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-premium-accent/5"

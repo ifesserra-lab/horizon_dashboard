@@ -39,6 +39,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				class="group-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col"
 				data-name={group.name.toLowerCase()}
 				data-campus={group.campus.name.toLowerCase()}
+				data-campus-slug={group.campus.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}
 				data-areas={group.knowledge_areas.map(ka => ka.name.toLowerCase()).join('|')}
 				data-leaders={group.leaders.map(l => l.name.toLowerCase()).join('|')}
 			>
@@ -100,6 +101,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 
 		function filterGroups() {
 			const query = searchInput.value.toLowerCase().trim();
+			const preferredCampus = localStorage.getItem('preferred-campus') || '';
 			let visibleCount = 0;
 
 			// Show/hide reset button
@@ -113,16 +115,18 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				const element = card as HTMLElement;
 				const name = element.dataset.name || '';
 				const campus = element.dataset.campus || '';
+				const campusSlug = element.dataset.campusSlug || '';
 				const areas = element.dataset.areas || '';
 				const leaders = element.dataset.leaders || '';
 				
-				const matches = !query || 
+				const matchesCampus = !preferredCampus || campusSlug === preferredCampus;
+				const matchesSearch = !query || 
 					name.includes(query) || 
 					campus.includes(query) ||
 					areas.includes(query) || 
 					leaders.includes(query);
 
-				if (matches) {
+				if (matchesCampus && matchesSearch) {
 					element.style.display = 'flex';
 					visibleCount++;
 				} else {
@@ -141,12 +145,14 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 		}
 
 		searchInput?.addEventListener('input', filterGroups);
+		window.addEventListener('campus-filter-change', filterGroups);
 		
 		resetBtn?.addEventListener('click', () => {
 			searchInput.value = '';
 			filterGroups();
 			searchInput.focus();
 		});
+
+		filterGroups();
 	</script>
 </Layout>
-

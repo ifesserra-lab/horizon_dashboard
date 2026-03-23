@@ -1,6 +1,13 @@
 ---
-import martData from '../../data/mart/initiatives_analytics_mart.json';
-import groupsData from '../../data/canonical/research_groups_canonical.json';
+import defaultMartData from '../../data/mart/initiatives_analytics_mart.json';
+import defaultGroupsData from '../../data/canonical/research_groups_canonical.json';
+
+interface Props {
+    martData?: any;
+    groupsData?: any[];
+}
+
+const { martData = defaultMartData, groupsData = defaultGroupsData } = Astro.props;
 
 // --- Data Preparation: Ecosystem Evolution ---
 // Calculate cumulative active projects (running total)

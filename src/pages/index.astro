@@ -7,6 +7,14 @@ import advisorshipsData from "../data/canonical/advisorships_canonical.json";
 import AdvisorshipCharts from "../components/advisorships/AdvisorshipCharts.astro";
 import type { ResearchGroup } from "../types/groups";
 import type { ProjectAdvisorship } from "../types/advisorships";
+import {
+	buildAdvisorshipDashboard,
+	buildProjectMart,
+	getAdvisorshipProjectsByCampusSlug,
+	getGroupsByCampusSlug,
+	getProjectsByCampusSlug,
+	getRealCampuses,
+} from "../lib/tenant-data";
 
 const groups = groupsData as ResearchGroup[];
 const totalGroups = groups.length;
@@ -195,6 +203,40 @@ const icons = {
 	campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
 	areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
 };
+
+const campusStats = Object.fromEntries(
+	getRealCampuses().map((campus) => {
+		const campusGroups = groups.filter((group) => group.campus.id === campus.id);
+		return [
+			campus.slug,
+			{
+				totalGroups: campusGroups.length,
+				totalMembers: campusGroups.reduce(
+					(acc, group) => acc + (group.members?.length || 0),
+					0,
+				),
+				totalCampus: 1,
+				totalKnowledgeAreas: new Set(
+					campusGroups.flatMap((group) =>
+						group.knowledge_areas.map((area) => area.id),
+					),
+				).size,
+			},
+		];
+	}),
+);
+const campusHomeViews = Object.fromEntries(
+	getRealCampuses().map((campus) => [
+		campus.slug,
+		{
+			groups: getGroupsByCampusSlug(campus.slug),
+			projectMart: buildProjectMart(getProjectsByCampusSlug(campus.slug)),
+			advisorship: buildAdvisorshipDashboard(
+				getAdvisorshipProjectsByCampusSlug(campus.slug),
+			),
+		},
+	]),
+);
 ---
 
 <Layout title="Dashboard Overview">
@@ -219,6 +261,7 @@ const icons = {
 		class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
 		role="region"
 		aria-label="Métricas principais"
+		id="home-kpis"
 	>
 		<KpiCard
 			title="Total de Grupos"
@@ -246,16 +289,77 @@ const icons = {
 	</div>
 
 	<!-- Analytics Charts (US-035) -->
-	<HomeCharts />
+	<div id="home-charts-views">
+		<div data-campus-view="">
+			<HomeCharts />
+		</div>
+		{
+			Object.entries(campusHomeViews).map(([slug, view]) => (
+				<div data-campus-view={slug} class="hidden">
+					<HomeCharts martData={view.projectMart} groupsData={view.groups} />
+				</div>
+			))
+		}
+	</div>
 
 	<!-- Fellowship & Investment Charts (Home Integration) -->
-	<section class="mt-12 mb-12">
-		<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
-			Investimento e Bolsas
-		</h2>
-		<AdvisorshipCharts
-			analytics={analytics}
-			visibleTabs={["financial", "fellowships"]}
-		/>
-	</section>
+	<div id="home-advisorship-views">
+		<section class="mt-12 mb-12" data-campus-view="">
+			<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
+				Investimento e Bolsas
+			</h2>
+			<AdvisorshipCharts
+				analytics={analytics}
+				visibleTabs={["financial", "fellowships"]}
+			/>
+		</section>
+		{
+			Object.entries(campusHomeViews).map(([slug, view]) => (
+				<section class="mt-12 mb-12 hidden" data-campus-view={slug}>
+					<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
+						Investimento e Bolsas
+					</h2>
+					<AdvisorshipCharts
+						analytics={view.advisorship.analytics}
+						visibleTabs={["financial", "fellowships"]}
+					/>
+				</section>
+			))
+		}
+	</div>
+
+	<script define:vars={{ campusStats, defaultStats: { totalGroups, totalMembers, totalCampus, totalKnowledgeAreas } }}>
+		function updateHomeKpis(selectedCampus) {
+			const stats = selectedCampus && campusStats[selectedCampus]
+				? campusStats[selectedCampus]
+				: defaultStats;
+			const cards = document.querySelectorAll('[data-kpi-card]');
+			cards.forEach((card) => {
+				const title = card.getAttribute('data-kpi-card');
+				const valueNode = card.querySelector('[data-kpi-value]');
+				if (!valueNode) return;
+				if (title === 'Total de Grupos') valueNode.textContent = String(stats.totalGroups);
+				if (title === 'Pesquisadores') valueNode.textContent = String(stats.totalMembers);
+				if (title === 'Campus') valueNode.textContent = String(stats.totalCampus);
+				if (title === 'Áreas de Conhecimento') valueNode.textContent = String(stats.totalKnowledgeAreas);
+			});
+		}
+
+		function updateHomeViews(selectedCampus) {
+			document.querySelectorAll('#home-charts-views [data-campus-view], #home-advisorship-views [data-campus-view]').forEach((node) => {
+				const viewCampus = node.getAttribute('data-campus-view') || '';
+				node.classList.toggle('hidden', viewCampus !== selectedCampus);
+			});
+		}
+
+		window.addEventListener('campus-filter-change', (event) => {
+			const campus = event.detail?.campus || '';
+			updateHomeKpis(campus);
+			updateHomeViews(campus);
+		});
+
+		const initialCampus = localStorage.getItem('preferred-campus') || '';
+		updateHomeKpis(initialCampus);
+		updateHomeViews(initialCampus);
+	</script>
 </Layout>

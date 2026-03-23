@@ -22,6 +22,9 @@ const conclusionsData = martData.evolution.map((d: any) => ({ year: d.year, coun
 
 const maxYearCount = Math.max(...evolutionData.map((d: any) => d.count), 1);
 const maxConclusionCount = Math.max(...conclusionsData.map((d: any) => d.count), 1);
+const xAxisStep = Math.max(1, Math.ceil(Math.max(evolutionData.length, conclusionsData.length) / 7));
+const shouldShowYearLabel = (index: number, length: number) =>
+    length <= 8 || index === 0 || index === length - 1 || index % xAxisStep === 0;
 
 // 3. Team Composition Data (Direct from Mart)
 const participantsData = [
@@ -175,22 +178,29 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                         <div class="h-64 px-4 flex flex-col items-center justify-center relative">
                             <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
                                 {(() => {
-                                    if (evolutionData.length < 2) return null;
-                                    const padding = 20;
+                                    if (evolutionData.length === 0) return null;
+                                    const padding = 22;
                                     const width = 400 - padding * 2;
-                                    const height = 150 - padding * 2;
-                                    const stepX = width / (evolutionData.length - 1);
-                                    
+                                    const height = 150 - padding * 2 - 10;
+                                    const stepX =
+                                        evolutionData.length > 1
+                                            ? width / (evolutionData.length - 1)
+                                            : width;
                                     const points = evolutionData.map((d, i) => ({
                                         x: padding + i * stepX,
-                                        y: (150 - padding) - (d.count / maxYearCount) * height,
-                                        ...d
+                                        y: 150 - padding - (d.count / maxYearCount) * height,
+                                        ...d,
                                     }));
-
-                                    const pathData = points.reduce((acc, p, i) => 
-                                        i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
-                                    
-                                    const areaData = `${pathData} L ${points[points.length-1].x} ${150 - padding} L ${points[0].x} ${150 - padding} Z`;
+                                    const pathData = points.reduce(
+                                        (acc, point, index) =>
+                                            index === 0
+                                                ? `M ${point.x} ${point.y}`
+                                                : `${acc} L ${point.x} ${point.y}`,
+                                        "",
+                                    );
+                                    const areaData = points.length
+                                        ? `${pathData} L ${points[points.length - 1].x} ${150 - padding} L ${points[0].x} ${150 - padding} Z`
+                                        : "";
 
                                     return (
                                         <g>
@@ -200,17 +210,59 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                     <stop offset="100%" stop-color="var(--color-premium-purple)" />
                                                 </linearGradient>
                                                 <linearGradient id="area-gradient-start" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stop-color="var(--color-premium-accent)" stop-opacity="0.2" />
-                                                    <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                                                    <stop offset="0%" stop-color="var(--color-premium-accent)" stop-opacity="0.18" />
+                                                    <stop offset="100%" stop-color="var(--color-premium-accent)" stop-opacity="0" />
                                                 </linearGradient>
                                             </defs>
+
+                                            <line
+                                                x1={padding}
+                                                y1={150 - padding}
+                                                x2={400 - padding}
+                                                y2={150 - padding}
+                                                stroke="#334155"
+                                                stroke-opacity="0.2"
+                                                stroke-width="1"
+                                            />
+
                                             <path d={areaData} fill="url(#area-gradient-start)" />
-                                            <path d={pathData} fill="none" stroke="url(#line-gradient-start)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_8px_rgba(56,189,248,0.3)]" />
-                                            {points.map((p) => (
+                                            <path
+                                                d={pathData}
+                                                fill="none"
+                                                stroke="url(#line-gradient-start)"
+                                                stroke-width="3"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+
+                                            {points.map((point, i) => (
                                                 <g class="group/point">
-                                                    <text x={p.x} y={p.y - 12} text-anchor="middle" class="text-[10px] font-bold fill-text-main select-none">{p.count}</text>
-                                                    <circle cx={p.x} cy={p.y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-accent stroke-[2.5]" />
-                                                    <text x={p.x} y="165" text-anchor="middle" class="text-[10px] font-bold fill-text-muted uppercase tracking-tighter">{p.year}</text>
+                                                    <circle
+                                                        cx={point.x}
+                                                        cy={point.y}
+                                                        r="4"
+                                                        class="fill-bg-main stroke-premium-accent stroke-[2.5]"
+                                                    />
+                                                    <text
+                                                        x={point.x}
+                                                        y={point.y - 10}
+                                                        text-anchor="middle"
+                                                        class="text-[10px] font-bold fill-text-main select-none"
+                                                    >
+                                                        {point.count}
+                                                    </text>
+                                                    {
+                                                        shouldShowYearLabel(i, points.length) && (
+                                                            <text
+                                                                x={point.x}
+                                                                y="165"
+                                                                text-anchor="middle"
+                                                                class="text-[10px] font-bold fill-text-muted"
+                                                            >
+                                                                {point.year}
+                                                            </text>
+                                                        )
+                                                    }
                                                 </g>
                                             ))}
                                         </g>
@@ -234,11 +286,11 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                             <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
                                 {(() => {
                                     if (conclusionsData.length === 0) return null;
-                                    const padding = 20;
+                                    const padding = 22;
                                     const width = 400 - padding * 2;
-                                    const height = 150 - padding * 2;
-                                    const barWidth = Math.min(width / conclusionsData.length * 0.6, 25);
-                                    const stepX = width / (conclusionsData.length > 1 ? conclusionsData.length - 1 : 1);
+                                    const height = 150 - padding * 2 - 10;
+                                    const slotWidth = width / conclusionsData.length;
+                                    const barWidth = Math.min(Math.max(slotWidth * 0.52, 8), 24);
                                     
                                     return (
                                         <g>
@@ -248,8 +300,17 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                     <stop offset="100%" stop-color="#059669" />
                                                 </linearGradient>
                                             </defs>
+                                            <line
+                                                x1={padding}
+                                                y1={150 - padding}
+                                                x2={400 - padding}
+                                                y2={150 - padding}
+                                                stroke="#334155"
+                                                stroke-opacity="0.2"
+                                                stroke-width="1"
+                                            />
                                             {conclusionsData.map((d, i) => {
-                                                const x = conclusionsData.length > 1 ? padding + i * stepX : 200;
+                                                const x = padding + slotWidth * i + slotWidth / 2;
                                                 const barHeight = (d.count / maxConclusionCount) * height;
                                                 const y = (150 - padding) - barHeight;
                                                 
@@ -276,9 +337,9 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                             x={x} 
                                                             y="165" 
                                                             text-anchor="middle" 
-                                                            class="text-[10px] font-bold fill-text-muted uppercase tracking-tighter"
+                                                            class="text-[10px] font-bold fill-text-muted"
                                                         >
-                                                            {d.year}
+                                                            {shouldShowYearLabel(i, conclusionsData.length) ? d.year : ""}
                                                         </text>
                                                     </g>
                                                 );
@@ -314,59 +375,99 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                 </div>
 
                 <!-- Team Evolution Chart -->
-                <div class="h-64 mb-12 px-8 flex flex-col items-center justify-center max-w-4xl mx-auto w-full relative">
-                    <svg viewBox="0 0 400 150" class="w-full h-full overflow-visible">
-                        {(() => {
-                            if (finalTeamEvolution.length < 2) return null;
-                            
-                            const padding = 20;
-                            const width = 400 - padding * 2;
-                            const height = 150 - padding * 2;
-                            const stepX = width / (finalTeamEvolution.length - 1);
-                            
-                            const resPoints = finalTeamEvolution.map((d, i) => ({
-                                x: padding + i * stepX,
-                                y: (150 - padding) - (d.researchers / maxTeamCount) * height,
-                                count: d.researchers,
-                                year: d.year
-                            }));
-
-                            const stuPoints = finalTeamEvolution.map((d, i) => ({
-                                x: padding + i * stepX,
-                                y: (150 - padding) - (d.students / maxTeamCount) * height,
-                                count: d.students,
-                                year: d.year
-                            }));
-
-                            const resPath = resPoints.reduce((acc, p, i) => 
-                                i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
-                            
-                            const stuPath = stuPoints.reduce((acc, p, i) => 
-                                i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, "");
-
-                            return (
-                                <g>
-                                    <!-- Researchers Line -->
-                                    <path d={resPath} fill="none" stroke="var(--color-premium-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_5px_rgba(56,189,248,0.2)]" />
+                        <div class="h-64 mb-12 px-2 md:px-4 flex flex-col items-center justify-center w-full relative">
+                            <svg viewBox="0 0 520 150" class="w-full h-full overflow-visible">
+                                {(() => {
+                                    if (finalTeamEvolution.length === 0) return null;
                                     
-                                    <!-- Students Line -->
-                                    <path d={stuPath} fill="none" stroke="var(--color-premium-purple)" stroke-width="2.5" stroke-dasharray="4 2" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_5px_rgba(147,51,234,0.2)]" />
+                                    const padding = 22;
+                                    const chartWidth = 520;
+                                    const width = chartWidth - padding * 2;
+                                    const height = 150 - padding * 2 - 10;
+                                    const slotWidth = width / finalTeamEvolution.length;
+                                    const groupWidth = Math.min(Math.max(slotWidth * 0.72, 14), 30);
+                                    const barWidth = groupWidth / 2 - 2;
 
-                                    <!-- Points and Labels -->
-                                    {resPoints.map((p, i) => (
+                                    return (
                                         <g>
-                                            <!-- Researcher Label -->
-                                            <text x={p.x} y={p.y - 12} text-anchor="middle" class="text-[10px] font-bold fill-premium-accent select-none">{p.count}</text>
-                                            <circle cx={p.x} cy={p.y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-accent stroke-[2]" />
-                                            
-                                            <!-- Student Label -->
-                                            <text x={stuPoints[i].x} y={stuPoints[i].y + 18} text-anchor="middle" class="text-[10px] font-bold fill-premium-purple select-none">{stuPoints[i].count}</text>
-                                            <circle cx={stuPoints[i].x} cy={stuPoints[i].y} r="4" class="fill-white dark:fill-slate-900 stroke-premium-purple stroke-[2]" />
+                                            <line
+                                                x1={padding}
+                                                y1={150 - padding}
+                                                x2={chartWidth - padding}
+                                                y2={150 - padding}
+                                                stroke="#334155"
+                                                stroke-opacity="0.2"
+                                                stroke-width="1"
+                                            />
 
-                                            <!-- Year Label -->
-                                            <text x={p.x} y="165" text-anchor="middle" class="text-[10px] font-bold fill-text-muted select-none">{p.year}</text>
-                                        </g>
-                                    ))}
+                                    {finalTeamEvolution.map((item, index) => {
+                                        const centerX = padding + slotWidth * index + slotWidth / 2;
+                                        const researchersHeight =
+                                            (item.researchers / maxTeamCount) * height;
+                                        const studentsHeight =
+                                            (item.students / maxTeamCount) * height;
+                                        const researchersY = 150 - padding - researchersHeight;
+                                        const studentsY = 150 - padding - studentsHeight;
+
+                                        return (
+                                            <g>
+                                                <rect
+                                                    x={centerX - groupWidth / 2}
+                                                    y={researchersY}
+                                                    width={barWidth}
+                                                    height={researchersHeight}
+                                                    rx="4"
+                                                    fill="var(--color-premium-accent)"
+                                                    class="opacity-90"
+                                                />
+                                                <rect
+                                                    x={centerX - groupWidth / 2 + barWidth + 4}
+                                                    y={studentsY}
+                                                    width={barWidth}
+                                                    height={studentsHeight}
+                                                    rx="4"
+                                                    fill="var(--color-premium-purple)"
+                                                    class="opacity-85"
+                                                />
+
+                                                {
+                                                    index === finalTeamEvolution.length - 1 && (
+                                                        <>
+                                                            <text
+                                                                x={centerX - groupWidth / 2 + barWidth / 2}
+                                                                y={researchersY - 8}
+                                                                text-anchor="middle"
+                                                                class="text-[10px] font-bold fill-premium-accent select-none"
+                                                            >
+                                                                {item.researchers}
+                                                            </text>
+                                                            <text
+                                                                x={centerX - groupWidth / 2 + barWidth + 4 + barWidth / 2}
+                                                                y={studentsY - 8}
+                                                                text-anchor="middle"
+                                                                class="text-[10px] font-bold fill-premium-purple select-none"
+                                                            >
+                                                                {item.students}
+                                                            </text>
+                                                        </>
+                                                    )
+                                                }
+
+                                                {
+                                                    shouldShowYearLabel(index, finalTeamEvolution.length) && (
+                                                        <text
+                                                            x={centerX}
+                                                            y="165"
+                                                            text-anchor="middle"
+                                                            class="text-[10px] font-bold fill-text-muted select-none"
+                                                        >
+                                                            {item.year}
+                                                        </text>
+                                                    )
+                                                }
+                                            </g>
+                                        );
+                                    })}
                                 </g>
                             );
                         })()}

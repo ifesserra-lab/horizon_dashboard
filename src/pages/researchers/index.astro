@@ -7,6 +7,7 @@ import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
 import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
 import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
 import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
+import { getResearcherCampusSlugs } from "../../lib/tenant-data";
 
 const researchers = (researchersData as Researcher[]).sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -100,6 +101,7 @@ const baseUrl = import.meta.env.BASE_URL;
                         researcher={researcher}
                         stats={researcherStats[researcher.id]}
                         baseUrl={baseUrl}
+                        campusSlugs={getResearcherCampusSlugs(researcher)}
                     />
                 ))
             }
@@ -154,6 +156,7 @@ const baseUrl = import.meta.env.BASE_URL;
 
         function filterResearchers() {
             const query = searchInput.value.toLowerCase().trim();
+            const preferredCampus = localStorage.getItem("preferred-campus") || "";
             let visibleCount = 0;
 
             if (query) {
@@ -165,7 +168,12 @@ const baseUrl = import.meta.env.BASE_URL;
             cards.forEach((card) => {
                 const element = card as HTMLElement;
                 const name = element.dataset.name || "";
-                const matches = !query || name.includes(query);
+                const campusSlugs = (element.dataset.campusSlugs || "")
+                    .split("|")
+                    .filter(Boolean);
+                const matchesCampus =
+                    !preferredCampus || campusSlugs.includes(preferredCampus);
+                const matches = (!query || name.includes(query)) && matchesCampus;
 
                 if (matches) {
                     element.style.display = "flex";
@@ -185,6 +193,7 @@ const baseUrl = import.meta.env.BASE_URL;
         }
 
         searchInput?.addEventListener("input", filterResearchers);
+        window.addEventListener("campus-filter-change", filterResearchers);
         resetBtn?.addEventListener("click", () => {
             searchInput.value = "";
             filterResearchers();
@@ -206,5 +215,7 @@ const baseUrl = import.meta.env.BASE_URL;
                 );
             }
         });
+
+        filterResearchers();
     </script>
 </Layout>

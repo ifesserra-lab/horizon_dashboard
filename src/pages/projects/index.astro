@@ -6,6 +6,12 @@ import ProjectKpiCards from "../../components/projects/ProjectKpiCards.astro";
 import ProjectCharts from "../../components/projects/ProjectCharts.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import type { Project } from "../../types/projects";
+import {
+    buildProjectMart,
+    getProjectCampusSlugs,
+    getProjectsByCampusSlug,
+    getRealCampuses,
+} from "../../lib/tenant-data";
 
 // Cast data to Project type
 const allProjects = projectsData as unknown as Project[];
@@ -14,6 +20,12 @@ const allProjects = projectsData as unknown as Project[];
 const sortedProjects = [...allProjects].sort((a, b) => {
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
 });
+const campusProjectViews = Object.fromEntries(
+    getRealCampuses().map((campus) => [
+        campus.slug,
+        buildProjectMart(getProjectsByCampusSlug(campus.slug)),
+    ]),
+);
 ---
 
 <Layout title="Dashboard de Projetos">
@@ -36,11 +48,20 @@ const sortedProjects = [...allProjects].sort((a, b) => {
             </div>
         </header>
 
-        <!-- KPI Cards -->
-        <ProjectKpiCards martData={martData} />
-
-        <!-- Charts Dashboard -->
-        <ProjectCharts martData={martData} />
+        <div id="project-dashboard-views">
+            <div data-campus-view="">
+                <ProjectKpiCards martData={martData} />
+                <ProjectCharts martData={martData} />
+            </div>
+            {
+                Object.entries(campusProjectViews).map(([slug, view]) => (
+                    <div data-campus-view={slug} class="hidden">
+                        <ProjectKpiCards martData={view} />
+                        <ProjectCharts martData={view} />
+                    </div>
+                ))
+            }
+        </div>
 
         <!-- Search -->
         <div class="relative max-w-md w-full">
@@ -105,7 +126,10 @@ const sortedProjects = [...allProjects].sort((a, b) => {
             >
                 {
                     sortedProjects.map((project) => (
-                        <div class="project-card-wrapper transition-all duration-300">
+                        <div
+                            class="project-card-wrapper transition-all duration-300"
+                            data-campus-slugs={getProjectCampusSlugs(project).join("|")}
+                        >
                             <ProjectCard project={project} />
                         </div>
                     ))
@@ -158,6 +182,7 @@ const sortedProjects = [...allProjects].sort((a, b) => {
 
         function filterProjects() {
             const query = searchInput.value.toLowerCase().trim();
+            const preferredCampus = localStorage.getItem("preferred-campus") || "";
             let visibleCount = 0;
 
             if (query) {
@@ -176,10 +201,16 @@ const sortedProjects = [...allProjects].sort((a, b) => {
 
                 const name = projectCard.dataset.name || "";
                 const status = projectCard.dataset.status || "";
+                const campusSlugs = (element.dataset.campusSlugs || "")
+                    .split("|")
+                    .filter(Boolean);
+                const matchesCampus =
+                    !preferredCampus || campusSlugs.includes(preferredCampus);
                 // For a more complete search, we could include team members if we had them in data-attributes
 
                 const matches =
-                    !query || name.includes(query) || status.includes(query);
+                    (!query || name.includes(query) || status.includes(query)) &&
+                    matchesCampus;
 
                 if (matches) {
                     element.style.display = "block";
@@ -199,11 +230,26 @@ const sortedProjects = [...allProjects].sort((a, b) => {
         }
 
         searchInput?.addEventListener("input", filterProjects);
+        window.addEventListener("campus-filter-change", filterProjects);
+        function updateProjectViews(selectedCampus) {
+            document
+                .querySelectorAll("#project-dashboard-views [data-campus-view]")
+                .forEach((node) => {
+                    const viewCampus = node.getAttribute("data-campus-view") || "";
+                    node.classList.toggle("hidden", viewCampus !== selectedCampus);
+                });
+        }
+        window.addEventListener("campus-filter-change", (event) => {
+            updateProjectViews(event.detail?.campus || "");
+        });
 
         resetBtn?.addEventListener("click", () => {
             searchInput.value = "";
             filterProjects();
             searchInput.focus();
         });
+
+        filterProjects();
+        updateProjectViews(localStorage.getItem("preferred-campus") || "");
     </script>
 </Layout>

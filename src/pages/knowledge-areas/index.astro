@@ -3,6 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import knowledgeAreas from '../../data/mart/knowledge_areas_mart.json';
 import researchGroups from '../../data/canonical/research_groups_canonical.json';
 
+const slugify = (value: string) =>
+	value
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+
 // Calculate KPI values from canonical data
 const totalGroups = researchGroups.length;
 
@@ -73,6 +81,7 @@ const top10Areas = sortedAreas
 					class="area-card glass-card p-6 flex flex-col md:flex-row gap-6 group hover:border-premium-accent/30 transition-all"
 					data-name={area.area_name.toLowerCase()}
 					data-campuses={area.campuses.join('|').toLowerCase()}
+					data-campus-slugs={area.campuses.map(campus => slugify(campus)).join('|')}
 					data-groups={area.groups.map(g => g.name.toLowerCase()).join('|')}
 				>
 					<div class="md:w-1/3">
@@ -137,6 +146,7 @@ const top10Areas = sortedAreas
 
 		function filterAreas() {
 			const query = searchInput.value.toLowerCase().trim();
+			const preferredCampus = localStorage.getItem('preferred-campus') || '';
 			let visibleCount = 0;
 
 			// Show/hide reset button
@@ -150,14 +160,16 @@ const top10Areas = sortedAreas
 				const element = card as HTMLElement;
 				const name = element.dataset.name || '';
 				const campuses = element.dataset.campuses || '';
+				const campusSlugs = (element.dataset.campusSlugs || '').split('|').filter(Boolean);
 				const groups = element.dataset.groups || '';
 				
-				const matches = !query || 
+				const matchesCampus = !preferredCampus || campusSlugs.includes(preferredCampus);
+				const matchesSearch = !query || 
 					name.includes(query) || 
 					campuses.includes(query) ||
 					groups.includes(query);
 
-				if (matches) {
+				if (matchesCampus && matchesSearch) {
 					element.style.display = 'flex';
 					visibleCount++;
 				} else {
@@ -176,11 +188,14 @@ const top10Areas = sortedAreas
 		}
 
 		searchInput?.addEventListener('input', filterAreas);
+		window.addEventListener('campus-filter-change', filterAreas);
 		
 		resetBtn?.addEventListener('click', () => {
 			searchInput.value = '';
 			filterAreas();
 			searchInput.focus();
 		});
+
+		filterAreas();
 	</script>
 </Layout>

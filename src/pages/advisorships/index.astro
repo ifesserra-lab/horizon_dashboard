@@ -8,6 +8,12 @@ import type {
     ProjectAdvisorship,
     AdvisorshipItem,
 } from "../../types/advisorships";
+import { getAdvisorshipCampusSlugs } from "../../lib/tenant-data";
+import {
+    buildAdvisorshipDashboard,
+    getAdvisorshipProjectsByCampusSlug,
+    getRealCampuses,
+} from "../../lib/tenant-data";
 
 // Cast data
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
@@ -213,6 +219,12 @@ const analytics = {
     fellowship_financial_evolution: fellowshipFinancialEvolution,
     top_supervisors: topSupervisors,
 };
+const campusAdvisorshipViews = Object.fromEntries(
+    getRealCampuses().map((campus) => [
+        campus.slug,
+        buildAdvisorshipDashboard(getAdvisorshipProjectsByCampusSlug(campus.slug)),
+    ]),
+);
 ---
 
 <Layout title="Gestão de Orientações | Horizon">
@@ -267,11 +279,23 @@ const analytics = {
             </div>
         </div>
 
-        <AdvisorshipKpiCards summary={summary} />
-
-        <!-- Analytics Section -->
-        <div class="grid grid-cols-1 gap-8">
-            <AdvisorshipCharts analytics={analytics} />
+        <div id="advisorship-dashboard-views">
+            <div data-campus-view="">
+                <AdvisorshipKpiCards summary={summary} />
+                <div class="grid grid-cols-1 gap-8">
+                    <AdvisorshipCharts analytics={analytics} />
+                </div>
+            </div>
+            {
+                Object.entries(campusAdvisorshipViews).map(([slug, view]) => (
+                    <div data-campus-view={slug} class="hidden">
+                        <AdvisorshipKpiCards summary={view.summary} />
+                        <div class="grid grid-cols-1 gap-8">
+                            <AdvisorshipCharts analytics={view.analytics} />
+                        </div>
+                    </div>
+                ))
+            }
         </div>
 
         <!-- Filters and List Section -->
@@ -370,7 +394,16 @@ const analytics = {
                 >
                     {
                         sortedAdvisorships.map((advisorship) => (
-                            <div class="advisorship-item-wrapper transition-all duration-500 hover:scale-[1.02]">
+                            <div
+                                class="advisorship-item-wrapper transition-all duration-500 hover:scale-[1.02]"
+                                data-campus-slugs={getAdvisorshipCampusSlugs(
+                                    allProjects.find((project) =>
+                                        (project.advisorships || []).some(
+                                            (item) => item.id === advisorship.id,
+                                        ),
+                                    ) || allProjects[0],
+                                ).join("|")}
+                            >
                                 <AdvisorshipCard advisorship={advisorship} />
                             </div>
                         ))
@@ -436,11 +469,15 @@ const analytics = {
         const statusTerm = statusFilter.value.toLowerCase();
         const fellowshipTerm = fellowshipFilter.value.toLowerCase();
         const yearTerm = yearFilter.value.toLowerCase();
+        const preferredCampus = localStorage.getItem("preferred-campus") || "";
 
         let visibleCount = 0;
 
         items.forEach((item, index) => {
             const data = initialAdvisorships[index];
+            const campusSlugs = (item.dataset.campusSlugs || "")
+                .split("|")
+                .filter(Boolean);
             const studentName = (data.student_name || "").toLowerCase();
             const supervisorName = (data.supervisor_name || "").toLowerCase();
             const projectName = (data.projectName || "").toLowerCase();
@@ -460,12 +497,15 @@ const analytics = {
             const matchesFellowship =
                 fellowshipTerm === "all" || fellowship === fellowshipTerm;
             const matchesYear = yearTerm === "all" || year === yearTerm;
+            const matchesCampus =
+                !preferredCampus || campusSlugs.includes(preferredCampus);
 
             if (
                 matchesSearch &&
                 matchesStatus &&
                 matchesFellowship &&
-                matchesYear
+                matchesYear &&
+                matchesCampus
             ) {
                 item.style.display = "block";
                 visibleCount++;
@@ -489,6 +529,20 @@ const analytics = {
     statusFilter.addEventListener("change", filter);
     fellowshipFilter.addEventListener("change", filter);
     yearFilter.addEventListener("change", filter);
+    window.addEventListener("campus-filter-change", filter);
+    function updateAdvisorshipViews(selectedCampus) {
+        document
+            .querySelectorAll("#advisorship-dashboard-views [data-campus-view]")
+            .forEach((node) => {
+                const viewCampus = node.getAttribute("data-campus-view") || "";
+                node.classList.toggle("hidden", viewCampus !== selectedCampus);
+            });
+    }
+    window.addEventListener("campus-filter-change", (event) => {
+        updateAdvisorshipViews(event.detail?.campus || "");
+    });
+    filter();
+    updateAdvisorshipViews(localStorage.getItem("preferred-campus") || "");
 </script>
 
 <style>

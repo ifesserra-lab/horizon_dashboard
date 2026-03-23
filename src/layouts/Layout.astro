@@ -9,6 +9,18 @@ import "../styles/global.css";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import AccessibilityToggle from "../components/AccessibilityToggle.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
+import CampusGlobalSelect from "../components/campus/CampusGlobalSelect.astro";
+import { getRealCampuses } from "../lib/tenant-data";
+
+const campuses = getRealCampuses();
+const baseUrlValue = import.meta.env.BASE_URL;
+const pathSegments = Astro.url.pathname
+	.replace(import.meta.env.BASE_URL, "/")
+	.split("/")
+	.filter(Boolean);
+const currentCampusSlug =
+	pathSegments[0] === "campus" && pathSegments[1] ? pathSegments[1] : null;
+const navBasePath = import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
@@ -176,6 +188,11 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 					</h1>
 				</div>
 				<div class="flex items-center gap-4">
+					<CampusGlobalSelect
+						campuses={campuses}
+						currentCampusSlug={currentCampusSlug}
+						compact={true}
+					/>
 					<AccessibilityToggle />
 					<ThemeToggle />
 					<label
@@ -259,7 +276,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 					class="flex-1 flex flex-col gap-2"
 				>
 					<a
-						href={`${import.meta.env.BASE_URL}`}
+						href={navBasePath}
+						data-nav-section="overview"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -280,7 +298,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Dashboard</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}groups`}
+						href={`${navBasePath}groups`}
+						data-nav-section="groups"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -301,7 +320,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Grupos</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}researchers`}
+						href={`${navBasePath}researchers`}
+						data-nav-section="researchers"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -320,7 +340,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Pesquisadores</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}knowledge-areas`}
+						href={`${navBasePath}knowledge-areas`}
+						data-nav-section="knowledge-areas"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -341,7 +362,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Áreas</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}projects`}
+						href={`${navBasePath}projects`}
+						data-nav-section="projects"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -362,7 +384,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Projetos</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}advisorships`}
+						href={`${navBasePath}advisorships`}
+						data-nav-section="advisorships"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -384,9 +407,9 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Orientações</span>
 					</a>
 					<a
-						href="#"
-						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group opacity-50 cursor-not-allowed"
-						aria-disabled="true"
+						href={`${navBasePath}publications`}
+						data-nav-section="publications"
+						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
 							aria-hidden="true"
@@ -406,7 +429,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						<span class="font-medium">Publicações</span>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}download`}
+						href={`${navBasePath}download`}
+						data-nav-section="download"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -462,7 +486,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 					class="flex-1 flex flex-col gap-2 min-w-max"
 				>
 					<a
-						href={`${import.meta.env.BASE_URL}`}
+						href={navBasePath}
+						data-nav-section="overview"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -486,7 +511,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}groups`}
+						href={`${navBasePath}groups`}
+						data-nav-section="groups"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -510,7 +536,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}researchers`}
+						href={`${navBasePath}researchers`}
+						data-nav-section="researchers"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -532,7 +559,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}knowledge-areas`}
+						href={`${navBasePath}knowledge-areas`}
+						data-nav-section="knowledge-areas"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -556,7 +584,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}projects`}
+						href={`${navBasePath}projects`}
+						data-nav-section="projects"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -580,7 +609,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}advisorships`}
+						href={`${navBasePath}advisorships`}
+						data-nav-section="advisorships"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -605,9 +635,9 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href="#"
-						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group opacity-50 cursor-not-allowed"
-						aria-disabled="true"
+						href={`${navBasePath}publications`}
+						data-nav-section="publications"
+						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
 							aria-hidden="true"
@@ -630,7 +660,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 						>
 					</a>
 					<a
-						href={`${import.meta.env.BASE_URL}download`}
+						href={`${navBasePath}download`}
+						data-nav-section="download"
 						class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-premium-accent/10 hover:text-premium-accent group"
 					>
 						<svg
@@ -691,6 +722,10 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 					role="banner"
 					class="hidden md:flex h-16 border-b border-border-main glass-card rounded-none border-x-0 items-center justify-end px-8 z-10 transition-[padding] duration-300 gap-4"
 				>
+					<CampusGlobalSelect
+						campuses={campuses}
+						currentCampusSlug={currentCampusSlug}
+					/>
 					<AccessibilityToggle />
 					<ThemeToggle />
 				</header>
@@ -707,11 +742,13 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 			</div>
 		</div>
 
-		<script is:inline>
+		<script is:inline define:vars={{ baseUrlValue }}>
 			// Desktop Sidebar Toggle Logic
 			const sidebar = document.getElementById("desktop-sidebar");
 			const sidebarToggle = document.getElementById("sidebar-toggle");
 			const STORAGE_KEY = "sidebar-collapsed";
+			const CAMPUS_STORAGE_KEY = "preferred-campus";
+			const baseUrl = baseUrlValue;
 
 			// Initialize state
 			const isCollapsed = localStorage.getItem(STORAGE_KEY) === "true";
@@ -732,6 +769,82 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 				}
 
 				localStorage.setItem(STORAGE_KEY, String(newState));
+			});
+
+			function normalizePath(pathname) {
+				const normalizedBase = baseUrl.endsWith("/")
+					? baseUrl.slice(0, -1)
+					: baseUrl;
+				if (normalizedBase && pathname.startsWith(normalizedBase)) {
+					const stripped = pathname.slice(normalizedBase.length);
+					return stripped.startsWith("/") ? stripped : `/${stripped}`;
+				}
+				return pathname;
+			}
+
+			function detectSection(pathname) {
+				const parts = normalizePath(pathname).split("/").filter(Boolean);
+				return parts[0] || "overview";
+			}
+
+			function buildInstitutionalHref(section) {
+				return section === "overview" ? baseUrl : `${baseUrl}${section}`;
+			}
+
+			function applyCampusLinks(selectedCampus) {
+				const sectionLinks = document.querySelectorAll("[data-nav-section]");
+				sectionLinks.forEach((link) => {
+					const section = link.getAttribute("data-nav-section") || "overview";
+					link.setAttribute("href", buildInstitutionalHref(section));
+				});
+			}
+
+			function syncCampusSelectors(selectedCampus) {
+				const selectors = document.querySelectorAll("[data-campus-switcher]");
+				selectors.forEach((select) => {
+					select.value = selectedCampus || "";
+				});
+			}
+
+			function announceCampusChange(selectedCampus) {
+				document.documentElement.dataset.activeCampus = selectedCampus || "";
+				window.dispatchEvent(
+					new CustomEvent("campus-filter-change", {
+						detail: { campus: selectedCampus || "" },
+					}),
+				);
+			}
+
+			const currentPath = normalizePath(window.location.pathname);
+			const currentParts = currentPath.split("/").filter(Boolean);
+			const campusFromPath =
+				currentParts[0] === "campus" ? currentParts[1] || "" : "";
+			const storedCampus = localStorage.getItem(CAMPUS_STORAGE_KEY) || "";
+			const activeCampus = campusFromPath || storedCampus;
+
+			if (campusFromPath) {
+				localStorage.setItem(CAMPUS_STORAGE_KEY, campusFromPath);
+			}
+
+			applyCampusLinks(activeCampus);
+			syncCampusSelectors(activeCampus);
+			announceCampusChange(activeCampus);
+
+			const selectors = document.querySelectorAll("[data-campus-switcher]");
+			selectors.forEach((select) => {
+				select.addEventListener("change", (event) => {
+					const target = event.currentTarget;
+					const nextCampus = target.value;
+
+					if (nextCampus) {
+						localStorage.setItem(CAMPUS_STORAGE_KEY, nextCampus);
+						announceCampusChange(nextCampus);
+						return;
+					}
+
+					localStorage.removeItem(CAMPUS_STORAGE_KEY);
+					announceCampusChange("");
+				});
 			});
 		</script>
 	</body>
