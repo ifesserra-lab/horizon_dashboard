@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import projectsData from "../../data/canonical/initiatives_canonical.json";
-import martData from "../../data/mart/initiatives_analytics_mart.json";
 import ProjectKpiCards from "../../components/projects/ProjectKpiCards.astro";
 import ProjectCharts from "../../components/projects/ProjectCharts.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
@@ -20,12 +19,22 @@ const allProjects = projectsData as unknown as Project[];
 const sortedProjects = [...allProjects].sort((a, b) => {
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
 });
+const defaultProjectView = buildProjectMart(allProjects);
 const campusProjectViews = Object.fromEntries(
     getRealCampuses().map((campus) => [
         campus.slug,
         buildProjectMart(getProjectsByCampusSlug(campus.slug)),
     ]),
 );
+const projectTotalsByCampus = {
+    "": allProjects.length,
+    ...Object.fromEntries(
+        Object.entries(campusProjectViews).map(([slug, view]) => [
+            slug,
+            view.summary.total_projects,
+        ]),
+    ),
+};
 ---
 
 <Layout title="Dashboard de Projetos">
@@ -50,8 +59,8 @@ const campusProjectViews = Object.fromEntries(
 
         <div id="project-dashboard-views">
             <div data-campus-view="">
-                <ProjectKpiCards martData={martData} />
-                <ProjectCharts martData={martData} />
+                <ProjectKpiCards martData={defaultProjectView} />
+                <ProjectCharts martData={defaultProjectView} />
             </div>
             {
                 Object.entries(campusProjectViews).map(([slug, view]) => (
@@ -115,6 +124,7 @@ const campusProjectViews = Object.fromEntries(
                     Explorar Projetos
                 </h2>
                 <span
+                    id="projects-total-label"
                     class="text-xs font-bold text-text-muted uppercase tracking-widest"
                     >{allProjects.length} Projetos</span
                 >
@@ -172,17 +182,22 @@ const campusProjectViews = Object.fromEntries(
     </div>
 
     <!-- Client-side Logic -->
-    <script>
+    <script define:vars={{ projectTotalsByCampus }}>
         const searchInput = document.getElementById(
             "projectSearch",
         ) as HTMLInputElement;
         const resetBtn = document.getElementById("resetSearch");
         const emptyState = document.getElementById("emptyState");
         const projectCards = document.querySelectorAll(".project-card-wrapper");
+        const totalLabel = document.getElementById("projects-total-label");
+        const totalsByCampus = projectTotalsByCampus || {};
 
         function filterProjects() {
             const query = searchInput.value.toLowerCase().trim();
             const preferredCampus = localStorage.getItem("preferred-campus") || "";
+            const totalForCampus = Number(
+                totalsByCampus[preferredCampus] ?? totalsByCampus[""] ?? 0,
+            );
             let visibleCount = 0;
 
             if (query) {
@@ -226,6 +241,10 @@ const campusProjectViews = Object.fromEntries(
             } else {
                 emptyState?.classList.add("hidden");
                 emptyState?.classList.remove("flex");
+            }
+
+            if (totalLabel) {
+                totalLabel.textContent = `${visibleCount} de ${totalForCampus} projetos`;
             }
         }
 

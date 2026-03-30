@@ -7,7 +7,7 @@ import knowledgeAreasMart from "../data/mart/knowledge_areas_mart.json";
 import type { ResearchGroup } from "../types/groups";
 import type { Researcher } from "../types/researchers";
 import type { Project } from "../types/projects";
-import type { ProjectAdvisorship } from "../types/advisorships";
+import type { AdvisorshipItem, ProjectAdvisorship } from "../types/advisorships";
 
 export interface CampusRecord {
     id: string;
@@ -23,6 +23,13 @@ const slugify = (value: string) =>
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
+const normalizeComparable = (value: string | number | null | undefined) =>
+    String(value ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
 const campuses = (campusesCanonical as { id: string; name: string }[]).map(
     (campus) => ({
         ...campus,
@@ -35,11 +42,43 @@ const researchers = researchersCanonical as Researcher[];
 const projects = initiativesCanonical as any[];
 const advisorshipProjects = advisorshipsCanonical as unknown as ProjectAdvisorship[];
 const areas = knowledgeAreasMart as any[];
+const researcherById = new Map(
+    researchers.map((researcher) => [String(researcher.id), researcher]),
+);
+const researcherByNormalizedName = new Map(
+    researchers.map((researcher) => [
+        normalizeComparable(researcher.name),
+        researcher,
+    ]),
+);
+const researcherCampusSlugsById = new Map<string, string[]>();
+const advisorshipCampusSlugCache = new Map<string, string[]>();
 
 export const getRealCampuses = (): CampusRecord[] => campuses;
 
 export const getRealCampusBySlug = (slug: string): CampusRecord | undefined =>
     campuses.find((campus) => campus.slug === slug);
+
+const findResearcherByReference = ({
+    id,
+    name,
+}: {
+    id?: string | number | null;
+    name?: string | null;
+}) => {
+    const normalizedName = normalizeComparable(name);
+
+    if (id != null && id !== "") {
+        const byId = researcherById.get(String(id));
+        if (byId) return byId;
+    }
+
+    if (!normalizedName) {
+        return undefined;
+    }
+
+    return researcherByNormalizedName.get(normalizedName);
+};
 
 export const getGroupsByCampusSlug = (slug: string): ResearchGroup[] => {
     const campus = getRealCampusBySlug(slug);
@@ -70,7 +109,9 @@ export const getProjectsByCampusSlug = (slug: string): Project[] => {
         campusResearchers.map((researcher) => String(researcher.id)),
     );
     const campusResearcherNames = new Set(
-        campusResearchers.map((researcher) => researcher.name.toLowerCase()),
+        campusResearchers.map((researcher) =>
+            normalizeComparable(researcher.name),
+        ),
     );
 
     return (projects as Project[]).filter((project: any) => {
@@ -81,9 +122,9 @@ export const getProjectsByCampusSlug = (slug: string): Project[] => {
 
         const byTeam = (project.team || []).some((member: any) => {
             const memberId = String(member.person_id || member.id || "");
-            const memberName = String(
+            const memberName = normalizeComparable(
                 member.person_name || member.name || "",
-            ).toLowerCase();
+            );
             return (
                 campusResearcherIds.has(memberId) ||
                 campusResearcherNames.has(memberName)
@@ -94,39 +135,62 @@ export const getProjectsByCampusSlug = (slug: string): Project[] => {
     });
 };
 
-export const getAdvisorshipProjectsByCampusSlug = (
-    slug: string,
-): ProjectAdvisorship[] => {
-    const campusResearchers = getResearchersByCampusSlug(slug);
-    if (campusResearchers.length === 0) return [];
-
-    const campusResearcherIds = new Set(
-        campusResearchers.map((researcher) => String(researcher.id)),
+export const getAdvisorshipItemCampusSlugs = (
+    advisorship: AdvisorshipItem,
+): string[] => {
+    const cacheKey = String(
+        advisorship.id ||
+            `${advisorship.supervisor_id}:${advisorship.student_id}:${advisorship.supervisor_name}:${advisorship.student_name}`,
     );
-    const campusResearcherNames = new Set(
-        campusResearchers.map((researcher) => researcher.name.toLowerCase()),
-    );
+    const cached = advisorshipCampusSlugCache.get(cacheKey);
 
-    return advisorshipProjects.filter((project) => {
-        const byTeam = (project.team || []).some((member) =>
-            campusResearcherNames.has((member.name || "").toLowerCase()),
-        );
+    if (cached) {
+        return cached;
+    }
 
-        const byAdvisorship = (project.advisorships || []).some((advisorship) => {
-            const supervisorId = String(advisorship.supervisor_id || "");
-            const supervisorName = String(
-                advisorship.supervisor_name || "",
-            ).toLowerCase();
-            const studentId = String(advisorship.student_id || "");
-            return (
-                campusResearcherIds.has(supervisorId) ||
-                campusResearcherNames.has(supervisorName) ||
-                campusResearcherIds.has(studentId)
+    const matched = new Set<string>();
+
+    [
+        findResearcherByReference({
+            id: advisorship.supervisor_id,
+            name: advisorship.supervisor_name,
+        }),
+        findResearcherByReference({
+            id: advisorship.student_id,
+            name: advisorship.student_name,
+        }),
+    ]
+        .filter(Boolean)
+        .forEach((researcher) => {
+            getResearcherCampusSlugs(researcher as Researcher).forEach((campusSlug) =>
+                matched.add(campusSlug),
             );
         });
 
-        return byTeam || byAdvisorship;
-    });
+    const campusSlugs = [...matched];
+    advisorshipCampusSlugCache.set(cacheKey, campusSlugs);
+    return campusSlugs;
+};
+
+export const getAdvisorshipProjectsByCampusSlug = (
+    slug: string,
+): ProjectAdvisorship[] => {
+    return advisorshipProjects
+        .map((project) => {
+            const advisorships = (project.advisorships || []).filter((advisorship) =>
+                getAdvisorshipItemCampusSlugs(advisorship).includes(slug),
+            );
+
+            if (advisorships.length === 0) {
+                return null;
+            }
+
+            return {
+                ...project,
+                advisorships,
+            };
+        })
+        .filter(Boolean) as ProjectAdvisorship[];
 };
 
 export const getKnowledgeAreasByCampusSlug = (slug: string) => {
@@ -138,13 +202,22 @@ export const getKnowledgeAreasByCampusSlug = (slug: string) => {
 };
 
 export const getResearcherCampusSlugs = (researcher: Researcher): string[] => {
+    const cacheKey = String(researcher.id);
+    const cached = researcherCampusSlugsById.get(cacheKey);
+
+    if (cached) {
+        return cached;
+    }
+
     const campusGroupIds = new Set(
         (researcher.research_groups || []).map((group) => String(group.id)),
     );
     const matchedCampuses = groups
         .filter((group) => campusGroupIds.has(String(group.id)))
         .map((group) => slugify(group.campus.name));
-    return [...new Set(matchedCampuses)];
+    const campusSlugs = [...new Set(matchedCampuses)];
+    researcherCampusSlugsById.set(cacheKey, campusSlugs);
+    return campusSlugs;
 };
 
 export const getProjectCampusSlugs = (project: any): string[] => {
@@ -158,10 +231,10 @@ export const getProjectCampusSlugs = (project: any): string[] => {
     }
 
     (project.team || []).forEach((member: any) => {
-        const memberName = String(member.person_name || member.name || "").toLowerCase();
-        const researcher = researchers.find(
-            (item) => item.name.toLowerCase() === memberName,
-        );
+        const researcher = findResearcherByReference({
+            id: member.person_id || member.id,
+            name: member.person_name || member.name,
+        });
         if (!researcher) return;
         getResearcherCampusSlugs(researcher).forEach((slug) => matched.add(slug));
     });
@@ -172,22 +245,10 @@ export const getProjectCampusSlugs = (project: any): string[] => {
 export const getAdvisorshipCampusSlugs = (project: ProjectAdvisorship): string[] => {
     const matched = new Set<string>();
 
-    (project.team || []).forEach((member) => {
-        const researcher = researchers.find(
-            (item) => item.name.toLowerCase() === member.name.toLowerCase(),
-        );
-        if (!researcher) return;
-        getResearcherCampusSlugs(researcher).forEach((slug) => matched.add(slug));
-    });
-
     (project.advisorships || []).forEach((advisorship) => {
-        const researcher = researchers.find(
-            (item) =>
-                String(item.id) === String(advisorship.supervisor_id) ||
-                item.name.toLowerCase() === advisorship.supervisor_name.toLowerCase(),
+        getAdvisorshipItemCampusSlugs(advisorship).forEach((slug) =>
+            matched.add(slug),
         );
-        if (!researcher) return;
-        getResearcherCampusSlugs(researcher).forEach((slug) => matched.add(slug));
     });
 
     return [...matched];

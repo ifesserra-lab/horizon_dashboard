@@ -5,6 +5,7 @@ import PublicationsCharts from "../../components/charts/PublicationsCharts.astro
 import {
     buildPublicationsMart,
     getAggregatedPublications,
+    getPublicationsByCampusSlug,
     getCampusPublicationViews,
 } from "../../lib/publications-data";
 
@@ -30,9 +31,56 @@ const uniqueYears = [
     ),
 ].sort((a, b) => b - a);
 
-const researchersWithPublications = [...publicationsMart.top_researchers].sort(
-    (a, b) => a.name.localeCompare(b.name),
-);
+const buildResearcherOptions = (publications: typeof allPublications) => {
+    const authors = new Map<string, { id: string; name: string }>();
+
+    publications.forEach((publication) => {
+        publication.authors.forEach((author) => {
+            if (!authors.has(author.id)) {
+                authors.set(author.id, {
+                    id: author.id,
+                    name: author.name,
+                });
+            }
+        });
+    });
+
+    return [...authors.values()].sort((a, b) => a.name.localeCompare(b.name));
+};
+
+const buildPublicationYears = (publications: typeof allPublications) =>
+    [
+        ...new Set(
+            publications
+                .map((publication) => Number(publication.year))
+                .filter((year) => Number.isFinite(year)),
+        ),
+    ].sort((a, b) => b - a);
+
+const researchersWithPublications = buildResearcherOptions(allPublications);
+const publicationsCatalogByCampus = {
+    "": {
+        total: allPublications.length,
+        researchers: researchersWithPublications,
+        years: uniqueYears,
+        keywords: publicationsMart.top_keywords,
+    },
+    ...Object.fromEntries(
+        Object.keys(campusViews).map((slug) => {
+            const campusPublications = getPublicationsByCampusSlug(slug);
+
+            return [
+                slug,
+                {
+                    total: campusPublications.length,
+                    researchers: buildResearcherOptions(campusPublications),
+                    years: buildPublicationYears(campusPublications),
+                    keywords: campusViews[slug].top_keywords,
+                },
+            ];
+        }),
+    ),
+};
 ---
 
 <Layout
@@ -251,7 +299,7 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
                         </button>
                     </div>
 
-                    <div class="flex flex-wrap gap-2">
+                    <div id="publicationKeywordList" class="flex flex-wrap gap-2">
                         {
                             publicationsMart.top_keywords.map((item) => (
                                 <button
@@ -399,7 +447,7 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
         </main>
     </div>
 
-    <script>
+    <script define:vars={{ publicationsCatalogByCampus }}>
         const publicationSearch = document.getElementById(
             "publicationSearch",
         ) as HTMLInputElement | null;
@@ -412,14 +460,104 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
         const publicationYearFilter = document.getElementById(
             "publicationYearFilter",
         ) as HTMLSelectElement | null;
-        const keywordButtons = document.querySelectorAll(
-            ".publication-keyword-chip",
-        );
+        const keywordContainer = document.getElementById("publicationKeywordList");
         const clearKeywordFilter = document.getElementById("clearKeywordFilter");
         const publicationCards = document.querySelectorAll(".publication-card");
         const emptyState = document.getElementById("publicationsEmptyState");
         const countLabel = document.getElementById("publicationsCountLabel");
+        const publicationsCatalog = publicationsCatalogByCampus || {};
         let selectedKeyword = "";
+
+        function getCatalogForCampus(selectedCampus) {
+            return publicationsCatalog[selectedCampus] || publicationsCatalog[""] || {
+                total: publicationCards.length,
+                researchers: [],
+                years: [],
+                keywords: [],
+            };
+        }
+
+        function populateSelect(select, options, defaultLabel, getOptionValue) {
+            if (!select) return;
+
+            const currentValue = select.value;
+            const allowedValues = ["", ...options.map((option) => getOptionValue(option))];
+            const safeValue = allowedValues.includes(currentValue) ? currentValue : "";
+
+            select.innerHTML = "";
+
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = defaultLabel;
+            select.appendChild(defaultOption);
+
+            options.forEach((option) => {
+                const element = document.createElement("option");
+                const optionValue = getOptionValue(option);
+                element.value = optionValue;
+                element.textContent =
+                    typeof option === "object" && option !== null && "name" in option
+                        ? option.name
+                        : optionValue;
+                select.appendChild(element);
+            });
+
+            select.value = safeValue;
+        }
+
+        function renderKeywordChips(keywords) {
+            if (!keywordContainer) return;
+
+            keywordContainer.innerHTML = keywords
+                .map(
+                    (item) => `
+                        <button
+                            type="button"
+                            class="publication-keyword-chip px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-sm text-text-main transition-colors"
+                            data-keyword="${item.keyword}"
+                        >
+                            ${item.keyword} (${item.count})
+                        </button>
+                    `,
+                )
+                .join("");
+
+            keywordContainer
+                .querySelectorAll(".publication-keyword-chip")
+                .forEach((node) => {
+                    const isActive =
+                        (node as HTMLElement).dataset.keyword === selectedKeyword;
+                    node.classList.toggle("bg-premium-accent/15", isActive);
+                    node.classList.toggle("text-premium-accent", isActive);
+                });
+        }
+
+        function syncCampusControls(selectedCampus) {
+            const catalog = getCatalogForCampus(selectedCampus);
+
+            populateSelect(
+                publicationResearcherFilter,
+                catalog.researchers || [],
+                "Todos os pesquisadores",
+                (option) => String(option.id || ""),
+            );
+            populateSelect(
+                publicationYearFilter,
+                catalog.years || [],
+                "Todos os anos",
+                (option) => String(option),
+            );
+
+            const availableKeywords = (catalog.keywords || []).map(
+                (item) => item.keyword,
+            );
+
+            if (selectedKeyword && !availableKeywords.includes(selectedKeyword)) {
+                selectedKeyword = "";
+            }
+
+            renderKeywordChips(catalog.keywords || []);
+        }
 
         function updatePublicationViews(selectedCampus) {
             document
@@ -438,6 +576,8 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
             const selectedResearcher = publicationResearcherFilter?.value || "";
             const selectedYear = publicationYearFilter?.value || "";
             const selectedCampus = localStorage.getItem("preferred-campus") || "";
+            const campusCatalog = getCatalogForCampus(selectedCampus);
+            const totalForCampus = Number(campusCatalog.total || 0);
             let visibleCount = 0;
 
             publicationCards.forEach((card) => {
@@ -481,7 +621,7 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
             });
 
             if (countLabel) {
-                countLabel.textContent = `${visibleCount} publicações`;
+                countLabel.textContent = `${visibleCount} de ${totalForCampus} publicações`;
             }
 
             if (visibleCount === 0) {
@@ -497,39 +637,40 @@ const researchersWithPublications = [...publicationsMart.top_researchers].sort(
         publicationTypeFilter?.addEventListener("change", filterPublications);
         publicationResearcherFilter?.addEventListener("change", filterPublications);
         publicationYearFilter?.addEventListener("change", filterPublications);
-        keywordButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                selectedKeyword =
-                    (button as HTMLElement).dataset.keyword || "";
-                keywordButtons.forEach((node) =>
-                    node.classList.toggle(
-                        "bg-premium-accent/15",
-                        node === button,
-                    ),
-                );
-                keywordButtons.forEach((node) =>
-                    node.classList.toggle(
-                        "text-premium-accent",
-                        node === button,
-                    ),
-                );
-                filterPublications();
-            });
+        keywordContainer?.addEventListener("click", (event) => {
+            const button = (event.target as HTMLElement)?.closest(
+                ".publication-keyword-chip",
+            ) as HTMLElement | null;
+
+            if (!button) return;
+
+            selectedKeyword = button.dataset.keyword || "";
+            renderKeywordChips(
+                getCatalogForCampus(
+                    localStorage.getItem("preferred-campus") || "",
+                ).keywords || [],
+            );
+            filterPublications();
         });
         clearKeywordFilter?.addEventListener("click", () => {
             selectedKeyword = "";
-            keywordButtons.forEach((node) => {
-                node.classList.remove("bg-premium-accent/15", "text-premium-accent");
-            });
+            renderKeywordChips(
+                getCatalogForCampus(
+                    localStorage.getItem("preferred-campus") || "",
+                ).keywords || [],
+            );
             filterPublications();
         });
         window.addEventListener("campus-filter-change", (event) => {
             const selectedCampus = event.detail?.campus || "";
+            syncCampusControls(selectedCampus);
             updatePublicationViews(selectedCampus);
             filterPublications();
         });
 
-        updatePublicationViews(localStorage.getItem("preferred-campus") || "");
+        const initialCampus = localStorage.getItem("preferred-campus") || "";
+        syncCampusControls(initialCampus);
+        updatePublicationViews(initialCampus);
         filterPublications();
     </script>
 </Layout>
