@@ -10,17 +10,20 @@ import ThemeToggle from "../components/ThemeToggle.astro";
 import AccessibilityToggle from "../components/AccessibilityToggle.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import CampusGlobalSelect from "../components/campus/CampusGlobalSelect.astro";
-import { getRealCampuses } from "../lib/tenant-data";
+import { getRealCampuses, resolveCampusId } from "../lib/tenant-data";
 
 const campuses = getRealCampuses();
+const campusCatalog = campuses.map(({ id, name, slug }) => ({ id, name, slug }));
 const baseUrlValue = import.meta.env.BASE_URL;
+const navBasePath = import.meta.env.BASE_URL;
 const pathSegments = Astro.url.pathname
 	.replace(import.meta.env.BASE_URL, "/")
 	.split("/")
 	.filter(Boolean);
-const currentCampusSlug =
-	pathSegments[0] === "campus" && pathSegments[1] ? pathSegments[1] : null;
-const navBasePath = import.meta.env.BASE_URL;
+const currentCampusId =
+	pathSegments[0] === "campus" && pathSegments[1]
+		? resolveCampusId(pathSegments[1]) || null
+		: null;
 ---
 
 <!doctype html>
@@ -155,6 +158,68 @@ const navBasePath = import.meta.env.BASE_URL;
 			// Re-apply on View Transitions navigation (astro:after-swap)
 			document.addEventListener("astro:after-swap", applyThemeSettings);
 		</script>
+
+		<script
+			is:inline
+			define:vars={{ campusCatalog, currentCampusIdFromPath: currentCampusId }}
+		>
+			(() => {
+				const CAMPUS_STORAGE_KEY = "preferred-campus";
+				const campuses = campusCatalog || [];
+
+				const normalizeComparable = (value) =>
+					String(value ?? "")
+						.normalize("NFD")
+						.replace(/[\u0300-\u036f]/g, "")
+						.toLowerCase()
+						.trim();
+
+				const campusIndex = new Map();
+				campuses.forEach((campus) => {
+					campusIndex.set(String(campus.id), campus);
+					campusIndex.set(String(campus.slug), campus);
+					campusIndex.set(normalizeComparable(campus.name), campus);
+				});
+
+				const resolveCampus = (value) => {
+					const rawValue = String(value ?? "").trim();
+					if (!rawValue) return null;
+					return (
+						campusIndex.get(rawValue) ||
+						campusIndex.get(normalizeComparable(rawValue)) ||
+						null
+					);
+				};
+
+				const syncDocumentCampus = (campus) => {
+					document.documentElement.dataset.activeCampus = campus?.id || "";
+					document.documentElement.dataset.activeCampusSlug =
+						campus?.slug || "";
+					document.documentElement.dataset.activeCampusName =
+						campus?.name || "";
+				};
+
+				const pathCampus = resolveCampus(currentCampusIdFromPath);
+				const storedCampus = resolveCampus(
+					localStorage.getItem(CAMPUS_STORAGE_KEY),
+				);
+				const activeCampus = pathCampus || storedCampus;
+
+				if (activeCampus) {
+					localStorage.setItem(CAMPUS_STORAGE_KEY, String(activeCampus.id));
+				} else {
+					localStorage.removeItem(CAMPUS_STORAGE_KEY);
+				}
+
+				syncDocumentCampus(activeCampus);
+
+				window.__HORIZON_CAMPUS__ = {
+					campuses,
+					resolveCampus,
+					syncDocumentCampus,
+				};
+			})();
+		</script>
 	</head>
 	<body
 		class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300"
@@ -190,7 +255,7 @@ const navBasePath = import.meta.env.BASE_URL;
 				<div class="flex items-center gap-4">
 					<CampusGlobalSelect
 						campuses={campuses}
-						currentCampusSlug={currentCampusSlug}
+						currentCampusId={currentCampusId}
 						compact={true}
 					/>
 					<AccessibilityToggle />
@@ -724,7 +789,7 @@ const navBasePath = import.meta.env.BASE_URL;
 				>
 					<CampusGlobalSelect
 						campuses={campuses}
-						currentCampusSlug={currentCampusSlug}
+						currentCampusId={currentCampusId}
 					/>
 					<AccessibilityToggle />
 					<ThemeToggle />
@@ -749,6 +814,7 @@ const navBasePath = import.meta.env.BASE_URL;
 			const STORAGE_KEY = "sidebar-collapsed";
 			const CAMPUS_STORAGE_KEY = "preferred-campus";
 			const baseUrl = baseUrlValue;
+			const campusRuntime = window.__HORIZON_CAMPUS__ || {};
 
 			// Initialize state
 			const isCollapsed = localStorage.getItem(STORAGE_KEY) === "true";
@@ -791,6 +857,12 @@ const navBasePath = import.meta.env.BASE_URL;
 				return section === "overview" ? baseUrl : `${baseUrl}${section}`;
 			}
 
+			function getCampusRecord(value) {
+				return campusRuntime.resolveCampus
+					? campusRuntime.resolveCampus(value)
+					: null;
+			}
+
 			function applyCampusLinks(selectedCampus) {
 				const sectionLinks = document.querySelectorAll("[data-nav-section]");
 				sectionLinks.forEach((link) => {
@@ -807,10 +879,18 @@ const navBasePath = import.meta.env.BASE_URL;
 			}
 
 			function announceCampusChange(selectedCampus) {
-				document.documentElement.dataset.activeCampus = selectedCampus || "";
+				const campus = getCampusRecord(selectedCampus);
+				if (campusRuntime.syncDocumentCampus) {
+					campusRuntime.syncDocumentCampus(campus);
+				}
 				window.dispatchEvent(
 					new CustomEvent("campus-filter-change", {
-						detail: { campus: selectedCampus || "" },
+						detail: {
+							campusId: campus?.id || "",
+							campusSlug: campus?.slug || "",
+							campusName: campus?.name || "",
+							campus: campus?.id || "",
+						},
 					}),
 				);
 			}
@@ -818,8 +898,12 @@ const navBasePath = import.meta.env.BASE_URL;
 			const currentPath = normalizePath(window.location.pathname);
 			const currentParts = currentPath.split("/").filter(Boolean);
 			const campusFromPath =
-				currentParts[0] === "campus" ? currentParts[1] || "" : "";
-			const storedCampus = localStorage.getItem(CAMPUS_STORAGE_KEY) || "";
+				currentParts[0] === "campus"
+					? getCampusRecord(currentParts[1] || "")?.id || ""
+					: "";
+			const storedCampus =
+				getCampusRecord(localStorage.getItem(CAMPUS_STORAGE_KEY) || "")?.id ||
+				"";
 			const activeCampus = campusFromPath || storedCampus;
 
 			if (campusFromPath) {
@@ -834,7 +918,7 @@ const navBasePath = import.meta.env.BASE_URL;
 			selectors.forEach((select) => {
 				select.addEventListener("change", (event) => {
 					const target = event.currentTarget;
-					const nextCampus = target.value;
+					const nextCampus = getCampusRecord(target.value)?.id || "";
 
 					if (nextCampus) {
 						localStorage.setItem(CAMPUS_STORAGE_KEY, nextCampus);

@@ -39,7 +39,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				class="group-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col"
 				data-name={group.name.toLowerCase()}
 				data-campus={group.campus.name.toLowerCase()}
-				data-campus-slug={group.campus.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}
+				data-campus-id={String(group.campus.id)}
 				data-areas={group.knowledge_areas.map(ka => ka.name.toLowerCase()).join('|')}
 				data-leaders={group.leaders.map(l => l.name.toLowerCase()).join('|')}
 			>
@@ -115,11 +115,11 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				const element = card as HTMLElement;
 				const name = element.dataset.name || '';
 				const campus = element.dataset.campus || '';
-				const campusSlug = element.dataset.campusSlug || '';
+				const campusId = element.dataset.campusId || '';
 				const areas = element.dataset.areas || '';
 				const leaders = element.dataset.leaders || '';
 				
-				const matchesCampus = !preferredCampus || campusSlug === preferredCampus;
+				const matchesCampus = !preferredCampus || campusId === preferredCampus;
 				const matchesSearch = !query || 
 					name.includes(query) || 
 					campus.includes(query) ||

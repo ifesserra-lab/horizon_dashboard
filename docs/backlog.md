@@ -7,9 +7,8 @@ Tracks the delivery of versions to production (Main Branch).
 
 | Version | Date | Status | Description | PR | Issues |
 |---------|------|--------|-------------|-------|--------|
-<<<<<<< HEAD
-| **v2.2.0** | 2026-02-08 | **Released** | Feature: Researcher Profile Timeline & Career Badges | TBD | [#US-003](https://github.com/ifesserra-lab/horizon_dashboard/issues/3) |
-| **v2.1.1** | 2026-02-08 | **Released** | Quickfix: CI/CD Deployment & Advisorship Dashboard Refinements | [#88](https://github.com/ifesserra-lab/horizon_dashboard/pull/88), [#83](https://github.com/ifesserra-lab/horizon_dashboard/pull/83), [#84](https://github.com/ifesserra-lab/horizon_dashboard/pull/84), [#85](https://github.com/ifesserra-lab/horizon_dashboard/pull/85) | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
+| **v2.2.0** | 2026-02-08 | **Released** | Feature: Researcher Profile Timeline & Career Badges | [#89](https://github.com/ifesserra-lab/horizon_dashboard/pull/89) | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
+| **v2.1.1** | 2026-02-08 | **Released** | Quickfix: CI/CD Deployment & Advisorship Dashboard Refinements | [#88](https://github.com/ifesserra-lab/horizon_dashboard/pull/88), [#83](https://github.com/ifesserra-lab/horizon_dashboard/pull/83), [#84](https://github.com/ifesserra-lab/horizon_dashboard/pull/84), [#85](https://github.com/ifesserra-lab/horizon_dashboard/pull/85) | - |
 | **v2.1.0** | 2026-02-06 | **Released** | Feature: Advisorship Chart Segmentation by Type, Project Search/Scroll | TBD | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75), [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
 | **v2.0.1** | 2026-02-04 | **Released** | Refinement: Project Categorization & UI Fixes (Dates, Tooltip) | [#73](https://github.com/ifesserra-lab/horizon_dashboard/pull/73) | [#71](https://github.com/ifesserra-lab/horizon_dashboard/issues/71) |
 | **v2.0.0** | 2026-02-04 | **Released** | Feature: Articles Integration (Modal, Detail, Charts, Search) | TBD | [#US-040](https://github.com/ifesserra-lab/horizon_dashboard/issues/40), [#US-041](https://github.com/ifesserra-lab/horizon_dashboard/issues/41) |
@@ -91,7 +90,10 @@ Reflecting active work from `SI.3 Product Backlog`.
     - [x] **US-041** Gráfico de Evolução de Publicações (Done na v2.0.0)
     - [x] **US-042** Segmentação de Gráfico de Orientações por Tipo ([#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75)) (Done na v2.1.0)
     - [x] **US-043** Busca e Scroll nos Projetos ([#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77)) (Done na v2.1.0)
-    - [x] **Task** Design e Implementação da Timeline do Pesquisador (Done na v2.2.0)
+    - [x] **US-044** Linha do Tempo e Refinamentos do Perfil ([#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79)) (Done na v2.2.0)
     - [x] **Task** Badges de Métricas e Links Externos no Perfil (Done na v2.2.0)
+
+- **Cross-cutting Refinements** _(Concluído)_
+    - [x] **Refinement** Filtro global de campus padronizado por `campus.id` nas páginas principais, com publicações vinculadas ao campus canônico do artigo ([#91](https://github.com/ifesserra-lab/horizon_dashboard/issues/91)) (Concluído em 2026-03-30)
 
 - **Epic 3: Transparência (Release 3)** _(Planejado)_

@@ -7,7 +7,7 @@ import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
 import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
 import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
 import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
-import { getResearcherCampusSlugs } from "../../lib/tenant-data";
+import { getResearcherCampusIds } from "../../lib/tenant-data";
 
 const researchers = (researchersData as Researcher[]).sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -101,7 +101,7 @@ const baseUrl = import.meta.env.BASE_URL;
                         researcher={researcher}
                         stats={researcherStats[researcher.id]}
                         baseUrl={baseUrl}
-                        campusSlugs={getResearcherCampusSlugs(researcher)}
+                        campusIds={getResearcherCampusIds(researcher)}
                     />
                 ))
             }
@@ -168,11 +168,11 @@ const baseUrl = import.meta.env.BASE_URL;
             cards.forEach((card) => {
                 const element = card as HTMLElement;
                 const name = element.dataset.name || "";
-                const campusSlugs = (element.dataset.campusSlugs || "")
+                const campusIds = (element.dataset.campusIds || "")
                     .split("|")
                     .filter(Boolean);
                 const matchesCampus =
-                    !preferredCampus || campusSlugs.includes(preferredCampus);
+                    !preferredCampus || campusIds.includes(preferredCampus);
                 const matches = (!query || name.includes(query)) && matchesCampus;
 
                 if (matches) {

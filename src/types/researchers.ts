@@ -33,12 +33,18 @@ export interface AcademicEducation {
 }
 
 export interface Article {
-    id: string;
+    id: string | number;
     title: string;
-    year: string;
+    year: string | number;
     type: string;
     doi: string | null;
     journal_conference: string;
+    volume?: string | null;
+    pages?: string | null;
+    campus?: {
+        id: string | number;
+        name: string;
+    } | null;
 }
 
 export interface Researcher {

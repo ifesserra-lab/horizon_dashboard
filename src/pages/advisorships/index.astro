@@ -9,9 +9,9 @@ import type {
     AdvisorshipItem,
 } from "../../types/advisorships";
 import {
-    getAdvisorshipItemCampusSlugs,
+    getAdvisorshipItemCampusIds,
     buildAdvisorshipDashboard,
-    getAdvisorshipProjectsByCampusSlug,
+    getAdvisorshipProjectsByCampusId,
     getRealCampuses,
 } from "../../lib/tenant-data";
 
@@ -21,7 +21,7 @@ const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 type AdvisorshipExplorerItem = AdvisorshipItem & {
     projectId: string;
     projectName: string;
-    campusSlugs: string[];
+    campusIds: string[];
 };
 
 const getUniqueFellowships = (items: AdvisorshipExplorerItem[]) =>
@@ -57,7 +57,7 @@ const flattenProjectAdvisorships = (
                 ...advisorship,
                 projectId: String(project.id),
                 projectName: project.name,
-                campusSlugs: getAdvisorshipItemCampusSlugs(advisorship),
+                campusIds: getAdvisorshipItemCampusIds(advisorship),
             })),
         )
         .filter(Boolean);
@@ -242,8 +242,8 @@ const analytics = {
 };
 const campusAdvisorshipViews = Object.fromEntries(
     getRealCampuses().map((campus) => [
-        campus.slug,
-        buildAdvisorshipDashboard(getAdvisorshipProjectsByCampusSlug(campus.slug)),
+        campus.id,
+        buildAdvisorshipDashboard(getAdvisorshipProjectsByCampusId(campus.id)),
     ]),
 );
 const advisorshipCatalogByCampus = {
@@ -255,11 +255,11 @@ const advisorshipCatalogByCampus = {
     ...Object.fromEntries(
         getRealCampuses().map((campus) => {
             const campusItems = flattenProjectAdvisorships(
-                getAdvisorshipProjectsByCampusSlug(campus.slug),
+                getAdvisorshipProjectsByCampusId(campus.id),
             );
 
             return [
-                campus.slug,
+                campus.id,
                 {
                     total: campusItems.length,
                     fellowships: getUniqueFellowships(campusItems),
@@ -333,9 +333,9 @@ const advisorshipCatalogByCampus = {
                     <AdvisorshipCharts analytics={analytics} />
                 </div>
             </div>
-            {
-                Object.entries(campusAdvisorshipViews).map(([slug, view]) => (
-                    <div data-campus-view={slug} class="hidden">
+                {
+                    Object.entries(campusAdvisorshipViews).map(([campusId, view]) => (
+                    <div data-campus-view={campusId} class="hidden">
                         <AdvisorshipKpiCards summary={view.summary} />
                         <div class="grid grid-cols-1 gap-8">
                             <AdvisorshipCharts analytics={view.analytics} />
@@ -449,7 +449,7 @@ const advisorshipCatalogByCampus = {
                         sortedAdvisorships.map((advisorship) => (
                             <div
                                 class="advisorship-item-wrapper transition-all duration-500 hover:scale-[1.02]"
-                                data-campus-slugs={advisorship.campusSlugs.join("|")}
+                                data-campus-ids={advisorship.campusIds.join("|")}
                             >
                                 <AdvisorshipCard advisorship={advisorship} />
                             </div>
@@ -582,7 +582,7 @@ const advisorshipCatalogByCampus = {
 
         items.forEach((item, index) => {
             const data = initialAdvisorships[index];
-            const campusSlugs = (item.dataset.campusSlugs || "")
+            const campusIds = (item.dataset.campusIds || "")
                 .split("|")
                 .filter(Boolean);
             const studentName = (data.student_name || "").toLowerCase();
@@ -605,7 +605,7 @@ const advisorshipCatalogByCampus = {
                 fellowshipTerm === "all" || fellowship === fellowshipTerm;
             const matchesYear = yearTerm === "all" || year === yearTerm;
             const matchesCampus =
-                !preferredCampus || campusSlugs.includes(preferredCampus);
+                !preferredCampus || campusIds.includes(preferredCampus);
 
             if (
                 matchesSearch &&
@@ -637,7 +637,7 @@ const advisorshipCatalogByCampus = {
     fellowshipFilter.addEventListener("change", filter);
     yearFilter.addEventListener("change", filter);
     window.addEventListener("campus-filter-change", (event) => {
-        const selectedCampus = event.detail?.campus || "";
+        const selectedCampus = event.detail?.campusId || event.detail?.campus || "";
         syncCampusControls(selectedCampus);
         filter();
         updateAdvisorshipViews(selectedCampus);

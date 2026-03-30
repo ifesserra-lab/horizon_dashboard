@@ -2,14 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import knowledgeAreas from '../../data/mart/knowledge_areas_mart.json';
 import researchGroups from '../../data/canonical/research_groups_canonical.json';
-
-const slugify = (value: string) =>
-	value
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '');
+import { getCampusIdsFromNames } from '../../lib/tenant-data';
 
 // Calculate KPI values from canonical data
 const totalGroups = researchGroups.length;
@@ -81,7 +74,7 @@ const top10Areas = sortedAreas
 					class="area-card glass-card p-6 flex flex-col md:flex-row gap-6 group hover:border-premium-accent/30 transition-all"
 					data-name={area.area_name.toLowerCase()}
 					data-campuses={area.campuses.join('|').toLowerCase()}
-					data-campus-slugs={area.campuses.map(campus => slugify(campus)).join('|')}
+					data-campus-ids={getCampusIdsFromNames(area.campuses).join('|')}
 					data-groups={area.groups.map(g => g.name.toLowerCase()).join('|')}
 				>
 					<div class="md:w-1/3">
@@ -160,10 +153,10 @@ const top10Areas = sortedAreas
 				const element = card as HTMLElement;
 				const name = element.dataset.name || '';
 				const campuses = element.dataset.campuses || '';
-				const campusSlugs = (element.dataset.campusSlugs || '').split('|').filter(Boolean);
+				const campusIds = (element.dataset.campusIds || '').split('|').filter(Boolean);
 				const groups = element.dataset.groups || '';
 				
-				const matchesCampus = !preferredCampus || campusSlugs.includes(preferredCampus);
+				const matchesCampus = !preferredCampus || campusIds.includes(preferredCampus);
 				const matchesSearch = !query || 
 					name.includes(query) || 
 					campuses.includes(query) ||

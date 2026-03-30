@@ -10,9 +10,9 @@ import type { ProjectAdvisorship } from "../types/advisorships";
 import {
 	buildAdvisorshipDashboard,
 	buildProjectMart,
-	getAdvisorshipProjectsByCampusSlug,
-	getGroupsByCampusSlug,
-	getProjectsByCampusSlug,
+	getAdvisorshipProjectsByCampusId,
+	getGroupsByCampusId,
+	getProjectsByCampusId,
 	getRealCampuses,
 } from "../lib/tenant-data";
 
@@ -208,7 +208,7 @@ const campusStats = Object.fromEntries(
 	getRealCampuses().map((campus) => {
 		const campusGroups = groups.filter((group) => group.campus.id === campus.id);
 		return [
-			campus.slug,
+			campus.id,
 			{
 				totalGroups: campusGroups.length,
 				totalMembers: campusGroups.reduce(
@@ -227,12 +227,12 @@ const campusStats = Object.fromEntries(
 );
 const campusHomeViews = Object.fromEntries(
 	getRealCampuses().map((campus) => [
-		campus.slug,
+		campus.id,
 		{
-			groups: getGroupsByCampusSlug(campus.slug),
-			projectMart: buildProjectMart(getProjectsByCampusSlug(campus.slug)),
+			groups: getGroupsByCampusId(campus.id),
+			projectMart: buildProjectMart(getProjectsByCampusId(campus.id)),
 			advisorship: buildAdvisorshipDashboard(
-				getAdvisorshipProjectsByCampusSlug(campus.slug),
+				getAdvisorshipProjectsByCampusId(campus.id),
 			),
 		},
 	]),
@@ -294,8 +294,8 @@ const campusHomeViews = Object.fromEntries(
 			<HomeCharts />
 		</div>
 		{
-			Object.entries(campusHomeViews).map(([slug, view]) => (
-				<div data-campus-view={slug} class="hidden">
+			Object.entries(campusHomeViews).map(([campusId, view]) => (
+				<div data-campus-view={campusId} class="hidden">
 					<HomeCharts martData={view.projectMart} groupsData={view.groups} />
 				</div>
 			))
@@ -314,8 +314,8 @@ const campusHomeViews = Object.fromEntries(
 			/>
 		</section>
 		{
-			Object.entries(campusHomeViews).map(([slug, view]) => (
-				<section class="mt-12 mb-12 hidden" data-campus-view={slug}>
+			Object.entries(campusHomeViews).map(([campusId, view]) => (
+				<section class="mt-12 mb-12 hidden" data-campus-view={campusId}>
 					<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
 						Investimento e Bolsas
 					</h2>
@@ -353,9 +353,9 @@ const campusHomeViews = Object.fromEntries(
 		}
 
 		window.addEventListener('campus-filter-change', (event) => {
-			const campus = event.detail?.campus || '';
-			updateHomeKpis(campus);
-			updateHomeViews(campus);
+			const campusId = event.detail?.campusId || event.detail?.campus || '';
+			updateHomeKpis(campusId);
+			updateHomeViews(campusId);
 		});
 
 		const initialCampus = localStorage.getItem('preferred-campus') || '';

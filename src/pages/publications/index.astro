@@ -5,7 +5,7 @@ import PublicationsCharts from "../../components/charts/PublicationsCharts.astro
 import {
     buildPublicationsMart,
     getAggregatedPublications,
-    getPublicationsByCampusSlug,
+    getPublicationsByCampusId,
     getCampusPublicationViews,
 } from "../../lib/publications-data";
 
@@ -66,16 +66,16 @@ const publicationsCatalogByCampus = {
         keywords: publicationsMart.top_keywords,
     },
     ...Object.fromEntries(
-        Object.keys(campusViews).map((slug) => {
-            const campusPublications = getPublicationsByCampusSlug(slug);
+        Object.keys(campusViews).map((campusId) => {
+            const campusPublications = getPublicationsByCampusId(campusId);
 
             return [
-                slug,
+                campusId,
                 {
                     total: campusPublications.length,
                     researchers: buildResearcherOptions(campusPublications),
                     years: buildPublicationYears(campusPublications),
-                    keywords: campusViews[slug].top_keywords,
+                    keywords: campusViews[campusId].top_keywords,
                 },
             ];
         }),
@@ -142,8 +142,8 @@ const publicationsCatalogByCampus = {
                 </div>
 
                 {
-                    Object.entries(campusViews).map(([slug, martData]) => (
-                        <div data-campus-view={slug} class="space-y-8 hidden">
+                    Object.entries(campusViews).map(([campusId, martData]) => (
+                        <div data-campus-view={campusId} class="space-y-8 hidden">
                             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
                                 <KpiCard
                                     title="Publicações"
@@ -319,7 +319,7 @@ const publicationsCatalogByCampus = {
                         allPublications.map((publication) => (
                             <article
                                 class="publication-card glass-card p-6 space-y-4 transition-all duration-300"
-                                data-campus-slugs={publication.campus_slugs.join("|")}
+                                data-campus-id={publication.campus_id}
                                 data-title={publication.title.toLowerCase()}
                                 data-venue={String(
                                     publication.journal_conference || "",
@@ -582,11 +582,9 @@ const publicationsCatalogByCampus = {
 
             publicationCards.forEach((card) => {
                 const element = card as HTMLElement;
-                const campusSlugs = (element.dataset.campusSlugs || "")
-                    .split("|")
-                    .filter(Boolean);
                 const matchesCampus =
-                    !selectedCampus || campusSlugs.includes(selectedCampus);
+                    !selectedCampus ||
+                    (element.dataset.campusId || "") === selectedCampus;
                 const matchesQuery =
                     !query ||
                     (element.dataset.title || "").includes(query) ||
@@ -662,7 +660,7 @@ const publicationsCatalogByCampus = {
             filterPublications();
         });
         window.addEventListener("campus-filter-change", (event) => {
-            const selectedCampus = event.detail?.campus || "";
+            const selectedCampus = event.detail?.campusId || event.detail?.campus || "";
             syncCampusControls(selectedCampus);
             updatePublicationViews(selectedCampus);
             filterPublications();

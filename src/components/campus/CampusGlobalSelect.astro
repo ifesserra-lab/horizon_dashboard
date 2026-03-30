@@ -1,16 +1,17 @@
 ---
 interface CampusOption {
+    id: string;
     slug: string;
     name: string;
 }
 
 interface Props {
     campuses: CampusOption[];
-    currentCampusSlug?: string | null;
+    currentCampusId?: string | null;
     compact?: boolean;
 }
 
-const { campuses, currentCampusSlug = null, compact = false } = Astro.props;
+const { campuses, currentCampusId = null, compact = false } = Astro.props;
 const selectId = compact ? "campus-global-select-mobile" : "campus-global-select";
 ---
 
@@ -26,14 +27,14 @@ const selectId = compact ? "campus-global-select-mobile" : "campus-global-select
             id={selectId}
             data-campus-switcher
             class="w-full appearance-none rounded-xl border border-border-main bg-[var(--tag-bg)] px-4 py-2.5 pr-10 text-sm font-semibold text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/50"
-            value={currentCampusSlug ?? ""}
+            value={currentCampusId ?? ""}
         >
             <option value="">Todos os campi</option>
             {
                 campuses.map((campus) => (
                     <option
-                        value={campus.slug}
-                        selected={campus.slug === currentCampusSlug}
+                        value={campus.id}
+                        selected={campus.id === currentCampusId}
                     >
                         {campus.name}
                     </option>

@@ -30,9 +30,10 @@ const normalizeComparable = (value: string | number | null | undefined) =>
         .toLowerCase()
         .trim();
 
-const campuses = (campusesCanonical as { id: string; name: string }[]).map(
+const campuses = (campusesCanonical as { id: string | number; name: string }[]).map(
     (campus) => ({
-        ...campus,
+        id: String(campus.id),
+        name: campus.name,
         slug: slugify(campus.name),
     }),
 );
@@ -42,6 +43,11 @@ const researchers = researchersCanonical as Researcher[];
 const projects = initiativesCanonical as any[];
 const advisorshipProjects = advisorshipsCanonical as unknown as ProjectAdvisorship[];
 const areas = knowledgeAreasMart as any[];
+const campusById = new Map(campuses.map((campus) => [campus.id, campus]));
+const campusBySlug = new Map(campuses.map((campus) => [campus.slug, campus]));
+const campusByNormalizedName = new Map(
+    campuses.map((campus) => [normalizeComparable(campus.name), campus]),
+);
 const researcherById = new Map(
     researchers.map((researcher) => [String(researcher.id), researcher]),
 );
@@ -51,13 +57,48 @@ const researcherByNormalizedName = new Map(
         researcher,
     ]),
 );
-const researcherCampusSlugsById = new Map<string, string[]>();
-const advisorshipCampusSlugCache = new Map<string, string[]>();
+const researcherCampusIdsById = new Map<string, string[]>();
+const advisorshipCampusIdCache = new Map<string, string[]>();
 
 export const getRealCampuses = (): CampusRecord[] => campuses;
 
+export const getRealCampusById = (id: string): CampusRecord | undefined =>
+    campusById.get(String(id));
+
 export const getRealCampusBySlug = (slug: string): CampusRecord | undefined =>
-    campuses.find((campus) => campus.slug === slug);
+    campusBySlug.get(String(slug));
+
+export const getRealCampusByName = (name: string): CampusRecord | undefined =>
+    campusByNormalizedName.get(normalizeComparable(name));
+
+export const resolveCampusRecord = (
+    value: string | number | null | undefined,
+): CampusRecord | undefined => {
+    const normalized = String(value ?? "").trim();
+
+    if (!normalized) {
+        return undefined;
+    }
+
+    return (
+        getRealCampusById(normalized) ||
+        getRealCampusBySlug(normalized) ||
+        getRealCampusByName(normalized)
+    );
+};
+
+export const resolveCampusId = (
+    value: string | number | null | undefined,
+): string => resolveCampusRecord(value)?.id || "";
+
+export const getCampusIdsFromNames = (campusNames: string[] = []): string[] =>
+    [
+        ...new Set(
+            campusNames
+                .map((campusName) => resolveCampusId(campusName))
+                .filter(Boolean),
+        ),
+    ];
 
 const findResearcherByReference = ({
     id,
@@ -80,14 +121,17 @@ const findResearcherByReference = ({
     return researcherByNormalizedName.get(normalizedName);
 };
 
-export const getGroupsByCampusSlug = (slug: string): ResearchGroup[] => {
-    const campus = getRealCampusBySlug(slug);
+export const getGroupsByCampusId = (campusId: string): ResearchGroup[] => {
+    const campus = getRealCampusById(campusId);
     if (!campus) return [];
     return groups.filter((group) => String(group.campus_id) === String(campus.id));
 };
 
-export const getResearchersByCampusSlug = (slug: string): Researcher[] => {
-    const campusGroups = getGroupsByCampusSlug(slug);
+export const getGroupsByCampusSlug = (slug: string): ResearchGroup[] =>
+    getGroupsByCampusId(resolveCampusId(slug));
+
+export const getResearchersByCampusId = (campusId: string): Researcher[] => {
+    const campusGroups = getGroupsByCampusId(campusId);
     if (campusGroups.length === 0) return [];
 
     const campusGroupIds = new Set(campusGroups.map((group) => String(group.id)));
@@ -98,9 +142,12 @@ export const getResearchersByCampusSlug = (slug: string): Researcher[] => {
     );
 };
 
-export const getProjectsByCampusSlug = (slug: string): Project[] => {
-    const campusGroups = getGroupsByCampusSlug(slug);
-    const campusResearchers = getResearchersByCampusSlug(slug);
+export const getResearchersByCampusSlug = (slug: string): Researcher[] =>
+    getResearchersByCampusId(resolveCampusId(slug));
+
+export const getProjectsByCampusId = (campusId: string): Project[] => {
+    const campusGroups = getGroupsByCampusId(campusId);
+    const campusResearchers = getResearchersByCampusId(campusId);
 
     if (campusGroups.length === 0) return [];
 
@@ -135,14 +182,17 @@ export const getProjectsByCampusSlug = (slug: string): Project[] => {
     });
 };
 
-export const getAdvisorshipItemCampusSlugs = (
+export const getProjectsByCampusSlug = (slug: string): Project[] =>
+    getProjectsByCampusId(resolveCampusId(slug));
+
+export const getAdvisorshipItemCampusIds = (
     advisorship: AdvisorshipItem,
 ): string[] => {
     const cacheKey = String(
         advisorship.id ||
             `${advisorship.supervisor_id}:${advisorship.student_id}:${advisorship.supervisor_name}:${advisorship.student_name}`,
     );
-    const cached = advisorshipCampusSlugCache.get(cacheKey);
+    const cached = advisorshipCampusIdCache.get(cacheKey);
 
     if (cached) {
         return cached;
@@ -162,23 +212,30 @@ export const getAdvisorshipItemCampusSlugs = (
     ]
         .filter(Boolean)
         .forEach((researcher) => {
-            getResearcherCampusSlugs(researcher as Researcher).forEach((campusSlug) =>
-                matched.add(campusSlug),
+            getResearcherCampusIds(researcher as Researcher).forEach((campusId) =>
+                matched.add(campusId),
             );
         });
 
-    const campusSlugs = [...matched];
-    advisorshipCampusSlugCache.set(cacheKey, campusSlugs);
-    return campusSlugs;
+    const campusIds = [...matched];
+    advisorshipCampusIdCache.set(cacheKey, campusIds);
+    return campusIds;
 };
 
-export const getAdvisorshipProjectsByCampusSlug = (
-    slug: string,
+export const getAdvisorshipItemCampusSlugs = (
+    advisorship: AdvisorshipItem,
+): string[] =>
+    getAdvisorshipItemCampusIds(advisorship)
+        .map((campusId) => getRealCampusById(campusId)?.slug || "")
+        .filter(Boolean);
+
+export const getAdvisorshipProjectsByCampusId = (
+    campusId: string,
 ): ProjectAdvisorship[] => {
     return advisorshipProjects
         .map((project) => {
             const advisorships = (project.advisorships || []).filter((advisorship) =>
-                getAdvisorshipItemCampusSlugs(advisorship).includes(slug),
+                getAdvisorshipItemCampusIds(advisorship).includes(campusId),
             );
 
             if (advisorships.length === 0) {
@@ -193,17 +250,24 @@ export const getAdvisorshipProjectsByCampusSlug = (
         .filter(Boolean) as ProjectAdvisorship[];
 };
 
-export const getKnowledgeAreasByCampusSlug = (slug: string) => {
-    const campus = getRealCampusBySlug(slug);
+export const getAdvisorshipProjectsByCampusSlug = (
+    slug: string,
+): ProjectAdvisorship[] => getAdvisorshipProjectsByCampusId(resolveCampusId(slug));
+
+export const getKnowledgeAreasByCampusId = (campusId: string) => {
+    const campus = getRealCampusById(campusId);
     if (!campus) return [];
     return areas.filter((area) =>
         (area.campuses || []).includes(campus.name),
     );
 };
 
-export const getResearcherCampusSlugs = (researcher: Researcher): string[] => {
+export const getKnowledgeAreasByCampusSlug = (slug: string) =>
+    getKnowledgeAreasByCampusId(resolveCampusId(slug));
+
+export const getResearcherCampusIds = (researcher: Researcher): string[] => {
     const cacheKey = String(researcher.id);
-    const cached = researcherCampusSlugsById.get(cacheKey);
+    const cached = researcherCampusIdsById.get(cacheKey);
 
     if (cached) {
         return cached;
@@ -214,20 +278,25 @@ export const getResearcherCampusSlugs = (researcher: Researcher): string[] => {
     );
     const matchedCampuses = groups
         .filter((group) => campusGroupIds.has(String(group.id)))
-        .map((group) => slugify(group.campus.name));
-    const campusSlugs = [...new Set(matchedCampuses)];
-    researcherCampusSlugsById.set(cacheKey, campusSlugs);
-    return campusSlugs;
+        .map((group) => String(group.campus.id));
+    const campusIds = [...new Set(matchedCampuses)];
+    researcherCampusIdsById.set(cacheKey, campusIds);
+    return campusIds;
 };
 
-export const getProjectCampusSlugs = (project: any): string[] => {
+export const getResearcherCampusSlugs = (researcher: Researcher): string[] =>
+    getResearcherCampusIds(researcher)
+        .map((campusId) => getRealCampusById(campusId)?.slug || "")
+        .filter(Boolean);
+
+export const getProjectCampusIds = (project: any): string[] => {
     const matched = new Set<string>();
 
     if (project.research_group && project.research_group !== "None") {
         const group = groups.find(
             (item) => String(item.id) === String(project.research_group.id),
         );
-        if (group) matched.add(slugify(group.campus.name));
+        if (group) matched.add(String(group.campus.id));
     }
 
     (project.team || []).forEach((member: any) => {
@@ -236,23 +305,37 @@ export const getProjectCampusSlugs = (project: any): string[] => {
             name: member.person_name || member.name,
         });
         if (!researcher) return;
-        getResearcherCampusSlugs(researcher).forEach((slug) => matched.add(slug));
-    });
-
-    return [...matched];
-};
-
-export const getAdvisorshipCampusSlugs = (project: ProjectAdvisorship): string[] => {
-    const matched = new Set<string>();
-
-    (project.advisorships || []).forEach((advisorship) => {
-        getAdvisorshipItemCampusSlugs(advisorship).forEach((slug) =>
-            matched.add(slug),
+        getResearcherCampusIds(researcher).forEach((campusId) =>
+            matched.add(campusId),
         );
     });
 
     return [...matched];
 };
+
+export const getProjectCampusSlugs = (project: any): string[] =>
+    getProjectCampusIds(project)
+        .map((campusId) => getRealCampusById(campusId)?.slug || "")
+        .filter(Boolean);
+
+export const getAdvisorshipCampusIds = (project: ProjectAdvisorship): string[] => {
+    const matched = new Set<string>();
+
+    (project.advisorships || []).forEach((advisorship) => {
+        getAdvisorshipItemCampusIds(advisorship).forEach((campusId) =>
+            matched.add(campusId),
+        );
+    });
+
+    return [...matched];
+};
+
+export const getAdvisorshipCampusSlugs = (
+    project: ProjectAdvisorship,
+): string[] =>
+    getAdvisorshipCampusIds(project)
+        .map((campusId) => getRealCampusById(campusId)?.slug || "")
+        .filter(Boolean);
 
 export const buildProjectMart = (projectList: any[]) => {
     const totalProjects = projectList.length;

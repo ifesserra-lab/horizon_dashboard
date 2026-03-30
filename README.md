@@ -28,6 +28,10 @@
 - **Distribuição de Grupos**: Visualização da distribuição de grupos por grande área
 - **KPIs Institucionais**: Métricas de impacto e produção acadêmica
 
+### 🧭 Filtro Global por Campus e Dados Canônicos
+- **Filtro Persistente por ID**: O filtro global de campus usa `campus.id` como chave canônica em todas as páginas principais, mantendo compatibilidade com valores legados em slug e nome.
+- **Publicações por Campus Canônico**: A página de publicações usa `articles_canonical.campus.id/name` como fonte de verdade, evitando inferir campus pelos autores e impedindo duplicidade por coautoria.
+
 ### ♿ Acessibilidade Completa (v1.3.0)
 **Conformidade WCAG 2.1 Nível AA Certificada**
 

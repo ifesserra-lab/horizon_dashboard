@@ -5,6 +5,10 @@ export interface Publication {
     type: 'Article' | 'Conference' | 'Book' | 'Chapter' | 'Other';
     venue?: string;
     authors: string[];
+    campus?: {
+        id: string;
+        name: string;
+    } | null;
 }
 
 export interface ResearcherPublicationMetrics {

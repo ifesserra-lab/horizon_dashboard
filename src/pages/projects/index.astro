@@ -7,8 +7,8 @@ import ProjectCard from "../../components/ProjectCard.astro";
 import type { Project } from "../../types/projects";
 import {
     buildProjectMart,
-    getProjectCampusSlugs,
-    getProjectsByCampusSlug,
+    getProjectCampusIds,
+    getProjectsByCampusId,
     getRealCampuses,
 } from "../../lib/tenant-data";
 
@@ -22,8 +22,8 @@ const sortedProjects = [...allProjects].sort((a, b) => {
 const defaultProjectView = buildProjectMart(allProjects);
 const campusProjectViews = Object.fromEntries(
     getRealCampuses().map((campus) => [
-        campus.slug,
-        buildProjectMart(getProjectsByCampusSlug(campus.slug)),
+        campus.id,
+        buildProjectMart(getProjectsByCampusId(campus.id)),
     ]),
 );
 const projectTotalsByCampus = {
@@ -63,8 +63,8 @@ const projectTotalsByCampus = {
                 <ProjectCharts martData={defaultProjectView} />
             </div>
             {
-                Object.entries(campusProjectViews).map(([slug, view]) => (
-                    <div data-campus-view={slug} class="hidden">
+                Object.entries(campusProjectViews).map(([campusId, view]) => (
+                    <div data-campus-view={campusId} class="hidden">
                         <ProjectKpiCards martData={view} />
                         <ProjectCharts martData={view} />
                     </div>
@@ -138,7 +138,7 @@ const projectTotalsByCampus = {
                     sortedProjects.map((project) => (
                         <div
                             class="project-card-wrapper transition-all duration-300"
-                            data-campus-slugs={getProjectCampusSlugs(project).join("|")}
+                            data-campus-ids={getProjectCampusIds(project).join("|")}
                         >
                             <ProjectCard project={project} />
                         </div>
@@ -216,11 +216,11 @@ const projectTotalsByCampus = {
 
                 const name = projectCard.dataset.name || "";
                 const status = projectCard.dataset.status || "";
-                const campusSlugs = (element.dataset.campusSlugs || "")
+                const campusIds = (element.dataset.campusIds || "")
                     .split("|")
                     .filter(Boolean);
                 const matchesCampus =
-                    !preferredCampus || campusSlugs.includes(preferredCampus);
+                    !preferredCampus || campusIds.includes(preferredCampus);
                 // For a more complete search, we could include team members if we had them in data-attributes
 
                 const matches =
@@ -259,7 +259,7 @@ const projectTotalsByCampus = {
                 });
         }
         window.addEventListener("campus-filter-change", (event) => {
-            updateProjectViews(event.detail?.campus || "");
+            updateProjectViews(event.detail?.campusId || event.detail?.campus || "");
         });
 
         resetBtn?.addEventListener("click", () => {

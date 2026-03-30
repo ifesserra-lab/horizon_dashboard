@@ -1,7 +1,7 @@
 # Product Backlog – Horizon Dashboard
-**Última atualização:** 10/01/2026
+**Última atualização:** 30/03/2026
 **Responsável (PO):** Antigravity (Senior Lead)
-**Versão do Documento:** 1.0
+**Versão do Documento:** 1.1
 
 ---
 
@@ -193,7 +193,9 @@ Exibir métricas consolidadas (Índice H, Citações totais) integradas aos card
 | **US-030** | Painel de Acessibilidade Completo | **Done** | v1.3.0 | [#56](https://github.com/ifesserra-lab/horizon_dashboard/issues/56) |
 | **US-036** | Catálogo e Dashboard de Orientações | **Done** | v1.3.2 | [#51](https://github.com/ifesserra-lab/horizon_dashboard/pull/51) |
 | **US-042** | Segmentação de Gráfico de Orientações por Tipo | **Done** | v2.1.0 | [#75](https://github.com/ifesserra-lab/horizon_dashboard/issues/75) |
-| US-043 | Busca e Scroll nos Projetos | Média | Facilitar navegação em listas longas de projetos | OK | [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
+| **US-043** | Busca e Scroll nos Projetos | **Done** | v2.1.0 | [#77](https://github.com/ifesserra-lab/horizon_dashboard/issues/77) |
+| **US-044** | Linha do Tempo e Refinamentos do Perfil | **Done** | v2.2.0 | [#79](https://github.com/ifesserra-lab/horizon_dashboard/issues/79) |
+| **Refinement** | Filtro global de campus por ID canônico e publicações por campus canônico | **Done** | 2026-03-30 | [#91](https://github.com/ifesserra-lab/horizon_dashboard/issues/91) |
 ### US-006 – Dashboard de Áreas de Conhecimento
 **GitHub Issue**: [#21](https://github.com/ifesserra-lab/horizon_dashboard/issues/21)
 
@@ -1181,6 +1183,11 @@ Implementar um dashboard dedicado para visualização da produção acadêmica, 
 - **UI/UX**:
     - [ ] Design consistente com os demais dashboards (Title, KPIs, Charts).
     - [ ] Tooltips interativos nos gráficos.
+
+#### Refinamento entregue em 30/03/2026
+- O filtro global de campus passou a usar `campus.id` como chave canônica em todas as páginas principais, com compatibilidade de leitura para valores legados em slug e nome.
+- A página de publicações passou a usar `articles_canonical.campus.id/name` como fonte de verdade do campus do artigo.
+- Cada publicação agora pertence a exatamente um campus canônico, sem perder o vínculo multiautor para métricas por pesquisador.
 
 ### US-036 – Página de Download de Dados
 ```yaml

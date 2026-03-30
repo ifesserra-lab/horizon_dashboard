@@ -1,7 +1,7 @@
 import articlesCanonical from "../data/canonical/articles_canonical.json";
 import researchersCanonical from "../data/canonical/researchers_canonical.json";
 import type { Article, Researcher } from "../types/researchers";
-import { getRealCampuses, getResearcherCampusSlugs } from "./tenant-data";
+import { getRealCampuses } from "./tenant-data";
 
 export interface PublicationAuthor {
     id: string;
@@ -11,7 +11,8 @@ export interface PublicationAuthor {
 export interface AggregatedPublication extends Article {
     authors: PublicationAuthor[];
     author_names: string[];
-    campus_slugs: string[];
+    campus_id: string;
+    campus_name: string;
     primary_author: PublicationAuthor | null;
     internal_authors_count: number;
     keywords: string[];
@@ -60,6 +61,7 @@ export interface PublicationsMart {
 
 const researchers = researchersCanonical as Researcher[];
 const canonicalArticles = articlesCanonical as Article[];
+let aggregatedPublicationsCache: AggregatedPublication[] | null = null;
 const stopwords = new Set([
     "a",
     "an",
@@ -138,15 +140,26 @@ const extractKeywords = (article: Article) => {
 };
 
 export const getAggregatedPublications = (): AggregatedPublication[] => {
+    if (aggregatedPublicationsCache) {
+        return aggregatedPublicationsCache;
+    }
+
     const publicationMap = new Map<string, AggregatedPublication>(
         canonicalArticles.map((article) => [
             articleKey(article),
             {
                 ...article,
                 type: normalizeType(article.type),
+                campus: article.campus
+                    ? {
+                          id: String(article.campus.id),
+                          name: article.campus.name,
+                      }
+                    : null,
                 authors: [],
                 author_names: [],
-                campus_slugs: [],
+                campus_id: article.campus ? String(article.campus.id) : "",
+                campus_name: article.campus?.name || "",
                 primary_author: null,
                 internal_authors_count: 0,
                 keywords: extractKeywords(article),
@@ -155,8 +168,6 @@ export const getAggregatedPublications = (): AggregatedPublication[] => {
     );
 
     researchers.forEach((researcher) => {
-        const campusSlugs = getResearcherCampusSlugs(researcher);
-
         (researcher.articles || []).forEach((article) => {
             const key = articleKey(article);
             const existing = publicationMap.get(key);
@@ -165,9 +176,16 @@ export const getAggregatedPublications = (): AggregatedPublication[] => {
                 publicationMap.set(key, {
                     ...article,
                     type: normalizeType(article.type),
+                    campus: article.campus
+                        ? {
+                              id: String(article.campus.id),
+                              name: article.campus.name,
+                          }
+                        : null,
                     authors: [{ id: String(researcher.id), name: researcher.name }],
                     author_names: [researcher.name],
-                    campus_slugs: [...campusSlugs],
+                    campus_id: article.campus ? String(article.campus.id) : "",
+                    campus_name: article.campus?.name || "",
                     primary_author: {
                         id: String(researcher.id),
                         name: researcher.name,
@@ -193,12 +211,6 @@ export const getAggregatedPublications = (): AggregatedPublication[] => {
                 existing.author_names.push(researcher.name);
             }
 
-            campusSlugs.forEach((slug) => {
-                if (!existing.campus_slugs.includes(slug)) {
-                    existing.campus_slugs.push(slug);
-                }
-            });
-
             existing.primary_author = existing.authors[0] || null;
             existing.internal_authors_count = existing.authors.length;
         });
@@ -209,19 +221,21 @@ export const getAggregatedPublications = (): AggregatedPublication[] => {
         publication.internal_authors_count = publication.authors.length;
     });
 
-    return [...publicationMap.values()]
+    aggregatedPublicationsCache = [...publicationMap.values()]
         .sort((a, b) => {
             const yearDiff = Number(b.year || 0) - Number(a.year || 0);
             if (yearDiff !== 0) return yearDiff;
             return a.title.localeCompare(b.title);
         });
+
+    return aggregatedPublicationsCache;
 };
 
-export const getPublicationsByCampusSlug = (
-    slug: string,
+export const getPublicationsByCampusId = (
+    campusId: string,
 ): AggregatedPublication[] =>
     getAggregatedPublications().filter((publication) =>
-        publication.campus_slugs.includes(slug),
+        publication.campus_id === String(campusId),
     );
 
 export const buildPublicationsMart = (
@@ -388,7 +402,7 @@ export const buildPublicationsMart = (
 export const getCampusPublicationViews = () =>
     Object.fromEntries(
         getRealCampuses().map((campus) => [
-            campus.slug,
-            buildPublicationsMart(getPublicationsByCampusSlug(campus.slug)),
+            campus.id,
+            buildPublicationsMart(getPublicationsByCampusId(campus.id)),
         ]),
     );
