@@ -1,0 +1,165 @@
+---
+import type { ProvenanceField } from "../../lib/provenance";
+
+interface Props {
+    title?: string;
+    intro?: string;
+    fields: ProvenanceField[];
+}
+
+const { title = "Fontes dos Dados", intro, fields } = Astro.props;
+const visibleFields = (fields || []).filter((field) => field.sources.length > 0);
+
+const formatDateTime = (value: string | null) => {
+    if (!value) return null;
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    return date.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+---
+
+{
+    visibleFields.length > 0 && (
+        <section class="glass-card p-8 space-y-6" aria-labelledby="data-sources-title">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div>
+                    <h3
+                        id="data-sources-title"
+                        class="text-2xl font-bold font-['Outfit'] text-text-main"
+                    >
+                        {title}
+                    </h3>
+                    {
+                        intro && (
+                            <p class="text-sm text-text-secondary mt-2 max-w-3xl">
+                                {intro}
+                            </p>
+                        )
+                    }
+                </div>
+
+                <span class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent border border-premium-accent/20 text-[10px] font-bold uppercase tracking-wider w-fit">
+                    {visibleFields.length} blocos rastreados
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                {
+                    visibleFields.map((field) => {
+                        const systemLabels = [
+                            ...new Set(field.sources.map((source) => source.sourceSystemLabel)),
+                        ];
+
+                        return (
+                            <details class="rounded-2xl border border-border-main bg-[var(--tag-bg)]/40 p-4">
+                                <summary class="list-none cursor-pointer flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                                    <div>
+                                        <p class="text-sm font-bold text-text-main">
+                                            {field.label}
+                                        </p>
+                                        {
+                                            field.description && (
+                                                <p class="text-sm text-text-secondary mt-1">
+                                                    {field.description}
+                                                </p>
+                                            )
+                                        }
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        {
+                                            systemLabels.map((label) => (
+                                                <span class="px-2.5 py-1 rounded-full bg-white/5 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                                                    {label}
+                                                </span>
+                                            ))
+                                        }
+                                    </div>
+                                </summary>
+
+                                <div class="mt-4 pt-4 border-t border-border-main space-y-3">
+                                    {
+                                        field.sources.map((source) => (
+                                            <article class="rounded-xl border border-border-main/70 bg-white/5 p-4 space-y-2">
+                                                <div class="flex flex-wrap gap-2">
+                                                    <span class="px-2 py-0.5 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-wider">
+                                                        {source.sourceSystemLabel}
+                                                    </span>
+                                                    <span class="px-2 py-0.5 rounded-full bg-white/5 text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                        {source.sourceEntityLabel}
+                                                    </span>
+                                                    {
+                                                        source.flowName && (
+                                                            <span class="px-2 py-0.5 rounded-full bg-white/5 text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                                {source.flowName}
+                                                            </span>
+                                                        )
+                                                    }
+                                                </div>
+
+                                                <div>
+                                                    <p class="text-sm font-semibold text-text-main">
+                                                        {source.sourceLabel}
+                                                    </p>
+                                                    {
+                                                        source.sourceUrl ? (
+                                                            <a
+                                                                href={source.sourceUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                class="text-xs text-premium-accent hover:underline break-all"
+                                                            >
+                                                                {source.sourceUrl}
+                                                            </a>
+                                                        ) : (
+                                                            <p class="text-xs text-text-secondary break-all font-mono">
+                                                                {source.sourcePath ||
+                                                                    source.sourceFile ||
+                                                                    source.sourceRecordKey}
+                                                            </p>
+                                                        )
+                                                    }
+                                                </div>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-text-secondary">
+                                                    {
+                                                        source.extractedAt && (
+                                                            <p>
+                                                                <span class="font-bold text-text-main">
+                                                                    Extraido em:
+                                                                </span>{" "}
+                                                                {formatDateTime(source.extractedAt)}
+                                                            </p>
+                                                        )
+                                                    }
+                                                    {
+                                                        source.assertedAt && (
+                                                            <p>
+                                                                <span class="font-bold text-text-main">
+                                                                    Afirmado em:
+                                                                </span>{" "}
+                                                                {formatDateTime(source.assertedAt)}
+                                                            </p>
+                                                        )
+                                                    }
+                                                </div>
+                                            </article>
+                                        ))
+                                    }
+                                </div>
+                            </details>
+                        );
+                    })
+                }
+            </div>
+        </section>
+    )
+}

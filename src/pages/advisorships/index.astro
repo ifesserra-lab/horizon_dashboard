@@ -8,8 +8,8 @@ import type {
     ProjectAdvisorship,
     AdvisorshipItem,
 } from "../../types/advisorships";
-import { getAdvisorshipCampusSlugs } from "../../lib/tenant-data";
 import {
+    getAdvisorshipItemCampusSlugs,
     buildAdvisorshipDashboard,
     getAdvisorshipProjectsByCampusSlug,
     getRealCampuses,
@@ -18,15 +18,52 @@ import {
 // Cast data
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
+type AdvisorshipExplorerItem = AdvisorshipItem & {
+    projectId: string;
+    projectName: string;
+    campusSlugs: string[];
+};
+
+const getUniqueFellowships = (items: AdvisorshipExplorerItem[]) =>
+    [
+        ...new Set(
+            items
+                .map((item) => item.fellowship?.name)
+                .filter(Boolean) as string[],
+        ),
+    ].sort();
+
+const getUniqueYears = (items: AdvisorshipExplorerItem[]) =>
+    [
+        ...new Set(
+            items
+                .map((item) =>
+                    item.start_date
+                        ? new Date(item.start_date.replace(" ", "T"))
+                              .getFullYear()
+                              .toString()
+                        : null,
+                )
+                .filter(Boolean) as string[],
+        ),
+    ].sort((a, b) => b.localeCompare(a));
+
+const flattenProjectAdvisorships = (
+    projects: ProjectAdvisorship[],
+): AdvisorshipExplorerItem[] =>
+    projects
+        .flatMap((project) =>
+            (project.advisorships || []).map((advisorship) => ({
+                ...advisorship,
+                projectId: String(project.id),
+                projectName: project.name,
+                campusSlugs: getAdvisorshipItemCampusSlugs(advisorship),
+            })),
+        )
+        .filter(Boolean);
+
 // Flatten all advisorships for the explorer
-const allAdvisorships = allProjects
-    .flatMap((project) =>
-        (project.advisorships || []).map((adv) => ({
-            ...adv,
-            projectName: project.name,
-        })),
-    )
-    .filter(Boolean);
+const allAdvisorships = flattenProjectAdvisorships(allProjects);
 
 // Sort by start date (if available)
 const sortedAdvisorships = [...allAdvisorships].sort((a, b) => {
@@ -37,26 +74,10 @@ const sortedAdvisorships = [...allAdvisorships].sort((a, b) => {
 
 // Extract Filters Data
 const uniqueFellowships = [
-    ...new Set(
-        allAdvisorships
-            .map((a) => a.fellowship?.name)
-            .filter(Boolean) as string[],
-    ),
-].sort();
+    ...getUniqueFellowships(allAdvisorships),
+];
 
-const uniqueYears = [
-    ...new Set(
-        allAdvisorships
-            .map((a) =>
-                a.start_date
-                    ? new Date(a.start_date.replace(" ", "T"))
-                          .getFullYear()
-                          .toString()
-                    : null,
-            )
-            .filter(Boolean) as string[],
-    ),
-].sort((a, b) => b.localeCompare(a)); // Descending years
+const uniqueYears = [...getUniqueYears(allAdvisorships)];
 
 // Calculate Summary Data
 const uniqueStudents = new Set(allAdvisorships.map((a) => a.student_id)).size;
@@ -225,6 +246,29 @@ const campusAdvisorshipViews = Object.fromEntries(
         buildAdvisorshipDashboard(getAdvisorshipProjectsByCampusSlug(campus.slug)),
     ]),
 );
+const advisorshipCatalogByCampus = {
+    "": {
+        total: allAdvisorships.length,
+        fellowships: uniqueFellowships,
+        years: uniqueYears,
+    },
+    ...Object.fromEntries(
+        getRealCampuses().map((campus) => {
+            const campusItems = flattenProjectAdvisorships(
+                getAdvisorshipProjectsByCampusSlug(campus.slug),
+            );
+
+            return [
+                campus.slug,
+                {
+                    total: campusItems.length,
+                    fellowships: getUniqueFellowships(campusItems),
+                    years: getUniqueYears(campusItems),
+                },
+            ];
+        }),
+    ),
+};
 ---
 
 <Layout title="Gestão de Orientações | Horizon">
@@ -272,8 +316,11 @@ const campusAdvisorshipViews = Object.fromEntries(
                     <span
                         class="w-2 h-2 rounded-full bg-premium-accent animate-pulse"
                     ></span>
-                    <span class="text-sm font-bold text-text-secondary"
-                        >{allAdvisorships.length} Registros</span
+                    <span
+                        id="advisorship-record-count"
+                        class="text-sm font-bold text-text-secondary"
+                    >
+                        {allAdvisorships.length} Registros</span
                     >
                 </div>
             </div>
@@ -304,6 +351,12 @@ const campusAdvisorshipViews = Object.fromEntries(
                 <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">
                     Explorador de Orientações
                 </h2>
+                <span
+                    id="advisorship-total-label"
+                    class="text-xs font-bold text-text-muted uppercase tracking-widest"
+                >
+                    {allAdvisorships.length} orientações
+                </span>
             </div>
 
             <div class="glass-card p-6">
@@ -396,13 +449,7 @@ const campusAdvisorshipViews = Object.fromEntries(
                         sortedAdvisorships.map((advisorship) => (
                             <div
                                 class="advisorship-item-wrapper transition-all duration-500 hover:scale-[1.02]"
-                                data-campus-slugs={getAdvisorshipCampusSlugs(
-                                    allProjects.find((project) =>
-                                        (project.advisorships || []).some(
-                                            (item) => item.id === advisorship.id,
-                                        ),
-                                    ) || allProjects[0],
-                                ).join("|")}
+                                data-campus-slugs={advisorship.campusSlugs.join("|")}
                             >
                                 <AdvisorshipCard advisorship={advisorship} />
                             </div>
@@ -453,7 +500,13 @@ const campusAdvisorshipViews = Object.fromEntries(
     </div>
 </Layout>
 
-<script is:inline define:vars={{ initialAdvisorships: sortedAdvisorships }}>
+<script
+    is:inline
+    define:vars={{
+        initialAdvisorships: sortedAdvisorships,
+        advisorshipCatalogByCampus,
+    }}
+>
     // Re-initialize logic for filtering
     const searchInput = document.getElementById("search-input");
     const statusFilter = document.getElementById("status-filter");
@@ -462,7 +515,57 @@ const campusAdvisorshipViews = Object.fromEntries(
     const grid = document.getElementById("advisorships-grid");
     const emptyState = document.getElementById("empty-state");
     const counterText = document.getElementById("counter-text");
+    const totalLabel = document.getElementById("advisorship-total-label");
+    const recordCount = document.getElementById("advisorship-record-count");
     const items = document.querySelectorAll(".advisorship-item-wrapper");
+    const baseCatalog = advisorshipCatalogByCampus || {};
+
+    function populateSelect(select, options, emptyLabel) {
+        if (!select) return;
+
+        const currentValue = select.value;
+        const nextOptions = ["all", ...options];
+        const safeValue = nextOptions.includes(currentValue) ? currentValue : "all";
+
+        select.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "all";
+        defaultOption.textContent = emptyLabel;
+        select.appendChild(defaultOption);
+
+        options.forEach((optionValue) => {
+            const option = document.createElement("option");
+            option.value = optionValue;
+            option.textContent = optionValue;
+            select.appendChild(option);
+        });
+
+        select.value = safeValue;
+    }
+
+    function syncCampusControls(selectedCampus) {
+        const catalog = baseCatalog[selectedCampus] || baseCatalog[""] || {
+            total: initialAdvisorships.length,
+            fellowships: [],
+            years: [],
+        };
+
+        populateSelect(
+            fellowshipFilter,
+            catalog.fellowships || [],
+            "Todas as Bolsas",
+        );
+        populateSelect(yearFilter, catalog.years || [], "Todos os Anos");
+
+        const total = Number(catalog.total || 0);
+        if (recordCount) {
+            recordCount.textContent = `${total} Registros`;
+        }
+        if (totalLabel) {
+            totalLabel.textContent = `${total} orientações`;
+        }
+    }
 
     function filter() {
         const searchTerm = searchInput.value.toLowerCase();
@@ -470,6 +573,10 @@ const campusAdvisorshipViews = Object.fromEntries(
         const fellowshipTerm = fellowshipFilter.value.toLowerCase();
         const yearTerm = yearFilter.value.toLowerCase();
         const preferredCampus = localStorage.getItem("preferred-campus") || "";
+        const campusCatalog = baseCatalog[preferredCampus] || baseCatalog[""] || {
+            total: initialAdvisorships.length,
+        };
+        const totalForCampus = Number(campusCatalog.total || 0);
 
         let visibleCount = 0;
 
@@ -522,14 +629,19 @@ const campusAdvisorshipViews = Object.fromEntries(
             emptyState.classList.add("hidden");
         }
 
-        counterText.textContent = `Mostrando ${visibleCount} de ${initialAdvisorships.length} orientações`;
+        counterText.textContent = `Mostrando ${visibleCount} de ${totalForCampus} orientações`;
     }
 
     searchInput.addEventListener("input", filter);
     statusFilter.addEventListener("change", filter);
     fellowshipFilter.addEventListener("change", filter);
     yearFilter.addEventListener("change", filter);
-    window.addEventListener("campus-filter-change", filter);
+    window.addEventListener("campus-filter-change", (event) => {
+        const selectedCampus = event.detail?.campus || "";
+        syncCampusControls(selectedCampus);
+        filter();
+        updateAdvisorshipViews(selectedCampus);
+    });
     function updateAdvisorshipViews(selectedCampus) {
         document
             .querySelectorAll("#advisorship-dashboard-views [data-campus-view]")
@@ -538,11 +650,10 @@ const campusAdvisorshipViews = Object.fromEntries(
                 node.classList.toggle("hidden", viewCampus !== selectedCampus);
             });
     }
-    window.addEventListener("campus-filter-change", (event) => {
-        updateAdvisorshipViews(event.detail?.campus || "");
-    });
+    const initialCampus = localStorage.getItem("preferred-campus") || "";
+    syncCampusControls(initialCampus);
     filter();
-    updateAdvisorshipViews(localStorage.getItem("preferred-campus") || "");
+    updateAdvisorshipViews(initialCampus);
 </script>
 
 <style>

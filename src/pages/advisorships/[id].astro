@@ -1,6 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import advisorshipsData from "../../data/canonical/advisorships_canonical.json";
+import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import { buildProvenanceFields } from "../../lib/provenance";
 import type { ProjectAdvisorship } from "../../types/advisorships";
 
 export function getStaticPaths() {
@@ -41,6 +43,43 @@ const statusStyles = {
 const currentStatusStyle =
     statusStyles[advisorship.status as keyof typeof statusStyles] ||
     "bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+
+const advisorshipSourceFields = buildProvenanceFields([
+    {
+        label: "Identidade da orientacao",
+        description: "Nome, status e descricao principal da orientacao exibida.",
+        entityType: "advisorship",
+        entityId: advisorship.id,
+        attributeNames: ["name", "status", "description"],
+    },
+    {
+        label: "Periodo de vigencia",
+        description: "Datas de inicio e termino apresentadas no bloco de execucao.",
+        entityType: "advisorship",
+        entityId: advisorship.id,
+        attributeNames: ["start_date", "end_date"],
+    },
+    {
+        label: "Orientador e estudante",
+        description:
+            "Fontes usadas para compor os nomes de orientador, estudantes e participantes associados.",
+        entityType: "advisorship",
+        entityId: advisorship.id,
+        attributeNames: ["coordinator_name", "student_names", "researcher_names"],
+    },
+    ...(projectId
+        ? [
+              {
+                  label: "Projeto vinculado",
+                  description:
+                      "Projeto pai relacionado a esta orientacao na navegacao do site.",
+                  entityType: "initiative" as const,
+                  entityId: projectId,
+                  attributeNames: ["name", "status", "start_date", "end_date"],
+              },
+          ]
+        : []),
+]);
 ---
 
 <Layout
@@ -301,5 +340,11 @@ const currentStatusStyle =
                 }
             </div>
         </section>
+
+        <DataSourcesPanel
+            title="Fontes dos Dados da Orientacao"
+            intro="Os blocos abaixo mostram de quais registros de origem a camada canonica montou os dados exibidos nesta orientacao."
+            fields={advisorshipSourceFields}
+        />
     </div>
 </Layout>

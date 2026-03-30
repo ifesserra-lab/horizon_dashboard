@@ -1,11 +1,14 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import type { InlineSourceItem } from "../../lib/provenance";
+import InlineSources from "../provenance/InlineSources.astro";
 
 interface Props {
     researcher: Researcher;
+    educationSources?: InlineSourceItem[][];
 }
 
-const { researcher } = Astro.props;
+const { researcher, educationSources = [] } = Astro.props;
 ---
 
 {/* Academic Education Section */}
@@ -20,7 +23,7 @@ const { researcher } = Astro.props;
                     Formação Acadêmica
                 </h3>
                 <div class="space-y-4">
-                    {researcher.academic_education.map((edu) => (
+                    {researcher.academic_education.map((edu, index) => (
                         <div class="glass-card p-5 border-l-4 border-l-premium-accent hover:bg-premium-accent/[0.02] transition-all">
                             <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-4">
                                 <span class="text-xs font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded w-fit">
@@ -104,6 +107,11 @@ const { researcher } = Astro.props;
                                     </div>
                                 )}
                             </div>
+
+                            <InlineSources
+                                sources={educationSources[index] ?? []}
+                                label="Fonte deste card"
+                            />
                         </div>
                     ))}
                 </div>

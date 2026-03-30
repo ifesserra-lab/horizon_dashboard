@@ -3,6 +3,11 @@ import Layout from "../../layouts/Layout.astro";
 import researchersData from "../../data/canonical/researchers_canonical.json";
 import initiativesData from "../../data/canonical/initiatives_canonical.json";
 import type { Researcher } from "../../types/researchers";
+import {
+    getAcademicEducationSources,
+    getAttributeSources,
+    toInlineSourceItems,
+} from "../../lib/provenance";
 
 // Profile Components
 import ResearcherProfileHeader from "../../components/researchers/ResearcherProfileHeader.astro";
@@ -45,6 +50,79 @@ const enrichedResearcher = {
     ...researcher,
     initiatives: enrichedInitiatives,
 };
+
+const profileHeaderSources = toInlineSourceItems([
+    ...getAttributeSources("researcher", researcher.id, [
+        "name",
+        "identification_id",
+        "cnpq_url",
+        "google_scholar_url",
+    ]),
+    ...researcher.knowledge_areas.flatMap((area) =>
+        getAttributeSources("knowledge_area", area.id, ["name"]),
+    ),
+]);
+
+const resumeSources = toInlineSourceItems(
+    getAttributeSources("researcher", researcher.id, ["resume"]),
+);
+
+const educationSources = researcher.academic_education.map((education) =>
+    toInlineSourceItems(getAcademicEducationSources(education)),
+);
+
+const groupSourcesById = Object.fromEntries(
+    researcher.research_groups.map((group) => [
+        String(group.id),
+        toInlineSourceItems(
+            getAttributeSources("research_group", group.id, ["name"]),
+        ),
+    ]),
+);
+
+const initiativeSourcesById = Object.fromEntries(
+    enrichedResearcher.initiatives.map((initiative) => [
+        String(initiative.id),
+        toInlineSourceItems(
+            getAttributeSources("initiative", initiative.id, [
+                "name",
+                "status",
+                "start_date",
+                "end_date",
+            ]),
+        ),
+    ]),
+);
+
+const advisorshipSourcesById = Object.fromEntries(
+    (researcher.advisorships || []).map((advisorship) => [
+        String(advisorship.id),
+        toInlineSourceItems([
+            ...getAttributeSources("advisorship", advisorship.id, [
+                "name",
+                "status",
+                "start_date",
+                "end_date",
+                "coordinator_name",
+                "student_names",
+            ]),
+        ]),
+    ]),
+);
+
+const articleSourcesById = Object.fromEntries(
+    researcher.articles.map((article) => [
+        String(article.id),
+        toInlineSourceItems(
+            getAttributeSources("article", article.id, [
+                "title",
+                "year",
+                "doi",
+                "journal_conference",
+            ]),
+        ),
+    ]),
+);
 ---
 
 <Layout
@@ -57,8 +135,14 @@ const enrichedResearcher = {
 
     <div class="flex flex-col lg:flex-row gap-8 items-start">
         <div class="flex-1 space-y-8 w-full">
-            <ResearcherProfileHeader researcher={enrichedResearcher} />
-            <ResearcherProfileResume researcher={enrichedResearcher} />
+            <ResearcherProfileHeader
+                researcher={enrichedResearcher}
+                sources={profileHeaderSources}
+            />
+            <ResearcherProfileResume
+                researcher={enrichedResearcher}
+                sources={resumeSources}
+            />
 
             <ResearcherProfileStats
                 totalArticles={enrichedResearcher.articles.length}
@@ -71,14 +155,27 @@ const enrichedResearcher = {
                 advisorships={researcher.advisorships || []}
             />
 
-            <ResearcherProfileEducation researcher={enrichedResearcher} />
-            <ResearcherProfileGroups researcher={enrichedResearcher} />
-            <ResearcherProfileInitiatives researcher={enrichedResearcher} />
+            <ResearcherProfileEducation
+                researcher={enrichedResearcher}
+                educationSources={educationSources}
+            />
+            <ResearcherProfileGroups
+                researcher={enrichedResearcher}
+                groupSourcesById={groupSourcesById}
+            />
+            <ResearcherProfileInitiatives
+                researcher={enrichedResearcher}
+                initiativeSourcesById={initiativeSourcesById}
+            />
             <ResearcherProfileAdvisorships
                 advisorships={researcher.advisorships || []}
+                advisorshipSourcesById={advisorshipSourcesById}
             />
 
-            <ResearcherProfileArticles researcher={enrichedResearcher} />
+            <ResearcherProfileArticles
+                researcher={enrichedResearcher}
+                articleSourcesById={articleSourcesById}
+            />
         </div>
     </div>
 </Layout>

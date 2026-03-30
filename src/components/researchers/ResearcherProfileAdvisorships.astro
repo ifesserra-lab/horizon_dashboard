@@ -1,11 +1,13 @@
 ---
 import type { ResearcherAdvisorship } from "../../types/researchers";
+import type { InlineSourceItem } from "../../lib/provenance";
 
 interface Props {
     advisorships: ResearcherAdvisorship[];
+    advisorshipSourcesById?: Record<string, InlineSourceItem[]>;
 }
 
-const { advisorships } = Astro.props;
+const { advisorships, advisorshipSourcesById = {} } = Astro.props;
 ---
 
 <section aria-labelledby="advisorships-title" class="space-y-6 pb-20">
@@ -66,9 +68,10 @@ const { advisorships } = Astro.props;
     </div>
 </section>
 
-<script define:vars={{ advisorships }}>
+<script define:vars={{ advisorships, advisorshipSourcesById }}>
     // Provide data to client-side
     window.researcherAdvisorships = advisorships || [];
+    window.researcherAdvisorshipSources = advisorshipSourcesById || {};
 </script>
 
 <script>
@@ -94,6 +97,40 @@ const { advisorships } = Astro.props;
         let displayedCount = 0;
         const BATCH_SIZE = 20;
         let observer: IntersectionObserver | null = null;
+        const advisorshipSourcesById =
+            (window as any).researcherAdvisorshipSources || {};
+
+        function escapeHtml(value: string) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function renderSourcesHtml(sources: any[]) {
+            if (!sources || sources.length === 0) return "";
+
+            return `
+                <div class="mt-4 pt-3 border-t border-border-main/50">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2">
+                        Fonte deste card
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        ${sources
+                            .map((source) => {
+                                const content = `<span class="text-premium-accent">${escapeHtml(source.systemLabel)}</span><span>${escapeHtml(source.sourceLabel)}</span>`;
+                                if (source.sourceUrl) {
+                                    return `<a href="${escapeHtml(source.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary hover:text-premium-accent hover:border-premium-accent/30 transition-colors">${content}</a>`;
+                                }
+                                return `<span title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary">${content}</span>`;
+                            })
+                            .join("")}
+                    </div>
+                </div>
+            `;
+        }
 
         function updateUI() {
             if (
@@ -122,32 +159,34 @@ const { advisorships } = Astro.props;
             const type = adv.type || "Orientação";
             const startYear = adv.start_year || "N/A";
             const endYear = adv.end_year === "None" ? "Atual" : adv.end_year;
+            const sources = advisorshipSourcesById[String(adv.id)] || [];
 
             card.innerHTML = `
                 <div class="flex justify-between items-start mb-3">
                     <span class="text-[10px] font-bold text-premium-accent uppercase tracking-wider bg-premium-accent/10 px-2 py-0.5 rounded">
-                        ${type}
+                        ${escapeHtml(type)}
                     </span>
                     <span class="text-[10px] font-medium text-text-secondary">
-                        ${startYear} - ${endYear}
+                        ${escapeHtml(startYear)} - ${escapeHtml(endYear)}
                     </span>
                 </div>
                 <h5 class="font-bold text-text-main mb-2 leading-snug truncate-2-lines group-hover:text-premium-accent transition-colors">
-                    ${adv.name}
+                    ${escapeHtml(adv.name)}
                 </h5>
                 <div class="flex flex-col gap-1">
                     <p class="text-xs text-text-secondary">
                         <span class="font-bold text-text-main">
                             Estudante:
                         </span>
-                        ${adv.student_name}
+                        ${escapeHtml(adv.student_name)}
                     </p>
                     <div class="flex items-center gap-2 mt-1">
                          <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${statusClass}">
-                            ${statusText}
+                            ${escapeHtml(statusText)}
                          </span>
                     </div>
                 </div>
+                ${renderSourcesHtml(sources)}
             `;
             return card;
         }
