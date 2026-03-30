@@ -2,6 +2,8 @@
 import Layout from "../../layouts/Layout.astro";
 import groupsData from "../../data/canonical/research_groups_canonical.json";
 import projectsData from "../../data/canonical/initiatives_canonical.json";
+import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import { buildProvenanceFields } from "../../lib/provenance";
 import type { ResearchGroup } from "../../types/groups";
 import type { Project } from "../../types/projects";
 
@@ -32,6 +34,52 @@ const formatDate = (dateStr: string) => {
 const isAlumni = (endDate: string | null | undefined) => {
 	return endDate && endDate !== "None" && endDate !== "null";
 };
+
+const groupSourceFields = buildProvenanceFields([
+	{
+		label: "Identidade do grupo",
+		description:
+			"Nome, sigla, campus e metadados basicos exibidos no topo da pagina.",
+		entityType: "research_group",
+		entityId: group.id,
+		attributeNames: ["name", "short_name", "campus_name", "site_url"],
+	},
+	{
+		label: "Descricao do grupo",
+		description: "Texto descritivo principal do grupo de pesquisa.",
+		entityType: "research_group",
+		entityId: group.id,
+		attributeNames: ["description"],
+	},
+	{
+		label: "Areas de conhecimento",
+		description: "Areas exibidas como tags no perfil do grupo.",
+		entityType: "research_group",
+		entityId: group.id,
+		attributeNames: ["area_name"],
+	},
+	{
+		label: "Membros e liderancas",
+		description:
+			"Registros fonte que sustentam as pessoas listadas como membros e lideres do grupo.",
+		entityType: "research_group",
+		entityId: group.id,
+	},
+	...(groupProjects.length > 0
+		? [
+				{
+					label: "Projetos vinculados ao grupo",
+					description:
+						"Projetos relacionados a este grupo e mostrados nesta rota.",
+					entities: groupProjects.map((project) => ({
+						entityType: "initiative" as const,
+						entityId: project.id,
+						attributeNames: ["name", "status", "start_date", "end_date"],
+					})),
+				},
+			]
+		: []),
+]);
 ---
 
 <Layout title={group.name} breadcrumbReplacements={{ [group.id]: group.name }}>
@@ -903,4 +951,10 @@ const isAlumni = (endDate: string | null | undefined) => {
 			}
 		</div>
 	</section>
+
+	<DataSourcesPanel
+		title="Fontes dos Dados do Grupo"
+		intro="A rastreabilidade abaixo mostra quais registros de origem alimentaram os blocos principais exibidos nesta pagina do grupo."
+		fields={groupSourceFields}
+	/>
 </Layout>

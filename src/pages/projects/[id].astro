@@ -8,6 +8,8 @@
  */
 import Layout from "../../layouts/Layout.astro";
 import projectsData from "../../data/canonical/initiatives_canonical.json";
+import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import { buildProvenanceFields } from "../../lib/provenance";
 import type { Project } from "../../types/projects";
 
 /**
@@ -58,6 +60,51 @@ const statusStyles = {
 const currentStatusStyle =
 	statusStyles[project.status as keyof typeof statusStyles] ||
 	"bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+
+const projectSourceFields = buildProvenanceFields([
+	{
+		label: "Identidade e status do projeto",
+		description:
+			"Nome, status e classificacao principal exibidos no cabecalho e no resumo lateral.",
+		entityType: "initiative",
+		entityId: project.id,
+		attributeNames: ["name", "status"],
+	},
+	{
+		label: "Cronograma de execucao",
+		description: "Datas de inicio e termino apresentadas nesta pagina.",
+		entityType: "initiative",
+		entityId: project.id,
+		attributeNames: ["start_date", "end_date"],
+	},
+	{
+		label: "Descricao do projeto",
+		description: "Resumo textual do projeto quando disponivel.",
+		entityType: "initiative",
+		entityId: project.id,
+		attributeNames: ["description"],
+	},
+	{
+		label: "Equipe do projeto",
+		description:
+			"Pesquisadores, estudantes e coordenacao mostrados nos blocos de equipe.",
+		entityType: "initiative",
+		entityId: project.id,
+		attributeNames: ["coordinator_name", "researcher_names", "student_names"],
+	},
+	...(project.research_group
+		? [
+				{
+					label: "Grupo de pesquisa vinculado",
+					description:
+						"Fonte do grupo relacionado ao projeto quando essa ligacao existe.",
+					entityType: "research_group" as const,
+					entityId: project.research_group.id,
+					attributeNames: ["name", "description", "campus_name", "area_name"],
+				},
+			]
+		: []),
+]);
 
 /**
  * Helper function to check if a team member is an alumni (egresso).
@@ -605,4 +652,10 @@ const isAlumni = (endDate: string | null | undefined) => {
 			</section>
 		</aside>
 	</div>
+
+	<DataSourcesPanel
+		title="Fontes dos Dados do Projeto"
+		intro="Cada bloco abaixo resume de quais registros de origem a camada canonica montou as informacoes exibidas nesta pagina do projeto."
+		fields={projectSourceFields}
+	/>
 </Layout>

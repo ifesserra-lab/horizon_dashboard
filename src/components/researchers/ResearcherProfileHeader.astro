@@ -1,11 +1,14 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import type { InlineSourceItem } from "../../lib/provenance";
+import InlineSources from "../provenance/InlineSources.astro";
 
 interface Props {
     researcher: Researcher;
+    sources?: InlineSourceItem[];
 }
 
-const { researcher } = Astro.props;
+const { researcher, sources = [] } = Astro.props;
 ---
 
 <article class="glass-card p-8" aria-labelledby="researcher-title">
@@ -146,4 +149,6 @@ const { researcher } = Astro.props;
             }
         </div>
     </div>
+
+    <InlineSources sources={sources} label="Fonte deste card" />
 </article>

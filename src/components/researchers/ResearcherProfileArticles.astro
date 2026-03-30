@@ -1,11 +1,13 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import type { InlineSourceItem } from "../../lib/provenance";
 
 interface Props {
     researcher: Researcher;
+    articleSourcesById?: Record<string, InlineSourceItem[]>;
 }
 
-const { researcher } = Astro.props;
+const { researcher, articleSourcesById = {} } = Astro.props;
 ---
 
 <section aria-labelledby="articles-title" class="space-y-6 pb-20">
@@ -66,9 +68,10 @@ const { researcher } = Astro.props;
     </div>
 </section>
 
-<script define:vars={{ researcher }}>
+<script define:vars={{ researcher, articleSourcesById }}>
     // Provide articles data to client-side
     window.researcherArticles = researcher.articles || [];
+    window.researcherArticleSources = articleSourcesById || {};
 </script>
 
 <script>
@@ -87,6 +90,39 @@ const { researcher } = Astro.props;
         let displayedCount = 0;
         const BATCH_SIZE = 30;
         let observer: IntersectionObserver | null = null;
+        const articleSourcesById = (window as any).researcherArticleSources || {};
+
+        function escapeHtml(value: string) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function renderSourcesHtml(sources: any[]) {
+            if (!sources || sources.length === 0) return "";
+
+            return `
+                <div class="mt-4 pt-3 border-t border-border-main/50">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2">
+                        Fonte deste card
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        ${sources
+                            .map((source) => {
+                                const content = `<span class="text-premium-accent">${escapeHtml(source.systemLabel)}</span><span>${escapeHtml(source.sourceLabel)}</span>`;
+                                if (source.sourceUrl) {
+                                    return `<a href="${escapeHtml(source.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary hover:text-premium-accent hover:border-premium-accent/30 transition-colors">${content}</a>`;
+                                }
+                                return `<span title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary">${content}</span>`;
+                            })
+                            .join("")}
+                    </div>
+                </div>
+            `;
+        }
 
         function updateUI() {
             if (
@@ -110,6 +146,7 @@ const { researcher } = Astro.props;
                 const articleEl = document.createElement("div");
                 articleEl.className =
                     "glass-card p-5 border border-border-main hover:border-premium-purple/30 transition-all";
+                const sources = articleSourcesById[String(article.id)] || [];
 
                 const doiLink = article.doi
                     ? `<a href="${article.doi.startsWith("http") ? article.doi : "https://doi.org/" + article.doi}" 
@@ -125,18 +162,19 @@ const { researcher } = Astro.props;
                         <div class="space-y-2">
                              <div class="flex items-center gap-2">
                                 <span class="px-2 py-0.5 rounded-md bg-premium-purple/10 text-premium-purple text-[10px] font-bold uppercase tracking-wider">
-                                    ${article.type || "ARTIGO"}
+                                    ${escapeHtml(article.type || "ARTIGO")}
                                 </span>
-                                <span class="text-xs font-bold text-text-secondary">${article.year}</span>
+                                <span class="text-xs font-bold text-text-secondary">${escapeHtml(article.year)}</span>
                             </div>
-                            <h4 class="text-sm font-bold text-text-main leading-snug">${article.title}</h4>
+                            <h4 class="text-sm font-bold text-text-main leading-snug">${escapeHtml(article.title)}</h4>
                             <p class="text-xs text-text-secondary flex items-center gap-1.5 italic">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                                ${article.journal_conference}
+                                ${escapeHtml(article.journal_conference)}
                             </p>
                         </div>
                         ${doiLink}
                     </div>
+                    ${renderSourcesHtml(sources)}
                 `;
                 articlesList?.appendChild(articleEl);
             });

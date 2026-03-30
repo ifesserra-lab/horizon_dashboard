@@ -1,0 +1,53 @@
+---
+import type { InlineSourceItem } from "../../lib/provenance";
+
+interface Props {
+    sources?: InlineSourceItem[];
+    label?: string;
+    className?: string;
+}
+
+const {
+    sources = [],
+    label = "Fonte",
+    className = "",
+} = Astro.props;
+
+const visibleSources = (sources || []).filter(Boolean);
+---
+
+{
+    visibleSources.length > 0 && (
+        <div class={`mt-4 pt-3 border-t border-border-main/50 ${className}`.trim()}>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2">
+                {label}
+            </p>
+            <div class="flex flex-wrap gap-2">
+                {
+                    visibleSources.map((source) =>
+                        source.sourceUrl ? (
+                            <a
+                                href={source.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={source.title}
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary hover:text-premium-accent hover:border-premium-accent/30 transition-colors"
+                            >
+                                <span class="text-premium-accent">{source.systemLabel}</span>
+                                <span>{source.sourceLabel}</span>
+                            </a>
+                        ) : (
+                            <span
+                                title={source.title}
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary"
+                            >
+                                <span class="text-premium-accent">{source.systemLabel}</span>
+                                <span>{source.sourceLabel}</span>
+                            </span>
+                        ),
+                    )
+                }
+            </div>
+        </div>
+    )
+}

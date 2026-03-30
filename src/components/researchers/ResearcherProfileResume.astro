@@ -1,11 +1,14 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import type { InlineSourceItem } from "../../lib/provenance";
+import InlineSources from "../provenance/InlineSources.astro";
 
 interface Props {
     researcher: Researcher;
+    sources?: InlineSourceItem[];
 }
 
-const { researcher } = Astro.props;
+const { researcher, sources = [] } = Astro.props;
 ---
 
 {
@@ -21,6 +24,7 @@ const { researcher } = Astro.props;
                 <p class="text-text-main text-sm leading-relaxed">
                     {researcher.resume}
                 </p>
+                <InlineSources sources={sources} label="Fonte deste card" />
             </div>
         </section>
     )
