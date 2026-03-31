@@ -1,9 +1,9 @@
-import campusesCanonical from "../data/canonical/campuses_canonical.json";
-import groupsCanonical from "../data/canonical/research_groups_canonical.json";
-import researchersCanonical from "../data/canonical/researchers_canonical.json";
-import initiativesCanonical from "../data/canonical/initiatives_canonical.json";
-import advisorshipsCanonical from "../data/canonical/advisorships_canonical.json";
-import knowledgeAreasMart from "../data/mart/knowledge_areas_mart.json";
+import campusesCanonical from "../data/campuses_canonical.json";
+import groupsCanonical from "../data/research_groups_canonical.json";
+import researchersCanonical from "../data/researchers_canonical.json";
+import initiativesCanonical from "../data/initiatives_canonical.json";
+import advisorshipsCanonical from "../data/advisorships_canonical.json";
+import knowledgeAreasMart from "../data/knowledge_areas_mart.json";
 import type { ResearchGroup } from "../types/groups";
 import type { Researcher } from "../types/researchers";
 import type { Project } from "../types/projects";

@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import attributeAssertionsCanonical from "../data/canonical/attribute_assertions_canonical.json";
-import ingestionRunsCanonical from "../data/canonical/ingestion_runs_canonical.json";
+import attributeAssertionsCanonical from "../data/attribute_assertions_canonical.json";
+import ingestionRunsCanonical from "../data/ingestion_runs_canonical.json";
 
 export type CanonicalEntityType =
     | "academic_education"
@@ -100,7 +100,7 @@ const parseTolerantJsonFile = <T>(relativePath: string) => {
 };
 
 const sourceRecords = parseTolerantJsonFile<SourceRecord[]>(
-    "src/data/canonical/source_records_canonical.json",
+    "src/data/source_records_canonical.json",
 );
 
 const sourceSystemLabels: Record<string, string> = {

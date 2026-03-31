@@ -1,0 +1,133 @@
+name: Sync ETL Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 0'
+
+concurrency:
+  group: etl-data-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+    env:
+      EXPORTS_PAGE_URL: https://github.com/ifesserra-lab/horizon_etl/tree/main/data/exports
+
+    steps:
+      - name: Checkout dashboard repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Sync exported datasets from GitHub into src/data
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest_file="$(mktemp)"
+          exports_page_url="${EXPORTS_PAGE_URL%/}"
+          github_prefix="https://github.com/"
+
+          if [[ "$exports_page_url" != ${github_prefix}* ]]; then
+            echo "A URL de origem precisa estar no formato https://github.com/<owner>/<repo>/tree/<branch>/<path>" >&2
+            exit 1
+          fi
+
+          relative_url="${exports_page_url#${github_prefix}}"
+          owner="${relative_url%%/*}"
+          repo_and_rest="${relative_url#*/}"
+          repo="${repo_and_rest%%/*}"
+          tree_and_path="${repo_and_rest#*/}"
+
+          if [[ "$tree_and_path" != tree/*/* ]]; then
+            echo "Nao foi possivel extrair branch e caminho a partir de $EXPORTS_PAGE_URL" >&2
+            exit 1
+          fi
+
+          tree_and_path="${tree_and_path#tree/}"
+          branch="${tree_and_path%%/*}"
+          exports_path="${tree_and_path#*/}"
+          exports_api_url="https://api.github.com/repos/$owner/$repo/contents/$exports_path?ref=$branch"
+
+          curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "$exports_api_url" > "$manifest_file"
+
+          mkdir -p src/data
+          find src/data -maxdepth 1 -type f -name '*.json' -delete
+
+          downloaded_count=0
+
+          while IFS=$'\t' read -r filename download_url; do
+            curl -fsSL "$download_url" -o "src/data/$filename"
+            downloaded_count=$((downloaded_count + 1))
+          done < <(
+            jq -r '.[] | select(.type == "file" and (.name | endswith(".json"))) | [.name, .download_url] | @tsv' "$manifest_file"
+          )
+
+          if [[ "$downloaded_count" -eq 0 ]]; then
+            echo "Nenhum arquivo JSON foi encontrado em ifesserra-lab/horizon_etl/data/exports." >&2
+            exit 1
+          fi
+
+          {
+            echo "## Data sync summary"
+            echo
+            echo "Source page: $EXPORTS_PAGE_URL"
+            echo
+            echo "Source API: \`$exports_api_url\`"
+            echo
+            echo "Downloaded files: $downloaded_count"
+            echo
+            echo '```'
+            git status --short src/data
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if git diff --quiet -- src/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.sync.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.sync.outputs.changed == 'true'
+        run: npm ci
+
+      - name: Validate production build
+        if: steps.sync.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Commit synced data
+        if: steps.sync.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add src/data
+          git commit -m "chore(data): sync ETL exports"
+          git push origin HEAD:main
+
+      - name: No data changes
+        if: steps.sync.outputs.changed != 'true'
+        run: echo "Nenhuma alteracao encontrada em src/data."

@@ -1,19 +1,19 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 
-import advisorshipsCanonical from "../../data/canonical/advisorships_canonical.json";
-import articlesCanonical from "../../data/canonical/articles_canonical.json";
-import campusesCanonical from "../../data/canonical/campuses_canonical.json";
-import fellowshipsCanonical from "../../data/canonical/fellowships_canonical.json";
-import initiativeTypesCanonical from "../../data/canonical/initiative_types_canonical.json";
-import initiativesCanonical from "../../data/canonical/initiatives_canonical.json";
-import knowledgeAreasCanonical from "../../data/canonical/knowledge_areas_canonical.json";
-import organizationsCanonical from "../../data/canonical/organizations_canonical.json";
-import researchGroupsCanonical from "../../data/canonical/research_groups_canonical.json";
-import researchersCanonical from "../../data/canonical/researchers_canonical.json";
-import advisorshipAnalytics from "../../data/mart/advisorship_analytics.json";
-import initiativesMart from "../../data/mart/initiatives_analytics_mart.json";
-import knowledgeAreasMart from "../../data/mart/knowledge_areas_mart.json";
+import advisorshipsCanonical from "../../data/advisorships_canonical.json";
+import articlesCanonical from "../../data/articles_canonical.json";
+import campusesCanonical from "../../data/campuses_canonical.json";
+import fellowshipsCanonical from "../../data/fellowships_canonical.json";
+import initiativeTypesCanonical from "../../data/initiative_types_canonical.json";
+import initiativesCanonical from "../../data/initiatives_canonical.json";
+import knowledgeAreasCanonical from "../../data/knowledge_areas_canonical.json";
+import organizationsCanonical from "../../data/organizations_canonical.json";
+import researchGroupsCanonical from "../../data/research_groups_canonical.json";
+import researchersCanonical from "../../data/researchers_canonical.json";
+import advisorshipAnalytics from "../../data/advisorship_analytics.json";
+import initiativesMart from "../../data/initiatives_analytics_mart.json";
+import knowledgeAreasMart from "../../data/knowledge_areas_mart.json";
 
 type DatasetType = "Canonical" | "Mart";
 
@@ -22,7 +22,6 @@ interface DatasetItem {
     name: string;
     description: string;
     type: DatasetType;
-    folder: "canonical" | "mart";
     countLabel: string;
     data: unknown;
     structure: string;
@@ -54,7 +53,6 @@ const datasets: DatasetItem[] = [
         name: "advisorships_canonical.json",
         description: "Orientações com estudante, tipologia, período e status.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(advisorshipsCanonical),
         data: advisorshipsCanonical,
         structure: buildStructurePreview(advisorshipsCanonical),
@@ -64,7 +62,6 @@ const datasets: DatasetItem[] = [
         name: "articles_canonical.json",
         description: "Artigos publicados com ano, tipo, DOI e veículo.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(articlesCanonical),
         data: articlesCanonical,
         structure: buildStructurePreview(articlesCanonical),
@@ -74,7 +71,6 @@ const datasets: DatasetItem[] = [
         name: "campuses_canonical.json",
         description: "Cadastro de campi usado nos vínculos e filtros do portal.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(campusesCanonical),
         data: campusesCanonical,
         structure: buildStructurePreview(campusesCanonical),
@@ -84,7 +80,6 @@ const datasets: DatasetItem[] = [
         name: "fellowships_canonical.json",
         description: "Bolsas e relações de fomento ligadas às iniciativas.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(fellowshipsCanonical),
         data: fellowshipsCanonical,
         structure: buildStructurePreview(fellowshipsCanonical),
@@ -94,7 +89,6 @@ const datasets: DatasetItem[] = [
         name: "initiative_types_canonical.json",
         description: "Tipos de iniciativa utilizados na base do portal.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(initiativeTypesCanonical),
         data: initiativeTypesCanonical,
         structure: buildStructurePreview(initiativeTypesCanonical),
@@ -104,7 +98,6 @@ const datasets: DatasetItem[] = [
         name: "initiatives_canonical.json",
         description: "Projetos e iniciativas com vigência, equipe e tipo.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(initiativesCanonical),
         data: initiativesCanonical,
         structure: buildStructurePreview(initiativesCanonical),
@@ -114,7 +107,6 @@ const datasets: DatasetItem[] = [
         name: "knowledge_areas_canonical.json",
         description: "Tabela de áreas do conhecimento adotadas no portal.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(knowledgeAreasCanonical),
         data: knowledgeAreasCanonical,
         structure: buildStructurePreview(knowledgeAreasCanonical),
@@ -124,7 +116,6 @@ const datasets: DatasetItem[] = [
         name: "organizations_canonical.json",
         description: "Organizações financiadoras, parceiras e relacionadas.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(organizationsCanonical),
         data: organizationsCanonical,
         structure: buildStructurePreview(organizationsCanonical),
@@ -134,7 +125,6 @@ const datasets: DatasetItem[] = [
         name: "research_groups_canonical.json",
         description: "Grupos de pesquisa com líderes, membros e áreas.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(researchGroupsCanonical),
         data: researchGroupsCanonical,
         structure: buildStructurePreview(researchGroupsCanonical),
@@ -144,7 +134,6 @@ const datasets: DatasetItem[] = [
         name: "researchers_canonical.json",
         description: "Pesquisadores com perfil, vínculos, artigos e orientações.",
         type: "Canonical",
-        folder: "canonical",
         countLabel: buildCountLabel(researchersCanonical),
         data: researchersCanonical,
         structure: buildStructurePreview(researchersCanonical),
@@ -154,7 +143,6 @@ const datasets: DatasetItem[] = [
         name: "advisorship_analytics.json",
         description: "Agregações analíticas das orientações para dashboards.",
         type: "Mart",
-        folder: "mart",
         countLabel: buildCountLabel(advisorshipAnalytics),
         data: advisorshipAnalytics,
         structure: buildStructurePreview(advisorshipAnalytics),
@@ -164,7 +152,6 @@ const datasets: DatasetItem[] = [
         name: "initiatives_analytics_mart.json",
         description: "Agregações de projetos com resumo, evolução e composição.",
         type: "Mart",
-        folder: "mart",
         countLabel: buildCountLabel(initiativesMart),
         data: initiativesMart,
         structure: buildStructurePreview(initiativesMart),
@@ -174,7 +161,6 @@ const datasets: DatasetItem[] = [
         name: "knowledge_areas_mart.json",
         description: "Matriz analítica das áreas com contagens e agrupamentos.",
         type: "Mart",
-        folder: "mart",
         countLabel: buildCountLabel(knowledgeAreasMart),
         data: knowledgeAreasMart,
         structure: buildStructurePreview(knowledgeAreasMart),
@@ -216,7 +202,7 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Bases Canônicas</h2>
-                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data/canonical</span>.</p>
+                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data</span>.</p>
                 </div>
             </div>
 
@@ -238,7 +224,7 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
                         </p>
 
                         <p class="text-xs text-text-muted uppercase tracking-[0.18em]">
-                            <span class="font-mono normal-case">src/data/{dataset.folder}</span>
+                            <span class="font-mono normal-case">src/data</span>
                         </p>
 
                         <details class="group/details mt-2">
@@ -271,7 +257,7 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Marts Analíticos</h2>
-                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data/mart</span>.</p>
+                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data</span>.</p>
                 </div>
             </div>
 
@@ -293,7 +279,7 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
                         </p>
 
                         <p class="text-xs text-text-muted uppercase tracking-[0.18em]">
-                            <span class="font-mono normal-case">src/data/{dataset.folder}</span>
+                            <span class="font-mono normal-case">src/data</span>
                         </p>
 
                         <details class="group/details mt-2">
