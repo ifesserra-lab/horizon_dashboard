@@ -7,10 +7,23 @@ import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
 import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
 import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
 import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
-import { getResearcherCampusIds } from "../../lib/tenant-data";
+import {
+    getRealCampuses,
+    getResearcherCampusIds,
+    getResearchersByCampusId,
+} from "../../lib/tenant-data";
 
-const researchers = (researchersData as Researcher[]).sort((a, b) =>
-    a.name.localeCompare(b.name),
+const sortResearchersByName = (items: Researcher[]) =>
+    [...items].sort((a, b) =>
+        a.name.localeCompare(b.name),
+    );
+
+const researchers = sortResearchersByName(researchersData as Researcher[]);
+const campusResearcherViews = Object.fromEntries(
+    getRealCampuses().map((campus) => [
+        campus.id,
+        sortResearchersByName(getResearchersByCampusId(campus.id)),
+    ]),
 );
 
 // Calculate counts for each researcher
@@ -79,11 +92,25 @@ const baseUrl = import.meta.env.BASE_URL;
             </div>
         </header>
 
-        <!-- KPI Cards -->
-        <ResearcherKpiCards researchers={researchers} />
-
-        <!-- Analytics Charts -->
-        <ResearcherCharts researchers={researchers} />
+        <div id="researcher-dashboard-views">
+            <div data-campus-view="">
+                <ResearcherKpiCards researchers={researchers} />
+                <ResearcherCharts researchers={researchers} instanceId="all" />
+            </div>
+            {
+                Object.entries(campusResearcherViews).map(
+                    ([campusId, campusResearchers]) => (
+                        <div data-campus-view={campusId} class="hidden">
+                            <ResearcherKpiCards researchers={campusResearchers} />
+                            <ResearcherCharts
+                                researchers={campusResearchers}
+                                instanceId={`campus-${campusId}`}
+                            />
+                        </div>
+                    ),
+                )
+            }
+        </div>
 
         <!-- Search & Filters -->
         <ResearcherFilters />
@@ -154,6 +181,16 @@ const baseUrl = import.meta.env.BASE_URL;
         const emptyState = document.getElementById("emptyState");
         const cards = document.querySelectorAll(".researcher-card");
 
+        function updateResearcherViews(selectedCampus) {
+            document
+                .querySelectorAll("#researcher-dashboard-views [data-campus-view]")
+                .forEach((node) => {
+                    const viewCampus =
+                        node.getAttribute("data-campus-view") || "";
+                    node.classList.toggle("hidden", viewCampus !== selectedCampus);
+                });
+        }
+
         function filterResearchers() {
             const query = searchInput.value.toLowerCase().trim();
             const preferredCampus = localStorage.getItem("preferred-campus") || "";
@@ -193,7 +230,10 @@ const baseUrl = import.meta.env.BASE_URL;
         }
 
         searchInput?.addEventListener("input", filterResearchers);
-        window.addEventListener("campus-filter-change", filterResearchers);
+        window.addEventListener("campus-filter-change", (event) => {
+            updateResearcherViews(event.detail?.campusId || event.detail?.campus || "");
+            filterResearchers();
+        });
         resetBtn?.addEventListener("click", () => {
             searchInput.value = "";
             filterResearchers();
@@ -217,5 +257,6 @@ const baseUrl = import.meta.env.BASE_URL;
         });
 
         filterResearchers();
+        updateResearcherViews(localStorage.getItem("preferred-campus") || "");
     </script>
 </Layout>

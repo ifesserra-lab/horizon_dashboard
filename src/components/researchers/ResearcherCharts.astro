@@ -4,9 +4,16 @@ import ArticleYearChart from "./ArticleYearChart.astro";
 
 interface Props {
     researchers: Researcher[];
+    instanceId?: string;
 }
 
-const { researchers } = Astro.props;
+const { researchers, instanceId = "default" } = Astro.props;
+const overviewTabId = `tab-overview-${instanceId}`;
+const areasTabId = `tab-areas-${instanceId}`;
+const productionTabId = `tab-production-${instanceId}`;
+const overviewPanelId = `panel-overview-${instanceId}`;
+const areasPanelId = `panel-areas-${instanceId}`;
+const productionPanelId = `panel-production-${instanceId}`;
 
 // Groups and Areas map creation (needed for charts)
 const areasMap = new Map<string, number>();
@@ -86,7 +93,7 @@ const maxGroupCount = topGroups.length > 0 ? topGroups[0].count : 1;
 const allArticles = researchers.flatMap((r) => r.articles || []);
 ---
 
-<div class="space-y-8 mb-12">
+<div class="space-y-8 mb-12" data-researcher-charts-root={instanceId}>
     <!-- Tabs Standard (Text + Bottom Border) -->
     <div>
         <div
@@ -96,8 +103,8 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
             <button
                 role="tab"
                 aria-selected="true"
-                aria-controls="panel-overview"
-                id="tab-overview"
+                aria-controls={overviewPanelId}
+                id={overviewTabId}
                 class="pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent"
             >
                 Visão Geral
@@ -105,8 +112,8 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
             <button
                 role="tab"
                 aria-selected="false"
-                aria-controls="panel-areas"
-                id="tab-areas"
+                aria-controls={areasPanelId}
+                id={areasTabId}
                 class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
             >
                 Áreas do Conhecimento
@@ -114,8 +121,8 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
             <button
                 role="tab"
                 aria-selected="false"
-                aria-controls="panel-production"
-                id="tab-production"
+                aria-controls={productionPanelId}
+                id={productionTabId}
                 class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
             >
                 Produção Científica
@@ -127,9 +134,9 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
     <div class="relative min-h-[400px]">
         <!-- Panel 1: Overview -->
         <div
-            id="panel-overview"
+            id={overviewPanelId}
             role="tabpanel"
-            aria-labelledby="tab-overview"
+            aria-labelledby={overviewTabId}
             class="transition-all duration-300 opacity-100 scale-100"
         >
             <div
@@ -220,9 +227,9 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
 
         <!-- Panel 2: Knowledge Areas -->
         <div
-            id="panel-areas"
+            id={areasPanelId}
             role="tabpanel"
-            aria-labelledby="tab-areas"
+            aria-labelledby={areasTabId}
             class="hidden transition-all duration-300 opacity-0 scale-95"
         >
             <div
@@ -265,9 +272,9 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
         </div>
         <!-- Panel 3: Production -->
         <div
-            id="panel-production"
+            id={productionPanelId}
             role="tabpanel"
-            aria-labelledby="tab-production"
+            aria-labelledby={productionTabId}
             class="hidden transition-all duration-300 opacity-0 scale-95"
         >
             <div class="mt-6 h-[400px]">
@@ -279,36 +286,61 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
 
 <script>
     const setupTabs = () => {
-        const tabs = document.querySelectorAll('[role="tab"]');
-        const panels = document.querySelectorAll('[role="tabpanel"]');
+        document
+            .querySelectorAll("[data-researcher-charts-root]")
+            .forEach((root) => {
+                const element = root as HTMLElement;
 
-        tabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-                const targetId = tab.getAttribute("aria-controls");
+                if (element.dataset.tabsBound === "true") {
+                    return;
+                }
 
-                tabs.forEach((t) => {
-                    t.setAttribute("aria-selected", "false");
-                    t.className =
-                        "pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent";
-                });
-                tab.setAttribute("aria-selected", "true");
-                tab.className =
-                    "pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent";
+                element.dataset.tabsBound = "true";
 
-                panels.forEach((panel) => {
-                    if (panel.id === targetId) {
-                        panel.classList.remove("hidden");
-                        requestAnimationFrame(() => {
-                            panel.classList.add("opacity-100", "scale-100");
-                            panel.classList.remove("opacity-0", "scale-95");
+                const tabs = element.querySelectorAll('[role="tab"]');
+                const panels = element.querySelectorAll('[role="tabpanel"]');
+
+                tabs.forEach((tab) => {
+                    tab.addEventListener("click", () => {
+                        const targetId = tab.getAttribute("aria-controls");
+
+                        tabs.forEach((t) => {
+                            t.setAttribute("aria-selected", "false");
+                            t.className =
+                                "pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent";
                         });
-                    } else {
-                        panel.classList.add("hidden", "opacity-0", "scale-95");
-                        panel.classList.remove("opacity-100", "scale-100");
-                    }
+                        tab.setAttribute("aria-selected", "true");
+                        tab.className =
+                            "pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent";
+
+                        panels.forEach((panel) => {
+                            if (panel.id === targetId) {
+                                panel.classList.remove("hidden");
+                                requestAnimationFrame(() => {
+                                    panel.classList.add(
+                                        "opacity-100",
+                                        "scale-100",
+                                    );
+                                    panel.classList.remove(
+                                        "opacity-0",
+                                        "scale-95",
+                                    );
+                                });
+                            } else {
+                                panel.classList.add(
+                                    "hidden",
+                                    "opacity-0",
+                                    "scale-95",
+                                );
+                                panel.classList.remove(
+                                    "opacity-100",
+                                    "scale-100",
+                                );
+                            }
+                        });
+                    });
                 });
             });
-        });
     };
 
     setupTabs();
