@@ -75,6 +75,8 @@ const { advisorships, advisorshipSourcesById = {} } = Astro.props;
 </script>
 
 <script>
+    import { normalizeSearchText } from "../../lib/search";
+
     document.addEventListener("DOMContentLoaded", () => {
         const listContainer = document.getElementById("advisorshipsList");
         const searchInput = document.getElementById(
@@ -238,13 +240,13 @@ const { advisorships, advisorshipSourcesById = {} } = Astro.props;
         }
 
         function handleSearch() {
-            const query = searchInput.value.toLowerCase().trim();
+            const query = normalizeSearchText(searchInput?.value || "");
             filteredItems = allItems.filter(
                 (a: any) =>
-                    (a.name && a.name.toLowerCase().includes(query)) ||
+                    (a.name && normalizeSearchText(a.name).includes(query)) ||
                     (a.student_name &&
-                        a.student_name.toLowerCase().includes(query)) ||
-                    (a.type && a.type.toLowerCase().includes(query)),
+                        normalizeSearchText(a.student_name).includes(query)) ||
+                    (a.type && normalizeSearchText(a.type).includes(query)),
             );
 
             displayedCount = 0;

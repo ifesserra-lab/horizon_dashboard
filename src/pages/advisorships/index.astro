@@ -14,6 +14,7 @@ import {
     getAdvisorshipProjectsByCampusId,
     getRealCampuses,
 } from "../../lib/tenant-data";
+import { buildSearchIndex } from "../../lib/search";
 
 // Cast data
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
@@ -22,6 +23,7 @@ type AdvisorshipExplorerItem = AdvisorshipItem & {
     projectId: string;
     projectName: string;
     campusIds: string[];
+    searchIndex: string;
 };
 
 const getUniqueFellowships = (items: AdvisorshipExplorerItem[]) =>
@@ -58,6 +60,13 @@ const flattenProjectAdvisorships = (
                 projectId: String(project.id),
                 projectName: project.name,
                 campusIds: getAdvisorshipItemCampusIds(advisorship),
+                searchIndex: buildSearchIndex([
+                    advisorship.student_name,
+                    advisorship.supervisor_name,
+                    project.name,
+                    advisorship.name,
+                    advisorship.type,
+                ]),
             })),
         )
         .filter(Boolean);
@@ -501,12 +510,23 @@ const advisorshipCatalogByCampus = {
 </Layout>
 
 <script
-    is:inline
     define:vars={{
         initialAdvisorships: sortedAdvisorships,
         advisorshipCatalogByCampus,
     }}
 >
+    window.__initialAdvisorships = initialAdvisorships;
+    window.__advisorshipCatalogByCampus = advisorshipCatalogByCampus;
+</script>
+
+<script>
+    import { normalizeSearchText as normalizeSearch } from "../../lib/search";
+    import {
+        getCampusFilterValue,
+        splitPipeValues,
+        updateCampusViews,
+    } from "../../lib/campus-ui";
+
     // Re-initialize logic for filtering
     const searchInput = document.getElementById("search-input");
     const statusFilter = document.getElementById("status-filter");
@@ -518,7 +538,9 @@ const advisorshipCatalogByCampus = {
     const totalLabel = document.getElementById("advisorship-total-label");
     const recordCount = document.getElementById("advisorship-record-count");
     const items = document.querySelectorAll(".advisorship-item-wrapper");
-    const baseCatalog = advisorshipCatalogByCampus || {};
+    const initialAdvisorships = (window as any).__initialAdvisorships || [];
+    const baseCatalog = (window as any).__advisorshipCatalogByCampus || {};
+    let currentCampusId = localStorage.getItem("preferred-campus") || "";
 
     function populateSelect(select, options, emptyLabel) {
         if (!select) return;
@@ -568,12 +590,11 @@ const advisorshipCatalogByCampus = {
     }
 
     function filter() {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = normalizeSearch(searchInput.value);
         const statusTerm = statusFilter.value.toLowerCase();
         const fellowshipTerm = fellowshipFilter.value.toLowerCase();
         const yearTerm = yearFilter.value.toLowerCase();
-        const preferredCampus = localStorage.getItem("preferred-campus") || "";
-        const campusCatalog = baseCatalog[preferredCampus] || baseCatalog[""] || {
+        const campusCatalog = baseCatalog[currentCampusId] || baseCatalog[""] || {
             total: initialAdvisorships.length,
         };
         const totalForCampus = Number(campusCatalog.total || 0);
@@ -582,12 +603,7 @@ const advisorshipCatalogByCampus = {
 
         items.forEach((item, index) => {
             const data = initialAdvisorships[index];
-            const campusIds = (item.dataset.campusIds || "")
-                .split("|")
-                .filter(Boolean);
-            const studentName = (data.student_name || "").toLowerCase();
-            const supervisorName = (data.supervisor_name || "").toLowerCase();
-            const projectName = (data.projectName || "").toLowerCase();
+            const campusIds = splitPipeValues(item.dataset.campusIds);
             const status = (data.status || "").toLowerCase();
             const fellowship = (data.fellowship?.name || "").toLowerCase();
             const year = data.start_date
@@ -597,15 +613,13 @@ const advisorshipCatalogByCampus = {
                 : "";
 
             const matchesSearch =
-                studentName.includes(searchTerm) ||
-                supervisorName.includes(searchTerm) ||
-                projectName.includes(searchTerm);
+                !searchTerm || (data.searchIndex || "").includes(searchTerm);
             const matchesStatus = statusTerm === "all" || status === statusTerm;
             const matchesFellowship =
                 fellowshipTerm === "all" || fellowship === fellowshipTerm;
             const matchesYear = yearTerm === "all" || year === yearTerm;
             const matchesCampus =
-                !preferredCampus || campusIds.includes(preferredCampus);
+                !currentCampusId || campusIds.includes(currentCampusId);
 
             if (
                 matchesSearch &&
@@ -637,23 +651,20 @@ const advisorshipCatalogByCampus = {
     fellowshipFilter.addEventListener("change", filter);
     yearFilter.addEventListener("change", filter);
     window.addEventListener("campus-filter-change", (event) => {
-        const selectedCampus = event.detail?.campusId || event.detail?.campus || "";
-        syncCampusControls(selectedCampus);
+        currentCampusId = getCampusFilterValue(event);
+        syncCampusControls(currentCampusId);
         filter();
-        updateAdvisorshipViews(selectedCampus);
+        updateAdvisorshipViews(currentCampusId);
     });
     function updateAdvisorshipViews(selectedCampus) {
-        document
-            .querySelectorAll("#advisorship-dashboard-views [data-campus-view]")
-            .forEach((node) => {
-                const viewCampus = node.getAttribute("data-campus-view") || "";
-                node.classList.toggle("hidden", viewCampus !== selectedCampus);
-            });
+        updateCampusViews(
+            "#advisorship-dashboard-views [data-campus-view]",
+            selectedCampus,
+        );
     }
-    const initialCampus = localStorage.getItem("preferred-campus") || "";
-    syncCampusControls(initialCampus);
+    syncCampusControls(currentCampusId);
     filter();
-    updateAdvisorshipViews(initialCampus);
+    updateAdvisorshipViews(currentCampusId);
 </script>
 
 <style>

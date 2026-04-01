@@ -1,5 +1,6 @@
 ---
 import type { Project } from "../types/projects";
+import { buildSearchIndex } from "../lib/search";
 
 interface Props {
 	project: Project;
@@ -31,6 +32,11 @@ const currentStatusStyle =
 	class="project-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col h-full"
 	data-name={project.name.toLowerCase()}
 	data-status={project.status.toLowerCase()}
+	data-search={buildSearchIndex([
+		project.name,
+		project.status,
+		...(project.team || []).map((member) => member.person_name),
+	])}
 >
 	<div class="flex items-start justify-between mb-4">
 		<div

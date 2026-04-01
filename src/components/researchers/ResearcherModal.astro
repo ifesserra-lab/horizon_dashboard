@@ -206,6 +206,8 @@
 </div>
 
 <script>
+    import { normalizeSearchText } from "../../lib/search";
+
     // Modal & Articles Logic
     const modal = document.getElementById("articlesModal");
     const modalContent = document.getElementById("modalContent");
@@ -761,7 +763,7 @@
      * Re-renders the list of articles matching the title or journal/conference name.
      */
     function handleArticleSearch() {
-        const query = articleSearch.value.toLowerCase().trim();
+        const query = normalizeSearchText(articleSearch?.value || "");
         const researcher = (window as any).researchersData.find(
             (r: any) => String(r.id) === String(currentResearcherId),
         );
@@ -769,8 +771,8 @@
 
         filteredArticles = researcher.articles.filter(
             (a: any) =>
-                a.title.toLowerCase().includes(query) ||
-                a.journal_conference.toLowerCase().includes(query),
+                normalizeSearchText(a.title).includes(query) ||
+                normalizeSearchText(a.journal_conference).includes(query),
         );
 
         displayedCount = 0;

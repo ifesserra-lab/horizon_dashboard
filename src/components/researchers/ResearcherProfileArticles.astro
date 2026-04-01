@@ -75,6 +75,8 @@ const { researcher, articleSourcesById = {} } = Astro.props;
 </script>
 
 <script>
+    import { normalizeSearchText } from "../../lib/search";
+
     document.addEventListener("DOMContentLoaded", () => {
         const articlesList = document.getElementById("articlesList");
         const articleSearch = document.getElementById(
@@ -215,11 +217,11 @@ const { researcher, articleSourcesById = {} } = Astro.props;
         }
 
         function handleSearch() {
-            const query = articleSearch.value.toLowerCase().trim();
+            const query = normalizeSearchText(articleSearch?.value || "");
             filteredArticles = allArticles.filter(
                 (a: any) =>
-                    a.title.toLowerCase().includes(query) ||
-                    a.journal_conference.toLowerCase().includes(query),
+                    normalizeSearchText(a.title).includes(query) ||
+                    normalizeSearchText(a.journal_conference).includes(query),
             );
 
             displayedCount = 0;

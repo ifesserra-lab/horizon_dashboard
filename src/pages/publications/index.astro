@@ -8,6 +8,7 @@ import {
     getPublicationsByCampusId,
     getCampusPublicationViews,
 } from "../../lib/publications-data";
+import { buildSearchIndex } from "../../lib/search";
 
 const title = "Produção Acadêmica | Horizon Dashboard";
 const description =
@@ -329,6 +330,11 @@ const publicationsCatalogByCampus = {
                                 data-type={publication.type}
                                 data-year={publication.year}
                                 data-keywords={publication.keywords.join("|")}
+                                data-search={buildSearchIndex([
+                                    publication.title,
+                                    publication.journal_conference,
+                                    ...publication.author_names,
+                                ])}
                             >
                                 <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                                     <div class="space-y-3">
@@ -448,6 +454,17 @@ const publicationsCatalogByCampus = {
     </div>
 
     <script define:vars={{ publicationsCatalogByCampus }}>
+        window.__publicationsCatalogByCampus = publicationsCatalogByCampus;
+    </script>
+
+    <script>
+        import { normalizeSearchText as normalizeSearch } from "../../lib/search";
+        import {
+            getCampusFilterValue,
+            splitPipeValues,
+            updateCampusViews,
+        } from "../../lib/campus-ui";
+
         const publicationSearch = document.getElementById(
             "publicationSearch",
         ) as HTMLInputElement | null;
@@ -465,8 +482,10 @@ const publicationsCatalogByCampus = {
         const publicationCards = document.querySelectorAll(".publication-card");
         const emptyState = document.getElementById("publicationsEmptyState");
         const countLabel = document.getElementById("publicationsCountLabel");
-        const publicationsCatalog = publicationsCatalogByCampus || {};
+        const publicationsCatalog =
+            (window as any).__publicationsCatalogByCampus || {};
         let selectedKeyword = "";
+        let currentCampusId = localStorage.getItem("preferred-campus") || "";
 
         function getCatalogForCampus(selectedCampus) {
             return publicationsCatalog[selectedCampus] || publicationsCatalog[""] || {
@@ -560,41 +579,30 @@ const publicationsCatalogByCampus = {
         }
 
         function updatePublicationViews(selectedCampus) {
-            document
-                .querySelectorAll(
-                    "#publications-dashboard-views [data-campus-view]",
-                )
-                .forEach((node) => {
-                    const viewCampus = node.getAttribute("data-campus-view") || "";
-                    node.classList.toggle("hidden", viewCampus !== selectedCampus);
-                });
+            updateCampusViews(
+                "#publications-dashboard-views [data-campus-view]",
+                selectedCampus,
+            );
         }
 
         function filterPublications() {
-            const query = publicationSearch?.value.toLowerCase().trim() || "";
+            const query = normalizeSearch(publicationSearch?.value || "");
             const selectedType = publicationTypeFilter?.value || "";
             const selectedResearcher = publicationResearcherFilter?.value || "";
             const selectedYear = publicationYearFilter?.value || "";
-            const selectedCampus = localStorage.getItem("preferred-campus") || "";
-            const campusCatalog = getCatalogForCampus(selectedCampus);
+            const campusCatalog = getCatalogForCampus(currentCampusId);
             const totalForCampus = Number(campusCatalog.total || 0);
             let visibleCount = 0;
 
             publicationCards.forEach((card) => {
                 const element = card as HTMLElement;
                 const matchesCampus =
-                    !selectedCampus ||
-                    (element.dataset.campusId || "") === selectedCampus;
-                const matchesQuery =
-                    !query ||
-                    (element.dataset.title || "").includes(query) ||
-                    (element.dataset.venue || "").includes(query) ||
-                    (element.dataset.authors || "").includes(query);
+                    !currentCampusId ||
+                    (element.dataset.campusId || "") === currentCampusId;
+                const matchesQuery = !query || (element.dataset.search || "").includes(query);
                 const matchesType =
                     !selectedType || (element.dataset.type || "") === selectedType;
-                const researcherIds = (element.dataset.authorIds || "")
-                    .split("|")
-                    .filter(Boolean);
+                const researcherIds = splitPipeValues(element.dataset.authorIds);
                 const matchesResearcher =
                     !selectedResearcher ||
                     researcherIds.includes(selectedResearcher);
@@ -602,10 +610,9 @@ const publicationsCatalogByCampus = {
                     !selectedYear || (element.dataset.year || "") === selectedYear;
                 const matchesKeyword =
                     !selectedKeyword ||
-                    (element.dataset.keywords || "")
-                        .split("|")
-                        .filter(Boolean)
-                        .includes(selectedKeyword);
+                    splitPipeValues(element.dataset.keywords).includes(
+                        selectedKeyword,
+                    );
                 const matches =
                     matchesCampus &&
                     matchesQuery &&
@@ -643,32 +650,23 @@ const publicationsCatalogByCampus = {
             if (!button) return;
 
             selectedKeyword = button.dataset.keyword || "";
-            renderKeywordChips(
-                getCatalogForCampus(
-                    localStorage.getItem("preferred-campus") || "",
-                ).keywords || [],
-            );
+            renderKeywordChips(getCatalogForCampus(currentCampusId).keywords || []);
             filterPublications();
         });
         clearKeywordFilter?.addEventListener("click", () => {
             selectedKeyword = "";
-            renderKeywordChips(
-                getCatalogForCampus(
-                    localStorage.getItem("preferred-campus") || "",
-                ).keywords || [],
-            );
+            renderKeywordChips(getCatalogForCampus(currentCampusId).keywords || []);
             filterPublications();
         });
         window.addEventListener("campus-filter-change", (event) => {
-            const selectedCampus = event.detail?.campusId || event.detail?.campus || "";
-            syncCampusControls(selectedCampus);
-            updatePublicationViews(selectedCampus);
+            currentCampusId = getCampusFilterValue(event);
+            syncCampusControls(currentCampusId);
+            updatePublicationViews(currentCampusId);
             filterPublications();
         });
 
-        const initialCampus = localStorage.getItem("preferred-campus") || "";
-        syncCampusControls(initialCampus);
-        updatePublicationViews(initialCampus);
+        syncCampusControls(currentCampusId);
+        updatePublicationViews(currentCampusId);
         filterPublications();
     </script>
 </Layout>
