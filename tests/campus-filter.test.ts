@@ -11,6 +11,8 @@ import {
     getAdvisorshipItemCampusIds,
     getAdvisorshipProjectsByCampusId,
     getCampusIdsFromNames,
+    getGroupsByCampusId,
+    getKnowledgeAreasByCampusId,
     getProjectCampusIds,
     getProjectsByCampusId,
     getRealCampuses,
@@ -118,6 +120,24 @@ describe("Campus dashboards remain keyed by id", () => {
         ).length;
 
         expect(dashboard.summary.total_advisorships).toBe(expectedTotal);
+    });
+
+    it("builds knowledge area summaries by campus id", () => {
+        const campusAreas = getKnowledgeAreasByCampusId("6");
+        const campusName =
+            getRealCampuses().find((campus) => campus.id === "6")?.name || "";
+
+        expect(campusAreas.length).toBeGreaterThan(0);
+        expect(campusAreas.every((area) => area.groups_count === area.groups.length)).toBe(true);
+        expect(campusAreas.every((area) => area.campuses.length === 1)).toBe(true);
+        expect(
+            campusAreas.every((area) =>
+                area.groups.every((group) => group.campus === campusName),
+            ),
+        ).toBe(true);
+        expect(campusAreas[0].groups_count).toBeLessThanOrEqual(
+            getGroupsByCampusId("6").length,
+        );
     });
 });
 

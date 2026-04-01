@@ -60,6 +60,20 @@ const researcherByNormalizedName = new Map(
 const researcherCampusIdsById = new Map<string, string[]>();
 const advisorshipCampusIdCache = new Map<string, string[]>();
 
+export interface KnowledgeAreaGroupRecord {
+    id: string | number;
+    name: string;
+    campus: string;
+}
+
+export interface KnowledgeAreaViewRecord {
+    area_id: string | number;
+    area_name: string;
+    groups_count: number;
+    groups: KnowledgeAreaGroupRecord[];
+    campuses: string[];
+}
+
 export const getRealCampuses = (): CampusRecord[] => campuses;
 
 export const getRealCampusById = (id: string): CampusRecord | undefined =>
@@ -257,13 +271,66 @@ export const getAdvisorshipProjectsByCampusSlug = (
 export const getKnowledgeAreasByCampusId = (campusId: string) => {
     const campus = getRealCampusById(campusId);
     if (!campus) return [];
-    return areas.filter((area) =>
-        (area.campuses || []).includes(campus.name),
-    );
+
+    return areas
+        .map((area) => {
+            const groups = (area.groups || []).filter(
+                (group: any) =>
+                    normalizeComparable(group.campus) ===
+                    normalizeComparable(campus.name),
+            );
+
+            if (groups.length === 0) {
+                return null;
+            }
+
+            return {
+                area_id: area.area_id,
+                area_name: area.area_name,
+                groups_count: groups.length,
+                groups,
+                campuses: [
+                    ...new Set(
+                        groups.map((group: any) => String(group.campus || "")),
+                    ),
+                ].filter(Boolean),
+            };
+        })
+        .filter(Boolean)
+        .sort(
+            (a, b) =>
+                (b?.groups_count || 0) - (a?.groups_count || 0) ||
+                String(a?.area_name || "").localeCompare(
+                    String(b?.area_name || ""),
+                ),
+        ) as KnowledgeAreaViewRecord[];
 };
 
 export const getKnowledgeAreasByCampusSlug = (slug: string) =>
     getKnowledgeAreasByCampusId(resolveCampusId(slug));
+
+export const getKnowledgeAreasView = (): KnowledgeAreaViewRecord[] =>
+    areas
+        .map((area) => ({
+            area_id: area.area_id,
+            area_name: area.area_name,
+            groups_count: Array.isArray(area.groups)
+                ? area.groups.length
+                : Number(area.groups_count || 0),
+            groups: (area.groups || []) as KnowledgeAreaGroupRecord[],
+            campuses: [
+                ...new Set(
+                    (area.groups || []).map((group: any) =>
+                        String(group.campus || ""),
+                    ),
+                ),
+            ].filter(Boolean),
+        }))
+        .sort(
+            (a, b) =>
+                b.groups_count - a.groups_count ||
+                a.area_name.localeCompare(b.area_name),
+        );
 
 export const getResearcherCampusIds = (researcher: Researcher): string[] => {
     const cacheKey = String(researcher.id);
