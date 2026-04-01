@@ -114,6 +114,15 @@ export const getCampusIdsFromNames = (campusNames: string[] = []): string[] =>
         ),
     ];
 
+export const getCampusNamesFromIds = (campusIds: string[] = []): string[] =>
+    [
+        ...new Set(
+            campusIds
+                .map((campusId) => getRealCampusById(campusId)?.name || "")
+                .filter(Boolean),
+        ),
+    ];
+
 const findResearcherByReference = ({
     id,
     name,

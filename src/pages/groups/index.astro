@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import groupsData from '../../data/research_groups_canonical.json';
 import type { ResearchGroup } from '../../types/groups';
+import { buildSearchIndex } from '../../lib/search';
 
 const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompare(b.name));
 ---
@@ -42,6 +43,12 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				data-campus-id={String(group.campus.id)}
 				data-areas={group.knowledge_areas.map(ka => ka.name.toLowerCase()).join('|')}
 				data-leaders={group.leaders.map(l => l.name.toLowerCase()).join('|')}
+				data-search={buildSearchIndex([
+					group.name,
+					group.campus.name,
+					...group.knowledge_areas.map((ka) => ka.name),
+					...group.leaders.map((leader) => leader.name),
+				])}
 			>
 				<div class="flex items-start justify-between mb-4">
 					<div aria-hidden="true" class="w-12 h-12 rounded-xl bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-border-main flex items-center justify-center text-premium-accent font-bold overflow-hidden text-xs text-center p-1 leading-tight">
@@ -94,14 +101,17 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 	</div>
 
 	<script>
+		import { normalizeSearchText } from '../../lib/search';
+		import { getCampusFilterValue } from '../../lib/campus-ui';
+
 		const searchInput = document.getElementById('groupSearch') as HTMLInputElement;
 		const resetBtn = document.getElementById('resetFilters');
 		const emptyState = document.getElementById('emptyState');
 		const groupCards = document.querySelectorAll('.group-card');
+		let currentCampusId = localStorage.getItem('preferred-campus') || '';
 
 		function filterGroups() {
-			const query = searchInput.value.toLowerCase().trim();
-			const preferredCampus = localStorage.getItem('preferred-campus') || '';
+			const query = normalizeSearchText(searchInput?.value || '');
 			let visibleCount = 0;
 
 			// Show/hide reset button
@@ -113,18 +123,11 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 
 			groupCards.forEach(card => {
 				const element = card as HTMLElement;
-				const name = element.dataset.name || '';
-				const campus = element.dataset.campus || '';
 				const campusId = element.dataset.campusId || '';
-				const areas = element.dataset.areas || '';
-				const leaders = element.dataset.leaders || '';
+				const searchIndex = element.dataset.search || '';
 				
-				const matchesCampus = !preferredCampus || campusId === preferredCampus;
-				const matchesSearch = !query || 
-					name.includes(query) || 
-					campus.includes(query) ||
-					areas.includes(query) || 
-					leaders.includes(query);
+				const matchesCampus = !currentCampusId || campusId === currentCampusId;
+				const matchesSearch = !query || searchIndex.includes(query);
 
 				if (matchesCampus && matchesSearch) {
 					element.style.display = 'flex';
@@ -145,7 +148,10 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 		}
 
 		searchInput?.addEventListener('input', filterGroups);
-		window.addEventListener('campus-filter-change', filterGroups);
+		window.addEventListener('campus-filter-change', (event) => {
+			currentCampusId = getCampusFilterValue(event);
+			filterGroups();
+		});
 		
 		resetBtn?.addEventListener('click', () => {
 			searchInput.value = '';

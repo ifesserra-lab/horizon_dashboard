@@ -329,7 +329,16 @@ const campusHomeViews = Object.fromEntries(
 	</div>
 
 	<script define:vars={{ campusStats, defaultStats: { totalGroups, totalMembers, totalCampus, totalKnowledgeAreas } }}>
+		window.__homeCampusStats = campusStats;
+		window.__homeDefaultStats = defaultStats;
+	</script>
+
+	<script>
+		import { getCampusFilterValue, updateCampusViews } from '../lib/campus-ui';
+
 		function updateHomeKpis(selectedCampus) {
+			const campusStats = (window as any).__homeCampusStats || {};
+			const defaultStats = (window as any).__homeDefaultStats || {};
 			const stats = selectedCampus && campusStats[selectedCampus]
 				? campusStats[selectedCampus]
 				: defaultStats;
@@ -346,14 +355,14 @@ const campusHomeViews = Object.fromEntries(
 		}
 
 		function updateHomeViews(selectedCampus) {
-			document.querySelectorAll('#home-charts-views [data-campus-view], #home-advisorship-views [data-campus-view]').forEach((node) => {
-				const viewCampus = node.getAttribute('data-campus-view') || '';
-				node.classList.toggle('hidden', viewCampus !== selectedCampus);
-			});
+			updateCampusViews(
+				'#home-charts-views [data-campus-view], #home-advisorship-views [data-campus-view]',
+				selectedCampus
+			);
 		}
 
 		window.addEventListener('campus-filter-change', (event) => {
-			const campusId = event.detail?.campusId || event.detail?.campus || '';
+			const campusId = getCampusFilterValue(event);
 			updateHomeKpis(campusId);
 			updateHomeViews(campusId);
 		});

@@ -1,43 +1,39 @@
 ---
 import type { Researcher } from "../../types/researchers";
+import { buildSearchIndex } from "../../lib/search";
+import type { ResearcherStats } from "../../lib/researchers-data";
+import { getHighestAcademicDegree } from "../../lib/researchers-data";
 
 interface Props {
     researcher: Researcher;
-    stats: {
-        projects: number;
-        articles: number;
-        advisorships: number;
-        advisorshipsByType: Record<string, number>;
-        isSupervisor: boolean;
-        isStudent: boolean;
-    };
+    stats: ResearcherStats;
     baseUrl: string;
     campusIds?: string[];
+    campusNames?: string[];
 }
 
-const { researcher, stats, baseUrl, campusIds = [] } = Astro.props;
+const {
+    researcher,
+    stats,
+    baseUrl,
+    campusIds = [],
+    campusNames = [],
+} = Astro.props;
 
-function getHighestDegree(education: any[]) {
-    if (!education || education.length === 0) return null;
-    const hierarchy = {
-        Doutorado: 4,
-        Mestrado: 3,
-        Especialização: 2,
-        Graduação: 1,
-    };
-    return [...education].sort(
-        (a, b) =>
-            (hierarchy[b.degree as keyof typeof hierarchy] || 0) -
-            (hierarchy[a.degree as keyof typeof hierarchy] || 0),
-    )[0].degree;
-}
-
-const highestDegree = getHighestDegree(researcher.academic_education);
+const MAX_VISIBLE_CAMPUSES = 2;
+const MAX_VISIBLE_KNOWLEDGE_AREAS = 3;
+const highestDegree = getHighestAcademicDegree(researcher.academic_education);
+const visibleCampusNames = campusNames.slice(0, MAX_VISIBLE_CAMPUSES);
+const hiddenCampusCount = Math.max(
+    0,
+    campusNames.length - visibleCampusNames.length,
+);
 ---
 
 <article
     class="researcher-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col items-center text-center group"
     data-name={researcher.name.toLowerCase()}
+    data-search={buildSearchIndex([researcher.name])}
     data-campus-ids={campusIds.join("|")}
 >
     <div
@@ -57,6 +53,29 @@ const highestDegree = getHighestDegree(researcher.academic_education);
             <p class="text-[10px] font-bold uppercase tracking-wider text-premium-purple bg-premium-purple/5 px-2 py-0.5 rounded-full mb-2">
                 {highestDegree}
             </p>
+        )
+    }
+
+    {
+        campusNames.length > 0 && (
+            <div
+                class="flex flex-wrap justify-center gap-2 mb-3 w-full px-4"
+                title={campusNames.join(", ")}
+            >
+                {visibleCampusNames.map((campusName) => (
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-premium-accent/8 border border-premium-accent/15 text-[10px] font-bold text-premium-accent leading-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-premium-accent shrink-0"></span>
+                        {campusName}
+                    </span>
+                ))}
+                {
+                    hiddenCampusCount > 0 && (
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-premium-accent/8 border border-premium-accent/15 text-[10px] font-bold text-premium-accent leading-none">
+                            +{hiddenCampusCount}
+                        </span>
+                    )
+                }
+            </div>
         )
     }
 
@@ -95,8 +114,8 @@ const highestDegree = getHighestDegree(researcher.academic_education);
 
     <div class="flex flex-wrap justify-center gap-2 mb-4 w-full">
         {
-            researcher.knowledge_areas
-                .slice(0, 3)
+        researcher.knowledge_areas
+                .slice(0, MAX_VISIBLE_KNOWLEDGE_AREAS)
                 .map((area) => (
                     <span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary border border-border-main truncate max-w-[120px]">
                         {area.name}
@@ -104,9 +123,10 @@ const highestDegree = getHighestDegree(researcher.academic_education);
                 ))
         }
         {
-            researcher.knowledge_areas.length > 3 && (
+            researcher.knowledge_areas.length > MAX_VISIBLE_KNOWLEDGE_AREAS && (
                 <span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary">
-                    +{researcher.knowledge_areas.length - 3}
+                    +{researcher.knowledge_areas.length -
+                        MAX_VISIBLE_KNOWLEDGE_AREAS}
                 </span>
             )
         }

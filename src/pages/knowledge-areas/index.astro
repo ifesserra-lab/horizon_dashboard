@@ -104,23 +104,25 @@ const baseUrl = import.meta.env.BASE_URL;
 	</div>
 
 	<script>
+		import { normalizeSearchText } from '../../lib/search';
+		import {
+			getCampusFilterValue,
+			updateCampusViews,
+		} from '../../lib/campus-ui';
+
 		const searchInput = document.getElementById('areaSearch') as HTMLInputElement;
 		const resetBtn = document.getElementById('resetAreaSearch');
 		const emptyState = document.getElementById('emptyState');
+		let currentCampusId = localStorage.getItem('preferred-campus') || '';
+
 		function updateAreaViews(selectedCampus) {
-			document
-				.querySelectorAll('#knowledge-areas-views [data-campus-view]')
-				.forEach((node) => {
-					const viewCampus = node.getAttribute('data-campus-view') || '';
-					node.classList.toggle('hidden', viewCampus !== selectedCampus);
-				});
+			updateCampusViews('#knowledge-areas-views [data-campus-view]', selectedCampus);
 		}
 
 		function filterAreas() {
-			const query = searchInput.value.toLowerCase().trim();
-			const preferredCampus = localStorage.getItem('preferred-campus') || '';
+			const query = normalizeSearchText(searchInput?.value || '');
 			const activeView = document.querySelector(
-				`#knowledge-areas-views [data-campus-view="${preferredCampus}"]`
+				`#knowledge-areas-views [data-campus-view="${currentCampusId}"]`
 			) ||
 				document.querySelector('#knowledge-areas-views [data-campus-view=""]');
 			const areaCards = activeView?.querySelectorAll('.area-card') || [];
@@ -135,14 +137,8 @@ const baseUrl = import.meta.env.BASE_URL;
 
 			areaCards.forEach(card => {
 				const element = card as HTMLElement;
-				const name = element.dataset.name || '';
-				const campuses = element.dataset.campuses || '';
-				const groups = element.dataset.groups || '';
-				
-				const matchesSearch = !query || 
-					name.includes(query) || 
-					campuses.includes(query) ||
-					groups.includes(query);
+				const searchIndex = element.dataset.search || '';
+				const matchesSearch = !query || searchIndex.includes(query);
 
 				if (matchesSearch) {
 					element.style.display = 'flex';
@@ -164,7 +160,8 @@ const baseUrl = import.meta.env.BASE_URL;
 
 		searchInput?.addEventListener('input', filterAreas);
 		window.addEventListener('campus-filter-change', (event) => {
-			updateAreaViews(event.detail?.campusId || event.detail?.campus || '');
+			currentCampusId = getCampusFilterValue(event);
+			updateAreaViews(currentCampusId);
 			filterAreas();
 		});
 		
@@ -174,7 +171,7 @@ const baseUrl = import.meta.env.BASE_URL;
 			searchInput.focus();
 		});
 
-		updateAreaViews(localStorage.getItem('preferred-campus') || '');
+		updateAreaViews(currentCampusId);
 		filterAreas();
 	</script>
 </Layout>

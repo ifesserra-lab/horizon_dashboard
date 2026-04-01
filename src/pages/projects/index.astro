@@ -181,8 +181,19 @@ const projectTotalsByCampus = {
         </section>
     </div>
 
-    <!-- Client-side Logic -->
     <script define:vars={{ projectTotalsByCampus }}>
+        window.__projectTotalsByCampus = projectTotalsByCampus;
+    </script>
+
+    <!-- Client-side Logic -->
+    <script>
+        import { normalizeSearchText as normalizeSearch } from "../../lib/search";
+        import {
+            getCampusFilterValue,
+            splitPipeValues,
+            updateCampusViews,
+        } from "../../lib/campus-ui";
+
         const searchInput = document.getElementById(
             "projectSearch",
         ) as HTMLInputElement;
@@ -190,13 +201,13 @@ const projectTotalsByCampus = {
         const emptyState = document.getElementById("emptyState");
         const projectCards = document.querySelectorAll(".project-card-wrapper");
         const totalLabel = document.getElementById("projects-total-label");
-        const totalsByCampus = projectTotalsByCampus || {};
+        const totalsByCampus = (window as any).__projectTotalsByCampus || {};
+        let currentCampusId = localStorage.getItem("preferred-campus") || "";
 
         function filterProjects() {
-            const query = searchInput.value.toLowerCase().trim();
-            const preferredCampus = localStorage.getItem("preferred-campus") || "";
+            const query = normalizeSearch(searchInput?.value || "");
             const totalForCampus = Number(
-                totalsByCampus[preferredCampus] ?? totalsByCampus[""] ?? 0,
+                totalsByCampus[currentCampusId] ?? totalsByCampus[""] ?? 0,
             );
             let visibleCount = 0;
 
@@ -214,18 +225,12 @@ const projectTotalsByCampus = {
 
                 if (!projectCard) return;
 
-                const name = projectCard.dataset.name || "";
-                const status = projectCard.dataset.status || "";
-                const campusIds = (element.dataset.campusIds || "")
-                    .split("|")
-                    .filter(Boolean);
+                const searchIndex = projectCard.dataset.search || "";
+                const campusIds = splitPipeValues(element.dataset.campusIds);
                 const matchesCampus =
-                    !preferredCampus || campusIds.includes(preferredCampus);
-                // For a more complete search, we could include team members if we had them in data-attributes
+                    !currentCampusId || campusIds.includes(currentCampusId);
 
-                const matches =
-                    (!query || name.includes(query) || status.includes(query)) &&
-                    matchesCampus;
+                const matches = (!query || searchIndex.includes(query)) && matchesCampus;
 
                 if (matches) {
                     element.style.display = "block";
@@ -249,17 +254,16 @@ const projectTotalsByCampus = {
         }
 
         searchInput?.addEventListener("input", filterProjects);
-        window.addEventListener("campus-filter-change", filterProjects);
         function updateProjectViews(selectedCampus) {
-            document
-                .querySelectorAll("#project-dashboard-views [data-campus-view]")
-                .forEach((node) => {
-                    const viewCampus = node.getAttribute("data-campus-view") || "";
-                    node.classList.toggle("hidden", viewCampus !== selectedCampus);
-                });
+            updateCampusViews(
+                "#project-dashboard-views [data-campus-view]",
+                selectedCampus,
+            );
         }
         window.addEventListener("campus-filter-change", (event) => {
-            updateProjectViews(event.detail?.campusId || event.detail?.campus || "");
+            currentCampusId = getCampusFilterValue(event);
+            updateProjectViews(currentCampusId);
+            filterProjects();
         });
 
         resetBtn?.addEventListener("click", () => {
@@ -269,6 +273,6 @@ const projectTotalsByCampus = {
         });
 
         filterProjects();
-        updateProjectViews(localStorage.getItem("preferred-campus") || "");
+        updateProjectViews(currentCampusId);
     </script>
 </Layout>

@@ -8,10 +8,12 @@ import ResearcherModal from "../../components/researchers/ResearcherModal.astro"
 import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
 import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
 import {
+    getCampusNamesFromIds,
     getRealCampuses,
     getResearcherCampusIds,
     getResearchersByCampusId,
 } from "../../lib/tenant-data";
+import { buildResearcherStatsById } from "../../lib/researchers-data";
 
 const sortResearchersByName = (items: Researcher[]) =>
     [...items].sort((a, b) =>
@@ -25,49 +27,17 @@ const campusResearcherViews = Object.fromEntries(
         sortResearchersByName(getResearchersByCampusId(campus.id)),
     ]),
 );
+const researcherStats = buildResearcherStatsById(researchers);
+const researcherCards = researchers.map((researcher) => {
+    const campusIds = getResearcherCampusIds(researcher);
 
-// Calculate counts for each researcher
-const researcherStats = researchers.reduce(
-    (acc, researcher) => {
-        const initiativesCount = researcher.initiatives.length;
-        const articlesCount = researcher.articles.length;
-
-        // Use local advisorships from the researcher object
-        const advisorships = researcher.advisorships || [];
-
-        // Separate by type
-        const advisorshipsByType = advisorships.reduce(
-            (types, adv) => {
-                const t = adv.type || "Other";
-                types[t] = (types[t] || 0) + 1;
-                return types;
-            },
-            {} as Record<string, number>,
-        );
-
-        acc[researcher.id] = {
-            projects: initiativesCount,
-            articles: articlesCount,
-            advisorships: advisorships.length,
-            advisorshipsByType,
-            // Assuming the list contains supervisions
-            isSupervisor: advisorships.length > 0,
-            isStudent: false, // Cannot distinguish with current data structure
-        };
-        return acc;
-    },
-    {} as Record<
-        string,
-        {
-            projects: number;
-            articles: number;
-            advisorships: number;
-            advisorshipsByType: Record<string, number>;
-            isSupervisor: boolean;
-            isStudent: boolean;
-        }
-    >,
-);
+    return {
+        researcher,
+        stats: researcherStats[researcher.id],
+        campusIds,
+        campusNames: getCampusNamesFromIds(campusIds),
+    };
+});
 
 const baseUrl = import.meta.env.BASE_URL;
 ---
@@ -123,12 +93,13 @@ const baseUrl = import.meta.env.BASE_URL;
             aria-label="Lista de pesquisadores"
         >
             {
-                researchers.map((researcher) => (
+                researcherCards.map(({ researcher, stats, campusIds, campusNames }) => (
                     <ResearcherCard
                         researcher={researcher}
-                        stats={researcherStats[researcher.id]}
+                        stats={stats}
                         baseUrl={baseUrl}
-                        campusIds={getResearcherCampusIds(researcher)}
+                        campusIds={campusIds}
+                        campusNames={campusNames}
                     />
                 ))
             }
@@ -173,6 +144,13 @@ const baseUrl = import.meta.env.BASE_URL;
     </script>
 
     <script>
+        import { normalizeSearchText } from "../../lib/search";
+        import {
+            getCampusFilterValue,
+            splitPipeValues,
+            updateCampusViews,
+        } from "../../lib/campus-ui";
+
         // Main Search & Filter Logic
         const searchInput = document.getElementById(
             "researcherSearch",
@@ -180,20 +158,17 @@ const baseUrl = import.meta.env.BASE_URL;
         const resetBtn = document.getElementById("resetFilters");
         const emptyState = document.getElementById("emptyState");
         const cards = document.querySelectorAll(".researcher-card");
+        let currentCampusId = localStorage.getItem("preferred-campus") || "";
 
         function updateResearcherViews(selectedCampus) {
-            document
-                .querySelectorAll("#researcher-dashboard-views [data-campus-view]")
-                .forEach((node) => {
-                    const viewCampus =
-                        node.getAttribute("data-campus-view") || "";
-                    node.classList.toggle("hidden", viewCampus !== selectedCampus);
-                });
+            updateCampusViews(
+                "#researcher-dashboard-views [data-campus-view]",
+                selectedCampus,
+            );
         }
 
         function filterResearchers() {
-            const query = searchInput.value.toLowerCase().trim();
-            const preferredCampus = localStorage.getItem("preferred-campus") || "";
+            const query = normalizeSearchText(searchInput?.value || "");
             let visibleCount = 0;
 
             if (query) {
@@ -204,13 +179,12 @@ const baseUrl = import.meta.env.BASE_URL;
 
             cards.forEach((card) => {
                 const element = card as HTMLElement;
-                const name = element.dataset.name || "";
-                const campusIds = (element.dataset.campusIds || "")
-                    .split("|")
-                    .filter(Boolean);
+                const searchIndex = element.dataset.search || "";
+                const campusIds = splitPipeValues(element.dataset.campusIds);
                 const matchesCampus =
-                    !preferredCampus || campusIds.includes(preferredCampus);
-                const matches = (!query || name.includes(query)) && matchesCampus;
+                    !currentCampusId || campusIds.includes(currentCampusId);
+                const matches =
+                    (!query || searchIndex.includes(query)) && matchesCampus;
 
                 if (matches) {
                     element.style.display = "flex";
@@ -231,7 +205,8 @@ const baseUrl = import.meta.env.BASE_URL;
 
         searchInput?.addEventListener("input", filterResearchers);
         window.addEventListener("campus-filter-change", (event) => {
-            updateResearcherViews(event.detail?.campusId || event.detail?.campus || "");
+            currentCampusId = getCampusFilterValue(event);
+            updateResearcherViews(currentCampusId);
             filterResearchers();
         });
         resetBtn?.addEventListener("click", () => {
@@ -257,6 +232,6 @@ const baseUrl = import.meta.env.BASE_URL;
         });
 
         filterResearchers();
-        updateResearcherViews(localStorage.getItem("preferred-campus") || "");
+        updateResearcherViews(currentCampusId);
     </script>
 </Layout>

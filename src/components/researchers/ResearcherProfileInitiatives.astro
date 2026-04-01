@@ -76,6 +76,8 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
 </script>
 
 <script>
+    import { normalizeSearchText } from "../../lib/search";
+
     document.addEventListener("DOMContentLoaded", () => {
         const contentContainer = document.getElementById("projectsContent");
         const searchInput = document.getElementById(
@@ -305,16 +307,17 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
         }
 
         function handleSearch() {
-            const query = searchInput.value.toLowerCase().trim();
+            const query = normalizeSearchText(searchInput?.value || "");
             filteredInitiatives = sortInitiatives(
                 allInitiatives.filter(
                     (i: any) =>
-                        i.name.toLowerCase().includes(query) ||
-                        (i.status && i.status.toLowerCase().includes(query)) ||
+                        normalizeSearchText(i.name).includes(query) ||
+                        (i.status &&
+                            normalizeSearchText(i.status).includes(query)) ||
                         (i.initiative_type?.name &&
-                            i.initiative_type.name
-                                .toLowerCase()
-                                .includes(query)),
+                            normalizeSearchText(i.initiative_type.name).includes(
+                                query,
+                            )),
                 ),
             );
 

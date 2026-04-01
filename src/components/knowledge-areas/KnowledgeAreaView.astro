@@ -1,5 +1,6 @@
 ---
 import type { KnowledgeAreaViewRecord } from "../../lib/tenant-data";
+import { buildSearchIndex } from "../../lib/search";
 
 interface TopAreaRecord {
     name: string;
@@ -56,6 +57,11 @@ const { sortedAreas, top10Areas, baseUrl } = Astro.props;
             data-campuses={area.campuses.join("|").toLowerCase()}
             data-campus-ids=""
             data-groups={area.groups.map((group) => group.name.toLowerCase()).join("|")}
+            data-search={buildSearchIndex([
+                area.area_name,
+                ...area.campuses,
+                ...area.groups.map((group) => group.name),
+            ])}
         >
             <div class="md:w-1/3">
                 <div class="flex items-center gap-3 mb-4">
