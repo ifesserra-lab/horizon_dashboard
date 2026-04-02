@@ -21,6 +21,14 @@ export interface ResearcherKnowledgeArea {
     name: string;
 }
 
+export interface ResearcherRoleEvidence {
+    project_roles: string[];
+    research_group_roles: string[];
+    advisorship_roles: string[];
+    has_institutional_email: boolean;
+    academic_reference_count: number;
+}
+
 export interface AcademicEducation {
     institution: string;
     degree: string;
@@ -62,6 +70,12 @@ export interface Researcher {
     academic_education: AcademicEducation[];
     articles: Article[];
     advisorships: ResearcherAdvisorship[];
+    classification?: "student" | "researcher" | "outside_ifes" | null;
+    classification_confidence?: "low" | "medium" | "high" | null;
+    classification_note?: string | null;
+    role_evidence?: ResearcherRoleEvidence | null;
+    was_student?: boolean;
+    was_staff?: boolean;
 }
 
 export interface ResearcherAdvisorship {

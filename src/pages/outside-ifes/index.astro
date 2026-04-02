@@ -1,0 +1,186 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import type { Researcher } from "../../types/researchers";
+import ResearcherFilters from "../../components/researchers/ResearcherFilters.astro";
+import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
+import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
+import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
+import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
+import { outsideIfesResearchers } from "../../lib/researcher-collections";
+import { buildResearcherStatsById } from "../../lib/researchers-data";
+
+const externalResearchers = outsideIfesResearchers as Researcher[];
+const externalStats = buildResearcherStatsById(externalResearchers);
+const externalCards = externalResearchers.map((researcher) => ({
+    researcher,
+    stats: externalStats[researcher.id],
+    campusIds: [],
+    campusNames: [],
+}));
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<Layout
+    title="Externos ao Ifes"
+    breadcrumbReplacements={{ "outside-ifes": "Externos ao Ifes" }}
+>
+    <div class="space-y-10 pb-12">
+        <header class="flex flex-col gap-6">
+            <div>
+                <h1
+                    class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main"
+                >
+                    Colaboradores <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+                        >Externos</span
+                    >
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-3xl">
+                    Explore pessoas do recorte
+                    <code>outside_ifes_canonical</code>: atuação em projetos sem
+                    sinais institucionais do Ifes, como grupo de pesquisa,
+                    orientação ou e-mail institucional. A seleção de campus não
+                    altera este recorte.
+                </p>
+            </div>
+        </header>
+
+        <div id="outside-ifes-dashboard">
+            <ResearcherKpiCards
+                researchers={externalResearchers}
+                primaryLabel="Externos"
+            />
+            <ResearcherCharts
+                researchers={externalResearchers}
+                instanceId="outside-ifes"
+                memberLabel="Externos"
+            />
+        </div>
+
+        <ResearcherFilters
+            placeholder="Buscar colaborador externo por nome..."
+            label="colaboradores externos"
+        />
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            id="researchersGrid"
+            role="region"
+            aria-label="Lista de colaboradores externos"
+        >
+            {
+                externalCards.map(({ researcher, stats, campusIds, campusNames }) => (
+                    <ResearcherCard
+                        researcher={researcher}
+                        stats={stats}
+                        baseUrl={baseUrl}
+                        campusIds={campusIds}
+                        campusNames={campusNames}
+                    />
+                ))
+            }
+        </div>
+
+        <div
+            id="emptyState"
+            class="hidden flex-col items-center justify-center py-24 text-center"
+        >
+            <div
+                class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-12 h-12 opacity-50"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><circle cx="11" cy="11" r="8"></circle><path
+                        d="m21 21-4.3-4.3"></path><path d="M8 11h6"></path></svg
+                >
+            </div>
+            <h3 class="text-2xl font-bold font-['Outfit'] text-text-main mb-2">
+                Nenhum colaborador externo encontrado
+            </h3>
+            <p class="text-text-secondary max-w-sm">
+                Tente buscar por outro nome.
+            </p>
+        </div>
+    </div>
+
+    <ResearcherModal />
+
+    <script define:vars={{ externalResearchers }}>
+        window.researchersData = externalResearchers;
+    </script>
+
+    <script>
+        import { normalizeSearchText } from "../../lib/search";
+
+        const searchInput = document.getElementById(
+            "researcherSearch",
+        ) as HTMLInputElement;
+        const resetBtn = document.getElementById("resetFilters");
+        const emptyState = document.getElementById("emptyState");
+        const cards = document.querySelectorAll(".researcher-card");
+
+        function filterExternalResearchers() {
+            const query = normalizeSearchText(searchInput?.value || "");
+            let visibleCount = 0;
+
+            if (query) {
+                resetBtn?.classList.remove("hidden");
+            } else {
+                resetBtn?.classList.add("hidden");
+            }
+
+            cards.forEach((card) => {
+                const element = card as HTMLElement;
+                const searchIndex = element.dataset.search || "";
+                const matches = !query || searchIndex.includes(query);
+
+                if (matches) {
+                    element.style.display = "flex";
+                    visibleCount++;
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+            if (visibleCount === 0) {
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
+            } else {
+                emptyState?.classList.add("hidden");
+                emptyState?.classList.remove("flex");
+            }
+        }
+
+        searchInput?.addEventListener("input", filterExternalResearchers);
+        resetBtn?.addEventListener("click", () => {
+            searchInput.value = "";
+            filterExternalResearchers();
+            searchInput.focus();
+        });
+
+        document.addEventListener("click", (e) => {
+            const btn = (e.target as HTMLElement).closest(
+                ".view-articles-btn",
+            ) as HTMLButtonElement;
+            if (btn) {
+                const id = btn.dataset.researcherId!;
+                const name = btn.dataset.researcherName!;
+                window.dispatchEvent(
+                    new CustomEvent("open-researcher-modal", {
+                        detail: { id, name },
+                    }),
+                );
+            }
+        });
+
+        filterExternalResearchers();
+    </script>
+</Layout>

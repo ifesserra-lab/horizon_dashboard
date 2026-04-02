@@ -1,0 +1,174 @@
+---
+import type { StudentFellowship } from "../../lib/researcher-profiles";
+
+interface Props {
+    fellowships: StudentFellowship[];
+}
+
+const { fellowships } = Astro.props;
+
+const formatDate = (value: string | null) => {
+    if (!value) return "N/A";
+
+    return new Date(value.replace(" ", "T")).toLocaleDateString("pt-BR", {
+        month: "short",
+        year: "numeric",
+    });
+};
+
+const formatCurrency = (value: number | null) => {
+    if (value === null) return "Valor não informado";
+
+    return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+    }).format(value);
+};
+
+const formatProjectPeriod = (startDate: string | null, endDate: string | null) => {
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+
+    if (formattedStartDate === "N/A" && formattedEndDate === "N/A") {
+        return "Datas do projeto não informadas";
+    }
+
+    return `${formattedStartDate === "N/A" ? "Início não informado" : formattedStartDate} - ${formattedEndDate === "N/A" ? "Atual" : formattedEndDate}`;
+};
+---
+
+<section aria-labelledby="student-fellowships-title" class="space-y-6">
+    <div class="py-4 border-b border-border-main">
+        <h3
+            id="student-fellowships-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Bolsas Recebidas ({fellowships.length})
+        </h3>
+        <p class="text-sm text-text-secondary mt-2 max-w-3xl">
+            Bolsas identificadas nas orientações do estudante com programa,
+            período, orientador e financiador.
+        </p>
+    </div>
+
+    {
+        fellowships.length > 0 ? (
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {fellowships.map((fellowshipItem) => (
+                    <article class="glass-card p-5 border border-border-main space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-premium-purple/10 border border-premium-purple/20 text-[10px] font-bold uppercase tracking-wider text-premium-purple">
+                                        {fellowshipItem.fellowship.name}
+                                    </span>
+                                    <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                                        fellowshipItem.status?.toLowerCase() ===
+                                        "active"
+                                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                            : "bg-slate-500/10 border-slate-500/20 text-slate-500"
+                                    }`}>
+                                        {fellowshipItem.status || "Status não informado"}
+                                    </span>
+                                </div>
+                                <h4 class="text-lg font-bold text-text-main leading-tight">
+                                    {fellowshipItem.name}
+                                </h4>
+                                <p class="text-sm text-text-secondary mt-1">
+                                    {fellowshipItem.projectName}
+                                </p>
+                                <p class="text-xs text-text-secondary/90 mt-1">
+                                    {formatProjectPeriod(
+                                        fellowshipItem.projectStartDate,
+                                        fellowshipItem.projectEndDate,
+                                    )}
+                                </p>
+                            </div>
+
+                            <div class="rounded-2xl border border-premium-accent/20 bg-premium-accent/8 px-4 py-3 text-right">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Valor
+                                </p>
+                                <p class="text-lg font-bold text-premium-accent mt-1">
+                                    {formatCurrency(fellowshipItem.fellowship.value)}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Período
+                                </p>
+                                <p class="text-text-main mt-1">
+                                    {formatDate(fellowshipItem.startDate)} -
+                                    {" "}
+                                    {formatDate(fellowshipItem.endDate)}
+                                </p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Financiador
+                                </p>
+                                <p class="text-text-main mt-1">
+                                    {fellowshipItem.fellowship.sponsorName ||
+                                        "Não informado"}
+                                </p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Orientador
+                                </p>
+                                <p class="text-text-main mt-1">
+                                    {fellowshipItem.supervisorName ||
+                                        "Não informado"}
+                                </p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Campus
+                                </p>
+                                <p class="text-text-main mt-1">
+                                    {fellowshipItem.campusName || "Não informado"}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border-main/50">
+                            <p class="text-xs text-text-secondary">
+                                {fellowshipItem.fellowship.description ||
+                                    fellowshipItem.description ||
+                                    "Sem descrição adicional da bolsa."}
+                            </p>
+                            <a
+                                href={`${import.meta.env.BASE_URL}advisorships/${fellowshipItem.id}`}
+                                class="inline-flex items-center gap-2 text-xs font-bold text-premium-accent hover:translate-x-0.5 transition-transform"
+                            >
+                                Ver bolsa
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M5 12h14"></path>
+                                    <path d="m12 5 7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                ))}
+            </div>
+        ) : (
+            <p class="text-text-secondary italic">
+                Nenhuma bolsa foi identificada para este estudante no export
+                atual.
+            </p>
+        )
+    }
+</section>

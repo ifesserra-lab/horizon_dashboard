@@ -1,0 +1,185 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import type { Researcher } from "../../types/researchers";
+import ResearcherFilters from "../../components/researchers/ResearcherFilters.astro";
+import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
+import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
+import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
+import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
+import { unrecognizedResearchers } from "../../lib/researcher-collections";
+import { buildResearcherStatsById } from "../../lib/researchers-data";
+
+const unrecognizedPeople = unrecognizedResearchers as Researcher[];
+const unrecognizedStats = buildResearcherStatsById(unrecognizedPeople);
+const unrecognizedCards = unrecognizedPeople.map((researcher) => ({
+    researcher,
+    stats: unrecognizedStats[researcher.id],
+    campusIds: [],
+    campusNames: [],
+}));
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<Layout
+    title="Não reconhecidos"
+    breadcrumbReplacements={{ unrecognized: "Não reconhecidos" }}
+>
+    <div class="space-y-10 pb-12">
+        <header class="flex flex-col gap-6">
+            <div>
+                <h1
+                    class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main"
+                >
+                    Perfis <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+                        >Não Reconhecidos</span
+                    >
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-3xl">
+                    Explore pessoas do recorte
+                    <code>null_researchers_canonical</code>: registros sem
+                    evidência suficiente para classificar como pesquisador,
+                    estudante ou externo ao Ifes no export atual.
+                </p>
+            </div>
+        </header>
+
+        <div id="unrecognized-dashboard">
+            <ResearcherKpiCards
+                researchers={unrecognizedPeople}
+                primaryLabel="Não reconhecidos"
+            />
+            <ResearcherCharts
+                researchers={unrecognizedPeople}
+                instanceId="unrecognized"
+                memberLabel="Não reconhecidos"
+            />
+        </div>
+
+        <ResearcherFilters
+            placeholder="Buscar perfil não reconhecido por nome..."
+            label="perfis não reconhecidos"
+        />
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            id="researchersGrid"
+            role="region"
+            aria-label="Lista de perfis não reconhecidos"
+        >
+            {
+                unrecognizedCards.map(({ researcher, stats, campusIds, campusNames }) => (
+                    <ResearcherCard
+                        researcher={researcher}
+                        stats={stats}
+                        baseUrl={baseUrl}
+                        campusIds={campusIds}
+                        campusNames={campusNames}
+                    />
+                ))
+            }
+        </div>
+
+        <div
+            id="emptyState"
+            class="hidden flex-col items-center justify-center py-24 text-center"
+        >
+            <div
+                class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-12 h-12 opacity-50"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><circle cx="11" cy="11" r="8"></circle><path
+                        d="m21 21-4.3-4.3"></path><path d="M8 11h6"></path></svg
+                >
+            </div>
+            <h3 class="text-2xl font-bold font-['Outfit'] text-text-main mb-2">
+                Nenhum perfil não reconhecido encontrado
+            </h3>
+            <p class="text-text-secondary max-w-sm">
+                Tente buscar por outro nome.
+            </p>
+        </div>
+    </div>
+
+    <ResearcherModal />
+
+    <script define:vars={{ unrecognizedPeople }}>
+        window.researchersData = unrecognizedPeople;
+    </script>
+
+    <script>
+        import { normalizeSearchText } from "../../lib/search";
+
+        const searchInput = document.getElementById(
+            "researcherSearch",
+        ) as HTMLInputElement;
+        const resetBtn = document.getElementById("resetFilters");
+        const emptyState = document.getElementById("emptyState");
+        const cards = document.querySelectorAll(".researcher-card");
+
+        function filterUnrecognizedResearchers() {
+            const query = normalizeSearchText(searchInput?.value || "");
+            let visibleCount = 0;
+
+            if (query) {
+                resetBtn?.classList.remove("hidden");
+            } else {
+                resetBtn?.classList.add("hidden");
+            }
+
+            cards.forEach((card) => {
+                const element = card as HTMLElement;
+                const searchIndex = element.dataset.search || "";
+                const matches = !query || searchIndex.includes(query);
+
+                if (matches) {
+                    element.style.display = "flex";
+                    visibleCount++;
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+            if (visibleCount === 0) {
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
+            } else {
+                emptyState?.classList.add("hidden");
+                emptyState?.classList.remove("flex");
+            }
+        }
+
+        searchInput?.addEventListener("input", filterUnrecognizedResearchers);
+        resetBtn?.addEventListener("click", () => {
+            searchInput.value = "";
+            filterUnrecognizedResearchers();
+            searchInput.focus();
+        });
+
+        document.addEventListener("click", (e) => {
+            const btn = (e.target as HTMLElement).closest(
+                ".view-articles-btn",
+            ) as HTMLButtonElement;
+            if (btn) {
+                const id = btn.dataset.researcherId!;
+                const name = btn.dataset.researcherName!;
+                window.dispatchEvent(
+                    new CustomEvent("open-researcher-modal", {
+                        detail: { id, name },
+                    }),
+                );
+            }
+        });
+
+        filterUnrecognizedResearchers();
+    </script>
+</Layout>

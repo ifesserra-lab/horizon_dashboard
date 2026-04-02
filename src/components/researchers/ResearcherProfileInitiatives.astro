@@ -5,9 +5,14 @@ import type { InlineSourceItem } from "../../lib/provenance";
 interface Props {
     researcher: Researcher;
     initiativeSourcesById?: Record<string, InlineSourceItem[]>;
+    incrementalLoading?: boolean;
 }
 
-const { researcher, initiativeSourcesById = {} } = Astro.props;
+const {
+    researcher,
+    initiativeSourcesById = {},
+    incrementalLoading = true,
+} = Astro.props;
 ---
 
 <section aria-labelledby="projects-title" class="space-y-6 pb-20">
@@ -24,7 +29,7 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
             <input
                 type="text"
                 id="projectSearch"
-                placeholder="Buscar projetos..."
+                placeholder="Buscar iniciativas..."
                 class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
             />
             <svg
@@ -44,34 +49,48 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
         {/* Dynamic content will be injected here */}
     </div>
 
-    {/* Infinite Scroll Indicators */}
-    <div
-        id="projLoadMoreSentinel"
-        class="h-10 w-full flex items-center justify-center"
-    >
-        <div
-            id="projLoadingSpinner"
-            class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
-        >
-        </div>
-    </div>
-    <div
-        id="projAllLoadedMessage"
-        class="hidden text-center text-text-secondary text-sm py-4 italic"
-    >
-        Todos os projetos foram carregados.
-    </div>
+    {
+        incrementalLoading && (
+            <>
+                {/* Infinite Scroll Indicators */}
+                <div
+                    id="projLoadMoreSentinel"
+                    class="h-10 w-full flex items-center justify-center"
+                >
+                    <div
+                        id="projLoadingSpinner"
+                        class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-purple border-t-transparent"
+                    >
+                    </div>
+                </div>
+                <div
+                    id="projAllLoadedMessage"
+                    class="hidden text-center text-text-secondary text-sm py-4 italic"
+                >
+                    Todos os projetos foram carregados.
+                </div>
+            </>
+        )
+    }
     <div id="noProjectsFound" class="hidden text-center py-12">
         <p class="text-text-secondary italic">
-            Nenhum projeto encontrado para esta busca.
+            Nenhuma iniciativa encontrada para esta busca.
         </p>
     </div>
 </section>
 
-<script define:vars={{ researcher, baseUrl: import.meta.env.BASE_URL, initiativeSourcesById }}>
+<script
+    define:vars={{
+        researcher,
+        baseUrl: import.meta.env.BASE_URL,
+        initiativeSourcesById,
+        incrementalLoading,
+    }}
+>
     // Provide data to client-side
     window.researcherInitiatives = researcher.initiatives || [];
     window.researcherInitiativeSources = initiativeSourcesById || {};
+    window.researcherIncrementalLoading = incrementalLoading;
     window.baseUrl = baseUrl;
 </script>
 
@@ -89,6 +108,9 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
         const noResultsMsg = document.getElementById("noProjectsFound");
 
         let allInitiatives = (window as any).researcherInitiatives || [];
+        const useIncrementalLoading = Boolean(
+            (window as any).researcherIncrementalLoading,
+        );
 
         // Initial Sort: Active first, then by date desc
         function sortInitiatives(items: any[]) {
@@ -187,7 +209,7 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
 
                 <div class="pt-4 flex justify-end items-center border-t border-border-main/50">
                     <a href="${(window as any).baseUrl}projects/${init.id}" class="inline-flex items-center gap-2 px-4 py-2 bg-glass-accent/5 hover:bg-premium-purple/10 text-text-main font-bold text-xs rounded-xl transition-all border border-border-main/50 group/btn">
-                        Ver Projeto
+                        Ver Iniciativa
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </a>
                 </div>
@@ -226,29 +248,66 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
                     i.initiative_type?.name === "Research Project",
             },
             {
-                id: "extension",
-                name: "Extensão",
-                color: "text-purple-500",
-                icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+                id: "advisorship",
+                name: "Orientações e Bolsas",
+                color: "text-amber-500",
+                icon: '<path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 1 12 20.055a11.952 11.952 0 0 1-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14z"/>',
                 filter: (i: any) =>
-                    i.initiative_type?.name === "Extension Project",
+                    i.initiative_type?.name === "Advisorship",
             },
             {
-                id: "dev",
-                name: "Desenvolvimento",
+                id: "other",
+                name: "Outras iniciativas",
                 color: "text-blue-500",
-                icon: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+                icon: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
                 filter: (i: any) =>
-                    i.initiative_type?.name === "Development Project",
+                    !["Research Project", "Advisorship"].includes(
+                        i.initiative_type?.name || "",
+                    ),
             },
         ];
 
+        function getMatchingCategories(items: any[]) {
+            return categories.filter((cat) => items.some(cat.filter));
+        }
+
+        function syncLoadState() {
+            if (!useIncrementalLoading) {
+                return;
+            }
+
+            if (
+                displayedCount >= filteredInitiatives.length &&
+                filteredInitiatives.length > 0
+            ) {
+                allLoadedMsg?.classList.remove("hidden");
+                if (observer) observer.disconnect();
+            } else {
+                allLoadedMsg?.classList.add("hidden");
+            }
+        }
+
         function loadMore() {
+            const batchSize = useIncrementalLoading
+                ? BATCH_SIZE
+                : Math.max(filteredInitiatives.length, 1);
             const nextBatch = filteredInitiatives.slice(
                 displayedCount,
-                displayedCount + BATCH_SIZE,
+                displayedCount + batchSize,
             );
             if (nextBatch.length === 0) return;
+
+            const matchingCategories = getMatchingCategories(filteredInitiatives);
+
+            if (matchingCategories.length <= 1) {
+                nextBatch.forEach((init) => {
+                    contentContainer?.appendChild(createCard(init));
+                });
+
+                displayedCount += nextBatch.length;
+                syncLoadState();
+                return;
+            }
 
             // Group the batch into categories
             categories.forEach((cat) => {
@@ -274,19 +333,14 @@ const { researcher, initiativeSourcesById = {} } = Astro.props;
             });
 
             displayedCount += nextBatch.length;
-
-            if (
-                displayedCount >= filteredInitiatives.length &&
-                filteredInitiatives.length > 0
-            ) {
-                allLoadedMsg?.classList.remove("hidden");
-                if (observer) observer.disconnect();
-            } else {
-                allLoadedMsg?.classList.add("hidden");
-            }
+            syncLoadState();
         }
 
         function setupInfiniteScroll() {
+            if (!useIncrementalLoading) {
+                return;
+            }
+
             if (observer) observer.disconnect();
             observer = new IntersectionObserver(
                 (entries) => {

@@ -1,6 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import researchersData from "../../data/researchers_canonical.json";
 import type { Researcher } from "../../types/researchers";
 import ResearcherFilters from "../../components/researchers/ResearcherFilters.astro";
 import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
@@ -9,24 +8,16 @@ import ResearcherCharts from "../../components/researchers/ResearcherCharts.astr
 import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
 import {
     getCampusNamesFromIds,
-    getRealCampuses,
     getResearcherCampusIds,
-    getResearchersByCampusId,
 } from "../../lib/tenant-data";
+import {
+    buildCampusResearcherViews,
+    researchersOnly,
+} from "../../lib/researcher-collections";
 import { buildResearcherStatsById } from "../../lib/researchers-data";
 
-const sortResearchersByName = (items: Researcher[]) =>
-    [...items].sort((a, b) =>
-        a.name.localeCompare(b.name),
-    );
-
-const researchers = sortResearchersByName(researchersData as Researcher[]);
-const campusResearcherViews = Object.fromEntries(
-    getRealCampuses().map((campus) => [
-        campus.id,
-        sortResearchersByName(getResearchersByCampusId(campus.id)),
-    ]),
-);
+const researchers = researchersOnly as Researcher[];
+const campusResearcherViews = buildCampusResearcherViews(researchers);
 const researcherStats = buildResearcherStatsById(researchers);
 const researcherCards = researchers.map((researcher) => {
     const campusIds = getResearcherCampusIds(researcher);

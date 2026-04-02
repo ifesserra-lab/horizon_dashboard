@@ -3,9 +3,10 @@ import type { Researcher } from "../../types/researchers";
 
 interface Props {
     researchers: Researcher[];
+    primaryLabel?: string;
 }
 
-const { researchers } = Astro.props;
+const { researchers, primaryLabel = "Pesquisadores" } = Astro.props;
 
 // --- KPI Calculations ---
 const totalResearchers = researchers.length;
@@ -45,7 +46,7 @@ const totalAreas = uniqueAreas.size;
 ---
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-    <!-- Card 1: Pesquisadores -->
+    <!-- Card 1: Primary collection -->
     <div
         class="glass-card p-6 flex flex-col items-start gap-4 hover:-translate-y-1 transition-transform duration-300"
     >
@@ -71,7 +72,7 @@ const totalAreas = uniqueAreas.size;
             <p
                 class="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1"
             >
-                Pesquisadores
+                {primaryLabel}
             </p>
             <h3 class="text-3xl font-bold text-text-main font-['Outfit']">
                 {totalResearchers}

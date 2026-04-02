@@ -1,0 +1,121 @@
+---
+import type { StudentAdvisor } from "../../lib/researcher-profiles";
+
+interface Props {
+    advisors: StudentAdvisor[];
+}
+
+const { advisors } = Astro.props;
+
+const sourceLabels: Record<StudentAdvisor["sources"][number], string> = {
+    initiative_team: "Equipe da iniciativa",
+    fellowship_supervision: "Bolsa de pesquisa",
+    academic_education: "Formação acadêmica",
+};
+
+const formatDate = (value: string | null) => {
+    if (!value) return null;
+
+    return new Date(value.replace(" ", "T")).toLocaleDateString("pt-BR");
+};
+
+const formatPeriod = (startDate: string | null, endDate: string | null) => {
+    const startLabel = formatDate(startDate);
+    const endLabel = formatDate(endDate);
+
+    if (!startLabel && !endLabel) {
+        return "Datas do projeto não informadas";
+    }
+
+    return `${startLabel ?? "Início não informado"} - ${endLabel ?? "Atual"}`;
+};
+---
+
+<section aria-labelledby="student-advisors-title" class="space-y-6">
+    <div class="py-4 border-b border-border-main">
+        <h3
+            id="student-advisors-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Orientadores ({advisors.length})
+        </h3>
+        <p class="text-sm text-text-secondary mt-2 max-w-3xl">
+            Lista derivada das equipes das iniciativas, das bolsas de pesquisa
+            e, quando disponível, dos registros de formação acadêmica.
+        </p>
+    </div>
+
+    {
+        advisors.length > 0 ? (
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {advisors.map((advisor) => (
+                    <article class="glass-card p-5 border border-border-main space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                            <div>
+                                <h4 class="text-lg font-bold text-text-main">
+                                    {advisor.name}
+                                </h4>
+                                <p class="text-sm text-text-secondary">
+                                    {advisor.relatedInitiatives.length > 0
+                                        ? `${advisor.relatedInitiatives.length} iniciativa(s) vinculada(s)`
+                                        : "Sem iniciativa vinculada no export canônico"}
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                {advisor.sources.map((source) => (
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-premium-accent/8 border border-premium-accent/20 text-[10px] font-bold uppercase tracking-wider text-premium-accent">
+                                        {sourceLabels[source]}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {
+                            advisor.relatedInitiatives.length > 0 ? (
+                                <div class="space-y-3">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Iniciativas relacionadas
+                                    </p>
+                                    <div class="space-y-2">
+                                        {advisor.relatedInitiatives.map((initiative) => (
+                                            <a
+                                                href={`${import.meta.env.BASE_URL}projects/${initiative.id}`}
+                                                class="flex items-center justify-between gap-3 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3 text-sm text-text-main hover:border-premium-accent/30 hover:bg-premium-accent/[0.03] transition-colors"
+                                            >
+                                                <span class="min-w-0">
+                                                    <span class="line-clamp-2 block">
+                                                        {initiative.name}
+                                                    </span>
+                                                    <span class="mt-1 block text-xs text-text-secondary">
+                                                        {formatPeriod(
+                                                            initiative.startDate,
+                                                            initiative.endDate,
+                                                        )}
+                                                    </span>
+                                                </span>
+                                                <span class="shrink-0 text-premium-accent font-bold text-xs">
+                                                    Ver iniciativa
+                                                </span>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <p class="text-sm text-text-secondary italic">
+                                    Este nome foi identificado a partir da
+                                    formação acadêmica do estudante.
+                                </p>
+                            )
+                        }
+                    </article>
+                ))}
+            </div>
+        ) : (
+            <p class="text-text-secondary italic">
+                Nenhum orientador foi identificado para este estudante no
+                export atual.
+            </p>
+        )
+    }
+</section>

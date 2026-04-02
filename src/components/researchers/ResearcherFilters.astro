@@ -1,13 +1,17 @@
 ---
 interface Props {
     placeholder?: string;
+    label?: string;
 }
 
-const { placeholder = "Buscar por nome..." } = Astro.props;
+const {
+    placeholder = "Buscar por nome...",
+    label = "pesquisadores",
+} = Astro.props;
 ---
 
 <div class="relative max-w-md w-full">
-    <label for="researcherSearch" class="sr-only">Buscar pesquisadores</label>
+    <label for="researcherSearch" class="sr-only">Buscar {label}</label>
     <input
         type="text"
         id="researcherSearch"

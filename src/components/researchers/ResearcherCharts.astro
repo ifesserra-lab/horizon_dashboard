@@ -5,9 +5,14 @@ import ArticleYearChart from "./ArticleYearChart.astro";
 interface Props {
     researchers: Researcher[];
     instanceId?: string;
+    memberLabel?: string;
 }
 
-const { researchers, instanceId = "default" } = Astro.props;
+const {
+    researchers,
+    instanceId = "default",
+    memberLabel = "Pesquisadores",
+} = Astro.props;
 const overviewTabId = `tab-overview-${instanceId}`;
 const areasTabId = `tab-areas-${instanceId}`;
 const productionTabId = `tab-production-${instanceId}`;
@@ -52,7 +57,7 @@ if (coordinators === 0 && members === 0 && researchers.length > 0)
 const totalRoles = coordinators + members;
 const roleData = [
     { label: "Coordenadores", value: coordinators, color: "#38bdf8" }, // sky-400
-    { label: "Pesquisadores", value: members, color: "#818cf8" }, // indigo-400
+    { label: memberLabel, value: members, color: "#818cf8" }, // indigo-400
 ];
 
 // 3. Engagement Data

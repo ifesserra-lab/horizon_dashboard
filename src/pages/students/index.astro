@@ -1,0 +1,234 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import type { Researcher } from "../../types/researchers";
+import ResearcherFilters from "../../components/researchers/ResearcherFilters.astro";
+import ResearcherCard from "../../components/researchers/ResearcherCard.astro";
+import ResearcherModal from "../../components/researchers/ResearcherModal.astro";
+import ResearcherCharts from "../../components/researchers/ResearcherCharts.astro";
+import ResearcherKpiCards from "../../components/researchers/ResearcherKpiCards.astro";
+import {
+    getCampusNamesFromIds,
+    getResearcherCampusIds,
+} from "../../lib/tenant-data";
+import {
+    buildCampusResearcherViews,
+    studentsResearchers,
+} from "../../lib/researcher-collections";
+import { buildResearcherStatsById } from "../../lib/researchers-data";
+
+const students = studentsResearchers as Researcher[];
+const campusStudentViews = buildCampusResearcherViews(students);
+const studentStats = buildResearcherStatsById(students);
+const studentCards = students.map((student) => {
+    const campusIds = getResearcherCampusIds(student);
+
+    return {
+        researcher: student,
+        stats: studentStats[student.id],
+        campusIds,
+        campusNames: getCampusNamesFromIds(campusIds),
+    };
+});
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<Layout title="Estudantes">
+    <div class="space-y-10 pb-12">
+        <header class="flex flex-col gap-6">
+            <div>
+                <h1
+                    class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main"
+                >
+                    Estudantes em <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
+                        >Pesquisa</span
+                    >
+                </h1>
+                <p class="text-text-secondary mt-2 max-w-2xl">
+                    Explore estudantes do recorte <code>students_canonical</code>,
+                    com seus vínculos em projetos, grupos e produção acadêmica.
+                </p>
+            </div>
+        </header>
+
+        <div id="student-dashboard-views">
+            <div data-campus-view="">
+                <ResearcherKpiCards
+                    researchers={students}
+                    primaryLabel="Estudantes"
+                />
+                <ResearcherCharts
+                    researchers={students}
+                    instanceId="all-students"
+                    memberLabel="Estudantes"
+                />
+            </div>
+            {
+                Object.entries(campusStudentViews).map(
+                    ([campusId, campusStudents]) => (
+                        <div data-campus-view={campusId} class="hidden">
+                            <ResearcherKpiCards
+                                researchers={campusStudents}
+                                primaryLabel="Estudantes"
+                            />
+                            <ResearcherCharts
+                                researchers={campusStudents}
+                                instanceId={`students-campus-${campusId}`}
+                                memberLabel="Estudantes"
+                            />
+                        </div>
+                    ),
+                )
+            }
+        </div>
+
+        <ResearcherFilters
+            placeholder="Buscar estudante por nome..."
+            label="estudantes"
+        />
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            id="researchersGrid"
+            role="region"
+            aria-label="Lista de estudantes"
+        >
+            {
+                studentCards.map(({ researcher, stats, campusIds, campusNames }) => (
+                    <ResearcherCard
+                        researcher={researcher}
+                        stats={stats}
+                        baseUrl={baseUrl}
+                        campusIds={campusIds}
+                        campusNames={campusNames}
+                    />
+                ))
+            }
+        </div>
+
+        <div
+            id="emptyState"
+            class="hidden flex-col items-center justify-center py-24 text-center"
+        >
+            <div
+                class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-12 h-12 opacity-50"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><circle cx="11" cy="11" r="8"></circle><path
+                        d="m21 21-4.3-4.3"></path><path d="M8 11h6"></path></svg
+                >
+            </div>
+            <h3 class="text-2xl font-bold font-['Outfit'] text-text-main mb-2">
+                Nenhum estudante encontrado
+            </h3>
+            <p class="text-text-secondary max-w-sm">
+                Tente buscar por outro nome.
+            </p>
+        </div>
+    </div>
+
+    <ResearcherModal />
+
+    <script define:vars={{ students }}>
+        window.researchersData = students;
+    </script>
+
+    <script>
+        import { normalizeSearchText } from "../../lib/search";
+        import {
+            getCampusFilterValue,
+            splitPipeValues,
+            updateCampusViews,
+        } from "../../lib/campus-ui";
+
+        const searchInput = document.getElementById(
+            "researcherSearch",
+        ) as HTMLInputElement;
+        const resetBtn = document.getElementById("resetFilters");
+        const emptyState = document.getElementById("emptyState");
+        const cards = document.querySelectorAll(".researcher-card");
+        let currentCampusId = localStorage.getItem("preferred-campus") || "";
+
+        function updateStudentViews(selectedCampus) {
+            updateCampusViews(
+                "#student-dashboard-views [data-campus-view]",
+                selectedCampus,
+            );
+        }
+
+        function filterStudents() {
+            const query = normalizeSearchText(searchInput?.value || "");
+            let visibleCount = 0;
+
+            if (query) {
+                resetBtn?.classList.remove("hidden");
+            } else {
+                resetBtn?.classList.add("hidden");
+            }
+
+            cards.forEach((card) => {
+                const element = card as HTMLElement;
+                const searchIndex = element.dataset.search || "";
+                const campusIds = splitPipeValues(element.dataset.campusIds);
+                const matchesCampus =
+                    !currentCampusId || campusIds.includes(currentCampusId);
+                const matches =
+                    (!query || searchIndex.includes(query)) && matchesCampus;
+
+                if (matches) {
+                    element.style.display = "flex";
+                    visibleCount++;
+                } else {
+                    element.style.display = "none";
+                }
+            });
+
+            if (visibleCount === 0) {
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
+            } else {
+                emptyState?.classList.add("hidden");
+                emptyState?.classList.remove("flex");
+            }
+        }
+
+        searchInput?.addEventListener("input", filterStudents);
+        window.addEventListener("campus-filter-change", (event) => {
+            currentCampusId = getCampusFilterValue(event);
+            updateStudentViews(currentCampusId);
+            filterStudents();
+        });
+        resetBtn?.addEventListener("click", () => {
+            searchInput.value = "";
+            filterStudents();
+            searchInput.focus();
+        });
+
+        document.addEventListener("click", (e) => {
+            const btn = (e.target as HTMLElement).closest(
+                ".view-articles-btn",
+            ) as HTMLButtonElement;
+            if (btn) {
+                const id = btn.dataset.researcherId!;
+                const name = btn.dataset.researcherName!;
+                window.dispatchEvent(
+                    new CustomEvent("open-researcher-modal", {
+                        detail: { id, name },
+                    }),
+                );
+            }
+        });
+
+        filterStudents();
+        updateStudentViews(currentCampusId);
+    </script>
+</Layout>

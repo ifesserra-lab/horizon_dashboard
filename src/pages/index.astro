@@ -15,6 +15,7 @@ import {
 	getProjectsByCampusId,
 	getRealCampuses,
 } from "../lib/tenant-data";
+import { researcherCollectionCounts } from "../lib/researcher-collections";
 
 const groups = groupsData as ResearchGroup[];
 const totalGroups = groups.length;
@@ -26,6 +27,7 @@ const totalCampus = new Set(groups.map((g) => g.campus.id)).size;
 const totalKnowledgeAreas = new Set(
 	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
 ).size;
+const baseUrl = import.meta.env.BASE_URL;
 
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
@@ -202,7 +204,52 @@ const icons = {
 		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 	campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
 	areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+	student:
+		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7 12 4l8 3-8 3-8-3Z"/><path d="M6 10.5v4.5c0 1.2 2.7 3 6 3s6-1.8 6-3v-4.5"/><path d="M12 13v5"/></svg>',
+	external:
+		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>',
+	unrecognized:
+		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
 };
+
+const quickAccessPeopleLinks = [
+	{
+		title: "Pesquisadores",
+		description: "Visão completa dos perfis com vínculo institucional.",
+		count: researcherCollectionCounts.researchers,
+		href: `${baseUrl}researchers`,
+		icon: icons.members,
+		accentClass:
+			"text-premium-accent border-premium-accent/20 bg-premium-accent/[0.06]",
+	},
+	{
+		title: "Estudantes",
+		description: "Recorte dedicado aos classificados como student.",
+		count: researcherCollectionCounts.students,
+		href: `${baseUrl}students`,
+		icon: icons.student,
+		accentClass:
+			"text-premium-purple border-premium-purple/20 bg-premium-purple/[0.06]",
+	},
+	{
+		title: "Externos ao Ifes",
+		description: "Colaboradores sem sinais institucionais no Ifes.",
+		count: researcherCollectionCounts.outsideIfes,
+		href: `${baseUrl}outside-ifes`,
+		icon: icons.external,
+		accentClass:
+			"text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.08]",
+	},
+	{
+		title: "Não reconhecidos",
+		description: "Perfis sem evidência suficiente para classificação final.",
+		count: researcherCollectionCounts.unrecognized,
+		href: `${baseUrl}unrecognized`,
+		icon: icons.unrecognized,
+		accentClass:
+			"text-amber-400 border-amber-400/20 bg-amber-400/[0.08]",
+	},
+];
 
 const campusStats = Object.fromEntries(
 	getRealCampuses().map((campus) => {
@@ -287,6 +334,76 @@ const campusHomeViews = Object.fromEntries(
 			color="premium-accent"
 		/>
 	</div>
+
+	<section class="mb-12" aria-labelledby="quick-access-title">
+		<div class="flex items-end justify-between gap-4 mb-6">
+			<div>
+				<h2
+					id="quick-access-title"
+					class="text-2xl font-bold font-['Outfit'] text-text-main"
+				>
+					Acesso rápido a pessoas
+				</h2>
+				<p class="text-text-secondary mt-1 max-w-2xl">
+					Entre direto nos recortes principais de perfis já classificados no
+					export canônico.
+				</p>
+			</div>
+		</div>
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+			{
+				quickAccessPeopleLinks.map((item) => (
+					<a
+						href={item.href}
+						class="glass-card p-6 border border-border-main hover:border-premium-accent/40 transition-all duration-300 hover:-translate-y-1 group"
+					>
+						<div class="flex items-start justify-between gap-4">
+							<div
+								class={`w-12 h-12 rounded-2xl border flex items-center justify-center ${item.accentClass}`}
+								aria-hidden="true"
+							>
+								<Fragment set:html={item.icon} />
+							</div>
+							<span
+								class="text-3xl font-bold font-['Outfit'] text-text-main"
+							>
+								{item.count}
+							</span>
+						</div>
+						<div class="mt-6">
+							<h3
+								class="text-lg font-bold text-text-main group-hover:text-premium-accent transition-colors"
+							>
+								{item.title}
+							</h3>
+							<p class="text-sm text-text-secondary mt-2">
+								{item.description}
+							</p>
+						</div>
+						<div
+							class="mt-6 pt-4 border-t border-border-main text-sm font-bold text-premium-accent flex items-center gap-2"
+						>
+							Abrir listagem
+							<svg
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-4 h-4 transition-transform group-hover:translate-x-1"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</div>
+					</a>
+				))
+			}
+		</div>
+	</section>
 
 	<!-- Analytics Charts (US-035) -->
 	<div id="home-charts-views">

@@ -7,8 +7,14 @@
  * identification, description, leadership, team members (current and alumni), and additional metadata.
  */
 import Layout from "../../layouts/Layout.astro";
+import advisorshipsData from "../../data/advisorships_canonical.json";
 import projectsData from "../../data/initiatives_canonical.json";
 import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import { allResearchers } from "../../lib/researcher-collections";
+import {
+	type CanonicalProjectAdvisorshipRecord,
+	resolveProjectTeamMembers,
+} from "../../lib/project-team";
 import { buildProvenanceFields } from "../../lib/provenance";
 import type { Project } from "../../types/projects";
 
@@ -42,9 +48,9 @@ const { project } = Astro.props;
  * @param {string} dateStr - The ISO date string to format.
  * @returns {string} The formatted date string, or "N/A" if the input is invalid or missing.
  */
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: string | null | undefined) => {
 	if (!dateStr) return "N/A";
-	const date = new Date(dateStr);
+	const date = new Date(dateStr.replace(" ", "T"));
 	return date.toLocaleDateString("pt-BR", {
 		day: "2-digit",
 		month: "2-digit",
@@ -52,14 +58,19 @@ const formatDate = (dateStr: string) => {
 	});
 };
 
-const statusStyles = {
-	active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-	concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-};
+const formatParticipationPeriod = (
+	startDate: string | null | undefined,
+	endDate: string | null | undefined,
+) => {
+	const formattedStartDate = formatDate(startDate);
+	const formattedEndDate = formatDate(endDate);
 
-const currentStatusStyle =
-	statusStyles[project.status as keyof typeof statusStyles] ||
-	"bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+	if (formattedStartDate === "N/A" && formattedEndDate === "N/A") {
+		return "Período não informado";
+	}
+
+	return `${formattedStartDate === "N/A" ? "Início não informado" : formattedStartDate} — ${formattedEndDate === "N/A" ? "Atual" : formattedEndDate}`;
+};
 
 const projectSourceFields = buildProvenanceFields([
 	{
@@ -106,16 +117,67 @@ const projectSourceFields = buildProvenanceFields([
 		: []),
 ]);
 
-/**
- * Helper function to check if a team member is an alumni (egresso).
- * Handles both null/undefined and the string "None" from Python exports.
- *
- * @param {string | null | undefined} endDate - The end date of the member's participation in the project.
- * @returns {boolean} True if the member is an alumni (has a valid end date), false otherwise.
- */
-const isAlumni = (endDate: string | null | undefined) => {
-	return endDate && endDate !== "None" && endDate !== "null";
-};
+const projectAdvisorships = (
+	advisorshipsData as CanonicalProjectAdvisorshipRecord[]
+).find((advisorshipProject) => String(advisorshipProject.id) === String(project.id));
+
+const projectFellowshipCount = (projectAdvisorships?.advisorships ?? []).filter(
+	(advisorship) => advisorship.fellowship,
+).length;
+
+const resolvedTeamMembers = resolveProjectTeamMembers(
+	project.team ?? [],
+	allResearchers,
+	import.meta.env.BASE_URL,
+	projectAdvisorships,
+);
+
+const leadershipMembers = resolvedTeamMembers.filter((member) =>
+	member.roles.includes("Coordinator"),
+);
+
+const teamSections = [
+	{
+		id: "student",
+		title: "Estudantes",
+		accentClass: "bg-premium-purple",
+		hoverClass: "hover:border-premium-purple/30",
+		members: resolvedTeamMembers.filter((member) => member.bucket === "student"),
+	},
+	{
+		id: "researcher",
+		title: "Pesquisadores",
+		accentClass: "bg-premium-accent/60",
+		hoverClass: "hover:border-premium-accent/30",
+		members: resolvedTeamMembers.filter(
+			(member) => member.bucket === "researcher",
+		),
+	},
+	{
+		id: "outside_ifes",
+		title: "Externos ao Ifes",
+		accentClass: "bg-amber-500/70",
+		hoverClass: "hover:border-amber-500/30",
+		members: resolvedTeamMembers.filter(
+			(member) => member.bucket === "outside_ifes",
+		),
+	},
+	{
+		id: "unrecognized",
+		title: "Sem classificação",
+		accentClass: "bg-slate-500/60",
+		hoverClass: "hover:border-slate-400",
+		members: resolvedTeamMembers.filter(
+			(member) => member.bucket === "unrecognized",
+		),
+	},
+]
+	.map((section) => ({
+		...section,
+		currentMembers: section.members.filter((member) => !member.isAlumni),
+		alumniMembers: section.members.filter((member) => member.isAlumni),
+	}))
+	.filter((section) => section.members.length > 0);
 ---
 
 <Layout
@@ -266,276 +328,282 @@ const isAlumni = (endDate: string | null | undefined) => {
 					>
 						Equipe do Projeto
 					</h3>
+					<p class="text-sm text-text-secondary max-w-3xl mb-8">
+						A equipe abaixo usa a classificação canônica de cada
+						pessoa: estudantes, pesquisadores, externos ao Ifes e
+						participantes ainda sem classificação. O papel
+						registrado no projeto continua visível em cada card.
+						Quando houver bolsa vinculada a esse integrante no
+						projeto, ela também aparece no card.
+					</p>
 
-					{/* Researchers Section */}
 					{
-						(
-							project.team?.filter(
-								(m) =>
-									m.roles.includes("Researcher") &&
-									!m.roles.includes("Coordinator"),
-							) || []
-						).length > 0 && (
-							<div class="mb-12">
-								<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
-									<span class="w-1.5 h-6 bg-premium-accent/60 rounded-full" />
-									Pesquisadores
-								</h4>
+						teamSections.length > 0 ? (
+							teamSections.map((section) => (
+								<div class="mb-12">
+									<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+										<span class={`w-1.5 h-6 rounded-full ${section.accentClass}`} />
+										{section.title} ({section.members.length})
+									</h4>
 
-								{/* Current Researchers */}
-								{project.team?.filter(
-									(m) =>
-										m.roles.includes("Researcher") &&
-										!m.roles.includes("Coordinator") &&
-										!isAlumni(m.end_date),
-								).length > 0 && (
-									<div class="mb-8">
-										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
-											Atuais
-										</h5>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-											{project.team
-												.filter(
-													(m) =>
-														m.roles.includes(
-															"Researcher",
-														) &&
-														!m.roles.includes(
-															"Coordinator",
-														) &&
-														!isAlumni(m.end_date),
-												)
-												.map((member) => (
-													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-accent/30">
-														<div
-															aria-hidden="true"
-															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
-														>
-															{member.person_name.charAt(
-																0,
-															)}
-														</div>
-														<div class="flex-1 overflow-hidden">
-															<div class="flex items-center gap-2">
-																<h5 class="text-sm font-bold text-text-main truncate">
-																	{
-																		member.person_name
-																	}
-																</h5>
-															</div>
-															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-																Pesquisador
-															</p>
-														</div>
-													</div>
-												))}
-										</div>
-									</div>
-								)}
-
-								{/* Alumni Researchers */}
-								{project.team?.filter(
-									(m) =>
-										m.roles.includes("Researcher") &&
-										!m.roles.includes("Coordinator") &&
-										isAlumni(m.end_date),
-								).length > 0 && (
-									<div>
-										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
-											Egressos
-										</h5>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-											{project.team
-												.filter(
-													(m) =>
-														m.roles.includes(
-															"Researcher",
-														) &&
-														!m.roles.includes(
-															"Coordinator",
-														) &&
-														isAlumni(m.end_date),
-												)
-												.map((member) => (
-													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
-														<div
-															aria-hidden="true"
-															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
-														>
-															{member.person_name.charAt(
-																0,
-															)}
-															<span
-																class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
-																title="Egresso"
+									{
+										section.currentMembers.length > 0 && (
+											<div class="mb-8">
+												<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+													Atuais
+												</h5>
+												<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{section.currentMembers.map((member) => (
+														member.profileHref ? (
+															<a
+																href={member.profileHref}
+																class={`glass-card p-4 flex items-center gap-4 transition-all ${section.hoverClass}`}
 															>
-																<svg
-																	xmlns="http://www.w3.org/2000/svg"
-																	class="w-2.5 h-2.5 text-white"
-																	viewBox="0 0 24 24"
-																	fill="none"
-																	stroke="currentColor"
-																	stroke-width="3"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
+																<div
+																	aria-hidden="true"
+																	class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
 																>
-																	<path d="M5 12h14" />
-																	<path d="m12 5 7 7-7 7" />
-																</svg>
-															</span>
-														</div>
-														<div class="flex-1 overflow-hidden">
-															<div class="flex items-center gap-2">
-																<h5 class="text-sm font-bold text-text-main truncate">
+																	{member.person_name.charAt(0)}
+																</div>
+																<div class="flex-1 overflow-hidden">
+																	<div class="flex items-center gap-2">
+																		<h5 class="text-sm font-bold text-text-main truncate">
+																			{member.person_name}
+																		</h5>
+																	</div>
+																	<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																		{member.roles.join(" • ")}
+																	</p>
+																	<p class="text-xs text-text-secondary mt-1">
+																		{formatParticipationPeriod(
+																			member.start_date,
+																			member.end_date,
+																		)}
+																	</p>
 																	{
-																		member.person_name
+																		(member.fellowships.length > 0 ||
+																			section.id === "student") && (
+																			<div class="mt-2 flex flex-wrap gap-2">
+																				{member.fellowships.length > 0 ? (
+																					member.fellowships.map((fellowship) => (
+																						<span class="inline-flex items-center px-2 py-1 rounded-full bg-premium-purple/10 border border-premium-purple/20 text-[10px] font-bold uppercase tracking-wider text-premium-purple">
+																							{`Bolsa ${fellowship.name}${fellowship.sponsorName ? ` • ${fellowship.sponsorName}` : ""}`}
+																						</span>
+																					))
+																				) : (
+																					<span class="inline-flex items-center px-2 py-1 rounded-full bg-slate-500/10 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+																						Sem bolsa identificada neste projeto
+																					</span>
+																				)}
+																			</div>
+																		)
 																	}
-																</h5>
-																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
-																	Egresso
-																</span>
-															</div>
-															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-																Pesquisador
-															</p>
-														</div>
-													</div>
-												))}
-										</div>
-									</div>
-								)}
-							</div>
-						)
-					}
-
-					{/* Students Section */}
-					{
-						(
-							project.team?.filter((m) =>
-								m.roles.includes("Student"),
-							) || []
-						).length > 0 && (
-							<div class="mb-12">
-								<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
-									<span class="w-1.5 h-6 bg-premium-purple rounded-full" />
-									Estudantes
-								</h4>
-
-								{/* Current Students */}
-								{project.team?.filter(
-									(m) =>
-										m.roles.includes("Student") &&
-										!isAlumni(m.end_date),
-								).length > 0 && (
-									<div class="mb-8">
-										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
-											Atuais
-										</h5>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-											{project.team
-												.filter(
-													(m) =>
-														m.roles.includes(
-															"Student",
-														) &&
-														!isAlumni(m.end_date),
-												)
-												.map((member) => (
-													<div class="glass-card p-4 flex items-center gap-4 transition-all hover:border-premium-purple/30">
-														<div
-															aria-hidden="true"
-															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
-														>
-															{member.person_name.charAt(
-																0,
-															)}
-														</div>
-														<div class="flex-1 overflow-hidden">
-															<div class="flex items-center gap-2">
-																<h5 class="text-sm font-bold text-text-main truncate">
-																	{
-																		member.person_name
-																	}
-																</h5>
-															</div>
-															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-																Estudante
-															</p>
-														</div>
-													</div>
-												))}
-										</div>
-									</div>
-								)}
-
-								{/* Alumni Students */}
-								{project.team?.filter(
-									(m) =>
-										m.roles.includes("Student") &&
-										isAlumni(m.end_date),
-								).length > 0 && (
-									<div>
-										<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
-											Egressos
-										</h5>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-											{project.team
-												.filter(
-													(m) =>
-														m.roles.includes(
-															"Student",
-														) &&
-														isAlumni(m.end_date),
-												)
-												.map((member) => (
-													<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
-														<div
-															aria-hidden="true"
-															class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
-														>
-															{member.person_name.charAt(
-																0,
-															)}
-															<span
-																class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
-																title="Egresso"
+																</div>
+															</a>
+														) : (
+															<div
+																class={`glass-card p-4 flex items-center gap-4 transition-all ${section.hoverClass}`}
 															>
-																<svg
-																	xmlns="http://www.w3.org/2000/svg"
-																	class="w-2.5 h-2.5 text-white"
-																	viewBox="0 0 24 24"
-																	fill="none"
-																	stroke="currentColor"
-																	stroke-width="3"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
+																<div
+																	aria-hidden="true"
+																	class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
 																>
-																	<path d="M5 12h14" />
-																	<path d="m12 5 7 7-7 7" />
-																</svg>
-															</span>
-														</div>
-														<div class="flex-1 overflow-hidden">
-															<div class="flex items-center gap-2">
-																<h5 class="text-sm font-bold text-text-main truncate">
+																	{member.person_name.charAt(0)}
+																</div>
+																<div class="flex-1 overflow-hidden">
+																	<div class="flex items-center gap-2">
+																		<h5 class="text-sm font-bold text-text-main truncate">
+																			{member.person_name}
+																		</h5>
+																	</div>
+																	<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																		{member.roles.join(" • ")}
+																	</p>
+																	<p class="text-xs text-text-secondary mt-1">
+																		{formatParticipationPeriod(
+																			member.start_date,
+																			member.end_date,
+																		)}
+																	</p>
 																	{
-																		member.person_name
+																		(member.fellowships.length > 0 ||
+																			section.id === "student") && (
+																			<div class="mt-2 flex flex-wrap gap-2">
+																				{member.fellowships.length > 0 ? (
+																					member.fellowships.map((fellowship) => (
+																						<span class="inline-flex items-center px-2 py-1 rounded-full bg-premium-purple/10 border border-premium-purple/20 text-[10px] font-bold uppercase tracking-wider text-premium-purple">
+																							{`Bolsa ${fellowship.name}${fellowship.sponsorName ? ` • ${fellowship.sponsorName}` : ""}`}
+																						</span>
+																					))
+																				) : (
+																					<span class="inline-flex items-center px-2 py-1 rounded-full bg-slate-500/10 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+																						Sem bolsa identificada neste projeto
+																					</span>
+																				)}
+																			</div>
+																		)
 																	}
-																</h5>
-																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
-																	Egresso
-																</span>
+																</div>
 															</div>
-															<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
-																Estudante
-															</p>
-														</div>
-													</div>
-												))}
-										</div>
-									</div>
-								)}
-							</div>
+														)
+													))}
+												</div>
+											</div>
+										)
+									}
+
+									{
+										section.alumniMembers.length > 0 && (
+											<div>
+												<h5 class="text-xs font-bold uppercase tracking-widest text-text-secondary mb-4 px-1">
+													Egressos
+												</h5>
+												<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{section.alumniMembers.map((member) => (
+														member.profileHref ? (
+															<a
+																href={member.profileHref}
+																class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400"
+															>
+																<div
+																	aria-hidden="true"
+																	class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+																>
+																	{member.person_name.charAt(0)}
+																	<span
+																		class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+																		title="Egresso"
+																	>
+																		<svg
+																			xmlns="http://www.w3.org/2000/svg"
+																			class="w-2.5 h-2.5 text-white"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			stroke="currentColor"
+																			stroke-width="3"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																		>
+																			<path d="M5 12h14" />
+																			<path d="m12 5 7 7-7 7" />
+																		</svg>
+																	</span>
+																</div>
+																<div class="flex-1 overflow-hidden">
+																	<div class="flex items-center gap-2">
+																		<h5 class="text-sm font-bold text-text-main truncate">
+																			{member.person_name}
+																		</h5>
+																		<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																			Egresso
+																		</span>
+																	</div>
+																	<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																		{member.roles.join(" • ")}
+																	</p>
+																	<p class="text-xs text-text-secondary mt-1">
+																		{formatParticipationPeriod(
+																			member.start_date,
+																			member.end_date,
+																		)}
+																	</p>
+																	{
+																		(member.fellowships.length > 0 ||
+																			section.id === "student") && (
+																			<div class="mt-2 flex flex-wrap gap-2">
+																				{member.fellowships.length > 0 ? (
+																					member.fellowships.map((fellowship) => (
+																						<span class="inline-flex items-center px-2 py-1 rounded-full bg-premium-purple/10 border border-premium-purple/20 text-[10px] font-bold uppercase tracking-wider text-premium-purple">
+																							{`Bolsa ${fellowship.name}${fellowship.sponsorName ? ` • ${fellowship.sponsorName}` : ""}`}
+																						</span>
+																					))
+																				) : (
+																					<span class="inline-flex items-center px-2 py-1 rounded-full bg-slate-500/10 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+																						Sem bolsa identificada neste projeto
+																					</span>
+																				)}
+																			</div>
+																		)
+																	}
+																</div>
+															</a>
+														) : (
+															<div class="glass-card p-4 flex items-center gap-4 transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-slate-400">
+																<div
+																	aria-hidden="true"
+																	class="w-12 h-12 rounded-full bg-[var(--tag-bg)] border-2 border-border-main flex items-center justify-center text-text-secondary font-bold shrink-0 relative"
+																>
+																	{member.person_name.charAt(0)}
+																	<span
+																		class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-500 rounded-full border-2 border-[var(--tag-bg)] flex items-center justify-center"
+																		title="Egresso"
+																	>
+																		<svg
+																			xmlns="http://www.w3.org/2000/svg"
+																			class="w-2.5 h-2.5 text-white"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			stroke="currentColor"
+																			stroke-width="3"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																		>
+																			<path d="M5 12h14" />
+																			<path d="m12 5 7 7-7 7" />
+																		</svg>
+																	</span>
+																</div>
+																<div class="flex-1 overflow-hidden">
+																	<div class="flex items-center gap-2">
+																		<h5 class="text-sm font-bold text-text-main truncate">
+																			{member.person_name}
+																		</h5>
+																		<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																			Egresso
+																		</span>
+																	</div>
+																	<p class="text-[10px] font-bold uppercase tracking-tight text-text-secondary">
+																		{member.roles.join(" • ")}
+																	</p>
+																	<p class="text-xs text-text-secondary mt-1">
+																		{formatParticipationPeriod(
+																			member.start_date,
+																			member.end_date,
+																		)}
+																	</p>
+																	{
+																		(member.fellowships.length > 0 ||
+																			section.id === "student") && (
+																			<div class="mt-2 flex flex-wrap gap-2">
+																				{member.fellowships.length > 0 ? (
+																					member.fellowships.map((fellowship) => (
+																						<span class="inline-flex items-center px-2 py-1 rounded-full bg-premium-purple/10 border border-premium-purple/20 text-[10px] font-bold uppercase tracking-wider text-premium-purple">
+																							{`Bolsa ${fellowship.name}${fellowship.sponsorName ? ` • ${fellowship.sponsorName}` : ""}`}
+																						</span>
+																					))
+																				) : (
+																					<span class="inline-flex items-center px-2 py-1 rounded-full bg-slate-500/10 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+																						Sem bolsa identificada neste projeto
+																					</span>
+																				)}
+																			</div>
+																		)
+																	}
+																</div>
+															</div>
+														)
+													))}
+												</div>
+											</div>
+										)
+									}
+								</div>
+							))
+						) : (
+							<p class="text-text-secondary italic">
+								Nenhum integrante foi identificado para este projeto
+								no export atual.
+							</p>
 						)
 					}
 				</div>
@@ -545,8 +613,7 @@ const isAlumni = (endDate: string | null | undefined) => {
 		<aside class="w-full lg:w-80 space-y-6">
 			{/* Leadership Section */}
 			{
-				project.team?.filter((m) => m.roles.includes("Coordinator"))
-					.length > 0 && (
+				leadershipMembers.length > 0 && (
 					<section
 						class="bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-premium-accent/20 rounded-3xl p-6 backdrop-blur-md"
 						aria-labelledby="leadership-title"
@@ -558,9 +625,7 @@ const isAlumni = (endDate: string | null | undefined) => {
 							Liderança
 						</h4>
 						<div class="space-y-4">
-							{project.team
-								?.filter((m) => m.roles.includes("Coordinator"))
-								.map((leader) => (
+							{leadershipMembers.map((leader) => (
 									<div class="flex items-center gap-3 p-3 bg-white/30 dark:bg-white/5 rounded-2xl border border-border-main shadow-sm transition-all hover:bg-white/40 dark:hover:bg-white/10">
 										<div
 											aria-hidden="true"
@@ -631,6 +696,14 @@ const isAlumni = (endDate: string | null | undefined) => {
 									: project.initiative_type?.name ||
 										"Projeto de pesquisa"
 							}
+						</span>
+					</div>
+					<div class="flex justify-between text-xs">
+						<span class="text-text-secondary font-bold text-left"
+							>Bolsas vinculadas</span
+						>
+						<span class="text-text-main font-bold text-right">
+							{projectFellowshipCount}
 						</span>
 					</div>
 					{

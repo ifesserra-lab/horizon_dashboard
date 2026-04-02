@@ -39,6 +39,7 @@ describe("Researchers data helpers", () => {
             {
                 id: "1",
                 name: "Pesquisador Teste",
+                classification: "researcher",
                 initiatives: [
                     {
                         id: "p1",
@@ -91,6 +92,17 @@ describe("Researchers data helpers", () => {
                     },
                 ],
             },
+            {
+                id: "2",
+                name: "Estudante Teste",
+                classification: "student",
+                initiatives: [],
+                research_groups: [],
+                knowledge_areas: [],
+                academic_education: [],
+                articles: [],
+                advisorships: [],
+            },
         ];
 
         expect(buildResearcherStatsById(researchers)).toEqual({
@@ -103,6 +115,14 @@ describe("Researchers data helpers", () => {
                 },
                 isSupervisor: true,
                 isStudent: false,
+            },
+            "2": {
+                projects: 0,
+                articles: 0,
+                advisorships: 0,
+                advisorshipsByType: {},
+                isSupervisor: false,
+                isStudent: true,
             },
         });
     });

@@ -50,7 +50,9 @@ export const buildResearcherStatsById = (
             advisorships: advisorships.length,
             advisorshipsByType,
             isSupervisor: advisorships.length > 0,
-            isStudent: false,
+            isStudent:
+                researcher.classification === "student" ||
+                researcher.was_student === true,
         };
 
         return acc;
