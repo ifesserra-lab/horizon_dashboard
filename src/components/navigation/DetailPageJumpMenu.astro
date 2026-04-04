@@ -1,0 +1,192 @@
+---
+interface JumpMenuItem {
+    id: string;
+    label: string;
+}
+
+interface Props {
+    items: JumpMenuItem[];
+    title?: string;
+    description?: string;
+}
+
+const {
+    items,
+    title = "Navegacao rapida",
+    description = "Escolha uma secao para navegar pela pagina.",
+} = Astro.props;
+
+const availableItems = (items ?? []).filter(
+    (item): item is JumpMenuItem =>
+        Boolean(item?.id?.trim()) && Boolean(item?.label?.trim()),
+);
+
+const menuId = `detail-page-jump-${title
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || "menu"}`;
+---
+
+{
+    availableItems.length > 1 && (
+        <div
+            class="pointer-events-none fixed right-4 top-20 z-30 md:right-8 md:top-6"
+            data-detail-page-jump-floating
+        >
+            <details
+                class="pointer-events-auto group relative"
+                data-detail-page-jump-root
+            >
+                <summary
+                    class="flex cursor-pointer list-none items-center gap-3 rounded-full border border-premium-accent/25 bg-white/92 px-4 py-3 text-sm font-bold text-text-main shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-md transition hover:border-premium-accent/45 hover:text-premium-accent focus:outline-none focus:ring-2 focus:ring-premium-accent/30"
+                    aria-label={title}
+                >
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-premium-accent text-white shadow-lg shadow-premium-accent/25">
+                        <svg
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M3 6h18"></path>
+                            <path d="M7 12h10"></path>
+                            <path d="M10 18h4"></path>
+                        </svg>
+                    </span>
+                    <span class="hidden sm:inline">Navegar</span>
+                    <svg
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 text-text-secondary transition group-open:rotate-180"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </summary>
+
+                <div class="absolute right-0 top-full mt-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-border-main bg-white/95 shadow-[0_28px_70px_rgba(15,23,42,0.2)] backdrop-blur-xl">
+                    <div class="border-b border-border-main px-5 py-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+                            Menu suspenso
+                        </p>
+                        <h2
+                            id={`${menuId}-title`}
+                            class="mt-2 text-lg font-bold font-['Outfit'] text-text-main"
+                        >
+                            {title}
+                        </h2>
+                        <p class="mt-1 text-sm leading-relaxed text-text-secondary">
+                            {description}
+                        </p>
+                    </div>
+
+                    <nav
+                        class="max-h-[55vh] overflow-y-auto p-3"
+                        aria-labelledby={`${menuId}-title`}
+                    >
+                        <ul class="space-y-1">
+                            {
+                                availableItems.map((item, index) => (
+                                    <li>
+                                        <a
+                                            href={`#${item.id}`}
+                                            data-detail-page-jump-link
+                                            class="flex items-center justify-between gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-text-main transition hover:bg-premium-accent/8 hover:text-premium-accent"
+                                        >
+                                            <span class="min-w-0">{item.label}</span>
+                                            <span class="shrink-0 rounded-full border border-border-main bg-[var(--tag-bg)] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                                                {index + 1}
+                                            </span>
+                                        </a>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </details>
+        </div>
+    )
+}
+
+<script is:inline>
+    const bindFloatingDetailPageJumpMenus = () => {
+        document
+            .querySelectorAll("[data-detail-page-jump-root]")
+            .forEach((element) => {
+                if (!(element instanceof HTMLDetailsElement)) {
+                    return;
+                }
+
+                if (element.dataset.bound === "true") {
+                    return;
+                }
+
+                element.dataset.bound = "true";
+
+                element
+                    .querySelectorAll("[data-detail-page-jump-link]")
+                    .forEach((link) => {
+                        if (!(link instanceof HTMLAnchorElement)) {
+                            return;
+                        }
+
+                        link.addEventListener("click", (event) => {
+                            const hash = link.getAttribute("href");
+                            if (!hash?.startsWith("#")) {
+                                return;
+                            }
+
+                            const target = document.getElementById(hash.slice(1));
+                            if (!target) {
+                                return;
+                            }
+
+                            event.preventDefault();
+                            target.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            });
+                            history.replaceState(null, "", hash);
+                            element.open = false;
+                        });
+                    });
+            });
+
+        if (document.body.dataset.detailPageJumpOutsideBound === "true") {
+            return;
+        }
+
+        document.body.dataset.detailPageJumpOutsideBound = "true";
+
+        document.addEventListener("click", (event) => {
+            document
+                .querySelectorAll("[data-detail-page-jump-root]")
+                .forEach((element) => {
+                    if (
+                        element instanceof HTMLDetailsElement &&
+                        element.open &&
+                        !element.contains(event.target)
+                    ) {
+                        element.open = false;
+                    }
+                });
+        });
+    };
+
+    bindFloatingDetailPageJumpMenus();
+    document.addEventListener(
+        "astro:page-load",
+        bindFloatingDetailPageJumpMenus,
+    );
+</script>

@@ -27,6 +27,7 @@ import ResearcherProfileGroups from "../../components/researchers/ResearcherProf
 import ResearcherProfileInitiatives from "../../components/researchers/ResearcherProfileInitiatives.astro";
 import StudentProfileAdvisors from "../../components/researchers/StudentProfileAdvisors.astro";
 import StudentProfileFellowships from "../../components/researchers/StudentProfileFellowships.astro";
+import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
 
 export function getStaticPaths() {
     return studentsResearchers.map((student) => ({
@@ -145,6 +146,17 @@ const highlightCards = [
         surfaceClass: "bg-amber-500/8 border-amber-500/20",
     },
 ];
+
+const studentDetailSections = [
+    { id: "student-overview", label: "Visao geral" },
+    { id: "student-profile", label: "Perfil" },
+    { id: "student-fellowships", label: "Bolsas" },
+    { id: "student-advisors", label: "Orientadores" },
+    { id: "student-groups", label: "Grupos de pesquisa" },
+    { id: "student-initiatives", label: "Iniciativas" },
+    { id: "student-collaboration-graph", label: "Grafo de colaboracao" },
+    { id: "student-relationship-graph", label: "Grafo de relacionamento" },
+];
 ---
 
 <Layout
@@ -176,7 +188,16 @@ const highlightCards = [
             </a>
         </nav>
 
-        <section class="glass-card p-6 md:p-8 border border-border-main space-y-5">
+        <DetailPageJumpMenu
+            items={studentDetailSections}
+            title="Atalhos da pagina do estudante"
+            description="Ajuda a navegar mais rapido entre perfil, vinculos academicos e grafos desta pagina."
+        />
+
+        <section
+            id="student-overview"
+            class="glass-card scroll-mt-28 p-6 md:p-8 border border-border-main space-y-5"
+        >
             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-premium-accent mb-2">
@@ -215,28 +236,42 @@ const highlightCards = [
             </div>
         </section>
 
-        <ResearcherProfileHeader
-            researcher={enrichedStudent}
-            sources={profileHeaderSources}
-        />
+        <section id="student-profile" class="scroll-mt-28">
+            <ResearcherProfileHeader
+                researcher={enrichedStudent}
+                sources={profileHeaderSources}
+            />
+        </section>
 
-        <StudentProfileFellowships fellowships={studentFellowships} />
+        <section id="student-fellowships" class="scroll-mt-28">
+            <StudentProfileFellowships fellowships={studentFellowships} />
+        </section>
 
-        <StudentProfileAdvisors advisors={studentAdvisors} />
+        <section id="student-advisors" class="scroll-mt-28">
+            <StudentProfileAdvisors advisors={studentAdvisors} />
+        </section>
 
-        <ResearcherProfileGroups
-            researcher={enrichedStudent}
-            groupSourcesById={groupSourcesById}
-        />
+        <section id="student-groups" class="scroll-mt-28">
+            <ResearcherProfileGroups
+                researcher={enrichedStudent}
+                groupSourcesById={groupSourcesById}
+            />
+        </section>
 
-        <ResearcherProfileInitiatives
-            researcher={enrichedStudent}
-            initiativeSourcesById={initiativeSourcesById}
-            incrementalLoading={false}
-        />
+        <section id="student-initiatives" class="scroll-mt-28">
+            <ResearcherProfileInitiatives
+                researcher={enrichedStudent}
+                initiativeSourcesById={initiativeSourcesById}
+                incrementalLoading={false}
+            />
+        </section>
 
-        <PersonInteractionGraph graph={studentCollaborationGraph} />
+        <section id="student-collaboration-graph" class="scroll-mt-28">
+            <PersonInteractionGraph graph={studentCollaborationGraph} />
+        </section>
 
-        <PersonInteractionGraph graph={studentRelationshipGraph} />
+        <section id="student-relationship-graph" class="scroll-mt-28">
+            <PersonInteractionGraph graph={studentRelationshipGraph} />
+        </section>
     </div>
 </Layout>

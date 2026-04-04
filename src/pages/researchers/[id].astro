@@ -28,6 +28,7 @@ import ResearcherProfileAdvisorships from "../../components/researchers/Research
 import ResearcherProfileArticles from "../../components/researchers/ResearcherProfileArticles.astro";
 import ResearcherProfileStats from "../../components/researchers/ResearcherProfileStats.astro";
 import PersonInteractionGraph from "../../components/researchers/PersonInteractionGraph.astro";
+import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
 
 export function getStaticPaths() {
     const researchers = researchersData as unknown as Researcher[];
@@ -211,6 +212,24 @@ const researcherRelationshipGraph = relationshipGraphConfig.data
           baseUrl: import.meta.env.BASE_URL,
       })
     : null;
+
+const researcherDetailSections = [
+    { id: "researcher-profile", label: "Perfil" },
+    { id: "researcher-resume", label: "Resumo" },
+    { id: "researcher-stats", label: "Indicadores" },
+    { id: "researcher-dashboard", label: "Painel" },
+    { id: "researcher-education", label: "Formacao academica" },
+    { id: "researcher-groups", label: "Grupos de pesquisa" },
+    { id: "researcher-initiatives", label: "Iniciativas" },
+    { id: "researcher-advisorships", label: "Orientacoes" },
+    { id: "researcher-articles", label: "Publicacoes" },
+    ...(researcherCollaborationGraph
+        ? [{ id: "researcher-collaboration-graph", label: "Grafo de colaboracao" }]
+        : []),
+    ...(researcherRelationshipGraph
+        ? [{ id: "researcher-relationship-graph", label: "Grafo de relacionamento" }]
+        : []),
+];
 ---
 
 <Layout
@@ -223,57 +242,91 @@ const researcherRelationshipGraph = relationshipGraphConfig.data
 
     <div class="flex flex-col lg:flex-row gap-8 items-start">
         <div class="flex-1 space-y-8 w-full">
-            <ResearcherProfileHeader
-                researcher={enrichedResearcher}
-                sources={profileHeaderSources}
-            />
-            <ResearcherProfileResume
-                researcher={enrichedResearcher}
-                sources={resumeSources}
+            <DetailPageJumpMenu
+                items={researcherDetailSections}
+                title="Atalhos da pagina do pesquisador"
+                description="Permite saltar entre blocos do perfil, producao academica e grafos de rede."
             />
 
-            <ResearcherProfileStats
-                totalArticles={enrichedResearcher.articles.length}
-                totalProjects={enrichedResearcher.initiatives.length}
-                totalAdvisorships={researcher.advisorships?.length || 0}
-            />
+            <section id="researcher-profile" class="scroll-mt-28">
+                <ResearcherProfileHeader
+                    researcher={enrichedResearcher}
+                    sources={profileHeaderSources}
+                />
+            </section>
+            <section id="researcher-resume" class="scroll-mt-28">
+                <ResearcherProfileResume
+                    researcher={enrichedResearcher}
+                    sources={resumeSources}
+                />
+            </section>
 
-            <ResearcherProfileDashboard
-                researcher={enrichedResearcher}
-                advisorships={researcher.advisorships || []}
-            />
+            <section id="researcher-stats" class="scroll-mt-28">
+                <ResearcherProfileStats
+                    totalArticles={enrichedResearcher.articles.length}
+                    totalProjects={enrichedResearcher.initiatives.length}
+                    totalAdvisorships={researcher.advisorships?.length || 0}
+                />
+            </section>
 
-            <ResearcherProfileEducation
-                researcher={enrichedResearcher}
-                educationSources={educationSources}
-            />
-            <ResearcherProfileGroups
-                researcher={enrichedResearcher}
-                groupSourcesById={groupSourcesById}
-            />
-            <ResearcherProfileInitiatives
-                researcher={enrichedResearcher}
-                initiativeSourcesById={initiativeSourcesById}
-            />
-            <ResearcherProfileAdvisorships
-                advisorships={researcher.advisorships || []}
-                advisorshipSourcesById={advisorshipSourcesById}
-            />
+            <section id="researcher-dashboard" class="scroll-mt-28">
+                <ResearcherProfileDashboard
+                    researcher={enrichedResearcher}
+                    advisorships={researcher.advisorships || []}
+                />
+            </section>
 
-            <ResearcherProfileArticles
-                researcher={enrichedResearcher}
-                articleSourcesById={articleSourcesById}
-            />
+            <section id="researcher-education" class="scroll-mt-28">
+                <ResearcherProfileEducation
+                    researcher={enrichedResearcher}
+                    educationSources={educationSources}
+                />
+            </section>
+            <section id="researcher-groups" class="scroll-mt-28">
+                <ResearcherProfileGroups
+                    researcher={enrichedResearcher}
+                    groupSourcesById={groupSourcesById}
+                />
+            </section>
+            <section id="researcher-initiatives" class="scroll-mt-28">
+                <ResearcherProfileInitiatives
+                    researcher={enrichedResearcher}
+                    initiativeSourcesById={initiativeSourcesById}
+                />
+            </section>
+            <section id="researcher-advisorships" class="scroll-mt-28">
+                <ResearcherProfileAdvisorships
+                    advisorships={researcher.advisorships || []}
+                    advisorshipSourcesById={advisorshipSourcesById}
+                />
+            </section>
+
+            <section id="researcher-articles" class="scroll-mt-28">
+                <ResearcherProfileArticles
+                    researcher={enrichedResearcher}
+                    articleSourcesById={articleSourcesById}
+                />
+            </section>
 
             {
                 researcherCollaborationGraph && (
-                    <PersonInteractionGraph graph={researcherCollaborationGraph} />
+                    <section
+                        id="researcher-collaboration-graph"
+                        class="scroll-mt-28"
+                    >
+                        <PersonInteractionGraph graph={researcherCollaborationGraph} />
+                    </section>
                 )
             }
 
             {
                 researcherRelationshipGraph && (
-                    <PersonInteractionGraph graph={researcherRelationshipGraph} />
+                    <section
+                        id="researcher-relationship-graph"
+                        class="scroll-mt-28"
+                    >
+                        <PersonInteractionGraph graph={researcherRelationshipGraph} />
+                    </section>
                 )
             }
         </div>

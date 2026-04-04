@@ -10,12 +10,16 @@ import Layout from "../../layouts/Layout.astro";
 import advisorshipsData from "../../data/advisorships_canonical.json";
 import projectsData from "../../data/initiatives_canonical.json";
 import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
 import { allResearchers } from "../../lib/researcher-collections";
 import {
 	type CanonicalProjectAdvisorshipRecord,
 	resolveProjectTeamMembers,
 } from "../../lib/project-team";
-import { buildProvenanceFields } from "../../lib/provenance";
+import {
+	buildProvenanceFields,
+	type CanonicalEntityType,
+} from "../../lib/provenance";
 import type { Project } from "../../types/projects";
 
 /**
@@ -72,26 +76,31 @@ const formatParticipationPeriod = (
 	return `${formattedStartDate === "N/A" ? "Início não informado" : formattedStartDate} — ${formattedEndDate === "N/A" ? "Atual" : formattedEndDate}`;
 };
 
+const projectCanonicalEntityType: CanonicalEntityType =
+	project.initiative_type?.name === "Advisorship"
+		? "advisorship"
+		: "initiative";
+
 const projectSourceFields = buildProvenanceFields([
 	{
 		label: "Identidade e status do projeto",
 		description:
 			"Nome, status e classificacao principal exibidos no cabecalho e no resumo lateral.",
-		entityType: "initiative",
+		entityType: projectCanonicalEntityType,
 		entityId: project.id,
 		attributeNames: ["name", "status"],
 	},
 	{
 		label: "Cronograma de execucao",
 		description: "Datas de inicio e termino apresentadas nesta pagina.",
-		entityType: "initiative",
+		entityType: projectCanonicalEntityType,
 		entityId: project.id,
 		attributeNames: ["start_date", "end_date"],
 	},
 	{
 		label: "Descricao do projeto",
 		description: "Resumo textual do projeto quando disponivel.",
-		entityType: "initiative",
+		entityType: projectCanonicalEntityType,
 		entityId: project.id,
 		attributeNames: ["description"],
 	},
@@ -99,10 +108,22 @@ const projectSourceFields = buildProvenanceFields([
 		label: "Equipe do projeto",
 		description:
 			"Pesquisadores, estudantes e coordenacao mostrados nos blocos de equipe.",
-		entityType: "initiative",
+		entityType: projectCanonicalEntityType,
 		entityId: project.id,
 		attributeNames: ["coordinator_name", "researcher_names", "student_names"],
 	},
+	...(project.parent_id
+		? [
+				{
+					label: "Projeto pai vinculado",
+					description:
+						"Registro do projeto principal relacionado a este detalhe quando houver hierarquia entre iniciativa e orientacao.",
+					entityType: "initiative" as const,
+					entityId: project.parent_id,
+					attributeNames: ["name", "status", "start_date", "end_date"],
+				},
+			]
+		: []),
 	...(project.research_group
 		? [
 				{
@@ -178,6 +199,12 @@ const teamSections = [
 		alumniMembers: section.members.filter((member) => member.isAlumni),
 	}))
 	.filter((section) => section.members.length > 0);
+
+const projectDetailSections = [
+	{ id: "project-overview", label: "Visao geral" },
+	{ id: "project-team", label: "Equipe do projeto" },
+	{ id: "project-sources", label: "Fontes dos dados" },
+];
 ---
 
 <Layout
@@ -188,9 +215,19 @@ const teamSections = [
 		<!-- Back button removed -->
 	</nav>
 
+	<DetailPageJumpMenu
+		items={projectDetailSections}
+		title="Atalhos da pagina do projeto"
+		description="Permite saltar entre resumo executivo, equipe vinculada e rastreabilidade dos dados."
+	/>
+
 	<div class="flex flex-col lg:flex-row gap-8 items-start">
 		<div class="flex-1 space-y-8 w-full">
-			<article class="glass-card p-8" aria-labelledby="project-title">
+			<article
+				id="project-overview"
+				class="glass-card scroll-mt-28 p-8"
+				aria-labelledby="project-title"
+			>
 				<div
 					class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8"
 				>
@@ -320,7 +357,11 @@ const teamSections = [
 			</article>
 
 			<!-- Members Section -->
-			<section aria-labelledby="members-title" class="space-y-10">
+			<section
+				id="project-team"
+				aria-labelledby="members-title"
+				class="scroll-mt-28 space-y-10"
+			>
 				<div>
 					<h3
 						id="members-title"
@@ -726,9 +767,11 @@ const teamSections = [
 		</aside>
 	</div>
 
-	<DataSourcesPanel
-		title="Fontes dos Dados do Projeto"
-		intro="Cada bloco abaixo resume de quais registros de origem a camada canonica montou as informacoes exibidas nesta pagina do projeto."
-		fields={projectSourceFields}
-	/>
+	<section id="project-sources" class="scroll-mt-28">
+		<DataSourcesPanel
+			title="Fontes dos Dados do Projeto"
+			intro="Cada bloco abaixo resume de quais registros de origem a camada canonica montou as informacoes exibidas nesta pagina do projeto."
+			fields={projectSourceFields}
+		/>
+	</section>
 </Layout>

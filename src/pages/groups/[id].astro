@@ -8,6 +8,7 @@ import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro
 import ResearchGroupGraphDatasets from "../../components/groups/ResearchGroupGraphDatasets.astro";
 import ResearchGroupInteractionGraph from "../../components/groups/ResearchGroupInteractionGraph.astro";
 import ResearchGroupRelationshipTable from "../../components/groups/ResearchGroupRelationshipTable.astro";
+import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
 import { buildProvenanceFields } from "../../lib/provenance";
 import {
 	buildResearchGroupInteractionViewModel,
@@ -348,6 +349,13 @@ const topCollaboratingResearchers = (groupInteractionGraph?.nodes ?? [])
 const relationshipTableRows = groupInteractionGraph
 	? buildResearchGroupRelationshipTableRows(groupInteractionGraph)
 	: [];
+const groupDetailSections = [
+	{ id: "group-overview", label: "Visao geral" },
+	{ id: "group-members", label: "Membros" },
+	{ id: "group-projects", label: "Projetos" },
+	{ id: "group-graphs", label: "Grafos e relacoes" },
+	{ id: "group-sources", label: "Fontes dos dados" },
+];
 ---
 
 <Layout title={group.name} breadcrumbReplacements={{ [group.id]: group.name }}>
@@ -371,10 +379,20 @@ const relationshipTableRows = groupInteractionGraph
 		</a>
 	</nav>
 
+	<DetailPageJumpMenu
+		items={groupDetailSections}
+		title="Atalhos da pagina do grupo"
+		description="Facilita a navegacao entre visao geral, membros, projetos, grafos e fontes do grupo."
+	/>
+
 	<div class="flex flex-col lg:flex-row gap-8 items-start">
 		<!-- Main Details -->
 		<div class="flex-1 space-y-8">
-			<article class="glass-card p-8" aria-labelledby="group-title">
+			<article
+				id="group-overview"
+				class="glass-card scroll-mt-28 p-8"
+				aria-labelledby="group-title"
+			>
 				<div
 					class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8"
 				>
@@ -480,7 +498,11 @@ const relationshipTableRows = groupInteractionGraph
 			</article>
 
 			<!-- Members Section -->
-			<section aria-labelledby="members-title" class="space-y-10">
+			<section
+				id="group-members"
+				aria-labelledby="members-title"
+				class="scroll-mt-28 space-y-10"
+			>
 				<div>
 					<h3
 						id="members-title"
@@ -1035,8 +1057,9 @@ const relationshipTableRows = groupInteractionGraph
 
 	<!-- Projects Section -->
 	<section
+		id="group-projects"
 		aria-labelledby="projects-title"
-		class="space-y-10 mb-12 border-t border-border-main pt-10"
+		class="scroll-mt-28 space-y-10 mb-12 border-t border-border-main pt-10"
 	>
 		<div>
 			<h3
@@ -1221,8 +1244,9 @@ const relationshipTableRows = groupInteractionGraph
 	</section>
 
 	<section
+		id="group-graphs"
 		aria-labelledby="group-graphs-title"
-		class="space-y-8 mb-12 border-t border-border-main pt-10"
+		class="scroll-mt-28 space-y-8 mb-12 border-t border-border-main pt-10"
 	>
 		<div class="space-y-3">
 			<div class="flex flex-wrap gap-2">
@@ -1363,9 +1387,11 @@ const relationshipTableRows = groupInteractionGraph
 		/>
 	</section>
 
-	<DataSourcesPanel
-		title="Fontes dos Dados do Grupo"
-		intro="A rastreabilidade abaixo mostra quais registros de origem alimentaram os blocos principais exibidos nesta pagina do grupo."
-		fields={groupSourceFields}
-	/>
+	<section id="group-sources" class="scroll-mt-28">
+		<DataSourcesPanel
+			title="Fontes dos Dados do Grupo"
+			intro="A rastreabilidade abaixo mostra quais registros de origem alimentaram os blocos principais exibidos nesta pagina do grupo."
+			fields={groupSourceFields}
+		/>
+	</section>
 </Layout>
