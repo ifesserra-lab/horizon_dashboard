@@ -2,8 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import KpiCard from "../components/KpiCard.astro";
 import HomeCharts from "../components/home/HomeCharts.astro";
+import PeopleNetworkOverview from "../components/home/PeopleNetworkOverview.astro";
 import groupsData from "../data/research_groups_canonical.json";
 import advisorshipsData from "../data/advisorships_canonical.json";
+import peopleCollaborationGraphData from "../data/people_collaboration_graph.json";
+import peopleRelationshipGraphData from "../data/people_relationship_graph.json";
 import AdvisorshipCharts from "../components/advisorships/AdvisorshipCharts.astro";
 import type { ResearchGroup } from "../types/groups";
 import type { ProjectAdvisorship } from "../types/advisorships";
@@ -16,6 +19,10 @@ import {
 	getRealCampuses,
 } from "../lib/tenant-data";
 import { researcherCollectionCounts } from "../lib/researcher-collections";
+import {
+	buildPeopleNetworkOverview,
+	type PeopleGraphRawFile,
+} from "../lib/people-network";
 
 const groups = groupsData as ResearchGroup[];
 const totalGroups = groups.length;
@@ -28,6 +35,13 @@ const totalKnowledgeAreas = new Set(
 	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
 ).size;
 const baseUrl = import.meta.env.BASE_URL;
+const peopleNetworkOverview = buildPeopleNetworkOverview(
+	peopleCollaborationGraphData as PeopleGraphRawFile,
+	peopleRelationshipGraphData as PeopleGraphRawFile,
+	{
+		baseUrl,
+	},
+);
 
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
@@ -444,6 +458,8 @@ const campusHomeViews = Object.fromEntries(
 			))
 		}
 	</div>
+
+	<PeopleNetworkOverview overview={peopleNetworkOverview} />
 
 	<script define:vars={{ campusStats, defaultStats: { totalGroups, totalMembers, totalCampus, totalKnowledgeAreas } }}>
 		window.__homeCampusStats = campusStats;

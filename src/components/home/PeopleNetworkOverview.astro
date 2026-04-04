@@ -1,0 +1,580 @@
+---
+import {
+    peopleClassificationLabels,
+    type PeopleGraphClassificationKey,
+    type PeopleNetworkOverviewViewModel,
+} from "../../lib/people-network";
+
+interface Props {
+    overview: PeopleNetworkOverviewViewModel;
+}
+
+const { overview } = Astro.props;
+
+const integerFormatter = new Intl.NumberFormat("pt-BR");
+const decimalFormatter = new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+});
+const percentFormatter = new Intl.NumberFormat("pt-BR", {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+});
+
+const formatInteger = (value: number | null | undefined) =>
+    typeof value === "number" ? integerFormatter.format(value) : "N/A";
+
+const formatDecimal = (value: number | null | undefined) =>
+    typeof value === "number" ? decimalFormatter.format(value) : "N/A";
+
+const formatPercent = (value: number | null | undefined) =>
+    typeof value === "number" ? percentFormatter.format(value) : "N/A";
+
+const graphCards = [overview.collaboration, overview.relationship];
+const classificationOrder: PeopleGraphClassificationKey[] = [
+    "researcher",
+    "student",
+    "outside_ifes",
+    "null",
+];
+
+const comparisonCards = [
+    {
+        title: "Maior componente",
+        description: "Cobertura do bloco principal da rede.",
+        collaborationValue: formatPercent(
+            overview.collaboration.largestComponentShare,
+        ),
+        relationshipValue: formatPercent(
+            overview.relationship.largestComponentShare,
+        ),
+    },
+    {
+        title: "Clustering médio",
+        description: "Coesão local entre vizinhos imediatos.",
+        collaborationValue: formatDecimal(
+            overview.collaboration.averageClustering,
+        ),
+        relationshipValue: formatDecimal(
+            overview.relationship.averageClustering,
+        ),
+    },
+    {
+        title: "Modularidade",
+        description: "Força de separação entre comunidades detectadas.",
+        collaborationValue: formatDecimal(overview.collaboration.modularity),
+        relationshipValue: formatDecimal(overview.relationship.modularity),
+    },
+    {
+        title: "Arestas ponte",
+        description: "Conexões críticas para manter partes da rede ligadas.",
+        collaborationValue: formatInteger(overview.collaboration.bridgeEdgeCount),
+        relationshipValue: formatInteger(overview.relationship.bridgeEdgeCount),
+    },
+];
+---
+
+<section class="mt-12 mb-12" aria-labelledby="people-network-title">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
+        <div class="space-y-2">
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+                    Redes complexas
+                </span>
+                <span class="inline-flex items-center rounded-full border border-border-main bg-white/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+                    Grafo global de pessoas
+                </span>
+            </div>
+            <h2
+                id="people-network-title"
+                class="text-2xl font-bold font-['Outfit'] text-text-main"
+            >
+                Colaboração e estrutura da rede
+            </h2>
+            <p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
+                A seção abaixo usa os grafos globais de pessoas para destacar os
+                pesquisadores mais colaborativos, comparar a rede de colaboração com
+                a rede de relacionamento e expor indicadores clássicos de redes
+                complexas.
+            </p>
+        </div>
+    </div>
+
+    <div class="mb-6 rounded-3xl border border-slate-200/80 bg-white/82 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.08)]">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <article>
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    Colaboração
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-text-secondary">
+                    Prioriza trabalho conjunto explícito, como projeto, artigo e
+                    orientação. Por isso, a rede de colaboração tende a ser menor
+                    e mais seletiva.
+                </p>
+            </article>
+            <article>
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    Relacionamento
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-text-secondary">
+                    É um recorte mais amplo de vínculos acadêmicos e institucionais.
+                    Dependendo do export, ele pode incluir iniciativas compartilhadas
+                    e sobreposição em grupos, então costuma ser mais denso.
+                </p>
+            </article>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.85fr)] gap-6">
+        <div class="space-y-6">
+            <article class="glass-card p-6 border border-border-main">
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold font-['Outfit'] text-text-main">
+                            Top 10 pesquisadores colaboradores
+                        </h3>
+                        <p class="mt-2 text-sm text-text-secondary max-w-3xl">
+                            Ranking baseado no
+                            <code>people_collaboration_graph.json</code>, usando o
+                            peso acumulado de colaboração como critério principal.
+                        </p>
+                    </div>
+                    <div class="text-xs text-text-secondary">
+                        Peso = evidências somadas por projeto, artigo e orientação
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {
+                        overview.topCollaborators.map((person, index) => (
+                            <article class="rounded-2xl border border-border-main bg-white/80 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.05)]">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-premium-accent">
+                                            #{index + 1}
+                                        </p>
+                                        <h4 class="mt-2 text-sm font-bold leading-snug text-text-main">
+                                            {
+                                                person.profileHref ? (
+                                                    <a
+                                                        href={person.profileHref}
+                                                        class="transition-colors hover:text-premium-accent"
+                                                    >
+                                                        {person.name}
+                                                    </a>
+                                                ) : (
+                                                    person.name
+                                                )
+                                            }
+                                        </h4>
+                                    </div>
+                                    <span class="shrink-0 rounded-full border border-premium-accent/20 bg-premium-accent/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-premium-accent">
+                                        Peso {formatInteger(person.weightedDegree)}
+                                    </span>
+                                </div>
+
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <div class="rounded-xl border border-border-main bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                                            Conexões
+                                        </p>
+                                        <p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+                                            {formatInteger(person.degree)}
+                                        </p>
+                                    </div>
+                                    <div class="rounded-xl border border-border-main bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                                            Intensidade
+                                        </p>
+                                        <p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+                                            {formatInteger(person.weightedDegree)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        ))
+                    }
+                </div>
+            </article>
+
+            <article class="glass-card p-6 border border-border-main">
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold font-['Outfit'] text-text-main">
+                            Top 5 por perfil
+                        </h3>
+                        <p class="mt-2 text-sm text-text-secondary max-w-3xl">
+                            Tabelas derivadas diretamente dos nós dos grafos globais,
+                            separando os recortes de colaboração e relacionamento para
+                            pesquisadores, estudantes, externos ao Ifes e perfis sem
+                            classificação.
+                        </p>
+                    </div>
+                    <div class="text-xs text-text-secondary">
+                        Ordenação por peso acumulado e, em seguida, por grau
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 xl:grid-cols-2 gap-5">
+                    {
+                        classificationOrder.map((classificationKey) => {
+                            const collaborationRows =
+                                overview.collaboration.topByClassification[
+                                    classificationKey
+                                ];
+                            const relationshipRows =
+                                overview.relationship.topByClassification[
+                                    classificationKey
+                                ];
+
+                            return (
+                                <article class="rounded-3xl border border-border-main bg-white/75 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <h4 class="text-lg font-bold font-['Outfit'] text-text-main">
+                                            {peopleClassificationLabels[classificationKey]}
+                                        </h4>
+                                        <span class="rounded-full border border-border-main bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                            2 rankings
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-5 grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                                        <div class="rounded-2xl border border-border-main bg-white p-4">
+                                            <h5 class="text-sm font-bold text-text-main">
+                                                Colaboração
+                                            </h5>
+                                            <div class="mt-3 overflow-x-auto">
+                                                {
+                                                    collaborationRows.length > 0 ? (
+                                                        <table class="min-w-full text-sm">
+                                                            <thead>
+                                                                <tr class="border-b border-border-main text-left text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+                                                                    <th class="pb-2 pr-3 font-bold">#</th>
+                                                                    <th class="pb-2 pr-3 font-bold">Pessoa</th>
+                                                                    <th class="pb-2 pr-3 font-bold">Peso</th>
+                                                                    <th class="pb-2 font-bold">Grau</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {collaborationRows.map((person, index) => (
+                                                                    <tr class="border-b border-border-main/60 last:border-b-0">
+                                                                        <td class="py-2 pr-3 text-text-secondary">
+                                                                            {index + 1}
+                                                                        </td>
+                                                                        <td class="py-2 pr-3">
+                                                                            <div class="min-w-[180px]">
+                                                                                <div class="font-semibold text-text-main leading-snug">
+                                                                                    {
+                                                                                        person.profileHref ? (
+                                                                                            <a
+                                                                                                href={person.profileHref}
+                                                                                                class="transition-colors hover:text-premium-accent"
+                                                                                            >
+                                                                                                {person.name}
+                                                                                            </a>
+                                                                                        ) : (
+                                                                                            person.name
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                                {
+                                                                                    person.campusName && (
+                                                                                        <div class="text-xs text-text-secondary">
+                                                                                            {person.campusName}
+                                                                                        </div>
+                                                                                    )
+                                                                                }
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="py-2 pr-3 text-text-main">
+                                                                            {formatInteger(person.weightedDegree)}
+                                                                        </td>
+                                                                        <td class="py-2 text-text-main">
+                                                                            {formatInteger(person.degree)}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    ) : (
+                                                        <p class="text-sm text-text-secondary">
+                                                            Sem colaboração registrada para este perfil.
+                                                        </p>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-2xl border border-border-main bg-white p-4">
+                                            <h5 class="text-sm font-bold text-text-main">
+                                                Relacionamento
+                                            </h5>
+                                            <div class="mt-3 overflow-x-auto">
+                                                {
+                                                    relationshipRows.length > 0 ? (
+                                                        <table class="min-w-full text-sm">
+                                                            <thead>
+                                                                <tr class="border-b border-border-main text-left text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+                                                                    <th class="pb-2 pr-3 font-bold">#</th>
+                                                                    <th class="pb-2 pr-3 font-bold">Pessoa</th>
+                                                                    <th class="pb-2 pr-3 font-bold">Peso</th>
+                                                                    <th class="pb-2 font-bold">Grau</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {relationshipRows.map((person, index) => (
+                                                                    <tr class="border-b border-border-main/60 last:border-b-0">
+                                                                        <td class="py-2 pr-3 text-text-secondary">
+                                                                            {index + 1}
+                                                                        </td>
+                                                                        <td class="py-2 pr-3">
+                                                                            <div class="min-w-[180px]">
+                                                                                <div class="font-semibold text-text-main leading-snug">
+                                                                                    {
+                                                                                        person.profileHref ? (
+                                                                                            <a
+                                                                                                href={person.profileHref}
+                                                                                                class="transition-colors hover:text-premium-accent"
+                                                                                            >
+                                                                                                {person.name}
+                                                                                            </a>
+                                                                                        ) : (
+                                                                                            person.name
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                                {
+                                                                                    person.campusName && (
+                                                                                        <div class="text-xs text-text-secondary">
+                                                                                            {person.campusName}
+                                                                                        </div>
+                                                                                    )
+                                                                                }
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="py-2 pr-3 text-text-main">
+                                                                            {formatInteger(person.weightedDegree)}
+                                                                        </td>
+                                                                        <td class="py-2 text-text-main">
+                                                                            {formatInteger(person.degree)}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    ) : (
+                                                        <p class="text-sm text-text-secondary">
+                                                            Sem relacionamento registrado para este perfil.
+                                                        </p>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    }
+                </div>
+            </article>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {
+                    graphCards.map((graph) => (
+                        <article class="glass-card p-6 border border-border-main">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-bold font-['Outfit'] text-text-main">
+                                        {graph.title}
+                                    </h3>
+                                    <p class="mt-2 text-sm text-text-secondary">
+                                        {graph.description}
+                                    </p>
+                                </div>
+                                <span class="shrink-0 rounded-full border border-border-main bg-white/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    {graph.kind}
+                                </span>
+                            </div>
+
+                            <div class="mt-6 grid grid-cols-2 gap-3">
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Pessoas
+                                    </p>
+                                    <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatInteger(graph.nodeCount)}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Arestas
+                                    </p>
+                                    <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatInteger(graph.edgeCount)}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Densidade
+                                    </p>
+                                    <p class="mt-2 text-2xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatDecimal(graph.density)}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Maior componente
+                                    </p>
+                                    <p class="mt-2 text-2xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatPercent(graph.largestComponentShare)}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Comunidades
+                                    </p>
+                                    <p class="mt-2 text-2xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatInteger(graph.communityCount)}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Clustering
+                                    </p>
+                                    <p class="mt-2 text-2xl font-extrabold font-['Outfit'] text-text-main">
+                                        {formatDecimal(graph.averageClustering)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 space-y-4">
+                                <div>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Tipos de evidência
+                                    </p>
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        {
+                                            graph.relationTotals.map((item) => (
+                                                <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                                    {item.label}: {formatInteger(item.value)}
+                                                </span>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Composição da rede
+                                    </p>
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        {
+                                            graph.classificationDistribution.map((item) => (
+                                                <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                                    {item.label}: {formatInteger(item.value)}
+                                                </span>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <article class="glass-card p-6 border border-border-main">
+                <h3 class="text-xl font-bold font-['Outfit'] text-text-main">
+                    Hubs e conectores
+                </h3>
+                <p class="mt-2 text-sm text-text-secondary">
+                    Pesquisadores com maior centralidade de grau na
+                    <code>people_relationship_graph.json</code>, úteis para identificar
+                    nós que ligam muitos perfis dentro da rede.
+                </p>
+
+                <ol class="mt-6 space-y-4">
+                    {
+                        overview.topConnectors.map((person, index) => (
+                            <li class="rounded-2xl border border-border-main bg-white/80 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.05)]">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-600">
+                                            #{index + 1}
+                                        </p>
+                                        <h4 class="mt-2 text-sm font-bold leading-snug text-text-main">
+                                            {
+                                                person.profileHref ? (
+                                                    <a
+                                                        href={person.profileHref}
+                                                        class="transition-colors hover:text-premium-accent"
+                                                    >
+                                                        {person.name}
+                                                    </a>
+                                                ) : (
+                                                    person.name
+                                                )
+                                            }
+                                        </h4>
+                                    </div>
+                                    <div class="text-right text-xs text-text-secondary shrink-0">
+                                        <p>Grau {formatInteger(person.degree)}</p>
+                                        <p>
+                                            Centralidade {formatPercent(person.degreeCentrality)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ol>
+            </article>
+
+            <article class="glass-card p-6 border border-border-main">
+                <h3 class="text-xl font-bold font-['Outfit'] text-text-main">
+                    Comparativos de rede
+                </h3>
+                <p class="mt-2 text-sm text-text-secondary">
+                    Leitura rápida dos principais conceitos estruturais comparando os
+                    dois grafos globais.
+                </p>
+
+                <div class="mt-6 space-y-4">
+                    {
+                        comparisonCards.map((item) => (
+                            <article class="rounded-2xl border border-border-main bg-white/80 p-4">
+                                <h4 class="text-sm font-bold text-text-main">
+                                    {item.title}
+                                </h4>
+                                <p class="mt-1 text-xs text-text-secondary">
+                                    {item.description}
+                                </p>
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <div class="rounded-xl border border-border-main bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                                            Colaboração
+                                        </p>
+                                        <p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+                                            {item.collaborationValue}
+                                        </p>
+                                    </div>
+                                    <div class="rounded-xl border border-border-main bg-white p-3">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                                            Relacionamento
+                                        </p>
+                                        <p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+                                            {item.relationshipValue}
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        ))
+                    }
+                </div>
+            </article>
+        </div>
+    </div>
+</section>

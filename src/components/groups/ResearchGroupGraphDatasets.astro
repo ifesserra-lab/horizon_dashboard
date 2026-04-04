@@ -1,0 +1,222 @@
+---
+interface ResearchGroupDatasetPerson {
+    id: string;
+    name: string;
+    classification: string | null;
+    weightedDegree: number;
+    degree: number;
+}
+
+interface ResearchGroupDatasetBadge {
+    label: string;
+    value: number;
+}
+
+interface ResearchGroupDatasetCard {
+    key: "membership" | "relationship";
+    title: string;
+    description: string;
+    graphType: string | null;
+    available: boolean;
+    stats: {
+        nodes: number;
+        edges: number;
+        connectedComponents: number;
+        largestComponentSize: number;
+        memberCount: number;
+    };
+    relationTotals: ResearchGroupDatasetBadge[];
+    classificationDistribution: ResearchGroupDatasetBadge[];
+    topPeople: ResearchGroupDatasetPerson[];
+}
+
+interface Props {
+    datasets: ResearchGroupDatasetCard[];
+}
+
+const { datasets } = Astro.props;
+
+const accentByKey: Record<
+    ResearchGroupDatasetCard["key"],
+    {
+        badge: string;
+        border: string;
+        surface: string;
+        accent: string;
+    }
+> = {
+    membership: {
+        badge: "border-sky-400/25 bg-sky-400/10 text-sky-700",
+        border: "border-sky-200/80",
+        surface: "bg-sky-50/80",
+        accent: "text-sky-700",
+    },
+    relationship: {
+        badge: "border-emerald-400/25 bg-emerald-400/10 text-emerald-700",
+        border: "border-emerald-200/80",
+        surface: "bg-emerald-50/80",
+        accent: "text-emerald-700",
+    },
+};
+---
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+    {
+        datasets.map((dataset) => {
+            const accent = accentByKey[dataset.key];
+
+            return (
+                <article
+                    class={`rounded-3xl border ${accent.border} ${accent.surface} p-6 shadow-[0_20px_60px_rgba(148,163,184,0.10)] space-y-5`}
+                >
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div class="space-y-2">
+                            <span
+                                class={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${accent.badge}`}
+                            >
+                                {dataset.title}
+                            </span>
+                            <div>
+                                <h4 class="text-lg font-bold font-['Outfit'] text-text-main">
+                                    {dataset.title}
+                                </h4>
+                                <p class="mt-2 text-sm leading-relaxed text-text-secondary">
+                                    {dataset.description}
+                                </p>
+                            </div>
+                        </div>
+                        <span class={`text-xs font-bold ${accent.accent}`}>
+                            {dataset.available ? "Disponivel" : "Sem arquivo"}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Nos
+                            </p>
+                            <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                {dataset.stats.nodes}
+                            </p>
+                        </div>
+                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Arestas
+                            </p>
+                            <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                {dataset.stats.edges}
+                            </p>
+                        </div>
+                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Membros
+                            </p>
+                            <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                {dataset.stats.memberCount}
+                            </p>
+                        </div>
+                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Componentes
+                            </p>
+                            <p class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                                {dataset.stats.connectedComponents}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-border-main bg-white/70 p-4 space-y-3">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                tipo: {dataset.graphType ?? "desconhecido"}
+                            </span>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Maior componente
+                            </p>
+                            <p class="mt-1 text-sm text-text-main">
+                                {dataset.stats.largestComponentSize} pessoas conectadas no maior bloco.
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Tipos de relacao
+                            </p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                {
+                                    dataset.relationTotals.length > 0 ? (
+                                        dataset.relationTotals.map((item) => (
+                                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                                {item.label}: {item.value}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span class="text-sm text-text-secondary">
+                                            Sem relacoes registradas neste export.
+                                        </span>
+                                    )
+                                }
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Distribuicao por perfil
+                            </p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                {
+                                    dataset.classificationDistribution.length > 0 ? (
+                                        dataset.classificationDistribution.map((item) => (
+                                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                                {item.label}: {item.value}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span class="text-sm text-text-secondary">
+                                            Sem distribuicao disponivel.
+                                        </span>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            Pessoas em destaque
+                        </p>
+                        {
+                            dataset.topPeople.length > 0 ? (
+                                <ol class="mt-3 space-y-3">
+                                    {dataset.topPeople.map((person, index) => (
+                                        <li class="flex items-start justify-between gap-4">
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-semibold text-text-main">
+                                                    {index + 1}. {person.name}
+                                                </p>
+                                                <p class="text-xs uppercase tracking-[0.14em] text-text-secondary">
+                                                    {person.classification ?? "sem classificacao"}
+                                                </p>
+                                            </div>
+                                            <div class="shrink-0 text-right text-xs text-text-secondary">
+                                                <p>Peso {person.weightedDegree}</p>
+                                                <p>Grau {person.degree}</p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ol>
+                            ) : (
+                                <p class="mt-3 text-sm text-text-secondary">
+                                    Nenhuma pessoa em destaque foi registrada para este recorte.
+                                </p>
+                            )
+                        }
+                    </div>
+                </article>
+            );
+        })
+    }
+</div>

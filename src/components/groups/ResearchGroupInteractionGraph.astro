@@ -1,0 +1,653 @@
+---
+import type {
+    ResearchGroupInteractionClassificationKey,
+    ResearchGroupInteractionRelationType,
+    ResearchGroupInteractionViewModel,
+} from "../../types/groups";
+
+interface Props {
+    groupId: string | number;
+    groupName: string;
+    graphData: ResearchGroupInteractionViewModel | null;
+    baseUrl?: string;
+}
+
+const { groupId, groupName, graphData, baseUrl = import.meta.env.BASE_URL } =
+    Astro.props;
+
+const hasGraphData = Boolean(graphData && graphData.nodes.length > 1);
+const sectionId = `group-interaction-${groupId}`;
+
+const allRelationTypes: ResearchGroupInteractionRelationType[] = [
+    "project",
+    "article",
+    "orientation",
+    "initiative",
+    "advisorship",
+    "research_group",
+];
+const relationTypeOrder = graphData
+    ? allRelationTypes.filter((relationType) =>
+          graphData.modes.members.availableRelationTypes.includes(relationType) ||
+          graphData.modes.expanded.availableRelationTypes.includes(relationType),
+      )
+    : allRelationTypes;
+
+const classificationOrder: ResearchGroupInteractionClassificationKey[] = [
+    "student",
+    "researcher",
+    "outside_ifes",
+    "null",
+];
+
+const relationLabels: Record<ResearchGroupInteractionRelationType, string> = {
+    project: "Projeto",
+    article: "Artigo",
+    orientation: "Orientação",
+    initiative: "Iniciativa",
+    advisorship: "Orientação",
+    research_group: "Grupo de pesquisa",
+};
+
+const classificationLabels: Record<
+    ResearchGroupInteractionClassificationKey,
+    string
+> = {
+    student: "Estudante",
+    researcher: "Pesquisador",
+    outside_ifes: "Externo ao Ifes",
+    null: "Sem classificação",
+};
+
+const overallMemberCount = graphData?.modes.members.nodeCount ?? 0;
+const overallExpandedCount = graphData?.modes.expanded.nodeCount ?? 0;
+const advisorshipNeighborCount = Math.max(
+    0,
+    overallExpandedCount - overallMemberCount,
+);
+const initialMode = graphData?.defaultMode ?? "members";
+const initialModeSummary =
+    graphData?.modes[initialMode] ?? graphData?.modes.members ?? null;
+const serializedGraphData = hasGraphData
+    ? JSON.stringify(graphData).replace(/</g, "\\u003c")
+    : null;
+---
+
+<section
+    id={sectionId}
+    data-group-interaction-root
+    class="glass-card border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))] p-6 md:p-8 space-y-6 shadow-[0_24px_80px_rgba(148,163,184,0.14)]"
+    aria-labelledby={`group-interaction-title-${groupId}`}
+>
+    <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+        <div class="space-y-2">
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+                    Grafo de interação
+                </span>
+                {
+                    graphData?.hasExpandedMode && (
+                        <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-300">
+                            Vizinhos de orientação disponíveis
+                        </span>
+                    )
+                }
+            </div>
+            <h3
+                id={`group-interaction-title-${groupId}`}
+                class="text-2xl font-bold font-['Outfit'] text-text-main"
+            >
+                Interações em {groupName}
+            </h3>
+            <p class="text-sm leading-relaxed text-text-secondary max-w-3xl">
+                Visualização derivada do export de relações do grupo. Use os filtros
+                para alternar entre membros, vizinhos de orientação e diferentes
+                tipos de vínculo.
+            </p>
+        </div>
+        <div class="text-xs text-text-secondary">
+            {
+                hasGraphData
+                    ? `${graphData?.stats.nodes} pessoas mapeadas • ${graphData?.stats.edges} arestas totais`
+                    : "Ainda não há interações suficientes para desenhar um grafo."
+            }
+        </div>
+    </div>
+
+    {
+        hasGraphData ? (
+            <>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <article class="rounded-3xl border border-sky-200/80 bg-sky-50/90 p-5 shadow-[0_18px_50px_rgba(125,211,252,0.18)]">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                            Pessoas no grafo
+                        </p>
+                        <div class="mt-3 text-4xl font-extrabold font-['Outfit'] text-premium-accent">
+                            {graphData?.stats.nodes}
+                        </div>
+                        <p class="mt-2 text-sm text-text-secondary">
+                            Total de nós presentes no export desta rede.
+                        </p>
+                    </article>
+
+                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                            Membros do grupo
+                        </p>
+                        <div class="mt-3 text-4xl font-extrabold font-['Outfit'] text-text-main">
+                            {overallMemberCount}
+                        </div>
+                        <p class="mt-2 text-sm text-text-secondary">
+                            Participantes que pertencem ao grupo de pesquisa.
+                        </p>
+                    </article>
+
+                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                            Vizinhos de orientação
+                        </p>
+                        <div class="mt-3 text-4xl font-extrabold font-['Outfit'] text-text-main">
+                            {advisorshipNeighborCount}
+                        </div>
+                        <p class="mt-2 text-sm text-text-secondary">
+                            Pessoas externas ao grupo puxadas por orientações.
+                        </p>
+                    </article>
+
+                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                            Componentes conectados
+                        </p>
+                        <div class="mt-3 text-4xl font-extrabold font-['Outfit'] text-text-main">
+                            {graphData?.stats.connectedComponents}
+                        </div>
+                        <p class="mt-2 text-sm text-text-secondary">
+                            Componentes e isolamento calculados no export.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,0.5fr)] gap-7 items-start">
+                    <div class="space-y-4">
+                        <div class="rounded-3xl border border-slate-200/80 bg-white/90 p-5 space-y-4 shadow-[0_22px_60px_rgba(148,163,184,0.12)]">
+                            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4">
+                                <div class="relative">
+                                    <label for={`group-interaction-search-${groupId}`} class="sr-only">
+                                        Buscar pessoa no grafo
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id={`group-interaction-search-${groupId}`}
+                                        data-search-input
+                                        placeholder="Buscar por nome, campus ou classificação..."
+                                        class="w-full rounded-2xl border border-border-main bg-glass-bg px-12 py-4 text-sm text-text-main shadow-lg shadow-premium-accent/5 transition-all focus:border-premium-accent focus:outline-none focus:ring-2 focus:ring-premium-accent/50"
+                                    />
+                                    <svg
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.3-4.3"></path>
+                                    </svg>
+                                    <button
+                                        type="button"
+                                        data-search-reset
+                                        class="absolute right-4 top-1/2 hidden -translate-y-1/2 text-text-secondary transition-colors hover:text-premium-accent"
+                                        title="Limpar busca"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-5 w-5"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="m15 9-6 6"></path>
+                                            <path d="m9 9 6 6"></path>
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        data-reset-filters
+                                        class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                    >
+                                        Restaurar filtros
+                                    </button>
+                                    <button
+                                        type="button"
+                                        data-recenter-graph
+                                        class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                    >
+                                        Recentrar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr_1fr]">
+                                <div class="space-y-2">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Modo
+                                    </p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button
+                                            type="button"
+                                            data-mode-button
+                                            data-mode="members"
+                                            class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
+                                        >
+                                            Somente membros
+                                        </button>
+                                        {
+                                            graphData?.hasExpandedMode && (
+                                                <button
+                                                    type="button"
+                                                    data-mode-button
+                                                    data-mode="expanded"
+                                                    class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                                >
+                                                    Expandido
+                                                </button>
+                                            )
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Tipos de relação
+                                    </p>
+                                    <div class="flex flex-wrap gap-2">
+                                        {relationTypeOrder.map((relationType) => (
+                                            <button
+                                                type="button"
+                                                data-relation-filter
+                                                data-relation={relationType}
+                                                class={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
+                                                    initialModeSummary?.defaultRelationTypes.includes(
+                                                        relationType,
+                                                    )
+                                                        ? "border-premium-accent/25 bg-premium-accent/[0.10] text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
+                                                        : "border-slate-200/80 bg-slate-50/85 text-text-secondary hover:border-premium-accent/20 hover:text-text-main"
+                                                }`}
+                                            >
+                                                {relationLabels[relationType]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Classificação
+                                    </p>
+                                    <div class="flex flex-wrap gap-2">
+                                        {classificationOrder.map((classification) => (
+                                            <button
+                                                type="button"
+                                                data-classification-filter
+                                                data-classification={classification}
+                                                class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
+                                            >
+                                                {classificationLabels[classification]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-white shadow-[0_28px_80px_rgba(148,163,184,0.18)]">
+                            <canvas
+                                data-graph-canvas
+                                class="block h-[620px] w-full cursor-grab touch-none bg-white md:h-[760px] xl:h-[900px]"
+                            ></canvas>
+
+                            <div
+                                data-hover-tooltip
+                                class="pointer-events-none absolute hidden min-w-[200px] rounded-2xl border border-slate-200/90 bg-white/95 px-3 py-2 text-xs text-slate-900 shadow-[0_18px_50px_rgba(148,163,184,0.22)] backdrop-blur-md"
+                            ></div>
+
+                            <div
+                                data-canvas-empty
+                                class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-white/72 px-6 text-center backdrop-blur-sm"
+                            >
+                                <div class="max-w-sm space-y-2">
+                                    <p
+                                        data-empty-title
+                                        class="text-lg font-bold text-text-main"
+                                    >
+                                        Ajuste os filtros
+                                    </p>
+                                    <p
+                                        data-empty-body
+                                        class="text-sm leading-relaxed text-text-secondary"
+                                    >
+                                        Sem dados suficientes para desenhar o grafo neste recorte.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Como ler o grafo
+                            </p>
+                            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-3 w-3 rounded-full bg-premium-purple"></span>
+                                        Estudantes
+                                    </div>
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-3 w-3 rounded-full bg-premium-accent"></span>
+                                        Pesquisadores
+                                    </div>
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-3 w-3 rounded-full bg-amber-400"></span>
+                                        Externos ao Ifes
+                                    </div>
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-3 w-3 rounded-full bg-slate-400"></span>
+                                        Sem classificação
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-4 w-4 rounded-full border-2 border-sky-500 bg-white"></span>
+                                        Membro do grupo
+                                    </div>
+                                    <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                        <span class="h-4 w-4 rounded-full border-2 border-amber-500 bg-white"></span>
+                                        Vizinho via orientação
+                                    </div>
+                                    <p class="text-sm leading-relaxed text-text-secondary">
+                                        O tamanho do nó acompanha o grau ponderado. Quanto mais espessa a linha, maior o peso da interação entre duas pessoas.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="space-y-4">
+                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Resumo visível
+                            </p>
+                            <div class="mt-4 grid grid-cols-2 gap-3">
+                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Nós visíveis
+                                    </p>
+                                    <p
+                                        data-summary-visible-nodes
+                                        class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main"
+                                    >
+                                        {initialModeSummary?.nodeCount ?? 0}
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Arestas filtradas
+                                    </p>
+                                    <p
+                                        data-summary-visible-edges
+                                        class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main"
+                                    >
+                                        {initialModeSummary?.defaultVisibleEdgeCount ?? 0}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 space-y-3 text-sm text-text-secondary">
+                                <div class="flex items-start justify-between gap-4">
+                                    <span>Modo atual</span>
+                                    <span
+                                        data-summary-mode
+                                        class="text-right font-semibold text-text-main"
+                                    >
+                                        {
+                                            initialMode === "members"
+                                                ? "Somente membros"
+                                                : "Membros + vizinhos de orientação"
+                                        }
+                                    </span>
+                                </div>
+                                <div class="flex items-start justify-between gap-4">
+                                    <span>Relações ativas</span>
+                                    <span
+                                        data-summary-relations
+                                        class="text-right font-semibold text-text-main"
+                                    >
+                                        {
+                                            initialModeSummary?.defaultRelationTypes
+                                                .map((relationType) => relationLabels[relationType])
+                                                .join(" • ")
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div
+                                data-dense-indicator
+                                class={`mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200 ${
+                                    initialModeSummary?.usesDenseModeByDefault
+                                        ? ""
+                                        : "hidden"
+                                }`}
+                            >
+                                {
+                                    initialModeSummary?.usesDenseModeByDefault
+                                        ? "Modo denso ativo: selecione um nó para revelar as arestas filtradas."
+                                        : ""
+                                }
+                            </div>
+                        </article>
+
+                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Distribuição visível
+                            </p>
+                            <div class="mt-4 space-y-3">
+                                {classificationOrder.map((classification) => (
+                                    <div class="flex items-center justify-between gap-3 text-sm">
+                                        <span class="text-text-secondary">
+                                            {classificationLabels[classification]}
+                                        </span>
+                                        <span
+                                            data-classification-count={classification}
+                                            class="font-bold text-text-main"
+                                        >
+                                            {
+                                                initialModeSummary?.classificationCounts[
+                                                    classification
+                                                ] ?? 0
+                                            }
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </article>
+
+                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                            <div data-selection-empty class="space-y-3">
+                                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Detalhe do nó
+                                </p>
+                                <h4 class="text-lg font-bold text-text-main">
+                                    Selecione uma pessoa
+                                </h4>
+                                <p class="text-sm leading-relaxed text-text-secondary">
+                                    Clique em qualquer nó do grafo para ver campus,
+                                    classificação, grau ponderado, tipos de relação e o
+                                    link para o perfil detalhado.
+                                </p>
+                            </div>
+
+                            <div data-selection-panel class="hidden space-y-4">
+                                <div class="space-y-2">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        Pessoa selecionada
+                                    </p>
+                                    <h4
+                                        data-selection-name
+                                        class="text-xl font-bold text-text-main"
+                                    ></h4>
+                                    <p
+                                        data-selection-meta
+                                        class="text-sm text-text-secondary"
+                                    ></p>
+                                </div>
+
+                                <div
+                                    data-selection-badges
+                                    class="flex flex-wrap gap-2"
+                                ></div>
+
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <span class="text-text-secondary">Campus</span>
+                                        <span
+                                            data-selection-campus
+                                            class="text-right font-semibold text-text-main"
+                                        ></span>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-4">
+                                        <span class="text-text-secondary">Grau ponderado</span>
+                                        <span
+                                            data-selection-weighted-degree
+                                            class="text-right font-semibold text-text-main"
+                                        ></span>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-4">
+                                        <span class="text-text-secondary">Conexões visíveis</span>
+                                        <span
+                                            data-selection-connections
+                                            class="text-right font-semibold text-text-main"
+                                        ></span>
+                                    </div>
+                                    <div class="flex items-start justify-between gap-4">
+                                        <span class="text-text-secondary">Tipos de relação</span>
+                                        <span
+                                            data-selection-relations
+                                            class="text-right font-semibold text-text-main"
+                                        ></span>
+                                    </div>
+                                </div>
+
+                                <a
+                                    data-selection-link
+                                    href={baseUrl}
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-3 text-sm font-bold text-premium-accent transition-colors hover:bg-premium-accent hover:text-white"
+                                >
+                                    Abrir perfil
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </article>
+                    </aside>
+                </div>
+
+                <script
+                    type="application/json"
+                    data-group-interaction-payload
+                    set:html={serializedGraphData ?? ""}
+                ></script>
+            </>
+        ) : (
+            <div class="rounded-3xl border border-dashed border-slate-200/80 bg-white/88 px-6 py-10 text-center shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                <h4 class="text-xl font-bold text-text-main">
+                    Grafo indisponível
+                </h4>
+                <p class="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary mx-auto">
+                    Este grupo ainda não tem nós e arestas suficientes para uma
+                    visualização interativa. Quando o export de relações trouxer mais
+                    conexões, este bloco passará a exibir a rede do grupo.
+                </p>
+            </div>
+        )
+    }
+</section>
+
+{
+    hasGraphData && (
+        <script>
+            import { initializeResearchGroupInteractionGraph } from "../../lib/research-group-interaction-client";
+
+            const setupResearchGroupInteraction = () => {
+                document
+                    .querySelectorAll("[data-group-interaction-root]")
+                    .forEach((root) => {
+                        if (!(root instanceof HTMLElement)) return;
+                        if (root.dataset.groupInteractionInitialized === "true") {
+                            return;
+                        }
+
+                        const payload = root.querySelector(
+                            "[data-group-interaction-payload]",
+                        );
+
+                        if (!(payload instanceof HTMLScriptElement)) return;
+
+                        try {
+                            const rawGraphData = payload.textContent?.trim();
+                            if (!rawGraphData) return;
+
+                            initializeResearchGroupInteractionGraph({
+                                root,
+                                graphData: JSON.parse(rawGraphData),
+                            });
+                            root.dataset.groupInteractionInitialized = "true";
+                        } catch (error) {
+                            console.error(
+                                "Failed to initialize research group interaction graph",
+                                error,
+                            );
+                        }
+                    });
+            };
+
+            if (document.readyState === "loading") {
+                document.addEventListener(
+                    "DOMContentLoaded",
+                    setupResearchGroupInteraction,
+                    {
+                        once: true,
+                    },
+                );
+            } else {
+                setupResearchGroupInteraction();
+            }
+
+            document.addEventListener(
+                "astro:after-swap",
+                setupResearchGroupInteraction,
+            );
+        </script>
+    )
+}

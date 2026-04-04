@@ -1,0 +1,611 @@
+---
+import PersonInteractionTable from "./PersonInteractionTable.astro";
+import { buildStudentInteractionTableRows } from "../../lib/student-interaction";
+import type {
+    StudentInteractionEdge,
+    StudentInteractionNode,
+    StudentInteractionRelationType,
+    StudentInteractionViewModel,
+} from "../../types/student-graphs";
+
+interface Props {
+    graph: StudentInteractionViewModel;
+}
+
+const { graph } = Astro.props;
+
+const relationLabels: Record<StudentInteractionRelationType, string> = {
+    project: "Projeto",
+    orientation: "Orientação",
+    article: "Artigo",
+    initiative: "Iniciativa",
+    research_group: "Grupo de pesquisa",
+    advisorship: "Orientação",
+};
+
+const relationColors: Record<StudentInteractionRelationType, string> = {
+    project: "#0f766e",
+    orientation: "#d97706",
+    article: "#0284c7",
+    initiative: "#0891b2",
+    research_group: "#475569",
+    advisorship: "#d97706",
+};
+
+const graphTitle =
+    graph.graphKind === "collaboration"
+        ? "Grafo de colaboração"
+        : "Grafo de relacionamento";
+const graphBadge =
+    graph.graphKind === "collaboration" ? "Colaboração direta" : "Relacionamento direto";
+const graphDataSource = graph.graphDataSource;
+const focusEntityLabel =
+    graph.focusClassification === "student"
+        ? "estudante"
+        : graph.focusClassification === "researcher"
+          ? "pesquisador"
+          : graph.focusClassification === "outside_ifes"
+            ? "colaborador externo"
+            : "perfil";
+const graphDescriptionTail =
+    graph.graphKind === "collaboration"
+        ? `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas as colaborações diretas registradas no export.`
+        : `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas os relacionamentos diretos registrados no export.`;
+const graphEmptyDescription =
+    graph.graphKind === "collaboration"
+        ? `Nenhuma colaboração direta foi registrada para este ${focusEntityLabel} neste recorte.`
+        : `Nenhum relacionamento direto foi registrado para este ${focusEntityLabel} neste recorte.`;
+const graphConceptHeading =
+    graph.graphKind === "collaboration"
+        ? "Como ler o grafo de colaboração"
+        : "Como ler o grafo de relacionamento";
+const graphConceptText =
+    graph.graphKind === "collaboration"
+        ? "Este recorte prioriza trabalho conjunto explícito, como projeto, artigo e orientação. Por isso ele tende a ser menor e mais seletivo."
+        : "Este recorte é mais amplo e registra vínculos acadêmicos ou institucionais. Dependendo do export, ele pode incluir projeto, artigo, orientação, iniciativa compartilhada e sobreposição em grupos, então costuma ser mais denso que o grafo de colaboração.";
+
+const focusNode = graph.nodes.find((node) => node.isFocus) ?? graph.nodes[0];
+const edgeByTargetId = new Map(graph.edges.map((edge) => [edge.target, edge]));
+const neighborNodes = graph.nodes.filter((node) => !node.isFocus);
+const availableRelationTypes = graph.stats.availableRelationTypes;
+const topConnections = graph.topConnections.slice(0, 8);
+const remainingConnections = Math.max(0, graph.topConnections.length - topConnections.length);
+const maxEdgeWeight = Math.max(1, ...graph.edges.map((edge) => edge.weight));
+const usesDenseLabels = graph.edges.length > 60;
+const tableRows = buildStudentInteractionTableRows(graph);
+
+const metrics = [
+    {
+        label: "Pessoas exibidas",
+        value: graph.stats.nodeCount,
+    },
+    {
+        label: "Conexões diretas",
+        value: graph.stats.edgeCount,
+    },
+    {
+        label: "Peso acumulado",
+        value: graph.stats.totalWeight,
+    },
+    {
+        label: "Tipos de vínculo",
+        value: graph.stats.availableRelationTypes.length,
+    },
+];
+
+const getRelationColor = (relationTypes: StudentInteractionRelationType[]) => {
+    if (relationTypes.length > 1) return "#7c3aed";
+
+    const firstRelationType = relationTypes[0];
+    return firstRelationType ? relationColors[firstRelationType] : "#94a3b8";
+};
+
+const truncateLabel = (value: string, maxLength: number) =>
+    value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
+
+const getEdgeLabelText = (edge: StudentInteractionEdge) => {
+    const relationText = edge.relationTypes
+        .map((type) => relationLabels[type])
+        .join(" + ");
+
+    if (!relationText) {
+        return "Sem relação";
+    }
+
+    return truncateLabel(relationText, usesDenseLabels ? 18 : 28);
+};
+
+const describeEdge = (edge: StudentInteractionEdge) => {
+    const relationText = edge.relationTypes.map((type) => relationLabels[type]).join(" + ");
+
+    if (!relationText) {
+        return `Peso ${edge.weight}`;
+    }
+
+    return `${relationText} • peso ${edge.weight}`;
+};
+
+interface GraphLayout {
+    center: number;
+    size: number;
+    ringRadii: number[];
+    positions: Map<
+        string,
+        {
+            x: number;
+            y: number;
+            radius: number;
+            stroke: string;
+        }
+    >;
+}
+
+interface NodeLabelPlacement {
+    text: string;
+    x: number;
+    y: number;
+    textAnchor: "start" | "middle" | "end";
+}
+
+interface EdgeLabelPlacement {
+    text: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+const createGraphLayout = (
+    focus: StudentInteractionNode,
+    neighbors: StudentInteractionNode[],
+): GraphLayout => {
+    const positions = new Map<
+        string,
+        {
+            x: number;
+            y: number;
+            radius: number;
+            stroke: string;
+        }
+    >();
+    const ringRadii: number[] = [];
+    const baseNeighborRadius = 8;
+
+    positions.set(focus.id, {
+        x: 0,
+        y: 0,
+        radius: 22,
+        stroke: "#0f172a",
+    });
+
+    let placed = 0;
+    let ringIndex = 0;
+    let furthestRadius = 0;
+
+    while (placed < neighbors.length) {
+        const ringRadius = 170 + ringIndex * 96;
+        const circumference = Math.max(2 * Math.PI * ringRadius, 1);
+        const capacity = Math.max(12, Math.floor(circumference / 76));
+        const count = Math.min(capacity, neighbors.length - placed);
+
+        ringRadii.push(ringRadius);
+        furthestRadius = ringRadius;
+
+        for (let index = 0; index < count; index += 1) {
+            const neighbor = neighbors[placed + index];
+            const angle = -Math.PI / 2 + (index / count) * Math.PI * 2;
+            const edge = edgeByTargetId.get(neighbor.id);
+            const weightScale = edge ? edge.weight / maxEdgeWeight : 0;
+            const radius = baseNeighborRadius + weightScale * 8;
+
+            positions.set(neighbor.id, {
+                x: Math.cos(angle) * ringRadius,
+                y: Math.sin(angle) * ringRadius,
+                radius,
+                stroke: getRelationColor(edge?.relationTypes ?? []),
+            });
+        }
+
+        placed += count;
+        ringIndex += 1;
+    }
+
+    const labelMargin = usesDenseLabels ? 260 : 220;
+    const outerExtent = furthestRadius > 0 ? furthestRadius + labelMargin : 260;
+    const size = Math.max(960, Math.ceil(outerExtent * 2));
+    const center = size / 2;
+
+    positions.forEach((position, nodeId) => {
+        positions.set(nodeId, {
+            ...position,
+            x: position.x + center,
+            y: position.y + center,
+        });
+    });
+
+    return {
+        center,
+        size,
+        ringRadii,
+        positions,
+    };
+};
+
+const layout = createGraphLayout(focusNode, neighborNodes);
+const graphDescriptionText =
+    graph.stats.edgeCount > 0
+        ? `${graph.focusName} possui ${graph.stats.edgeCount} conexões diretas neste recorte.`
+        : graphEmptyDescription;
+
+const getNodeLabelPlacement = (
+    node: StudentInteractionNode,
+    position: {
+        x: number;
+        y: number;
+        radius: number;
+    },
+): NodeLabelPlacement => {
+    const maxLength = node.isFocus ? 44 : usesDenseLabels ? 18 : 26;
+    const text = truncateLabel(node.name, maxLength);
+
+    if (node.isFocus) {
+        return {
+            text,
+            x: position.x,
+            y: position.y + position.radius + 30,
+            textAnchor: "middle",
+        };
+    }
+
+    const dx = position.x - layout.center;
+    const dy = position.y - layout.center;
+    const horizontalOffset = position.radius + 12;
+    const verticalOffset = position.radius + 16;
+
+    if (Math.abs(dx) < 40) {
+        return {
+            text,
+            x: position.x,
+            y: position.y + (dy >= 0 ? verticalOffset : -verticalOffset),
+            textAnchor: "middle",
+        };
+    }
+
+    return {
+        text,
+        x: position.x + (dx >= 0 ? horizontalOffset : -horizontalOffset),
+        y: position.y + 4,
+        textAnchor: dx >= 0 ? "start" : "end",
+    };
+};
+
+const getEdgeLabelPlacement = (
+    edge: StudentInteractionEdge,
+    edgeIndex: number,
+): EdgeLabelPlacement | null => {
+    const sourcePosition = layout.positions.get(edge.source);
+    const targetPosition = layout.positions.get(edge.target);
+
+    if (!sourcePosition || !targetPosition) return null;
+
+    const ratio = usesDenseLabels ? 0.64 : 0.58;
+    const baseX = sourcePosition.x + (targetPosition.x - sourcePosition.x) * ratio;
+    const baseY = sourcePosition.y + (targetPosition.y - sourcePosition.y) * ratio;
+    const dx = targetPosition.x - sourcePosition.x;
+    const dy = targetPosition.y - sourcePosition.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const normalX = -dy / length;
+    const normalY = dx / length;
+    const side = edgeIndex % 2 === 0 ? 1 : -1;
+    const offset = usesDenseLabels ? 10 : 14;
+    const text = getEdgeLabelText(edge);
+    const width = Math.max(54, text.length * (usesDenseLabels ? 5.8 : 6.8));
+    const height = usesDenseLabels ? 18 : 22;
+
+    return {
+        text,
+        x: baseX + normalX * offset * side,
+        y: baseY + normalY * offset * side,
+        width,
+        height,
+    };
+};
+---
+
+<section
+    class="glass-card border border-border-main p-6 md:p-8 space-y-6"
+    aria-labelledby={`${graph.graphKind}-graph-title-${graph.focusId}`}
+>
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        <div class="space-y-2">
+            <span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+                {graphBadge}
+            </span>
+            <h3
+                id={`${graph.graphKind}-graph-title-${graph.focusId}`}
+                class="text-2xl font-bold font-['Outfit'] text-text-main"
+            >
+                {graphTitle}
+            </h3>
+            <p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
+                Rede ego-centrada derivada de <code>{graphDataSource}</code>.{" "}
+                {graphDescriptionTail}
+            </p>
+        </div>
+
+        <div class="text-sm text-text-secondary">
+            {graphDescriptionText}
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200/80 bg-slate-50/90 p-4 shadow-[0_16px_40px_rgba(148,163,184,0.08)]">
+        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+            {graphConceptHeading}
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-text-secondary">
+            {graphConceptText}
+        </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        {metrics.map((metric) => (
+            <article class="rounded-3xl border border-border-main bg-white/80 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    {metric.label}
+                </p>
+                <div class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main">
+                    {metric.value}
+                </div>
+            </article>
+        ))}
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+        {availableRelationTypes.length > 0 ? (
+            availableRelationTypes.map((relationType) => (
+                <span
+                    class="inline-flex items-center gap-2 rounded-full border border-border-main bg-white/80 px-3 py-1.5 text-xs font-semibold text-text-main"
+                >
+                    <span
+                        class="h-2.5 w-2.5 rounded-full"
+                        style={`background:${relationColors[relationType]}`}
+                    ></span>
+                    {relationLabels[relationType]}
+                    <span class="text-text-secondary">
+                        {graph.stats.relationTypeCounts[relationType]}
+                    </span>
+                </span>
+            ))
+        ) : (
+            <span class="inline-flex items-center rounded-full border border-dashed border-border-main px-3 py-1.5 text-xs font-semibold text-text-secondary">
+                Sem vínculos diretos registrados
+            </span>
+        )}
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)] xl:items-start">
+        <div class="rounded-[2rem] border border-slate-200/80 bg-white/92 p-4 shadow-[0_28px_80px_rgba(148,163,184,0.14)] md:p-6">
+            <svg
+                viewBox={`0 0 ${layout.size} ${layout.size}`}
+                class="h-auto w-full"
+                role="img"
+                aria-labelledby={`${graph.graphKind}-graph-svg-title-${graph.focusId}`}
+                aria-describedby={`${graph.graphKind}-graph-svg-desc-${graph.focusId}`}
+            >
+                <title id={`${graph.graphKind}-graph-svg-title-${graph.focusId}`}>
+                    {graphTitle} de {graph.focusName}
+                </title>
+                <desc id={`${graph.graphKind}-graph-svg-desc-${graph.focusId}`}>
+                    {graphDescriptionText}
+                </desc>
+
+                <defs>
+                    <radialGradient id={`${graph.graphKind}-focus-fill-${graph.focusId}`}>
+                        <stop offset="0%" stop-color="#f8fafc"></stop>
+                        <stop offset="100%" stop-color="#38bdf8"></stop>
+                    </radialGradient>
+                </defs>
+
+                {layout.ringRadii.map((ringRadius) => (
+                    <circle
+                        cx={layout.center}
+                        cy={layout.center}
+                        r={ringRadius}
+                        fill="none"
+                        stroke="rgba(148,163,184,0.18)"
+                        stroke-dasharray="8 12"
+                    ></circle>
+                ))}
+
+                {graph.edges.map((edge) => {
+                    const focusPosition = layout.positions.get(edge.source);
+                    const neighborPosition = layout.positions.get(edge.target);
+
+                    if (!focusPosition || !neighborPosition) return null;
+
+                    return (
+                        <line
+                            x1={focusPosition.x}
+                            y1={focusPosition.y}
+                            x2={neighborPosition.x}
+                            y2={neighborPosition.y}
+                            stroke={getRelationColor(edge.relationTypes)}
+                            stroke-opacity="0.45"
+                            stroke-width={1.5 + Math.min(edge.weight, 6) * 0.7}
+                            stroke-linecap="round"
+                        >
+                            <title>{describeEdge(edge)}</title>
+                        </line>
+                    );
+                })}
+
+                {graph.edges.map((edge, edgeIndex) => {
+                    const label = getEdgeLabelPlacement(edge, edgeIndex);
+
+                    if (!label) return null;
+
+                    return (
+                        <g>
+                            <rect
+                                x={label.x - label.width / 2}
+                                y={label.y - label.height / 2}
+                                width={label.width}
+                                height={label.height}
+                                rx="999"
+                                fill="rgba(255,255,255,0.92)"
+                                stroke="rgba(148,163,184,0.35)"
+                            ></rect>
+                            <text
+                                x={label.x}
+                                y={label.y}
+                                text-anchor="middle"
+                                dominant-baseline="middle"
+                                class={`fill-slate-700 font-semibold ${usesDenseLabels ? "text-[9px]" : "text-[11px]"}`}
+                            >
+                                {label.text}
+                            </text>
+                        </g>
+                    );
+                })}
+
+                {graph.nodes.map((node) => {
+                    const position = layout.positions.get(node.id);
+                    if (!position) return null;
+
+                    const edge = edgeByTargetId.get(node.id);
+                    const tooltip = node.isFocus
+                        ? `${node.name} • nó central`
+                        : `${node.name} • ${describeEdge(edge as StudentInteractionEdge)}`;
+                    const fill = node.isFocus
+                        ? `url(#${graph.graphKind}-focus-fill-${graph.focusId})`
+                        : "#ffffff";
+                    const stroke = node.isFocus ? "#0f172a" : position.stroke;
+
+                    return (
+                        <a href={node.profileHref ?? undefined}>
+                            <circle
+                                cx={position.x}
+                                cy={position.y}
+                                r={position.radius}
+                                fill={fill}
+                                stroke={stroke}
+                                stroke-width={node.isFocus ? 3.5 : 2.5}
+                                class="transition-opacity hover:opacity-85"
+                            >
+                                <title>{tooltip}</title>
+                            </circle>
+                        </a>
+                    );
+                })}
+
+                {graph.nodes.map((node) => {
+                    const position = layout.positions.get(node.id);
+                    if (!position) return null;
+
+                    const label = getNodeLabelPlacement(node, position);
+
+                    return (
+                        <text
+                            x={label.x}
+                            y={label.y}
+                            text-anchor={label.textAnchor}
+                            dominant-baseline="middle"
+                            paint-order="stroke"
+                            stroke="rgba(255,255,255,0.96)"
+                            stroke-width={node.isFocus ? 7 : 5}
+                            class={`fill-slate-900 ${node.isFocus ? "text-[24px] font-bold" : usesDenseLabels ? "text-[10px] font-semibold" : "text-[12px] font-semibold"}`}
+                        >
+                            {label.text}
+                        </text>
+                    );
+                })}
+            </svg>
+
+            <p class="mt-4 text-xs leading-relaxed text-text-secondary">
+                Os nomes ficam visíveis no próprio grafo. Clique em um círculo
+                para abrir o perfil da pessoa conectada.
+            </p>
+        </div>
+
+        <aside class="space-y-4">
+            <article class="rounded-3xl border border-border-main bg-white/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    Como ler
+                </p>
+                <div class="mt-4 space-y-3 text-sm text-text-secondary">
+                    <div class="flex items-center gap-3">
+                        <span class="h-3 w-3 rounded-full bg-premium-accent"></span>
+                        O nó central é o perfil atual.
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="h-3 w-3 rounded-full border-2 border-slate-500 bg-white"></span>
+                        Os nós periféricos são conexões diretas.
+                    </div>
+                    <p class="leading-relaxed">
+                        A espessura da aresta acompanha o peso da conexão. Nós
+                        maiores indicam vínculos mais fortes dentro deste recorte.
+                    </p>
+                </div>
+            </article>
+
+            <article class="rounded-3xl border border-border-main bg-white/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    Conexões em destaque
+                </p>
+
+                {topConnections.length > 0 ? (
+                    <div class="mt-4 space-y-3">
+                        {topConnections.map((connection) => (
+                            <div class="rounded-2xl border border-border-main bg-white/90 p-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0">
+                                        <a
+                                            href={connection.profileHref ?? "#"}
+                                            class="text-sm font-bold text-text-main transition-colors hover:text-premium-accent"
+                                        >
+                                            {connection.name}
+                                        </a>
+                                        <p class="mt-1 text-xs text-text-secondary">
+                                            {connection.campusName ?? "Campus não informado"}
+                                        </p>
+                                    </div>
+                                    <span class="inline-flex shrink-0 items-center rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-3 py-1 text-xs font-bold text-premium-accent">
+                                        peso {connection.weight}
+                                    </span>
+                                </div>
+
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    {connection.relationTypes.map((relationType) => (
+                                        <span
+                                            class="inline-flex items-center gap-2 rounded-full border border-border-main bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-text-main"
+                                        >
+                                            <span
+                                                class="h-2 w-2 rounded-full"
+                                                style={`background:${relationColors[relationType]}`}
+                                            ></span>
+                                            {relationLabels[relationType]}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        {
+                            remainingConnections > 0 && (
+                                <p class="text-xs text-text-secondary">
+                                    + {remainingConnections} conexões adicionais fora do destaque inicial.
+                                </p>
+                            )
+                        }
+                    </div>
+                ) : (
+                    <p class="mt-4 text-sm leading-relaxed text-text-secondary">
+                        {graphEmptyDescription}
+                    </p>
+                )}
+            </article>
+        </aside>
+    </div>
+
+    <PersonInteractionTable graphKind={graph.graphKind} rows={tableRows} />
+</section>

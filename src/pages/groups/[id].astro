@@ -2,24 +2,219 @@
 import Layout from "../../layouts/Layout.astro";
 import groupsData from "../../data/research_groups_canonical.json";
 import projectsData from "../../data/initiatives_canonical.json";
+import membershipGraphManifest from "../../data/research_group_membership_graphs_manifest.json";
+import relationshipGraphManifest from "../../data/research_group_relationship_graphs_manifest.json";
 import DataSourcesPanel from "../../components/provenance/DataSourcesPanel.astro";
+import ResearchGroupGraphDatasets from "../../components/groups/ResearchGroupGraphDatasets.astro";
+import ResearchGroupInteractionGraph from "../../components/groups/ResearchGroupInteractionGraph.astro";
+import ResearchGroupRelationshipTable from "../../components/groups/ResearchGroupRelationshipTable.astro";
 import { buildProvenanceFields } from "../../lib/provenance";
-import type { ResearchGroup } from "../../types/groups";
+import {
+	buildResearchGroupInteractionViewModel,
+	buildResearchGroupRelationshipTableRows,
+} from "../../lib/research-group-interaction";
+import type {
+	ResearchGroup,
+	ResearchGroupInteractionRawGraphFile,
+} from "../../types/groups";
 import type { Project } from "../../types/projects";
+
+const graphModules = import.meta.glob<{
+	default: ResearchGroupInteractionRawGraphFile;
+}>("../../data/research_group_relationship_graphs/*.json");
+const membershipGraphModules = import.meta.glob<{
+	default: ResearchGroupSummaryGraphFile;
+}>("../../data/research_group_membership_graphs/*.json");
+
+interface ResearchGroupGraphManifestEntry {
+	id: number;
+	path: string;
+	name?: string | null;
+	short_name?: string | null;
+	member_count?: number;
+	nodes?: number;
+	edges?: number;
+}
+
+interface ResearchGroupSummaryGraphFile {
+	metadata: {
+		scope: {
+			graph_type?: string;
+			research_group: {
+				id: string | number;
+				name: string;
+				short_name?: string | null;
+				member_count?: number;
+			};
+		};
+	};
+	graph_stats: {
+		nodes?: number;
+		edges?: number;
+		isolated_nodes?: number;
+		connected_components?: number;
+		largest_component_size?: number;
+		relation_event_totals?: Record<string, number | undefined>;
+		classification_distribution?: Record<string, number | undefined>;
+		top_people_by_weighted_degree?: Array<{
+			id: string | number;
+			name: string;
+			classification?: string | null;
+			weighted_degree?: number;
+			degree?: number;
+		}>;
+	};
+}
+
+const membershipGraphEntriesById = new Map(
+	(
+		(membershipGraphManifest as {
+			graphs: ResearchGroupGraphManifestEntry[];
+		}).graphs ?? []
+	).map((entry) => [String(entry.id), entry]),
+);
+
+const relationshipGraphEntriesById = new Map(
+	(
+		(relationshipGraphManifest as {
+			graphs: ResearchGroupGraphManifestEntry[];
+		}).graphs ?? []
+	).map((entry) => [String(entry.id), entry]),
+);
+
+const relationLabels: Record<string, string> = {
+	present_in: "Presenca no grupo",
+	research_group: "Grupo de pesquisa",
+	project: "Projeto",
+	article: "Artigo",
+	orientation: "Orientacao",
+	initiative: "Iniciativa",
+	advisorship: "Orientacao",
+};
+
+const classificationLabels: Record<string, string> = {
+	student: "Estudantes",
+	researcher: "Pesquisadores",
+	outside_ifes: "Externos ao Ifes",
+	null: "Sem classificacao",
+};
+
+const resolveGraphImporter = <T,>(
+	modules: Record<string, () => Promise<{ default: T }>>,
+	path: string | null,
+) =>
+	path
+		? Object.entries(modules).find(([modulePath]) => modulePath.endsWith(path))?.[1] ?? null
+		: null;
+
+const summarizeCountRecord = (record?: Record<string, number | undefined>) =>
+	Object.entries(record ?? {})
+		.map(([key, value]) => ({
+			label: relationLabels[key] ?? key.replaceAll("_", " "),
+			value: Number(value ?? 0),
+		}))
+		.filter((item) => item.value > 0)
+		.sort((left, right) => right.value - left.value);
+
+const summarizeClassificationRecord = (record?: Record<string, number | undefined>) =>
+	Object.entries(record ?? {})
+		.map(([key, value]) => ({
+			label: classificationLabels[key] ?? key.replaceAll("_", " "),
+			value: Number(value ?? 0),
+		}))
+		.filter((item) => item.value > 0)
+		.sort((left, right) => right.value - left.value);
+
+const buildDatasetCard = ({
+	key,
+	title,
+	description,
+	path,
+	manifestEntry,
+	graphFile,
+}: {
+	key: "membership" | "relationship";
+	title: string;
+	description: string;
+	path: string | null;
+	manifestEntry?: ResearchGroupGraphManifestEntry | null;
+	graphFile?: ResearchGroupSummaryGraphFile | null;
+}) => {
+	const stats = graphFile?.graph_stats;
+	const topPeople = (stats?.top_people_by_weighted_degree ?? [])
+		.slice(0, 5)
+		.map((person) => ({
+			id: String(person.id),
+			name: person.name,
+			classification: person.classification ?? null,
+			weightedDegree: Number(person.weighted_degree ?? 0),
+			degree: Number(person.degree ?? 0),
+		}));
+
+	return {
+		key,
+		title,
+		description,
+		graphType: graphFile?.metadata.scope.graph_type ?? null,
+		available: Boolean(path && (graphFile || manifestEntry)),
+		stats: {
+			nodes: Number(stats?.nodes ?? manifestEntry?.nodes ?? 0),
+			edges: Number(stats?.edges ?? manifestEntry?.edges ?? 0),
+			connectedComponents: Number(stats?.connected_components ?? 0),
+			largestComponentSize: Number(stats?.largest_component_size ?? 0),
+			memberCount: Number(
+				graphFile?.metadata.scope.research_group.member_count ??
+					manifestEntry?.member_count ??
+					group.members.length,
+			),
+		},
+		relationTotals: summarizeCountRecord(stats?.relation_event_totals),
+		classificationDistribution: summarizeClassificationRecord(
+			stats?.classification_distribution,
+		),
+		topPeople,
+	};
+};
 
 export function getStaticPaths() {
 	const groups = groupsData as ResearchGroup[];
+	const relationshipEntriesById = new Map(
+		(
+			(relationshipGraphManifest as {
+				graphs: ResearchGroupGraphManifestEntry[];
+			}).graphs ?? []
+		).map((entry) => [String(entry.id), entry]),
+	);
+	const membershipEntriesById = new Map(
+		(
+			(membershipGraphManifest as {
+				graphs: ResearchGroupGraphManifestEntry[];
+			}).graphs ?? []
+		).map((entry) => [String(entry.id), entry]),
+	);
 	return groups.map((group) => ({
 		params: { id: group.id.toString() },
-		props: { group },
+		props: {
+			group,
+			relationshipGraphPath:
+				relationshipEntriesById.get(String(group.id))?.path ?? null,
+			membershipGraphPath:
+				membershipEntriesById.get(String(group.id))?.path ?? null,
+		},
 	}));
 }
 
 interface Props {
 	group: ResearchGroup;
+	relationshipGraphPath?: string | null;
+	membershipGraphPath?: string | null;
 }
 
-const { group } = Astro.props;
+const {
+	group,
+	relationshipGraphPath = null,
+	membershipGraphPath = null,
+} = Astro.props;
 const groupProjects = (projectsData as Project[]).filter(
 	(p) => p.research_group?.id === group.id,
 );
@@ -80,6 +275,79 @@ const groupSourceFields = buildProvenanceFields([
 			]
 		: []),
 ]);
+
+const relationshipGraphImporter = resolveGraphImporter(
+	graphModules,
+	relationshipGraphPath,
+);
+const membershipGraphImporter = resolveGraphImporter(
+	membershipGraphModules,
+	membershipGraphPath,
+);
+
+const relationshipGraphFile = relationshipGraphImporter
+	? ((await relationshipGraphImporter()).default ?? null)
+	: null;
+const membershipGraphFile = membershipGraphImporter
+	? ((await membershipGraphImporter()).default ?? null)
+	: null;
+
+const relationshipGraphEntry =
+	relationshipGraphEntriesById.get(String(group.id)) ?? null;
+const membershipGraphEntry =
+	membershipGraphEntriesById.get(String(group.id)) ?? null;
+
+const groupGraphDatasets = [
+	buildDatasetCard({
+		key: "membership",
+		title: "Grafo de membresia",
+		description:
+			"Mostra a composicao do grupo no recorte exportado, sem depender de colaboracao direta entre as pessoas.",
+		path: membershipGraphPath,
+		manifestEntry: membershipGraphEntry,
+		graphFile: membershipGraphFile,
+	}),
+	buildDatasetCard({
+		key: "relationship",
+		title: "Grafo relacional",
+		description:
+			"Conecta pessoas por projeto, artigo e orientacao compartilhados e serve de base para a leitura estrutural mais rica da rede.",
+		path: relationshipGraphPath,
+		manifestEntry: relationshipGraphEntry,
+		graphFile: relationshipGraphFile,
+	}),
+];
+
+const groupInteractionGraph = relationshipGraphFile
+	? buildResearchGroupInteractionViewModel(
+			relationshipGraphFile as ResearchGroupInteractionRawGraphFile,
+			{
+				groupId: group.id,
+				groupName: group.name,
+				baseUrl: import.meta.env.BASE_URL,
+			},
+		)
+	: null;
+const topCollaboratingResearchers = (groupInteractionGraph?.nodes ?? [])
+	.filter(
+		(node) =>
+			node.classification === "researcher" && node.weightedDegree > 0,
+	)
+	.sort((left, right) => {
+		if (right.weightedDegree !== left.weightedDegree) {
+			return right.weightedDegree - left.weightedDegree;
+		}
+
+		if (right.degree !== left.degree) {
+			return right.degree - left.degree;
+		}
+
+		return left.name.localeCompare(right.name, "pt-BR");
+	})
+	.slice(0, 5);
+const relationshipTableRows = groupInteractionGraph
+	? buildResearchGroupRelationshipTableRows(groupInteractionGraph)
+	: [];
 ---
 
 <Layout title={group.name} breadcrumbReplacements={{ [group.id]: group.name }}>
@@ -950,6 +1218,149 @@ const groupSourceFields = buildProvenanceFields([
 				)
 			}
 		</div>
+	</section>
+
+	<section
+		aria-labelledby="group-graphs-title"
+		class="space-y-8 mb-12 border-t border-border-main pt-10"
+	>
+		<div class="space-y-3">
+			<div class="flex flex-wrap gap-2">
+				<span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+					Research Group Graphs
+				</span>
+				<span class="inline-flex items-center rounded-full border border-border-main bg-white/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+					Pastas research_group_*
+				</span>
+			</div>
+			<h3
+				id="group-graphs-title"
+				class="text-2xl font-bold font-['Outfit'] text-text-main"
+			>
+				Grafos do Grupo
+			</h3>
+				<p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
+					Esta secao resume os diferentes recortes de rede do grupo e, quando
+					houver conectividade suficiente, oferece a exploracao interativa das
+					interacoes entre pessoas.
+				</p>
+		</div>
+
+		<div class="rounded-3xl border border-slate-200/80 bg-white/82 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.08)]">
+			<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+				Como ler estes recortes
+			</p>
+			<p class="mt-2 text-sm leading-relaxed text-text-secondary">
+				O <strong>grafo relacional</strong> conecta pessoas por projeto, artigo
+				e orientacao compartilhados e alimenta o ranking e a visualizacao
+				interativa desta pagina. O <strong>grafo de membresia</strong> mostra
+				principalmente quem compoe o grupo no recorte, mesmo quando nao ha
+				colaboracao direta suficiente para formar muitas conexoes.
+			</p>
+		</div>
+
+		<div class="rounded-3xl border border-emerald-200/80 bg-emerald-50/80 p-6 shadow-[0_20px_60px_rgba(16,185,129,0.10)]">
+			<div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+				<div class="space-y-2">
+					<span class="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+						Top 5
+					</span>
+					<div>
+						<h4 class="text-xl font-bold font-['Outfit'] text-text-main">
+							Pesquisadores colaboradores
+						</h4>
+						<p class="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">
+							Ranking calculado a partir do grafo relacional do grupo,
+							priorizando pesquisadores com maior peso acumulado de colaboracao.
+						</p>
+					</div>
+				</div>
+				<div class="text-xs text-text-secondary">
+					{
+						topCollaboratingResearchers.length > 0
+							? `${topCollaboratingResearchers.length} pesquisadores com colaboracoes registradas`
+							: "Nenhuma colaboracao de pesquisador registrada neste recorte"
+					}
+				</div>
+			</div>
+
+			{
+				topCollaboratingResearchers.length > 0 ? (
+					<div class="mt-6 grid grid-cols-1 xl:grid-cols-5 gap-4">
+						{topCollaboratingResearchers.map((researcher, index) => (
+							<article class="rounded-2xl border border-border-main bg-white/80 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+								<div class="flex items-start justify-between gap-3">
+									<div class="min-w-0">
+										<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+											#{index + 1}
+										</p>
+										<h5 class="mt-2 text-sm font-bold text-text-main leading-snug">
+											{
+												researcher.profileHref ? (
+													<a
+														href={`${researcher.profileHref}`}
+														class="transition-colors hover:text-premium-accent"
+													>
+														{researcher.name}
+													</a>
+												) : (
+													researcher.name
+												)
+											}
+										</h5>
+										{
+											researcher.campusName && (
+												<p class="mt-1 text-xs text-text-secondary">
+													{researcher.campusName}
+												</p>
+											)
+										}
+									</div>
+									<span class="shrink-0 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700">
+										Peso {researcher.weightedDegree}
+									</span>
+								</div>
+
+								<div class="mt-4 grid grid-cols-2 gap-3">
+									<div class="rounded-xl border border-border-main bg-white p-3">
+										<p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+											Conexoes
+										</p>
+										<p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+											{researcher.degree}
+										</p>
+									</div>
+									<div class="rounded-xl border border-border-main bg-white p-3">
+										<p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+											Peso total
+										</p>
+										<p class="mt-1 text-lg font-extrabold font-['Outfit'] text-text-main">
+											{researcher.weightedDegree}
+										</p>
+									</div>
+								</div>
+							</article>
+						))}
+					</div>
+				) : (
+					<div class="mt-6 rounded-2xl border border-dashed border-border-main bg-white/60 p-6 text-sm text-text-secondary">
+						Este grupo ainda nao possui pesquisadores com colaboracoes registradas
+						no grafo relacional atual.
+					</div>
+				)
+			}
+		</div>
+
+		<ResearchGroupGraphDatasets datasets={groupGraphDatasets} />
+
+		<ResearchGroupRelationshipTable rows={relationshipTableRows} />
+
+		<ResearchGroupInteractionGraph
+			groupId={group.id}
+			groupName={group.name}
+			graphData={groupInteractionGraph}
+			baseUrl={import.meta.env.BASE_URL}
+		/>
 	</section>
 
 	<DataSourcesPanel

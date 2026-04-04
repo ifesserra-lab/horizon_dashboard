@@ -2,11 +2,17 @@
 import Layout from "../../layouts/Layout.astro";
 import initiativesData from "../../data/initiatives_canonical.json";
 import advisorshipsData from "../../data/advisorships_canonical.json";
+import studentCollaborationGraphData from "../../data/students_collaboration_graph.json";
+import studentRelationshipGraphData from "../../data/students_relationship_graph.json";
 import type { Researcher } from "../../types/researchers";
+import type { StudentInteractionRawGraphFile } from "../../types/student-graphs";
 import {
     getAttributeSources,
     toInlineSourceItems,
 } from "../../lib/provenance";
+import {
+    buildStudentInteractionViewModel,
+} from "../../lib/student-interaction";
 import {
     enrichResearcherInitiatives,
     getStudentAdvisors,
@@ -16,6 +22,7 @@ import {
 } from "../../lib/researcher-profiles";
 import { studentsResearchers } from "../../lib/researcher-collections";
 import ResearcherProfileHeader from "../../components/researchers/ResearcherProfileHeader.astro";
+import PersonInteractionGraph from "../../components/researchers/PersonInteractionGraph.astro";
 import ResearcherProfileGroups from "../../components/researchers/ResearcherProfileGroups.astro";
 import ResearcherProfileInitiatives from "../../components/researchers/ResearcherProfileInitiatives.astro";
 import StudentProfileAdvisors from "../../components/researchers/StudentProfileAdvisors.astro";
@@ -49,6 +56,28 @@ const studentFellowships = getStudentFellowships(
     student,
     canonicalAdvisorshipProjects,
     canonicalInitiatives,
+);
+const studentCollaborationGraph = buildStudentInteractionViewModel(
+    studentCollaborationGraphData as StudentInteractionRawGraphFile,
+    {
+        focusId: student.id,
+        focusName: student.name,
+        focusClassification: student.classification ?? "student",
+        graphDataSource: "students_collaboration_graph",
+        graphKind: "collaboration",
+        baseUrl: import.meta.env.BASE_URL,
+    },
+);
+const studentRelationshipGraph = buildStudentInteractionViewModel(
+    studentRelationshipGraphData as StudentInteractionRawGraphFile,
+    {
+        focusId: student.id,
+        focusName: student.name,
+        focusClassification: student.classification ?? "student",
+        graphDataSource: "students_relationship_graph",
+        graphKind: "relationship",
+        baseUrl: import.meta.env.BASE_URL,
+    },
 );
 
 const profileHeaderSources = toInlineSourceItems([
@@ -205,5 +234,9 @@ const highlightCards = [
             initiativeSourcesById={initiativeSourcesById}
             incrementalLoading={false}
         />
+
+        <PersonInteractionGraph graph={studentCollaborationGraph} />
+
+        <PersonInteractionGraph graph={studentRelationshipGraph} />
     </div>
 </Layout>

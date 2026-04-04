@@ -2,18 +2,31 @@
 import Layout from "../../layouts/Layout.astro";
 
 import advisorshipsCanonical from "../../data/advisorships_canonical.json";
+import advisorshipsCanonicalUrl from "../../data/advisorships_canonical.json?url";
 import articlesCanonical from "../../data/articles_canonical.json";
+import articlesCanonicalUrl from "../../data/articles_canonical.json?url";
 import campusesCanonical from "../../data/campuses_canonical.json";
+import campusesCanonicalUrl from "../../data/campuses_canonical.json?url";
 import fellowshipsCanonical from "../../data/fellowships_canonical.json";
+import fellowshipsCanonicalUrl from "../../data/fellowships_canonical.json?url";
 import initiativeTypesCanonical from "../../data/initiative_types_canonical.json";
+import initiativeTypesCanonicalUrl from "../../data/initiative_types_canonical.json?url";
 import initiativesCanonical from "../../data/initiatives_canonical.json";
+import initiativesCanonicalUrl from "../../data/initiatives_canonical.json?url";
 import knowledgeAreasCanonical from "../../data/knowledge_areas_canonical.json";
+import knowledgeAreasCanonicalUrl from "../../data/knowledge_areas_canonical.json?url";
 import organizationsCanonical from "../../data/organizations_canonical.json";
+import organizationsCanonicalUrl from "../../data/organizations_canonical.json?url";
 import researchGroupsCanonical from "../../data/research_groups_canonical.json";
+import researchGroupsCanonicalUrl from "../../data/research_groups_canonical.json?url";
 import researchersCanonical from "../../data/researchers_canonical.json";
+import researchersCanonicalUrl from "../../data/researchers_canonical.json?url";
 import advisorshipAnalytics from "../../data/advisorship_analytics.json";
+import advisorshipAnalyticsUrl from "../../data/advisorship_analytics.json?url";
 import initiativesMart from "../../data/initiatives_analytics_mart.json";
+import initiativesMartUrl from "../../data/initiatives_analytics_mart.json?url";
 import knowledgeAreasMart from "../../data/knowledge_areas_mart.json";
+import knowledgeAreasMartUrl from "../../data/knowledge_areas_mart.json?url";
 
 type DatasetType = "Canonical" | "Mart";
 
@@ -22,9 +35,13 @@ interface DatasetItem {
     name: string;
     description: string;
     type: DatasetType;
+    countValue: number;
     countLabel: string;
-    data: unknown;
+    sizeLabel: string;
     structure: string;
+    sampleKeys: string[];
+    downloadHref: string;
+    searchText: string;
 }
 
 const buildStructurePreview = (data: unknown) => {
@@ -33,6 +50,18 @@ const buildStructurePreview = (data: unknown) => {
     }
 
     return JSON.stringify(data, null, 2);
+};
+
+const buildCountValue = (data: unknown) => {
+    if (Array.isArray(data)) {
+        return data.length;
+    }
+
+    if (data && typeof data === "object") {
+        return Object.keys(data).length;
+    }
+
+    return 0;
 };
 
 const buildCountLabel = (data: unknown) => {
@@ -47,174 +76,592 @@ const buildCountLabel = (data: unknown) => {
     return "Sem contagem";
 };
 
+const buildSizeBytes = (data: unknown) =>
+    Buffer.byteLength(JSON.stringify(data), "utf8");
+
+const buildSizeLabel = (data: unknown) => {
+    const bytes = buildSizeBytes(data);
+
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+const buildSampleKeys = (data: unknown) => {
+    if (Array.isArray(data)) {
+        const firstItem = data[0];
+        if (firstItem && typeof firstItem === "object" && !Array.isArray(firstItem)) {
+            return Object.keys(firstItem).slice(0, 6);
+        }
+        return [];
+    }
+
+    if (data && typeof data === "object") {
+        return Object.keys(data).slice(0, 6);
+    }
+
+    return [];
+};
+
+const buildSearchText = (
+    name: string,
+    description: string,
+    type: DatasetType,
+    sampleKeys: string[],
+) => [name, description, type, ...sampleKeys].join(" ").toLowerCase();
+
 const datasets: DatasetItem[] = [
     {
         id: "advisorships",
         name: "advisorships_canonical.json",
         description: "Orientações com estudante, tipologia, período e status.",
         type: "Canonical",
+        countValue: buildCountValue(advisorshipsCanonical),
         countLabel: buildCountLabel(advisorshipsCanonical),
-        data: advisorshipsCanonical,
+        sizeLabel: buildSizeLabel(advisorshipsCanonical),
         structure: buildStructurePreview(advisorshipsCanonical),
+        sampleKeys: buildSampleKeys(advisorshipsCanonical),
+        downloadHref: advisorshipsCanonicalUrl,
+        searchText: buildSearchText(
+            "advisorships_canonical.json",
+            "Orientações com estudante, tipologia, período e status.",
+            "Canonical",
+            buildSampleKeys(advisorshipsCanonical),
+        ),
     },
     {
         id: "articles",
         name: "articles_canonical.json",
         description: "Artigos publicados com ano, tipo, DOI e veículo.",
         type: "Canonical",
+        countValue: buildCountValue(articlesCanonical),
         countLabel: buildCountLabel(articlesCanonical),
-        data: articlesCanonical,
+        sizeLabel: buildSizeLabel(articlesCanonical),
         structure: buildStructurePreview(articlesCanonical),
+        sampleKeys: buildSampleKeys(articlesCanonical),
+        downloadHref: articlesCanonicalUrl,
+        searchText: buildSearchText(
+            "articles_canonical.json",
+            "Artigos publicados com ano, tipo, DOI e veículo.",
+            "Canonical",
+            buildSampleKeys(articlesCanonical),
+        ),
     },
     {
         id: "campuses",
         name: "campuses_canonical.json",
         description: "Cadastro de campi usado nos vínculos e filtros do portal.",
         type: "Canonical",
+        countValue: buildCountValue(campusesCanonical),
         countLabel: buildCountLabel(campusesCanonical),
-        data: campusesCanonical,
+        sizeLabel: buildSizeLabel(campusesCanonical),
         structure: buildStructurePreview(campusesCanonical),
+        sampleKeys: buildSampleKeys(campusesCanonical),
+        downloadHref: campusesCanonicalUrl,
+        searchText: buildSearchText(
+            "campuses_canonical.json",
+            "Cadastro de campi usado nos vínculos e filtros do portal.",
+            "Canonical",
+            buildSampleKeys(campusesCanonical),
+        ),
     },
     {
         id: "fellowships",
         name: "fellowships_canonical.json",
         description: "Bolsas e relações de fomento ligadas às iniciativas.",
         type: "Canonical",
+        countValue: buildCountValue(fellowshipsCanonical),
         countLabel: buildCountLabel(fellowshipsCanonical),
-        data: fellowshipsCanonical,
+        sizeLabel: buildSizeLabel(fellowshipsCanonical),
         structure: buildStructurePreview(fellowshipsCanonical),
+        sampleKeys: buildSampleKeys(fellowshipsCanonical),
+        downloadHref: fellowshipsCanonicalUrl,
+        searchText: buildSearchText(
+            "fellowships_canonical.json",
+            "Bolsas e relações de fomento ligadas às iniciativas.",
+            "Canonical",
+            buildSampleKeys(fellowshipsCanonical),
+        ),
     },
     {
         id: "initiative-types",
         name: "initiative_types_canonical.json",
         description: "Tipos de iniciativa utilizados na base do portal.",
         type: "Canonical",
+        countValue: buildCountValue(initiativeTypesCanonical),
         countLabel: buildCountLabel(initiativeTypesCanonical),
-        data: initiativeTypesCanonical,
+        sizeLabel: buildSizeLabel(initiativeTypesCanonical),
         structure: buildStructurePreview(initiativeTypesCanonical),
+        sampleKeys: buildSampleKeys(initiativeTypesCanonical),
+        downloadHref: initiativeTypesCanonicalUrl,
+        searchText: buildSearchText(
+            "initiative_types_canonical.json",
+            "Tipos de iniciativa utilizados na base do portal.",
+            "Canonical",
+            buildSampleKeys(initiativeTypesCanonical),
+        ),
     },
     {
         id: "initiatives",
         name: "initiatives_canonical.json",
         description: "Projetos e iniciativas com vigência, equipe e tipo.",
         type: "Canonical",
+        countValue: buildCountValue(initiativesCanonical),
         countLabel: buildCountLabel(initiativesCanonical),
-        data: initiativesCanonical,
+        sizeLabel: buildSizeLabel(initiativesCanonical),
         structure: buildStructurePreview(initiativesCanonical),
+        sampleKeys: buildSampleKeys(initiativesCanonical),
+        downloadHref: initiativesCanonicalUrl,
+        searchText: buildSearchText(
+            "initiatives_canonical.json",
+            "Projetos e iniciativas com vigência, equipe e tipo.",
+            "Canonical",
+            buildSampleKeys(initiativesCanonical),
+        ),
     },
     {
         id: "knowledge-areas",
         name: "knowledge_areas_canonical.json",
         description: "Tabela de áreas do conhecimento adotadas no portal.",
         type: "Canonical",
+        countValue: buildCountValue(knowledgeAreasCanonical),
         countLabel: buildCountLabel(knowledgeAreasCanonical),
-        data: knowledgeAreasCanonical,
+        sizeLabel: buildSizeLabel(knowledgeAreasCanonical),
         structure: buildStructurePreview(knowledgeAreasCanonical),
+        sampleKeys: buildSampleKeys(knowledgeAreasCanonical),
+        downloadHref: knowledgeAreasCanonicalUrl,
+        searchText: buildSearchText(
+            "knowledge_areas_canonical.json",
+            "Tabela de áreas do conhecimento adotadas no portal.",
+            "Canonical",
+            buildSampleKeys(knowledgeAreasCanonical),
+        ),
     },
     {
         id: "organizations",
         name: "organizations_canonical.json",
         description: "Organizações financiadoras, parceiras e relacionadas.",
         type: "Canonical",
+        countValue: buildCountValue(organizationsCanonical),
         countLabel: buildCountLabel(organizationsCanonical),
-        data: organizationsCanonical,
+        sizeLabel: buildSizeLabel(organizationsCanonical),
         structure: buildStructurePreview(organizationsCanonical),
+        sampleKeys: buildSampleKeys(organizationsCanonical),
+        downloadHref: organizationsCanonicalUrl,
+        searchText: buildSearchText(
+            "organizations_canonical.json",
+            "Organizações financiadoras, parceiras e relacionadas.",
+            "Canonical",
+            buildSampleKeys(organizationsCanonical),
+        ),
     },
     {
         id: "groups",
         name: "research_groups_canonical.json",
         description: "Grupos de pesquisa com líderes, membros e áreas.",
         type: "Canonical",
+        countValue: buildCountValue(researchGroupsCanonical),
         countLabel: buildCountLabel(researchGroupsCanonical),
-        data: researchGroupsCanonical,
+        sizeLabel: buildSizeLabel(researchGroupsCanonical),
         structure: buildStructurePreview(researchGroupsCanonical),
+        sampleKeys: buildSampleKeys(researchGroupsCanonical),
+        downloadHref: researchGroupsCanonicalUrl,
+        searchText: buildSearchText(
+            "research_groups_canonical.json",
+            "Grupos de pesquisa com líderes, membros e áreas.",
+            "Canonical",
+            buildSampleKeys(researchGroupsCanonical),
+        ),
     },
     {
         id: "researchers",
         name: "researchers_canonical.json",
         description: "Pesquisadores com perfil, vínculos, artigos e orientações.",
         type: "Canonical",
+        countValue: buildCountValue(researchersCanonical),
         countLabel: buildCountLabel(researchersCanonical),
-        data: researchersCanonical,
+        sizeLabel: buildSizeLabel(researchersCanonical),
         structure: buildStructurePreview(researchersCanonical),
+        sampleKeys: buildSampleKeys(researchersCanonical),
+        downloadHref: researchersCanonicalUrl,
+        searchText: buildSearchText(
+            "researchers_canonical.json",
+            "Pesquisadores com perfil, vínculos, artigos e orientações.",
+            "Canonical",
+            buildSampleKeys(researchersCanonical),
+        ),
     },
     {
         id: "advisorship-analytics",
         name: "advisorship_analytics.json",
         description: "Agregações analíticas das orientações para dashboards.",
         type: "Mart",
+        countValue: buildCountValue(advisorshipAnalytics),
         countLabel: buildCountLabel(advisorshipAnalytics),
-        data: advisorshipAnalytics,
+        sizeLabel: buildSizeLabel(advisorshipAnalytics),
         structure: buildStructurePreview(advisorshipAnalytics),
+        sampleKeys: buildSampleKeys(advisorshipAnalytics),
+        downloadHref: advisorshipAnalyticsUrl,
+        searchText: buildSearchText(
+            "advisorship_analytics.json",
+            "Agregações analíticas das orientações para dashboards.",
+            "Mart",
+            buildSampleKeys(advisorshipAnalytics),
+        ),
     },
     {
         id: "initiatives-analytics",
         name: "initiatives_analytics_mart.json",
         description: "Agregações de projetos com resumo, evolução e composição.",
         type: "Mart",
+        countValue: buildCountValue(initiativesMart),
         countLabel: buildCountLabel(initiativesMart),
-        data: initiativesMart,
+        sizeLabel: buildSizeLabel(initiativesMart),
         structure: buildStructurePreview(initiativesMart),
+        sampleKeys: buildSampleKeys(initiativesMart),
+        downloadHref: initiativesMartUrl,
+        searchText: buildSearchText(
+            "initiatives_analytics_mart.json",
+            "Agregações de projetos com resumo, evolução e composição.",
+            "Mart",
+            buildSampleKeys(initiativesMart),
+        ),
     },
     {
         id: "knowledge-areas-mart",
         name: "knowledge_areas_mart.json",
         description: "Matriz analítica das áreas com contagens e agrupamentos.",
         type: "Mart",
+        countValue: buildCountValue(knowledgeAreasMart),
         countLabel: buildCountLabel(knowledgeAreasMart),
-        data: knowledgeAreasMart,
+        sizeLabel: buildSizeLabel(knowledgeAreasMart),
         structure: buildStructurePreview(knowledgeAreasMart),
+        sampleKeys: buildSampleKeys(knowledgeAreasMart),
+        downloadHref: knowledgeAreasMartUrl,
+        searchText: buildSearchText(
+            "knowledge_areas_mart.json",
+            "Matriz analítica das áreas com contagens e agrupamentos.",
+            "Mart",
+            buildSampleKeys(knowledgeAreasMart),
+        ),
     },
 ];
 
 const canonicalDatasets = datasets.filter((dataset) => dataset.type === "Canonical");
 const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
+const totalDatasets = datasets.length;
+const totalItems = datasets.reduce((sum, dataset) => sum + dataset.countValue, 0);
+const totalDownloadBytes = [
+    advisorshipsCanonical,
+    articlesCanonical,
+    campusesCanonical,
+    fellowshipsCanonical,
+    initiativeTypesCanonical,
+    initiativesCanonical,
+    knowledgeAreasCanonical,
+    organizationsCanonical,
+    researchGroupsCanonical,
+    researchersCanonical,
+    advisorshipAnalytics,
+    initiativesMart,
+    knowledgeAreasMart,
+].reduce((sum, data) => sum + buildSizeBytes(data), 0);
+
+const formatSummaryBytes = (bytes: number) => {
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(0)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const catalogHighlights = [
+    {
+        label: "Datasets disponíveis",
+        value: totalDatasets,
+        description: "Arquivos prontos para download direto em JSON.",
+        accentClass: "text-premium-accent",
+        surfaceClass: "bg-premium-accent/[0.08] border-premium-accent/20",
+    },
+    {
+        label: "Estruturas catalogadas",
+        value: totalItems.toLocaleString("pt-BR"),
+        description: "Registros ou blocos somados entre bases canônicas e marts.",
+        accentClass: "text-emerald-400",
+        surfaceClass: "bg-emerald-400/[0.08] border-emerald-400/20",
+    },
+    {
+        label: "Peso do catálogo",
+        value: formatSummaryBytes(totalDownloadBytes),
+        description: "Estimativa de navegação e prévia estrutural exibida nesta página.",
+        accentClass: "text-amber-400",
+        surfaceClass: "bg-amber-400/[0.08] border-amber-400/20",
+    },
+];
+
+const guideCards = [
+    {
+        title: "Baixe o arquivo bruto",
+        body: "Cada card aponta para o JSON gerado pelo build. O download não depende mais de blobs inline no HTML.",
+    },
+    {
+        title: "Use a estrutura como contrato",
+        body: "A prévia mostra o primeiro registro ou o bloco raiz para acelerar integrações, ETL e exploração em notebook.",
+    },
+    {
+        title: "Separe base e análise",
+        body: "As bases canônicas preservam entidades e vínculos. Os marts já chegam agregados para KPIs, séries e dashboards.",
+    },
+];
 ---
 
 <Layout title="Dados Abertos">
-    <div class="space-y-10 pb-12">
-        <header class="flex flex-col gap-6">
-            <div>
-                <h1 class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main">
-                    Dados <span class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple">Abertos</span>
-                </h1>
-                <p class="text-text-secondary mt-2 max-w-3xl">
-                    Catálogo dos arquivos disponíveis em <span class="font-mono text-text-main">src/data</span>.
-                    Aqui você pode baixar as bases canônicas e os marts analíticos que alimentam o portal.
-                </p>
+    <div class="space-y-10 pb-12" id="open-data-catalog">
+        <header class="relative overflow-hidden glass-card border border-border-main p-8 md:p-10">
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute -top-24 right-0 h-56 w-56 rounded-full bg-premium-accent/10 blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-premium-purple/10 blur-3xl"></div>
+            </div>
+
+            <div class="relative space-y-8">
+                <div class="flex flex-wrap gap-2">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
+                        Catálogo técnico
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-400">
+                        Download direto JSON
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)] gap-8 items-start">
+                    <div class="space-y-4">
+                        <h1 class="text-4xl md:text-5xl font-extrabold font-['Outfit'] tracking-tight text-text-main leading-tight">
+                            Dados <span class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple">Abertos</span>
+                        </h1>
+                        <p class="text-text-secondary max-w-3xl text-base leading-relaxed">
+                            Repositório público dos arquivos que alimentam o portal Horizon.
+                            Use esta página para baixar datasets em JSON, comparar bases canônicas
+                            com marts analíticos e inspecionar rapidamente a estrutura esperada de cada arquivo.
+                        </p>
+
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <a
+                                href="#datasets-canonical"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-2 text-sm font-bold text-premium-accent transition-colors hover:bg-premium-accent/15"
+                            >
+                                Ver bases canônicas
+                            </a>
+                            <a
+                                href="#datasets-mart"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/[0.08] px-4 py-2 text-sm font-bold text-amber-300 transition-colors hover:bg-amber-400/15"
+                            >
+                                Ver marts analíticos
+                            </a>
+                            <a
+                                href="#open-data-guide"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-purple/20 hover:bg-premium-purple/[0.06]"
+                            >
+                                Como usar
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[2rem] border border-border-main bg-black/10 p-5 backdrop-blur-sm">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-muted">
+                            Leitura rápida
+                        </p>
+                        <div class="mt-4 grid grid-cols-1 gap-3">
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Bases canônicas</p>
+                                <p class="mt-2 text-2xl font-bold font-['Outfit'] text-text-main">{canonicalDatasets.length}</p>
+                                <p class="mt-1 text-sm text-text-secondary">Entidades normalizadas para navegação, vínculo e reconciliação.</p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Marts analíticos</p>
+                                <p class="mt-2 text-2xl font-bold font-['Outfit'] text-text-main">{martDatasets.length}</p>
+                                <p class="mt-1 text-sm text-text-secondary">Agregações prontas para KPIs, gráficos e séries históricas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {catalogHighlights.map((highlight) => (
+                        <article class={`rounded-3xl border p-5 ${highlight.surfaceClass}`}>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                                {highlight.label}
+                            </p>
+                            <div class={`mt-3 text-4xl font-extrabold font-['Outfit'] ${highlight.accentClass}`}>
+                                {highlight.value}
+                            </div>
+                            <p class="mt-2 text-sm text-text-secondary">
+                                {highlight.description}
+                            </p>
+                        </article>
+                    ))}
+                </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="glass-card p-6">
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Bases Canônicas</p>
-                <p class="text-3xl font-bold font-['Outfit'] text-text-main mt-2">{canonicalDatasets.length}</p>
-                <p class="text-sm text-text-secondary mt-1">Arquivos brutos normalizados para navegação e vínculo de entidades.</p>
-            </div>
-            <div class="glass-card p-6">
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Marts Analíticos</p>
-                <p class="text-3xl font-bold font-['Outfit'] text-text-main mt-2">{martDatasets.length}</p>
-                <p class="text-sm text-text-secondary mt-1">Agregações preparadas para gráficos, KPIs e séries históricas.</p>
-            </div>
-        </div>
+        <section
+            id="open-data-guide"
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] gap-6"
+        >
+            <article class="glass-card border border-border-main p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-11 h-11 rounded-2xl bg-premium-accent/10 border border-premium-accent/20 flex items-center justify-center text-premium-accent">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"></path><path d="m17 8-5-5-5 5"></path><path d="M20 21H4"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Como usar este catálogo</h2>
+                        <p class="text-text-secondary text-sm mt-1">Baixe, valide e integre os dados sem depender da interface do portal.</p>
+                    </div>
+                </div>
 
-        <section class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {guideCards.map((card, index) => (
+                        <article class="rounded-3xl border border-border-main bg-white/[0.03] p-5">
+                            <div class="w-9 h-9 rounded-2xl bg-premium-purple/10 border border-premium-purple/20 flex items-center justify-center text-sm font-bold text-premium-purple">
+                                {index + 1}
+                            </div>
+                            <h3 class="mt-4 text-base font-bold text-text-main">{card.title}</h3>
+                            <p class="mt-2 text-sm leading-relaxed text-text-secondary">{card.body}</p>
+                        </article>
+                    ))}
+                </div>
+            </article>
+
+            <article class="glass-card border border-border-main p-6 md:p-8">
+                <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-premium-accent">
+                    Convenções
+                </p>
+                <div class="mt-5 space-y-4">
+                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                        <p class="text-sm font-bold text-text-main">Canonical</p>
+                        <p class="mt-1 text-sm text-text-secondary">
+                            Preserva entidades, vínculos e granularidade de origem para exploração e reconciliação.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                        <p class="text-sm font-bold text-text-main">Mart</p>
+                        <p class="mt-1 text-sm text-text-secondary">
+                            Resume métricas prontas para painéis, KPIs e análises comparativas.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                        <p class="text-sm font-bold text-text-main">Prévia estrutural</p>
+                        <p class="mt-1 text-sm text-text-secondary">
+                            Mostra o primeiro registro ou o bloco raiz para servir como contrato rápido do arquivo.
+                        </p>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="glass-card border border-border-main p-6 md:p-8 space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-muted">
+                        Explorar datasets
+                    </p>
+                    <h2 class="text-2xl font-bold font-['Outfit'] text-text-main mt-1">
+                        Encontre a base certa mais rápido
+                    </h2>
+                </div>
+                <div class="text-sm text-text-secondary">
+                    <span id="datasetVisibleCount">{datasets.length}</span> arquivos visíveis
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">
+                <div class="relative">
+                    <label for="datasetSearch" class="sr-only">Buscar dataset</label>
+                    <input
+                        type="text"
+                        id="datasetSearch"
+                        placeholder="Buscar por nome, descrição ou campos..."
+                        class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+                    />
+                    <svg
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <button
+                        id="resetDatasetSearch"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-premium-accent transition-colors hidden"
+                        title="Limpar busca"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-2 text-sm font-bold text-premium-accent"
+                        data-dataset-filter="all"
+                    >
+                        Todos
+                    </button>
+                    <button
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                        data-dataset-filter="canonical"
+                    >
+                        Canonical
+                    </button>
+                    <button
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-amber-400/20 hover:text-text-main"
+                        data-dataset-filter="mart"
+                    >
+                        Mart
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="datasets-canonical" class="space-y-5" data-dataset-section="canonical">
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Bases Canônicas</h2>
-                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data</span>.</p>
+                    <p class="text-text-secondary mt-1">Arquivos de entidades e vínculos em <span class="font-mono text-text-main">src/data</span>.</p>
                 </div>
+                <span class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">
+                    {canonicalDatasets.length} arquivos
+                </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {canonicalDatasets.map((dataset) => (
-                    <article class="glass-card p-6 flex flex-col gap-4 h-full hover:border-premium-accent/40 transition-all duration-300">
+                    <article
+                        class="glass-card p-6 flex flex-col gap-5 h-full hover:border-premium-accent/40 transition-all duration-300"
+                        data-dataset-card
+                        data-dataset-type="canonical"
+                        data-search={dataset.searchText}
+                    >
                         <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-[0.18em] text-emerald-500">Canonical</p>
-                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] mt-2 break-all">{dataset.name}</h3>
+                            <div class="space-y-2">
+                                <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">
+                                    Canonical
+                                </span>
+                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] leading-snug break-all">
+                                    {dataset.name}
+                                </h3>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold border bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                            <span class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
                                 {dataset.countLabel}
                             </span>
                         </div>
@@ -223,53 +670,92 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
                             {dataset.description}
                         </p>
 
-                        <p class="text-xs text-text-muted uppercase tracking-[0.18em]">
-                            <span class="font-mono normal-case">src/data</span>
-                        </p>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
+                                <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
+                                <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
+                            </div>
+                        </div>
 
-                        <details class="group/details mt-2">
-                            <summary class="cursor-pointer text-xs font-bold text-premium-accent uppercase tracking-wider hover:text-premium-purple transition-colors list-none flex items-center gap-2">
-                                <span class="group-open/details:hidden">Ver Estrutura</span>
-                                <span class="hidden group-open/details:inline">Ocultar Estrutura</span>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Campos visíveis na prévia
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                {dataset.sampleKeys.length > 0 ? (
+                                    dataset.sampleKeys.map((field) => (
+                                        <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
+                                            {field}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span class="text-sm text-text-secondary">Sem amostra de campos.</span>
+                                )}
+                            </div>
+                        </div>
+
+                        <details class="group/details mt-1">
+                            <summary class="cursor-pointer list-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-premium-accent transition-colors hover:text-premium-purple">
+                                <span class="group-open/details:hidden">Ver estrutura</span>
+                                <span class="hidden group-open/details:inline">Ocultar estrutura</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </summary>
-                            <div class="mt-3 bg-slate-900 rounded-lg p-3 border border-white/10 overflow-hidden">
-                                <pre class="text-[10px] text-slate-300 font-mono overflow-x-auto whitespace-pre no-scrollbar"><code>{dataset.structure}</code></pre>
+                            <div class="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-3">
+                                <pre class="no-scrollbar overflow-x-auto whitespace-pre text-[10px] text-slate-300 font-mono"><code>{dataset.structure}</code></pre>
                             </div>
                         </details>
 
-                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-end">
-                            <button
-                                class="download-btn flex items-center gap-2 text-sm font-bold text-premium-accent hover:text-white hover:bg-premium-accent px-3 py-1.5 rounded-lg transition-all duration-300"
-                                data-filename={dataset.name}
-                                data-blob={JSON.stringify(dataset.data)}
+                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
+                            <span class="text-xs text-text-secondary">
+                                JSON bruto
+                            </span>
+                            <a
+                                href={dataset.downloadHref}
+                                download={dataset.name}
+                                class="inline-flex items-center gap-2 rounded-xl border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-2 text-sm font-bold text-premium-accent transition-colors hover:bg-premium-accent hover:text-white"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
                                 Download
-                            </button>
+                            </a>
                         </div>
                     </article>
                 ))}
             </div>
         </section>
 
-        <section class="space-y-5">
+        <section id="datasets-mart" class="space-y-5" data-dataset-section="mart">
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Marts Analíticos</h2>
-                    <p class="text-text-secondary mt-1">Arquivos em <span class="font-mono text-text-main">src/data</span>.</p>
+                    <p class="text-text-secondary mt-1">Agregações prontas para gráficos, KPIs e séries em <span class="font-mono text-text-main">src/data</span>.</p>
                 </div>
+                <span class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">
+                    {martDatasets.length} arquivos
+                </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {martDatasets.map((dataset) => (
-                    <article class="glass-card p-6 flex flex-col gap-4 h-full hover:border-premium-accent/40 transition-all duration-300">
+                    <article
+                        class="glass-card p-6 flex flex-col gap-5 h-full hover:border-amber-400/40 transition-all duration-300"
+                        data-dataset-card
+                        data-dataset-type="mart"
+                        data-search={dataset.searchText}
+                    >
                         <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-[0.18em] text-amber-500">Mart</p>
-                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] mt-2 break-all">{dataset.name}</h3>
+                            <div class="space-y-2">
+                                <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">
+                                    Mart
+                                </span>
+                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] leading-snug break-all">
+                                    {dataset.name}
+                                </h3>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold border bg-amber-500/10 text-amber-500 border-amber-500/20">
+                            <span class="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-300">
                                 {dataset.countLabel}
                             </span>
                         </div>
@@ -278,62 +764,182 @@ const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
                             {dataset.description}
                         </p>
 
-                        <p class="text-xs text-text-muted uppercase tracking-[0.18em]">
-                            <span class="font-mono normal-case">src/data</span>
-                        </p>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
+                                <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
+                            </div>
+                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
+                                <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
+                            </div>
+                        </div>
 
-                        <details class="group/details mt-2">
-                            <summary class="cursor-pointer text-xs font-bold text-premium-accent uppercase tracking-wider hover:text-premium-purple transition-colors list-none flex items-center gap-2">
-                                <span class="group-open/details:hidden">Ver Estrutura</span>
-                                <span class="hidden group-open/details:inline">Ocultar Estrutura</span>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Campos visíveis na prévia
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                {dataset.sampleKeys.length > 0 ? (
+                                    dataset.sampleKeys.map((field) => (
+                                        <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
+                                            {field}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span class="text-sm text-text-secondary">Sem amostra de campos.</span>
+                                )}
+                            </div>
+                        </div>
+
+                        <details class="group/details mt-1">
+                            <summary class="cursor-pointer list-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-premium-accent transition-colors hover:text-premium-purple">
+                                <span class="group-open/details:hidden">Ver estrutura</span>
+                                <span class="hidden group-open/details:inline">Ocultar estrutura</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </summary>
-                            <div class="mt-3 bg-slate-900 rounded-lg p-3 border border-white/10 overflow-hidden">
-                                <pre class="text-[10px] text-slate-300 font-mono overflow-x-auto whitespace-pre no-scrollbar"><code>{dataset.structure}</code></pre>
+                            <div class="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-3">
+                                <pre class="no-scrollbar overflow-x-auto whitespace-pre text-[10px] text-slate-300 font-mono"><code>{dataset.structure}</code></pre>
                             </div>
                         </details>
 
-                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-end">
-                            <button
-                                class="download-btn flex items-center gap-2 text-sm font-bold text-premium-accent hover:text-white hover:bg-premium-accent px-3 py-1.5 rounded-lg transition-all duration-300"
-                                data-filename={dataset.name}
-                                data-blob={JSON.stringify(dataset.data)}
+                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
+                            <span class="text-xs text-text-secondary">
+                                JSON analítico
+                            </span>
+                            <a
+                                href={dataset.downloadHref}
+                                download={dataset.name}
+                                class="inline-flex items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-300 transition-colors hover:bg-amber-400 hover:text-slate-950"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
                                 Download
-                            </button>
+                            </a>
                         </div>
                     </article>
                 ))}
             </div>
         </section>
+
+        <div
+            id="datasetEmptyState"
+            class="hidden flex-col items-center justify-center py-20 text-center glass-card border border-dashed border-border-main"
+        >
+            <div class="w-16 h-16 rounded-3xl bg-white/[0.03] border border-border-main flex items-center justify-center text-text-secondary mb-5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path><path d="M8 11h6"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold font-['Outfit'] text-text-main">Nenhum dataset encontrado</h3>
+            <p class="mt-2 max-w-md text-text-secondary">
+                Ajuste sua busca ou volte para o filtro <strong>Todos</strong> para ver o catálogo completo.
+            </p>
+        </div>
     </div>
 </Layout>
 
 <script>
-    function setupDownloads() {
-        document.querySelectorAll(".download-btn").forEach((button) => {
+    import { normalizeSearchText } from "../../lib/search";
+
+    function setupOpenDataCatalog() {
+        const root = document.getElementById("open-data-catalog");
+        if (!root || root.dataset.initialized === "true") return;
+        root.dataset.initialized = "true";
+
+        const searchInput = document.getElementById(
+            "datasetSearch",
+        ) as HTMLInputElement | null;
+        const resetButton = document.getElementById("resetDatasetSearch");
+        const visibleCountLabel = document.getElementById("datasetVisibleCount");
+        const emptyState = document.getElementById("datasetEmptyState");
+        const cards = Array.from(
+            document.querySelectorAll<HTMLElement>("[data-dataset-card]"),
+        );
+        const sections = Array.from(
+            document.querySelectorAll<HTMLElement>("[data-dataset-section]"),
+        );
+        const filterButtons = Array.from(
+            document.querySelectorAll<HTMLButtonElement>("[data-dataset-filter]"),
+        );
+
+        let activeFilter = "all";
+
+        const syncFilterButtonState = () => {
+            filterButtons.forEach((button) => {
+                const isActive = button.dataset.datasetFilter === activeFilter;
+                button.classList.toggle("border-premium-accent/20", isActive);
+                button.classList.toggle("bg-premium-accent/[0.08]", isActive);
+                button.classList.toggle("text-premium-accent", isActive);
+                button.classList.toggle("border-border-main", !isActive);
+                button.classList.toggle("bg-white/[0.03]", !isActive);
+                button.classList.toggle("text-text-secondary", !isActive);
+            });
+        };
+
+        const applyFilters = () => {
+            const query = normalizeSearchText(searchInput?.value || "");
+            let visibleCards = 0;
+
+            if (query) {
+                resetButton?.classList.remove("hidden");
+            } else {
+                resetButton?.classList.add("hidden");
+            }
+
+            cards.forEach((card) => {
+                const matchesType =
+                    activeFilter === "all" ||
+                    card.dataset.datasetType === activeFilter;
+                const matchesQuery =
+                    !query ||
+                    normalizeSearchText(card.dataset.search || "").includes(query);
+                const isVisible = matchesType && matchesQuery;
+
+                card.classList.toggle("hidden", !isVisible);
+                if (isVisible) visibleCards += 1;
+            });
+
+            sections.forEach((section) => {
+                const visibleSectionCards = section.querySelectorAll(
+                    "[data-dataset-card]:not(.hidden)",
+                ).length;
+                section.classList.toggle("hidden", visibleSectionCards === 0);
+            });
+
+            if (visibleCountLabel) {
+                visibleCountLabel.textContent = String(visibleCards);
+            }
+
+            emptyState?.classList.toggle("hidden", visibleCards !== 0);
+            emptyState?.classList.toggle("flex", visibleCards === 0);
+        };
+
+        filterButtons.forEach((button) => {
             button.addEventListener("click", () => {
-                const filename = button.getAttribute("data-filename");
-                const content = button.getAttribute("data-blob");
-
-                if (!filename || !content) return;
-
-                const blob = new Blob([content], { type: "application/json" });
-                const url = window.URL.createObjectURL(blob);
-                const anchor = document.createElement("a");
-                anchor.style.display = "none";
-                anchor.href = url;
-                anchor.download = filename;
-
-                document.body.appendChild(anchor);
-                anchor.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(anchor);
+                activeFilter = button.dataset.datasetFilter || "all";
+                syncFilterButtonState();
+                applyFilters();
             });
         });
+
+        searchInput?.addEventListener("input", applyFilters);
+        resetButton?.addEventListener("click", () => {
+            if (searchInput) {
+                searchInput.value = "";
+            }
+            applyFilters();
+            searchInput?.focus();
+        });
+
+        syncFilterButtonState();
+        applyFilters();
     }
 
-    setupDownloads();
-    document.addEventListener("astro:after-swap", setupDownloads);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupOpenDataCatalog, {
+            once: true,
+        });
+    } else {
+        setupOpenDataCatalog();
+    }
+
+    document.addEventListener("astro:after-swap", setupOpenDataCatalog);
 </script>

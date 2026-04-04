@@ -2,12 +2,20 @@
 import Layout from "../../layouts/Layout.astro";
 import researchersData from "../../data/researchers_canonical.json";
 import initiativesData from "../../data/initiatives_canonical.json";
+import researchersOnlyCollaborationGraphData from "../../data/researchers_only_collaboration_graph.json";
+import researchersOnlyRelationshipGraphData from "../../data/researchers_only_relationship_graph.json";
+import outsideIfesCollaborationGraphData from "../../data/outside_ifes_collaboration_graph.json";
+import outsideIfesRelationshipGraphData from "../../data/outside_ifes_relationship_graph.json";
+import nullResearchersCollaborationGraphData from "../../data/null_researchers_collaboration_graph.json";
+import nullResearchersRelationshipGraphData from "../../data/null_researchers_relationship_graph.json";
 import type { Researcher } from "../../types/researchers";
+import type { StudentInteractionRawGraphFile } from "../../types/student-graphs";
 import {
     getAcademicEducationSources,
     getAttributeSources,
     toInlineSourceItems,
 } from "../../lib/provenance";
+import { buildStudentInteractionViewModel } from "../../lib/student-interaction";
 
 // Profile Components
 import ResearcherProfileHeader from "../../components/researchers/ResearcherProfileHeader.astro";
@@ -19,6 +27,7 @@ import ResearcherProfileInitiatives from "../../components/researchers/Researche
 import ResearcherProfileAdvisorships from "../../components/researchers/ResearcherProfileAdvisorships.astro";
 import ResearcherProfileArticles from "../../components/researchers/ResearcherProfileArticles.astro";
 import ResearcherProfileStats from "../../components/researchers/ResearcherProfileStats.astro";
+import PersonInteractionGraph from "../../components/researchers/PersonInteractionGraph.astro";
 
 export function getStaticPaths() {
     const researchers = researchersData as unknown as Researcher[];
@@ -123,6 +132,85 @@ const articleSourcesById = Object.fromEntries(
         ),
     ]),
 );
+
+const researcherGraphDataByClassification = {
+    student: {
+        collaboration: {
+            data: null,
+            source: "students_collaboration_graph",
+        },
+        relationship: {
+            data: null,
+            source: "students_relationship_graph",
+        },
+    },
+    researcher: {
+        collaboration: {
+            data: researchersOnlyCollaborationGraphData as StudentInteractionRawGraphFile,
+            source: "researchers_only_collaboration_graph",
+        },
+        relationship: {
+            data: researchersOnlyRelationshipGraphData as StudentInteractionRawGraphFile,
+            source: "researchers_only_relationship_graph",
+        },
+    },
+    outside_ifes: {
+        collaboration: {
+            data: outsideIfesCollaborationGraphData as StudentInteractionRawGraphFile,
+            source: "outside_ifes_collaboration_graph",
+        },
+        relationship: {
+            data: outsideIfesRelationshipGraphData as StudentInteractionRawGraphFile,
+            source: "outside_ifes_relationship_graph",
+        },
+    },
+    null: {
+        collaboration: {
+            data: nullResearchersCollaborationGraphData as StudentInteractionRawGraphFile,
+            source: "null_researchers_collaboration_graph",
+        },
+        relationship: {
+            data: nullResearchersRelationshipGraphData as StudentInteractionRawGraphFile,
+            source: "null_researchers_relationship_graph",
+        },
+    },
+} as const;
+
+const graphBucket =
+    researcher.classification === "student"
+        ? "student"
+        : researcher.classification === "researcher"
+          ? "researcher"
+          : researcher.classification === "outside_ifes"
+            ? "outside_ifes"
+            : "null";
+
+const collaborationGraphConfig =
+    researcherGraphDataByClassification[graphBucket].collaboration;
+const relationshipGraphConfig =
+    researcherGraphDataByClassification[graphBucket].relationship;
+
+const researcherCollaborationGraph = collaborationGraphConfig.data
+    ? buildStudentInteractionViewModel(collaborationGraphConfig.data, {
+          focusId: researcher.id,
+          focusName: researcher.name,
+          focusClassification: researcher.classification ?? null,
+          graphDataSource: collaborationGraphConfig.source,
+          graphKind: "collaboration",
+          baseUrl: import.meta.env.BASE_URL,
+      })
+    : null;
+
+const researcherRelationshipGraph = relationshipGraphConfig.data
+    ? buildStudentInteractionViewModel(relationshipGraphConfig.data, {
+          focusId: researcher.id,
+          focusName: researcher.name,
+          focusClassification: researcher.classification ?? null,
+          graphDataSource: relationshipGraphConfig.source,
+          graphKind: "relationship",
+          baseUrl: import.meta.env.BASE_URL,
+      })
+    : null;
 ---
 
 <Layout
@@ -176,6 +264,18 @@ const articleSourcesById = Object.fromEntries(
                 researcher={enrichedResearcher}
                 articleSourcesById={articleSourcesById}
             />
+
+            {
+                researcherCollaborationGraph && (
+                    <PersonInteractionGraph graph={researcherCollaborationGraph} />
+                )
+            }
+
+            {
+                researcherRelationshipGraph && (
+                    <PersonInteractionGraph graph={researcherRelationshipGraph} />
+                )
+            }
         </div>
     </div>
 </Layout>
