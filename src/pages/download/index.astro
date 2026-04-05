@@ -3,20 +3,52 @@ import Layout from "../../layouts/Layout.astro";
 
 import advisorshipsCanonical from "../../data/advisorships_canonical.json";
 import advisorshipsCanonicalUrl from "../../data/advisorships_canonical.json?url";
+import advisorshipsTracking from "../../data/advisorships_tracking.json";
+import advisorshipsTrackingUrl from "../../data/advisorships_tracking.json?url";
 import articlesCanonical from "../../data/articles_canonical.json";
 import articlesCanonicalUrl from "../../data/articles_canonical.json?url";
+import attributeAssertionsCanonical from "../../data/attribute_assertions_canonical.json";
+import attributeAssertionsCanonicalUrl from "../../data/attribute_assertions_canonical.json?url";
 import campusesCanonical from "../../data/campuses_canonical.json";
 import campusesCanonicalUrl from "../../data/campuses_canonical.json?url";
+import entityChangeLogsCanonical from "../../data/entity_change_logs_canonical.json";
+import entityChangeLogsCanonicalUrl from "../../data/entity_change_logs_canonical.json?url";
+import entityMatchesCanonical from "../../data/entity_matches_canonical.json";
+import entityMatchesCanonicalUrl from "../../data/entity_matches_canonical.json?url";
 import fellowshipsCanonical from "../../data/fellowships_canonical.json";
 import fellowshipsCanonicalUrl from "../../data/fellowships_canonical.json?url";
+import ingestionRunsCanonical from "../../data/ingestion_runs_canonical.json";
+import ingestionRunsCanonicalUrl from "../../data/ingestion_runs_canonical.json?url";
 import initiativeTypesCanonical from "../../data/initiative_types_canonical.json";
 import initiativeTypesCanonicalUrl from "../../data/initiative_types_canonical.json?url";
 import initiativesCanonical from "../../data/initiatives_canonical.json";
 import initiativesCanonicalUrl from "../../data/initiatives_canonical.json?url";
+import initiativesTracking from "../../data/initiatives_tracking.json";
+import initiativesTrackingUrl from "../../data/initiatives_tracking.json?url";
 import knowledgeAreasCanonical from "../../data/knowledge_areas_canonical.json";
 import knowledgeAreasCanonicalUrl from "../../data/knowledge_areas_canonical.json?url";
 import organizationsCanonical from "../../data/organizations_canonical.json";
 import organizationsCanonicalUrl from "../../data/organizations_canonical.json?url";
+import outsideIfesCanonical from "../../data/outside_ifes_canonical.json";
+import outsideIfesCanonicalUrl from "../../data/outside_ifes_canonical.json?url";
+import outsideIfesCollaborationGraph from "../../data/outside_ifes_collaboration_graph.json";
+import outsideIfesCollaborationGraphUrl from "../../data/outside_ifes_collaboration_graph.json?url";
+import outsideIfesRelationshipGraph from "../../data/outside_ifes_relationship_graph.json";
+import outsideIfesRelationshipGraphUrl from "../../data/outside_ifes_relationship_graph.json?url";
+import nullResearchersCanonical from "../../data/null_researchers_canonical.json";
+import nullResearchersCanonicalUrl from "../../data/null_researchers_canonical.json?url";
+import nullResearchersCollaborationGraph from "../../data/null_researchers_collaboration_graph.json";
+import nullResearchersCollaborationGraphUrl from "../../data/null_researchers_collaboration_graph.json?url";
+import nullResearchersRelationshipGraph from "../../data/null_researchers_relationship_graph.json";
+import nullResearchersRelationshipGraphUrl from "../../data/null_researchers_relationship_graph.json?url";
+import peopleCollaborationGraph from "../../data/people_collaboration_graph.json";
+import peopleCollaborationGraphUrl from "../../data/people_collaboration_graph.json?url";
+import peopleRelationshipGraph from "../../data/people_relationship_graph.json";
+import peopleRelationshipGraphUrl from "../../data/people_relationship_graph.json?url";
+import researchGroupMembershipGraphsManifest from "../../data/research_group_membership_graphs_manifest.json";
+import researchGroupMembershipGraphsManifestUrl from "../../data/research_group_membership_graphs_manifest.json?url";
+import researchGroupRelationshipGraphsManifest from "../../data/research_group_relationship_graphs_manifest.json";
+import researchGroupRelationshipGraphsManifestUrl from "../../data/research_group_relationship_graphs_manifest.json?url";
 import researchGroupsCanonical from "../../data/research_groups_canonical.json";
 import researchGroupsCanonicalUrl from "../../data/research_groups_canonical.json?url";
 import researchersCanonical from "../../data/researchers_canonical.json";
@@ -27,16 +59,42 @@ import initiativesMart from "../../data/initiatives_analytics_mart.json";
 import initiativesMartUrl from "../../data/initiatives_analytics_mart.json?url";
 import knowledgeAreasMart from "../../data/knowledge_areas_mart.json";
 import knowledgeAreasMartUrl from "../../data/knowledge_areas_mart.json?url";
+import researchersOnlyCanonical from "../../data/researchers_only_canonical.json";
+import researchersOnlyCanonicalUrl from "../../data/researchers_only_canonical.json?url";
+import researchersOnlyCollaborationGraph from "../../data/researchers_only_collaboration_graph.json";
+import researchersOnlyCollaborationGraphUrl from "../../data/researchers_only_collaboration_graph.json?url";
+import researchersOnlyRelationshipGraph from "../../data/researchers_only_relationship_graph.json";
+import researchersOnlyRelationshipGraphUrl from "../../data/researchers_only_relationship_graph.json?url";
+import researchersTracking from "../../data/researchers_tracking.json";
+import researchersTrackingUrl from "../../data/researchers_tracking.json?url";
+import studentsCanonical from "../../data/students_canonical.json";
+import studentsCanonicalUrl from "../../data/students_canonical.json?url";
+import studentsCollaborationGraph from "../../data/students_collaboration_graph.json";
+import studentsCollaborationGraphUrl from "../../data/students_collaboration_graph.json?url";
+import studentsRelationshipGraph from "../../data/students_relationship_graph.json";
+import studentsRelationshipGraphUrl from "../../data/students_relationship_graph.json?url";
 
-type DatasetType = "Canonical" | "Mart";
+type DatasetSection = "canonical" | "tracking" | "graph" | "mart";
+
+interface DatasetDefinition {
+    id: string;
+    name: string;
+    description: string;
+    section: DatasetSection;
+    badgeLabel: string;
+    data: unknown;
+    downloadHref: string;
+}
 
 interface DatasetItem {
     id: string;
     name: string;
     description: string;
-    type: DatasetType;
+    section: DatasetSection;
+    badgeLabel: string;
     countValue: number;
     countLabel: string;
+    sizeBytes: number;
     sizeLabel: string;
     structure: string;
     sampleKeys: string[];
@@ -44,15 +102,88 @@ interface DatasetItem {
     searchText: string;
 }
 
+interface DatasetSectionMeta {
+    key: DatasetSection;
+    anchorId: string;
+    title: string;
+    description: string;
+    chipLabel: string;
+    badgeClass: string;
+    countClass: string;
+    hoverClass: string;
+    buttonClass: string;
+    summarySurfaceClass: string;
+    summaryValueClass: string;
+    summaryDescription: string;
+}
+
+const isObjectRecord = (
+    value: unknown,
+): value is Record<string, unknown> =>
+    Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+const isGraphDataset = (
+    data: unknown,
+): data is {
+    metadata?: Record<string, unknown>;
+    graph_stats?: Record<string, unknown>;
+    graph: { nodes?: unknown[]; edges?: unknown[] };
+} => {
+    if (!isObjectRecord(data) || !isObjectRecord(data.graph)) {
+        return false;
+    }
+
+    return Array.isArray(data.graph.nodes) && Array.isArray(data.graph.edges);
+};
+
+const isGraphManifestDataset = (
+    data: unknown,
+): data is {
+    metadata?: Record<string, unknown>;
+    graphs: unknown[];
+} => isObjectRecord(data) && Array.isArray(data.graphs);
+
 const buildStructurePreview = (data: unknown) => {
     if (Array.isArray(data)) {
         return JSON.stringify(data[0] ?? {}, null, 2);
+    }
+
+    if (isGraphDataset(data)) {
+        return JSON.stringify(
+            {
+                metadata: data.metadata ?? {},
+                graph_stats: data.graph_stats ?? {},
+                sample_nodes: data.graph.nodes.slice(0, 1),
+                sample_edges: data.graph.edges.slice(0, 1),
+            },
+            null,
+            2,
+        );
+    }
+
+    if (isGraphManifestDataset(data)) {
+        return JSON.stringify(
+            {
+                metadata: data.metadata ?? {},
+                sample_graphs: data.graphs.slice(0, 2),
+            },
+            null,
+            2,
+        );
     }
 
     return JSON.stringify(data, null, 2);
 };
 
 const buildCountValue = (data: unknown) => {
+    if (isGraphDataset(data)) {
+        return data.graph.nodes.length;
+    }
+
+    if (isGraphManifestDataset(data)) {
+        return data.graphs.length;
+    }
+
     if (Array.isArray(data)) {
         return data.length;
     }
@@ -65,6 +196,14 @@ const buildCountValue = (data: unknown) => {
 };
 
 const buildCountLabel = (data: unknown) => {
+    if (isGraphDataset(data)) {
+        return `${data.graph.nodes.length} nós · ${data.graph.edges.length} arestas`;
+    }
+
+    if (isGraphManifestDataset(data)) {
+        return `${data.graphs.length} grafos`;
+    }
+
     if (Array.isArray(data)) {
         return `${data.length} registros`;
     }
@@ -94,6 +233,35 @@ const buildSizeLabel = (data: unknown) => {
 };
 
 const buildSampleKeys = (data: unknown) => {
+    if (isGraphDataset(data)) {
+        const nodeKeys =
+            data.graph.nodes[0] &&
+            isObjectRecord(data.graph.nodes[0])
+                ? Object.keys(data.graph.nodes[0]).slice(0, 3)
+                : [];
+        const edgeKeys =
+            data.graph.edges[0] &&
+            isObjectRecord(data.graph.edges[0])
+                ? Object.keys(data.graph.edges[0]).slice(0, 3)
+                : [];
+
+        return [
+            "metadata",
+            "graph_stats",
+            ...nodeKeys.map((key) => `node.${key}`),
+            ...edgeKeys.map((key) => `edge.${key}`),
+        ].slice(0, 6);
+    }
+
+    if (isGraphManifestDataset(data)) {
+        const firstGraph = data.graphs[0];
+        if (isObjectRecord(firstGraph)) {
+            return Object.keys(firstGraph).slice(0, 6);
+        }
+
+        return ["metadata", "graphs"];
+    }
+
     if (Array.isArray(data)) {
         const firstItem = data[0];
         if (firstItem && typeof firstItem === "object" && !Array.isArray(firstItem)) {
@@ -112,266 +280,460 @@ const buildSampleKeys = (data: unknown) => {
 const buildSearchText = (
     name: string,
     description: string,
-    type: DatasetType,
+    badgeLabel: string,
     sampleKeys: string[],
-) => [name, description, type, ...sampleKeys].join(" ").toLowerCase();
+) => [name, description, badgeLabel, ...sampleKeys].join(" ").toLowerCase();
+
+const createDataset = ({
+    id,
+    name,
+    description,
+    section,
+    badgeLabel,
+    data,
+    downloadHref,
+}: DatasetDefinition): DatasetItem => {
+    const sampleKeys = buildSampleKeys(data);
+    const sizeBytes = buildSizeBytes(data);
+
+    return {
+        id,
+        name,
+        description,
+        section,
+        badgeLabel,
+        countValue: buildCountValue(data),
+        countLabel: buildCountLabel(data),
+        sizeBytes,
+        sizeLabel: buildSizeLabel(data),
+        structure: buildStructurePreview(data),
+        sampleKeys,
+        downloadHref,
+        searchText: buildSearchText(name, description, badgeLabel, sampleKeys),
+    };
+};
 
 const datasets: DatasetItem[] = [
-    {
-        id: "advisorships",
-        name: "advisorships_canonical.json",
-        description: "Orientações com estudante, tipologia, período e status.",
-        type: "Canonical",
-        countValue: buildCountValue(advisorshipsCanonical),
-        countLabel: buildCountLabel(advisorshipsCanonical),
-        sizeLabel: buildSizeLabel(advisorshipsCanonical),
-        structure: buildStructurePreview(advisorshipsCanonical),
-        sampleKeys: buildSampleKeys(advisorshipsCanonical),
-        downloadHref: advisorshipsCanonicalUrl,
-        searchText: buildSearchText(
-            "advisorships_canonical.json",
-            "Orientações com estudante, tipologia, período e status.",
-            "Canonical",
-            buildSampleKeys(advisorshipsCanonical),
-        ),
-    },
-    {
-        id: "articles",
-        name: "articles_canonical.json",
-        description: "Artigos publicados com ano, tipo, DOI e veículo.",
-        type: "Canonical",
-        countValue: buildCountValue(articlesCanonical),
-        countLabel: buildCountLabel(articlesCanonical),
-        sizeLabel: buildSizeLabel(articlesCanonical),
-        structure: buildStructurePreview(articlesCanonical),
-        sampleKeys: buildSampleKeys(articlesCanonical),
-        downloadHref: articlesCanonicalUrl,
-        searchText: buildSearchText(
-            "articles_canonical.json",
-            "Artigos publicados com ano, tipo, DOI e veículo.",
-            "Canonical",
-            buildSampleKeys(articlesCanonical),
-        ),
-    },
-    {
+    createDataset({
         id: "campuses",
         name: "campuses_canonical.json",
-        description: "Cadastro de campi usado nos vínculos e filtros do portal.",
-        type: "Canonical",
-        countValue: buildCountValue(campusesCanonical),
-        countLabel: buildCountLabel(campusesCanonical),
-        sizeLabel: buildSizeLabel(campusesCanonical),
-        structure: buildStructurePreview(campusesCanonical),
-        sampleKeys: buildSampleKeys(campusesCanonical),
+        description: "Cadastro de campi usado nos filtros e vínculos do portal.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: campusesCanonical,
         downloadHref: campusesCanonicalUrl,
-        searchText: buildSearchText(
-            "campuses_canonical.json",
-            "Cadastro de campi usado nos vínculos e filtros do portal.",
-            "Canonical",
-            buildSampleKeys(campusesCanonical),
-        ),
-    },
-    {
-        id: "fellowships",
-        name: "fellowships_canonical.json",
-        description: "Bolsas e relações de fomento ligadas às iniciativas.",
-        type: "Canonical",
-        countValue: buildCountValue(fellowshipsCanonical),
-        countLabel: buildCountLabel(fellowshipsCanonical),
-        sizeLabel: buildSizeLabel(fellowshipsCanonical),
-        structure: buildStructurePreview(fellowshipsCanonical),
-        sampleKeys: buildSampleKeys(fellowshipsCanonical),
-        downloadHref: fellowshipsCanonicalUrl,
-        searchText: buildSearchText(
-            "fellowships_canonical.json",
-            "Bolsas e relações de fomento ligadas às iniciativas.",
-            "Canonical",
-            buildSampleKeys(fellowshipsCanonical),
-        ),
-    },
-    {
-        id: "initiative-types",
-        name: "initiative_types_canonical.json",
-        description: "Tipos de iniciativa utilizados na base do portal.",
-        type: "Canonical",
-        countValue: buildCountValue(initiativeTypesCanonical),
-        countLabel: buildCountLabel(initiativeTypesCanonical),
-        sizeLabel: buildSizeLabel(initiativeTypesCanonical),
-        structure: buildStructurePreview(initiativeTypesCanonical),
-        sampleKeys: buildSampleKeys(initiativeTypesCanonical),
-        downloadHref: initiativeTypesCanonicalUrl,
-        searchText: buildSearchText(
-            "initiative_types_canonical.json",
-            "Tipos de iniciativa utilizados na base do portal.",
-            "Canonical",
-            buildSampleKeys(initiativeTypesCanonical),
-        ),
-    },
-    {
-        id: "initiatives",
-        name: "initiatives_canonical.json",
-        description: "Projetos e iniciativas com vigência, equipe e tipo.",
-        type: "Canonical",
-        countValue: buildCountValue(initiativesCanonical),
-        countLabel: buildCountLabel(initiativesCanonical),
-        sizeLabel: buildSizeLabel(initiativesCanonical),
-        structure: buildStructurePreview(initiativesCanonical),
-        sampleKeys: buildSampleKeys(initiativesCanonical),
-        downloadHref: initiativesCanonicalUrl,
-        searchText: buildSearchText(
-            "initiatives_canonical.json",
-            "Projetos e iniciativas com vigência, equipe e tipo.",
-            "Canonical",
-            buildSampleKeys(initiativesCanonical),
-        ),
-    },
-    {
-        id: "knowledge-areas",
-        name: "knowledge_areas_canonical.json",
-        description: "Tabela de áreas do conhecimento adotadas no portal.",
-        type: "Canonical",
-        countValue: buildCountValue(knowledgeAreasCanonical),
-        countLabel: buildCountLabel(knowledgeAreasCanonical),
-        sizeLabel: buildSizeLabel(knowledgeAreasCanonical),
-        structure: buildStructurePreview(knowledgeAreasCanonical),
-        sampleKeys: buildSampleKeys(knowledgeAreasCanonical),
-        downloadHref: knowledgeAreasCanonicalUrl,
-        searchText: buildSearchText(
-            "knowledge_areas_canonical.json",
-            "Tabela de áreas do conhecimento adotadas no portal.",
-            "Canonical",
-            buildSampleKeys(knowledgeAreasCanonical),
-        ),
-    },
-    {
+    }),
+    createDataset({
         id: "organizations",
         name: "organizations_canonical.json",
         description: "Organizações financiadoras, parceiras e relacionadas.",
-        type: "Canonical",
-        countValue: buildCountValue(organizationsCanonical),
-        countLabel: buildCountLabel(organizationsCanonical),
-        sizeLabel: buildSizeLabel(organizationsCanonical),
-        structure: buildStructurePreview(organizationsCanonical),
-        sampleKeys: buildSampleKeys(organizationsCanonical),
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: organizationsCanonical,
         downloadHref: organizationsCanonicalUrl,
-        searchText: buildSearchText(
-            "organizations_canonical.json",
-            "Organizações financiadoras, parceiras e relacionadas.",
-            "Canonical",
-            buildSampleKeys(organizationsCanonical),
-        ),
-    },
-    {
-        id: "groups",
+    }),
+    createDataset({
+        id: "initiative-types",
+        name: "initiative_types_canonical.json",
+        description: "Tipos de iniciativa utilizados na base do portal.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: initiativeTypesCanonical,
+        downloadHref: initiativeTypesCanonicalUrl,
+    }),
+    createDataset({
+        id: "knowledge-areas",
+        name: "knowledge_areas_canonical.json",
+        description: "Tabela de áreas do conhecimento adotadas no portal.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: knowledgeAreasCanonical,
+        downloadHref: knowledgeAreasCanonicalUrl,
+    }),
+    createDataset({
+        id: "fellowships",
+        name: "fellowships_canonical.json",
+        description: "Bolsas e relações de fomento ligadas às iniciativas.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: fellowshipsCanonical,
+        downloadHref: fellowshipsCanonicalUrl,
+    }),
+    createDataset({
+        id: "articles",
+        name: "articles_canonical.json",
+        description: "Artigos publicados com ano, tipo, DOI e veículo.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: articlesCanonical,
+        downloadHref: articlesCanonicalUrl,
+    }),
+    createDataset({
+        id: "initiatives",
+        name: "initiatives_canonical.json",
+        description: "Projetos e iniciativas com vigência, equipe e tipologia.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: initiativesCanonical,
+        downloadHref: initiativesCanonicalUrl,
+    }),
+    createDataset({
+        id: "advisorships",
+        name: "advisorships_canonical.json",
+        description: "Orientações com estudante, tipologia, período e status.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: advisorshipsCanonical,
+        downloadHref: advisorshipsCanonicalUrl,
+    }),
+    createDataset({
+        id: "research-groups",
         name: "research_groups_canonical.json",
-        description: "Grupos de pesquisa com líderes, membros e áreas.",
-        type: "Canonical",
-        countValue: buildCountValue(researchGroupsCanonical),
-        countLabel: buildCountLabel(researchGroupsCanonical),
-        sizeLabel: buildSizeLabel(researchGroupsCanonical),
-        structure: buildStructurePreview(researchGroupsCanonical),
-        sampleKeys: buildSampleKeys(researchGroupsCanonical),
+        description: "Grupos de pesquisa com líderes, membros, campus e áreas.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: researchGroupsCanonical,
         downloadHref: researchGroupsCanonicalUrl,
-        searchText: buildSearchText(
-            "research_groups_canonical.json",
-            "Grupos de pesquisa com líderes, membros e áreas.",
-            "Canonical",
-            buildSampleKeys(researchGroupsCanonical),
-        ),
-    },
-    {
+    }),
+    createDataset({
         id: "researchers",
         name: "researchers_canonical.json",
-        description: "Pesquisadores com perfil, vínculos, artigos e orientações.",
-        type: "Canonical",
-        countValue: buildCountValue(researchersCanonical),
-        countLabel: buildCountLabel(researchersCanonical),
-        sizeLabel: buildSizeLabel(researchersCanonical),
-        structure: buildStructurePreview(researchersCanonical),
-        sampleKeys: buildSampleKeys(researchersCanonical),
+        description: "Base completa de pessoas com perfis, vínculos, artigos e orientações.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: researchersCanonical,
         downloadHref: researchersCanonicalUrl,
-        searchText: buildSearchText(
-            "researchers_canonical.json",
-            "Pesquisadores com perfil, vínculos, artigos e orientações.",
-            "Canonical",
-            buildSampleKeys(researchersCanonical),
-        ),
-    },
-    {
+    }),
+    createDataset({
+        id: "researchers-only",
+        name: "researchers_only_canonical.json",
+        description: "Recorte canônico apenas dos pesquisadores identificados no portal.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: researchersOnlyCanonical,
+        downloadHref: researchersOnlyCanonicalUrl,
+    }),
+    createDataset({
+        id: "students",
+        name: "students_canonical.json",
+        description: "Recorte canônico dos estudantes com iniciativas, grupos e publicações.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: studentsCanonical,
+        downloadHref: studentsCanonicalUrl,
+    }),
+    createDataset({
+        id: "outside-ifes",
+        name: "outside_ifes_canonical.json",
+        description: "Pessoas externas ao Ifes que aparecem nas redes e iniciativas.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: outsideIfesCanonical,
+        downloadHref: outsideIfesCanonicalUrl,
+    }),
+    createDataset({
+        id: "null-researchers",
+        name: "null_researchers_canonical.json",
+        description: "Perfis sem classificação consolidada para revisão e auditoria.",
+        section: "canonical",
+        badgeLabel: "Canonical",
+        data: nullResearchersCanonical,
+        downloadHref: nullResearchersCanonicalUrl,
+    }),
+    createDataset({
+        id: "attribute-assertions",
+        name: "attribute_assertions_canonical.json",
+        description: "Atributos candidatos por fonte com seleção, hash e justificativa.",
+        section: "tracking",
+        badgeLabel: "Proveniência",
+        data: attributeAssertionsCanonical,
+        downloadHref: attributeAssertionsCanonicalUrl,
+    }),
+    createDataset({
+        id: "entity-matches",
+        name: "entity_matches_canonical.json",
+        description: "Pareamentos entre registros de origem e entidades canônicas.",
+        section: "tracking",
+        badgeLabel: "Proveniência",
+        data: entityMatchesCanonical,
+        downloadHref: entityMatchesCanonicalUrl,
+    }),
+    createDataset({
+        id: "entity-change-logs",
+        name: "entity_change_logs_canonical.json",
+        description: "Histórico de alterações canônicas por execução de ingestão.",
+        section: "tracking",
+        badgeLabel: "Proveniência",
+        data: entityChangeLogsCanonical,
+        downloadHref: entityChangeLogsCanonicalUrl,
+    }),
+    createDataset({
+        id: "ingestion-runs",
+        name: "ingestion_runs_canonical.json",
+        description: "Execuções de ingestão com fluxo, status, hash e janela temporal.",
+        section: "tracking",
+        badgeLabel: "Proveniência",
+        data: ingestionRunsCanonical,
+        downloadHref: ingestionRunsCanonicalUrl,
+    }),
+    createDataset({
+        id: "researchers-tracking",
+        name: "researchers_tracking.json",
+        description: "Rastro consolidado das fontes, matches, atributos e mudanças de pesquisadores.",
+        section: "tracking",
+        badgeLabel: "Tracking",
+        data: researchersTracking,
+        downloadHref: researchersTrackingUrl,
+    }),
+    createDataset({
+        id: "initiatives-tracking",
+        name: "initiatives_tracking.json",
+        description: "Rastro consolidado das fontes, matches, atributos e mudanças de iniciativas.",
+        section: "tracking",
+        badgeLabel: "Tracking",
+        data: initiativesTracking,
+        downloadHref: initiativesTrackingUrl,
+    }),
+    createDataset({
+        id: "advisorships-tracking",
+        name: "advisorships_tracking.json",
+        description: "Rastro consolidado das fontes, matches, atributos e mudanças de orientações.",
+        section: "tracking",
+        badgeLabel: "Tracking",
+        data: advisorshipsTracking,
+        downloadHref: advisorshipsTrackingUrl,
+    }),
+    createDataset({
+        id: "people-collaboration-graph",
+        name: "people_collaboration_graph.json",
+        description: "Rede global de colaboração entre pessoas a partir de projetos, artigos e orientações.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: peopleCollaborationGraph,
+        downloadHref: peopleCollaborationGraphUrl,
+    }),
+    createDataset({
+        id: "people-relationship-graph",
+        name: "people_relationship_graph.json",
+        description: "Rede global de relacionamento com vínculos acadêmicos e institucionais ampliados.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: peopleRelationshipGraph,
+        downloadHref: peopleRelationshipGraphUrl,
+    }),
+    createDataset({
+        id: "researchers-only-collaboration-graph",
+        name: "researchers_only_collaboration_graph.json",
+        description: "Recorte de colaboração apenas entre pesquisadores identificados.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: researchersOnlyCollaborationGraph,
+        downloadHref: researchersOnlyCollaborationGraphUrl,
+    }),
+    createDataset({
+        id: "researchers-only-relationship-graph",
+        name: "researchers_only_relationship_graph.json",
+        description: "Recorte relacional apenas entre pesquisadores identificados.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: researchersOnlyRelationshipGraph,
+        downloadHref: researchersOnlyRelationshipGraphUrl,
+    }),
+    createDataset({
+        id: "students-collaboration-graph",
+        name: "students_collaboration_graph.json",
+        description: "Rede de colaboração centrada nos estudantes e seus vínculos diretos.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: studentsCollaborationGraph,
+        downloadHref: studentsCollaborationGraphUrl,
+    }),
+    createDataset({
+        id: "students-relationship-graph",
+        name: "students_relationship_graph.json",
+        description: "Rede de relacionamento dos estudantes com projetos, grupos e orientações.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: studentsRelationshipGraph,
+        downloadHref: studentsRelationshipGraphUrl,
+    }),
+    createDataset({
+        id: "outside-ifes-collaboration-graph",
+        name: "outside_ifes_collaboration_graph.json",
+        description: "Rede de colaboração dos perfis externos ao Ifes.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: outsideIfesCollaborationGraph,
+        downloadHref: outsideIfesCollaborationGraphUrl,
+    }),
+    createDataset({
+        id: "outside-ifes-relationship-graph",
+        name: "outside_ifes_relationship_graph.json",
+        description: "Rede de relacionamento dos perfis externos ao Ifes.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: outsideIfesRelationshipGraph,
+        downloadHref: outsideIfesRelationshipGraphUrl,
+    }),
+    createDataset({
+        id: "null-researchers-collaboration-graph",
+        name: "null_researchers_collaboration_graph.json",
+        description: "Rede de colaboração dos perfis ainda sem classificação consolidada.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: nullResearchersCollaborationGraph,
+        downloadHref: nullResearchersCollaborationGraphUrl,
+    }),
+    createDataset({
+        id: "null-researchers-relationship-graph",
+        name: "null_researchers_relationship_graph.json",
+        description: "Rede de relacionamento dos perfis ainda sem classificação consolidada.",
+        section: "graph",
+        badgeLabel: "Graph",
+        data: nullResearchersRelationshipGraph,
+        downloadHref: nullResearchersRelationshipGraphUrl,
+    }),
+    createDataset({
+        id: "research-group-membership-manifest",
+        name: "research_group_membership_graphs_manifest.json",
+        description: "Manifesto dos grafos de membresia de grupos, com caminho, nós e arestas por grupo.",
+        section: "graph",
+        badgeLabel: "Manifest",
+        data: researchGroupMembershipGraphsManifest,
+        downloadHref: researchGroupMembershipGraphsManifestUrl,
+    }),
+    createDataset({
+        id: "research-group-relationship-manifest",
+        name: "research_group_relationship_graphs_manifest.json",
+        description: "Manifesto dos grafos relacionais de grupos, com caminho, nós e arestas por grupo.",
+        section: "graph",
+        badgeLabel: "Manifest",
+        data: researchGroupRelationshipGraphsManifest,
+        downloadHref: researchGroupRelationshipGraphsManifestUrl,
+    }),
+    createDataset({
         id: "advisorship-analytics",
         name: "advisorship_analytics.json",
         description: "Agregações analíticas das orientações para dashboards.",
-        type: "Mart",
-        countValue: buildCountValue(advisorshipAnalytics),
-        countLabel: buildCountLabel(advisorshipAnalytics),
-        sizeLabel: buildSizeLabel(advisorshipAnalytics),
-        structure: buildStructurePreview(advisorshipAnalytics),
-        sampleKeys: buildSampleKeys(advisorshipAnalytics),
+        section: "mart",
+        badgeLabel: "Mart",
+        data: advisorshipAnalytics,
         downloadHref: advisorshipAnalyticsUrl,
-        searchText: buildSearchText(
-            "advisorship_analytics.json",
-            "Agregações analíticas das orientações para dashboards.",
-            "Mart",
-            buildSampleKeys(advisorshipAnalytics),
-        ),
-    },
-    {
+    }),
+    createDataset({
         id: "initiatives-analytics",
         name: "initiatives_analytics_mart.json",
         description: "Agregações de projetos com resumo, evolução e composição.",
-        type: "Mart",
-        countValue: buildCountValue(initiativesMart),
-        countLabel: buildCountLabel(initiativesMart),
-        sizeLabel: buildSizeLabel(initiativesMart),
-        structure: buildStructurePreview(initiativesMart),
-        sampleKeys: buildSampleKeys(initiativesMart),
+        section: "mart",
+        badgeLabel: "Mart",
+        data: initiativesMart,
         downloadHref: initiativesMartUrl,
-        searchText: buildSearchText(
-            "initiatives_analytics_mart.json",
-            "Agregações de projetos com resumo, evolução e composição.",
-            "Mart",
-            buildSampleKeys(initiativesMart),
-        ),
-    },
-    {
+    }),
+    createDataset({
         id: "knowledge-areas-mart",
         name: "knowledge_areas_mart.json",
         description: "Matriz analítica das áreas com contagens e agrupamentos.",
-        type: "Mart",
-        countValue: buildCountValue(knowledgeAreasMart),
-        countLabel: buildCountLabel(knowledgeAreasMart),
-        sizeLabel: buildSizeLabel(knowledgeAreasMart),
-        structure: buildStructurePreview(knowledgeAreasMart),
-        sampleKeys: buildSampleKeys(knowledgeAreasMart),
+        section: "mart",
+        badgeLabel: "Mart",
+        data: knowledgeAreasMart,
         downloadHref: knowledgeAreasMartUrl,
-        searchText: buildSearchText(
-            "knowledge_areas_mart.json",
-            "Matriz analítica das áreas com contagens e agrupamentos.",
-            "Mart",
-            buildSampleKeys(knowledgeAreasMart),
-        ),
+    }),
+];
+
+const datasetSectionsMeta: DatasetSectionMeta[] = [
+    {
+        key: "canonical",
+        anchorId: "datasets-canonical",
+        title: "Bases Canônicas",
+        description: "Entidades normalizadas, recortes de pessoas e vínculos estruturantes do portal.",
+        chipLabel: "Canonical",
+        badgeClass:
+            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+        countClass:
+            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+        hoverClass: "hover:border-emerald-400/40",
+        buttonClass:
+            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950",
+        summarySurfaceClass:
+            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+        summaryValueClass: "text-emerald-400",
+        summaryDescription:
+            "Entidades prontas para reconciliação, navegação e joins.",
+    },
+    {
+        key: "tracking",
+        anchorId: "datasets-tracking",
+        title: "Rastreabilidade e Proveniência",
+        description: "Arquivos de auditoria, tracking e histórico de mudanças da pipeline.",
+        chipLabel: "Tracking",
+        badgeClass:
+            "border-sky-400/20 bg-sky-400/10 text-sky-300",
+        countClass:
+            "border-sky-400/20 bg-sky-400/10 text-sky-300",
+        hoverClass: "hover:border-sky-400/40",
+        buttonClass:
+            "border-sky-400/20 bg-sky-400/10 text-sky-300 hover:bg-sky-400 hover:text-slate-950",
+        summarySurfaceClass:
+            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+        summaryValueClass: "text-sky-300",
+        summaryDescription:
+            "Fontes, assertivas, matches e alterações para auditoria.",
+    },
+    {
+        key: "graph",
+        anchorId: "datasets-graphs",
+        title: "Grafos e Manifestos",
+        description: "Redes complexas globais, recortes por perfil e catálogos de grafos por grupo.",
+        chipLabel: "Grafos",
+        badgeClass:
+            "border-premium-purple/20 bg-premium-purple/10 text-premium-purple",
+        countClass:
+            "border-premium-purple/20 bg-premium-purple/10 text-premium-purple",
+        hoverClass: "hover:border-premium-purple/40",
+        buttonClass:
+            "border-premium-purple/20 bg-premium-purple/10 text-premium-purple hover:bg-premium-purple hover:text-white",
+        summarySurfaceClass:
+            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+        summaryValueClass: "text-premium-purple",
+        summaryDescription:
+            "Recortes relacionais e manifests para exploração de redes.",
+    },
+    {
+        key: "mart",
+        anchorId: "datasets-mart",
+        title: "Marts Analíticos",
+        description: "Agregações prontas para KPIs, gráficos e leituras sintéticas.",
+        chipLabel: "Marts",
+        badgeClass:
+            "border-amber-400/20 bg-amber-400/10 text-amber-300",
+        countClass:
+            "border-amber-400/20 bg-amber-400/10 text-amber-300",
+        hoverClass: "hover:border-amber-400/40",
+        buttonClass:
+            "border-amber-400/20 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950",
+        summarySurfaceClass:
+            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+        summaryValueClass: "text-amber-300",
+        summaryDescription:
+            "Agregações prontas para séries, comparativos e dashboards.",
     },
 ];
 
-const canonicalDatasets = datasets.filter((dataset) => dataset.type === "Canonical");
-const martDatasets = datasets.filter((dataset) => dataset.type === "Mart");
+const datasetSections = datasetSectionsMeta.map((section) => ({
+    ...section,
+    datasets: datasets.filter((dataset) => dataset.section === section.key),
+}));
+
+const canonicalDatasets = datasetSections.find((section) => section.key === "canonical")?.datasets || [];
+const trackingDatasets = datasetSections.find((section) => section.key === "tracking")?.datasets || [];
+const graphDatasets = datasetSections.find((section) => section.key === "graph")?.datasets || [];
+const martDatasets = datasetSections.find((section) => section.key === "mart")?.datasets || [];
 const totalDatasets = datasets.length;
 const totalItems = datasets.reduce((sum, dataset) => sum + dataset.countValue, 0);
-const totalDownloadBytes = [
-    advisorshipsCanonical,
-    articlesCanonical,
-    campusesCanonical,
-    fellowshipsCanonical,
-    initiativeTypesCanonical,
-    initiativesCanonical,
-    knowledgeAreasCanonical,
-    organizationsCanonical,
-    researchGroupsCanonical,
-    researchersCanonical,
-    advisorshipAnalytics,
-    initiativesMart,
-    knowledgeAreasMart,
-].reduce((sum, data) => sum + buildSizeBytes(data), 0);
+const totalDownloadBytes = datasets.reduce(
+    (sum, dataset) => sum + dataset.sizeBytes,
+    0,
+);
 
 const formatSummaryBytes = (bytes: number) => {
     if (bytes < 1024 * 1024) {
@@ -379,6 +741,29 @@ const formatSummaryBytes = (bytes: number) => {
     }
 
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const latestIngestionDate = [...(ingestionRunsCanonical as Array<Record<string, string | null>>)]
+    .map((run) => run.finished_at || run.started_at || "")
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+
+const formatDateTime = (value: string | undefined) => {
+    if (!value) {
+        return "Sem data";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+    });
 };
 
 const catalogHighlights = [
@@ -390,9 +775,9 @@ const catalogHighlights = [
         surfaceClass: "bg-premium-accent/[0.08] border-premium-accent/20",
     },
     {
-        label: "Estruturas catalogadas",
+        label: "Entradas catalogadas",
         value: totalItems.toLocaleString("pt-BR"),
-        description: "Registros ou blocos somados entre bases canônicas e marts.",
+        description: "Registros, nós ou grafos somados entre as categorias catalogadas.",
         accentClass: "text-emerald-400",
         surfaceClass: "bg-emerald-400/[0.08] border-emerald-400/20",
     },
@@ -402,6 +787,13 @@ const catalogHighlights = [
         description: "Estimativa de navegação e prévia estrutural exibida nesta página.",
         accentClass: "text-amber-400",
         surfaceClass: "bg-amber-400/[0.08] border-amber-400/20",
+    },
+    {
+        label: "Última ingestão",
+        value: formatDateTime(latestIngestionDate),
+        description: "Referência temporal da última execução catalogada na base canônica.",
+        accentClass: "text-sky-300",
+        surfaceClass: "bg-sky-400/[0.08] border-sky-400/20",
     },
 ];
 
@@ -417,6 +809,14 @@ const guideCards = [
     {
         title: "Separe base e análise",
         body: "As bases canônicas preservam entidades e vínculos. Os marts já chegam agregados para KPIs, séries e dashboards.",
+    },
+    {
+        title: "Audite a pipeline",
+        body: "Use tracking, assertivas e change logs para entender de onde veio cada atributo e como a entidade mudou ao longo das cargas.",
+    },
+    {
+        title: "Explore redes complexas",
+        body: "Os arquivos de grafos já incluem metadados, estatísticas de rede e arestas para estudos de colaboração e relacionamento.",
     },
 ];
 ---
@@ -446,23 +846,20 @@ const guideCards = [
                         </h1>
                         <p class="text-text-secondary max-w-3xl text-base leading-relaxed">
                             Repositório público dos arquivos que alimentam o portal Horizon.
-                            Use esta página para baixar datasets em JSON, comparar bases canônicas
-                            com marts analíticos e inspecionar rapidamente a estrutura esperada de cada arquivo.
+                            Use esta página para baixar datasets em JSON, navegar por bases
+                            canônicas, rastreabilidade, grafos e marts analíticos, além de
+                            inspecionar rapidamente a estrutura esperada de cada arquivo.
                         </p>
 
                         <div class="flex flex-wrap gap-3 pt-2">
-                            <a
-                                href="#datasets-canonical"
-                                class="inline-flex items-center gap-2 rounded-2xl border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-2 text-sm font-bold text-premium-accent transition-colors hover:bg-premium-accent/15"
-                            >
-                                Ver bases canônicas
-                            </a>
-                            <a
-                                href="#datasets-mart"
-                                class="inline-flex items-center gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/[0.08] px-4 py-2 text-sm font-bold text-amber-300 transition-colors hover:bg-amber-400/15"
-                            >
-                                Ver marts analíticos
-                            </a>
+                            {datasetSections.map((section) => (
+                                <a
+                                    href={`#${section.anchorId}`}
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-accent/20 hover:bg-premium-accent/[0.08]"
+                                >
+                                    {section.title}
+                                </a>
+                            ))}
                             <a
                                 href="#open-data-guide"
                                 class="inline-flex items-center gap-2 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-purple/20 hover:bg-premium-purple/[0.06]"
@@ -476,22 +873,25 @@ const guideCards = [
                         <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-muted">
                             Leitura rápida
                         </p>
-                        <div class="mt-4 grid grid-cols-1 gap-3">
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Bases canônicas</p>
-                                <p class="mt-2 text-2xl font-bold font-['Outfit'] text-text-main">{canonicalDatasets.length}</p>
-                                <p class="mt-1 text-sm text-text-secondary">Entidades normalizadas para navegação, vínculo e reconciliação.</p>
-                            </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Marts analíticos</p>
-                                <p class="mt-2 text-2xl font-bold font-['Outfit'] text-text-main">{martDatasets.length}</p>
-                                <p class="mt-1 text-sm text-text-secondary">Agregações prontas para KPIs, gráficos e séries históricas.</p>
-                            </div>
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {datasetSections.map((section) => (
+                                <div class={section.summarySurfaceClass}>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                        {section.title}
+                                    </p>
+                                    <p class={`mt-2 text-2xl font-bold font-['Outfit'] ${section.summaryValueClass}`}>
+                                        {section.datasets.length}
+                                    </p>
+                                    <p class="mt-1 text-sm text-text-secondary">
+                                        {section.summaryDescription}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     {catalogHighlights.map((highlight) => (
                         <article class={`rounded-3xl border p-5 ${highlight.surfaceClass}`}>
                             <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
@@ -524,7 +924,7 @@ const guideCards = [
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {guideCards.map((card, index) => (
                         <article class="rounded-3xl border border-border-main bg-white/[0.03] p-5">
                             <div class="w-9 h-9 rounded-2xl bg-premium-purple/10 border border-premium-purple/20 flex items-center justify-center text-sm font-bold text-premium-purple">
@@ -542,22 +942,18 @@ const guideCards = [
                     Convenções
                 </p>
                 <div class="mt-5 space-y-4">
-                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
-                        <p class="text-sm font-bold text-text-main">Canonical</p>
-                        <p class="mt-1 text-sm text-text-secondary">
-                            Preserva entidades, vínculos e granularidade de origem para exploração e reconciliação.
-                        </p>
-                    </div>
-                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
-                        <p class="text-sm font-bold text-text-main">Mart</p>
-                        <p class="mt-1 text-sm text-text-secondary">
-                            Resume métricas prontas para painéis, KPIs e análises comparativas.
-                        </p>
-                    </div>
+                    {datasetSections.map((section) => (
+                        <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                            <p class="text-sm font-bold text-text-main">{section.title}</p>
+                            <p class="mt-1 text-sm text-text-secondary">
+                                {section.summaryDescription}
+                            </p>
+                        </div>
+                    ))}
                     <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
                         <p class="text-sm font-bold text-text-main">Prévia estrutural</p>
                         <p class="mt-1 text-sm text-text-secondary">
-                            Mostra o primeiro registro ou o bloco raiz para servir como contrato rápido do arquivo.
+                            Mostra o primeiro registro, amostra de grafo ou bloco raiz para servir como contrato rápido do arquivo.
                         </p>
                     </div>
                 </div>
@@ -624,6 +1020,18 @@ const guideCards = [
                         Canonical
                     </button>
                     <button
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-sky-400/20 hover:text-text-main"
+                        data-dataset-filter="tracking"
+                    >
+                        Tracking
+                    </button>
+                    <button
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-purple/20 hover:text-text-main"
+                        data-dataset-filter="graph"
+                    >
+                        Grafos
+                    </button>
+                    <button
                         class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-amber-400/20 hover:text-text-main"
                         data-dataset-filter="mart"
                     >
@@ -633,193 +1041,109 @@ const guideCards = [
             </div>
         </section>
 
-        <section id="datasets-canonical" class="space-y-5" data-dataset-section="canonical">
-            <div class="flex items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Bases Canônicas</h2>
-                    <p class="text-text-secondary mt-1">Arquivos de entidades e vínculos em <span class="font-mono text-text-main">src/data</span>.</p>
-                </div>
-                <span class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">
-                    {canonicalDatasets.length} arquivos
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {canonicalDatasets.map((dataset) => (
-                    <article
-                        class="glass-card p-6 flex flex-col gap-5 h-full hover:border-premium-accent/40 transition-all duration-300"
-                        data-dataset-card
-                        data-dataset-type="canonical"
-                        data-search={dataset.searchText}
-                    >
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="space-y-2">
-                                <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">
-                                    Canonical
-                                </span>
-                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] leading-snug break-all">
-                                    {dataset.name}
-                                </h3>
-                            </div>
-                            <span class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
-                                {dataset.countLabel}
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-text-secondary leading-relaxed">
-                            {dataset.description}
+        {datasetSections.map((section) => (
+            <section
+                id={section.anchorId}
+                class="space-y-5"
+                data-dataset-section={section.key}
+            >
+                <div class="flex items-end justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">
+                            {section.title}
+                        </h2>
+                        <p class="text-text-secondary mt-1">
+                            {section.description} em <span class="font-mono text-text-main">src/data</span>.
                         </p>
-
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
-                                <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
-                            </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
-                                <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                                Campos visíveis na prévia
-                            </p>
-                            <div class="flex flex-wrap gap-2">
-                                {dataset.sampleKeys.length > 0 ? (
-                                    dataset.sampleKeys.map((field) => (
-                                        <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
-                                            {field}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <span class="text-sm text-text-secondary">Sem amostra de campos.</span>
-                                )}
-                            </div>
-                        </div>
-
-                        <details class="group/details mt-1">
-                            <summary class="cursor-pointer list-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-premium-accent transition-colors hover:text-premium-purple">
-                                <span class="group-open/details:hidden">Ver estrutura</span>
-                                <span class="hidden group-open/details:inline">Ocultar estrutura</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </summary>
-                            <div class="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-3">
-                                <pre class="no-scrollbar overflow-x-auto whitespace-pre text-[10px] text-slate-300 font-mono"><code>{dataset.structure}</code></pre>
-                            </div>
-                        </details>
-
-                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
-                            <span class="text-xs text-text-secondary">
-                                JSON bruto
-                            </span>
-                            <a
-                                href={dataset.downloadHref}
-                                download={dataset.name}
-                                class="inline-flex items-center gap-2 rounded-xl border border-premium-accent/20 bg-premium-accent/[0.08] px-4 py-2 text-sm font-bold text-premium-accent transition-colors hover:bg-premium-accent hover:text-white"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
-                                Download
-                            </a>
-                        </div>
-                    </article>
-                ))}
-            </div>
-        </section>
-
-        <section id="datasets-mart" class="space-y-5" data-dataset-section="mart">
-            <div class="flex items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold font-['Outfit'] text-text-main">Marts Analíticos</h2>
-                    <p class="text-text-secondary mt-1">Agregações prontas para gráficos, KPIs e séries em <span class="font-mono text-text-main">src/data</span>.</p>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">
+                        {section.datasets.length} arquivos
+                    </span>
                 </div>
-                <span class="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">
-                    {martDatasets.length} arquivos
-                </span>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {martDatasets.map((dataset) => (
-                    <article
-                        class="glass-card p-6 flex flex-col gap-5 h-full hover:border-amber-400/40 transition-all duration-300"
-                        data-dataset-card
-                        data-dataset-type="mart"
-                        data-search={dataset.searchText}
-                    >
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="space-y-2">
-                                <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">
-                                    Mart
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {section.datasets.map((dataset) => (
+                        <article
+                            class={`glass-card p-6 flex flex-col gap-5 h-full transition-all duration-300 ${section.hoverClass}`}
+                            data-dataset-card
+                            data-dataset-type={section.key}
+                            data-search={dataset.searchText}
+                        >
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="space-y-2">
+                                    <span class={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${section.badgeClass}`}>
+                                        {dataset.badgeLabel}
+                                    </span>
+                                    <h3 class="text-lg font-bold text-text-main font-['Outfit'] leading-snug break-all">
+                                        {dataset.name}
+                                    </h3>
+                                </div>
+                                <span class={`rounded-full border px-3 py-1 text-xs font-bold ${section.countClass}`}>
+                                    {dataset.countLabel}
                                 </span>
-                                <h3 class="text-lg font-bold text-text-main font-['Outfit'] leading-snug break-all">
-                                    {dataset.name}
-                                </h3>
                             </div>
-                            <span class="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-300">
-                                {dataset.countLabel}
-                            </span>
-                        </div>
 
-                        <p class="text-sm text-text-secondary leading-relaxed">
-                            {dataset.description}
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
-                                <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
-                            </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
-                                <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                                Campos visíveis na prévia
+                            <p class="text-sm text-text-secondary leading-relaxed">
+                                {dataset.description}
                             </p>
-                            <div class="flex flex-wrap gap-2">
-                                {dataset.sampleKeys.length > 0 ? (
-                                    dataset.sampleKeys.map((field) => (
-                                        <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
-                                            {field}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <span class="text-sm text-text-secondary">Sem amostra de campos.</span>
-                                )}
-                            </div>
-                        </div>
 
-                        <details class="group/details mt-1">
-                            <summary class="cursor-pointer list-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-premium-accent transition-colors hover:text-premium-purple">
-                                <span class="group-open/details:hidden">Ver estrutura</span>
-                                <span class="hidden group-open/details:inline">Ocultar estrutura</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </summary>
-                            <div class="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-3">
-                                <pre class="no-scrollbar overflow-x-auto whitespace-pre text-[10px] text-slate-300 font-mono"><code>{dataset.structure}</code></pre>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
+                                    <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
+                                </div>
+                                <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
+                                    <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
+                                </div>
                             </div>
-                        </details>
 
-                        <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
-                            <span class="text-xs text-text-secondary">
-                                JSON analítico
-                            </span>
-                            <a
-                                href={dataset.downloadHref}
-                                download={dataset.name}
-                                class="inline-flex items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-300 transition-colors hover:bg-amber-400 hover:text-slate-950"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
-                                Download
-                            </a>
-                        </div>
-                    </article>
-                ))}
-            </div>
-        </section>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                    Campos visíveis na prévia
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    {dataset.sampleKeys.length > 0 ? (
+                                        dataset.sampleKeys.map((field) => (
+                                            <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
+                                                {field}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span class="text-sm text-text-secondary">Sem amostra de campos.</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <details class="group/details mt-1">
+                                <summary class="cursor-pointer list-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-premium-accent transition-colors hover:text-premium-purple">
+                                    <span class="group-open/details:hidden">Ver estrutura</span>
+                                    <span class="hidden group-open/details:inline">Ocultar estrutura</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-open/details:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </summary>
+                                <div class="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-3">
+                                    <pre class="no-scrollbar overflow-x-auto whitespace-pre text-[10px] text-slate-300 font-mono"><code>{dataset.structure}</code></pre>
+                                </div>
+                            </details>
+
+                            <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
+                                <span class="text-xs text-text-secondary">
+                                    Arquivo JSON
+                                </span>
+                                <a
+                                    href={dataset.downloadHref}
+                                    download={dataset.name}
+                                    class={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${section.buttonClass}`}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+                                    Download
+                                </a>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
+        ))}
 
         <div
             id="datasetEmptyState"
