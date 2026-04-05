@@ -15,10 +15,12 @@ import {
     researchersOnly,
 } from "../../lib/researcher-collections";
 import { buildResearcherStatsById } from "../../lib/researchers-data";
+import { buildResearcherCardView } from "../../lib/researcher-card-markup";
 
 const researchers = researchersOnly as Researcher[];
 const campusResearcherViews = buildCampusResearcherViews(researchers);
 const researcherStats = buildResearcherStatsById(researchers);
+const INITIAL_RESEARCHER_BATCH = 24;
 const researcherCards = researchers.map((researcher) => {
     const campusIds = getResearcherCampusIds(researcher);
 
@@ -31,6 +33,17 @@ const researcherCards = researchers.map((researcher) => {
 });
 
 const baseUrl = import.meta.env.BASE_URL;
+const initialResearcherCards = researcherCards.slice(0, INITIAL_RESEARCHER_BATCH);
+const researcherCardViews = researcherCards.map(
+    ({ researcher, stats, campusIds, campusNames }) =>
+        buildResearcherCardView({
+            researcher,
+            stats,
+            baseUrl,
+            campusIds,
+            campusNames,
+        }),
+);
 ---
 
 <Layout title="Pesquisadores">
@@ -76,6 +89,24 @@ const baseUrl = import.meta.env.BASE_URL;
         <!-- Search & Filters -->
         <ResearcherFilters />
 
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p
+                id="researcherResultsSummary"
+                class="text-sm text-text-secondary"
+                aria-live="polite"
+            >
+                Mostrando os primeiros {initialResearcherCards.length} de {researcherCardViews
+                    .length} pesquisadores.
+            </p>
+            <p
+                id="researcherLoadProgress"
+                class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-secondary"
+                aria-live="polite"
+            >
+                Role para carregar mais
+            </p>
+        </div>
+
         <!-- Researchers Grid -->
         <div
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
@@ -84,7 +115,7 @@ const baseUrl = import.meta.env.BASE_URL;
             aria-label="Lista de pesquisadores"
         >
             {
-                researcherCards.map(({ researcher, stats, campusIds, campusNames }) => (
+                initialResearcherCards.map(({ researcher, stats, campusIds, campusNames }) => (
                     <ResearcherCard
                         researcher={researcher}
                         stats={stats}
@@ -94,6 +125,25 @@ const baseUrl = import.meta.env.BASE_URL;
                     />
                 ))
             }
+        </div>
+
+        <div
+            id="researcherInfiniteStatus"
+            class="flex flex-col items-center gap-3"
+            aria-live="polite"
+        >
+            <div
+                id="researchersLoadingSpinner"
+                class="hidden animate-spin rounded-full h-8 w-8 border-4 border-premium-accent border-t-transparent"
+            >
+            </div>
+            <p
+                id="researchersAllLoaded"
+                class="hidden text-sm text-text-secondary italic"
+            >
+                Todos os pesquisadores visíveis já foram carregados.
+            </p>
+            <div id="researchersLoadMoreSentinel" class="h-2 w-full"></div>
         </div>
 
         <!-- Empty State -->
@@ -134,22 +184,43 @@ const baseUrl = import.meta.env.BASE_URL;
         window.researchersData = researchers;
     </script>
 
+    <script define:vars={{ researcherCardViews, initialBatchSize: INITIAL_RESEARCHER_BATCH }}>
+        window.researcherCardViews = researcherCardViews;
+        window.researcherInitialBatchSize = initialBatchSize;
+    </script>
+
     <script>
         import { normalizeSearchText } from "../../lib/search";
         import {
             getCampusFilterValue,
-            splitPipeValues,
             updateCampusViews,
         } from "../../lib/campus-ui";
+        import {
+            renderResearcherCardMarkup,
+            type ResearcherCardView,
+        } from "../../lib/researcher-card-markup";
 
-        // Main Search & Filter Logic
         const searchInput = document.getElementById(
             "researcherSearch",
         ) as HTMLInputElement;
         const resetBtn = document.getElementById("resetFilters");
         const emptyState = document.getElementById("emptyState");
-        const cards = document.querySelectorAll(".researcher-card");
+        const researchersGrid = document.getElementById("researchersGrid");
+        const resultsSummary = document.getElementById("researcherResultsSummary");
+        const loadProgress = document.getElementById("researcherLoadProgress");
+        const loadSentinel = document.getElementById("researchersLoadMoreSentinel");
+        const loadingSpinner = document.getElementById("researchersLoadingSpinner");
+        const allLoadedMessage = document.getElementById("researchersAllLoaded");
+        const infiniteStatus = document.getElementById("researcherInfiniteStatus");
+        const allResearchers = ((window as any).researcherCardViews ||
+            []) as ResearcherCardView[];
+        const initialBatchSize =
+            Number((window as any).researcherInitialBatchSize) || 24;
         let currentCampusId = localStorage.getItem("preferred-campus") || "";
+        let filteredResearchers = allResearchers;
+        let renderedCount = document.querySelectorAll(".researcher-card").length;
+        let observer: IntersectionObserver | null = null;
+        let isRendering = false;
 
         function updateResearcherViews(selectedCampus) {
             updateCampusViews(
@@ -158,9 +229,123 @@ const baseUrl = import.meta.env.BASE_URL;
             );
         }
 
+        function disconnectObserver() {
+            observer?.disconnect();
+            observer = null;
+        }
+
+        function updateLoadState() {
+            const totalFiltered = filteredResearchers.length;
+            const hasResults = totalFiltered > 0;
+            const hasMore = renderedCount < totalFiltered;
+
+            infiniteStatus?.classList.toggle("hidden", !hasResults);
+            loadSentinel?.classList.toggle("hidden", !hasResults || !hasMore);
+            loadingSpinner?.classList.toggle(
+                "hidden",
+                !hasResults || !hasMore || !isRendering,
+            );
+            allLoadedMessage?.classList.toggle("hidden", !hasResults || hasMore);
+
+            if (loadProgress) {
+                if (!hasResults) {
+                    loadProgress.textContent = "";
+                } else if (hasMore) {
+                    loadProgress.textContent = `${renderedCount} de ${totalFiltered} carregados`;
+                } else {
+                    loadProgress.textContent = `Lista completa: ${totalFiltered} carregados`;
+                }
+            }
+        }
+
+        function updateSummary(query: string) {
+            const totalFiltered = filteredResearchers.length;
+            const searchMessage = query
+                ? ` para "${searchInput?.value?.trim() || query}"`
+                : "";
+
+            if (resultsSummary) {
+                if (totalFiltered === 0) {
+                    resultsSummary.textContent =
+                        "Nenhum pesquisador corresponde aos filtros atuais.";
+                } else {
+                    resultsSummary.textContent = `${totalFiltered} pesquisador${totalFiltered === 1 ? "" : "es"} encontrado${totalFiltered === 1 ? "" : "s"}${searchMessage}.`;
+                }
+            }
+        }
+
+        function setupInfiniteScroll() {
+            disconnectObserver();
+
+            if (!loadSentinel || renderedCount >= filteredResearchers.length) {
+                return;
+            }
+
+            observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries.some((entry) => entry.isIntersecting)) {
+                        renderNextBatch();
+                    }
+                },
+                { rootMargin: "600px 0px" },
+            );
+
+            observer.observe(loadSentinel);
+        }
+
+        function renderNextBatch() {
+            if (
+                isRendering ||
+                !researchersGrid ||
+                renderedCount >= filteredResearchers.length
+            ) {
+                updateLoadState();
+                return;
+            }
+
+            isRendering = true;
+            updateLoadState();
+
+            const nextBatch = filteredResearchers.slice(
+                renderedCount,
+                renderedCount + initialBatchSize,
+            );
+
+            researchersGrid.insertAdjacentHTML(
+                "beforeend",
+                nextBatch.map((researcher) => renderResearcherCardMarkup(researcher)).join(""),
+            );
+
+            renderedCount += nextBatch.length;
+            isRendering = false;
+            updateLoadState();
+            setupInfiniteScroll();
+        }
+
+        function renderFilteredResearchers() {
+            disconnectObserver();
+
+            if (!researchersGrid) {
+                return;
+            }
+
+            researchersGrid.innerHTML = "";
+            renderedCount = 0;
+
+            if (!filteredResearchers.length) {
+                emptyState?.classList.remove("hidden");
+                emptyState?.classList.add("flex");
+                updateLoadState();
+                return;
+            }
+
+            emptyState?.classList.add("hidden");
+            emptyState?.classList.remove("flex");
+            renderNextBatch();
+        }
+
         function filterResearchers() {
             const query = normalizeSearchText(searchInput?.value || "");
-            let visibleCount = 0;
 
             if (query) {
                 resetBtn?.classList.remove("hidden");
@@ -168,30 +353,18 @@ const baseUrl = import.meta.env.BASE_URL;
                 resetBtn?.classList.add("hidden");
             }
 
-            cards.forEach((card) => {
-                const element = card as HTMLElement;
-                const searchIndex = element.dataset.search || "";
-                const campusIds = splitPipeValues(element.dataset.campusIds);
+            filteredResearchers = allResearchers.filter((researcher) => {
                 const matchesCampus =
-                    !currentCampusId || campusIds.includes(currentCampusId);
-                const matches =
-                    (!query || searchIndex.includes(query)) && matchesCampus;
+                    !currentCampusId ||
+                    researcher.campusIds.includes(currentCampusId);
+                const matchesSearch =
+                    !query || researcher.searchIndex.includes(query);
 
-                if (matches) {
-                    element.style.display = "flex";
-                    visibleCount++;
-                } else {
-                    element.style.display = "none";
-                }
+                return matchesCampus && matchesSearch;
             });
 
-            if (visibleCount === 0) {
-                emptyState?.classList.remove("hidden");
-                emptyState?.classList.add("flex");
-            } else {
-                emptyState?.classList.add("hidden");
-                emptyState?.classList.remove("flex");
-            }
+            updateSummary(query);
+            renderFilteredResearchers();
         }
 
         searchInput?.addEventListener("input", filterResearchers);
