@@ -371,6 +371,7 @@ const researcherCardViews = researcherCards.map(
         window.addEventListener("campus-filter-change", (event) => {
             currentCampusId = getCampusFilterValue(event);
             updateResearcherViews(currentCampusId);
+            if (searchInput) searchInput.value = "";
             filterResearchers();
         });
         resetBtn?.addEventListener("click", () => {
