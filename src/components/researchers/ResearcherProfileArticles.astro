@@ -12,7 +12,7 @@ const { researcher, articleSourcesById = {} } = Astro.props;
 
 <section aria-labelledby="articles-title" class="space-y-6 pb-20">
     <div
-        class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-border-main"
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-outline"
     >
         <h3
             id="articles-title"
@@ -25,7 +25,7 @@ const { researcher, articleSourcesById = {} } = Astro.props;
                 type="text"
                 id="articleSearch"
                 placeholder="Buscar artigos..."
-                class="w-full bg-glass-bg border border-border-main rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
+                class="w-full bg-glass-bg border border-outline rounded-xl px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all text-text-main"
             />
             <svg
                 class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
@@ -107,7 +107,7 @@ const { researcher, articleSourcesById = {} } = Astro.props;
             if (!sources || sources.length === 0) return "";
 
             return `
-                <div class="mt-4 pt-3 border-t border-border-main/50">
+                <div class="mt-4 pt-3 border-t border-outline/50">
                     <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2">
                         Fonte deste card
                     </p>
@@ -116,9 +116,9 @@ const { researcher, articleSourcesById = {} } = Astro.props;
                             .map((source) => {
                                 const content = `<span class="text-premium-accent">${escapeHtml(source.systemLabel)}</span><span>${escapeHtml(source.sourceLabel)}</span>`;
                                 if (source.sourceUrl) {
-                                    return `<a href="${escapeHtml(source.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary hover:text-premium-accent hover:border-premium-accent/30 transition-colors">${content}</a>`;
+                                    return `<a href="${escapeHtml(source.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-outline text-[10px] font-bold text-text-secondary hover:text-premium-accent hover:border-premium-accent/30 transition-colors">${content}</a>`;
                                 }
-                                return `<span title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-border-main text-[10px] font-bold text-text-secondary">${content}</span>`;
+                                return `<span title="${escapeHtml(source.title || source.sourceLabel)}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-outline text-[10px] font-bold text-text-secondary">${content}</span>`;
                             })
                             .join("")}
                     </div>
@@ -147,7 +147,7 @@ const { researcher, articleSourcesById = {} } = Astro.props;
             nextBatch.forEach((article) => {
                 const articleEl = document.createElement("div");
                 articleEl.className =
-                    "glass-card p-5 border border-border-main hover:border-premium-purple/30 transition-all";
+                    "glass-card p-5 border border-outline hover:border-premium-purple/30 transition-all";
                 const sources = articleSourcesById[String(article.id)] || [];
 
                 const doiLink = article.doi

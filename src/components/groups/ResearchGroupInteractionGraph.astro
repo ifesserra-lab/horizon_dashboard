@@ -76,7 +76,7 @@ const serializedGraphData = hasGraphData
 <section
     id={sectionId}
     data-group-interaction-root
-    class="glass-card border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))] p-6 md:p-8 space-y-6 shadow-[0_24px_80px_rgba(148,163,184,0.14)]"
+    class="glass-card border border-outline p-6 md:p-8 space-y-6 shadow-[0_24px_80px_rgba(148,163,184,0.14)]"
     aria-labelledby={`group-interaction-title-${groupId}`}
 >
     <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
@@ -118,7 +118,7 @@ const serializedGraphData = hasGraphData
         hasGraphData ? (
             <>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    <article class="rounded-3xl border border-sky-200/80 bg-sky-50/90 p-5 shadow-[0_18px_50px_rgba(125,211,252,0.18)]">
+                    <article class="rounded-3xl border border-sky-border bg-sky-surface p-5 shadow-sky-accent">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Pessoas no grafo
                         </p>
@@ -130,7 +130,7 @@ const serializedGraphData = hasGraphData
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Membros do grupo
                         </p>
@@ -142,7 +142,7 @@ const serializedGraphData = hasGraphData
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Vizinhos de orientação
                         </p>
@@ -154,7 +154,7 @@ const serializedGraphData = hasGraphData
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Componentes conectados
                         </p>
@@ -169,7 +169,7 @@ const serializedGraphData = hasGraphData
 
                 <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,0.5fr)] gap-7 items-start">
                     <div class="space-y-4">
-                        <div class="rounded-3xl border border-slate-200/80 bg-white/90 p-5 space-y-4 shadow-[0_22px_60px_rgba(148,163,184,0.12)]">
+                        <div class="rounded-3xl border border-outline/80 bg-page/90 p-5 space-y-4 shadow-[0_22px_60px_rgba(148,163,184,0.12)]">
                             <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4">
                                 <div class="relative">
                                     <label for={`group-interaction-search-${groupId}`} class="sr-only">
@@ -180,7 +180,7 @@ const serializedGraphData = hasGraphData
                                         id={`group-interaction-search-${groupId}`}
                                         data-search-input
                                         placeholder="Buscar por nome, campus ou classificação..."
-                                        class="w-full rounded-2xl border border-border-main bg-glass-bg px-12 py-4 text-sm text-text-main shadow-lg shadow-premium-accent/5 transition-all focus:border-premium-accent focus:outline-none focus:ring-2 focus:ring-premium-accent/50"
+                                        class="w-full rounded-2xl border border-outline bg-glass-bg px-12 py-4 text-sm text-text-main shadow-lg shadow-premium-accent/5 transition-all focus:border-premium-accent focus:outline-none focus:ring-2 focus:ring-premium-accent/50"
                                     />
                                     <svg
                                         aria-hidden="true"
@@ -223,14 +223,14 @@ const serializedGraphData = hasGraphData
                                     <button
                                         type="button"
                                         data-reset-filters
-                                        class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                        class="inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
                                     >
                                         Restaurar filtros
                                     </button>
                                     <button
                                         type="button"
                                         data-recenter-graph
-                                        class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                        class="inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
                                     >
                                         Recentrar
                                     </button>
@@ -257,7 +257,7 @@ const serializedGraphData = hasGraphData
                                                     type="button"
                                                     data-mode-button
                                                     data-mode="expanded"
-                                                    class="inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                                                    class="inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
                                                 >
                                                     Expandido
                                                 </button>
@@ -310,20 +310,20 @@ const serializedGraphData = hasGraphData
                             </div>
                         </div>
 
-                        <div class="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-white shadow-[0_28px_80px_rgba(148,163,184,0.18)]">
+                        <div class="relative overflow-hidden rounded-[2rem] border border-outline bg-page-bg shadow-[0_28px_80px_rgba(148,163,184,0.18)]">
                             <canvas
                                 data-graph-canvas
-                                class="block h-[620px] w-full cursor-grab touch-none bg-white md:h-[760px] xl:h-[900px]"
+                                class="block h-[620px] w-full cursor-grab touch-none bg-page-bg border-outline md:h-[760px] xl:h-[900px]"
                             ></canvas>
 
                             <div
                                 data-hover-tooltip
-                                class="pointer-events-none absolute hidden min-w-[200px] rounded-2xl border border-slate-200/90 bg-white/95 px-3 py-2 text-xs text-slate-900 shadow-[0_18px_50px_rgba(148,163,184,0.22)] backdrop-blur-md"
+                                class="pointer-events-none absolute hidden min-w-[200px] rounded-2xl border border-slate-200/90 bg-page-bg/95 px-3 py-2 text-xs text-slate-900 shadow-[0_18px_50px_rgba(148,163,184,0.22)] backdrop-blur-md"
                             ></div>
 
                             <div
                                 data-canvas-empty
-                                class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-white/72 px-6 text-center backdrop-blur-sm"
+                                class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-page-bg/72 px-6 text-center backdrop-blur-sm"
                             >
                                 <div class="max-w-sm space-y-2">
                                     <p
@@ -342,7 +342,7 @@ const serializedGraphData = hasGraphData
                             </div>
                         </div>
 
-                        <div class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <div class="rounded-3xl border border-outline bg-page-bg p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Como ler o grafo
                             </p>
@@ -367,7 +367,7 @@ const serializedGraphData = hasGraphData
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-4 w-4 rounded-full border-2 border-sky-500 bg-white"></span>
+                                        <span class="h-4 w-4 rounded-full border-2 border-sky-border bg-white"></span>
                                         Membro do grupo
                                     </div>
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
@@ -383,12 +383,12 @@ const serializedGraphData = hasGraphData
                     </div>
 
                     <aside class="space-y-4">
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Resumo visível
                             </p>
                             <div class="mt-4 grid grid-cols-2 gap-3">
-                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                <div class="rounded-2xl border border-outline bg-black/10 p-4">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                         Nós visíveis
                                     </p>
@@ -399,7 +399,7 @@ const serializedGraphData = hasGraphData
                                         {initialModeSummary?.nodeCount ?? 0}
                                     </p>
                                 </div>
-                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                <div class="rounded-2xl border border-outline bg-black/10 p-4">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                         Arestas filtradas
                                     </p>
@@ -457,7 +457,7 @@ const serializedGraphData = hasGraphData
                             </div>
                         </article>
 
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Distribuição visível
                             </p>
@@ -482,7 +482,7 @@ const serializedGraphData = hasGraphData
                             </div>
                         </article>
 
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-outline bg-page p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                             <div data-selection-empty class="space-y-3">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Detalhe do nó
@@ -580,7 +580,7 @@ const serializedGraphData = hasGraphData
                 ></script>
             </>
         ) : (
-            <div class="rounded-3xl border border-dashed border-slate-200/80 bg-white/88 px-6 py-10 text-center shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+            <div class="rounded-3xl border border-outline bg-page-bg px-6 py-10 text-center shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                 <h4 class="text-xl font-bold text-text-main">
                     Grafo indisponível
                 </h4>

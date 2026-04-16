@@ -23,7 +23,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 					type="text" 
 					id="groupSearch"
 					placeholder="Buscar por nome, campus, líder ou área..." 
-					class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+					class="w-full bg-glass-bg border border-outline rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
 				/>
 				<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
 				
@@ -51,10 +51,10 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				])}
 			>
 				<div class="flex items-start justify-between mb-4">
-					<div aria-hidden="true" class="w-12 h-12 rounded-xl bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-border-main flex items-center justify-center text-premium-accent font-bold overflow-hidden text-xs text-center p-1 leading-tight">
+					<div aria-hidden="true" class="w-12 h-12 rounded-xl bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-outline flex items-center justify-center text-premium-accent font-bold overflow-hidden text-xs text-center p-1 leading-tight">
 						{group.short_name || group.name.charAt(0)}
 					</div>
-					<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary uppercase tracking-wider border border-border-main">
+					<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary uppercase tracking-wider border border-outline">
 						{group.campus.name}
 					</span>
 				</div>
@@ -68,7 +68,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 
 				<div class="flex flex-wrap gap-2 mb-6" aria-label="Áreas de conhecimento">
 					{group.knowledge_areas.slice(0, 2).map(area => (
-						<span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary border border-border-main">
+						<span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary border border-outline">
 							{area.name}
 						</span>
 					))}
@@ -79,7 +79,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 					)}
 				</div>
 
-				<div class="pt-6 border-t border-border-main flex justify-end items-center mt-auto">
+				<div class="pt-6 border-t border-outline flex justify-end items-center mt-auto">
 					<a href={`${import.meta.env.BASE_URL}groups/${group.id}`} class="text-xs font-bold text-premium-accent flex items-center gap-1 hover:translate-x-1 transition-transform focus:ring-2 focus:ring-premium-accent rounded px-1" aria-label={`Detalhes de ${group.name}`}>
 						Detalhes
 						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -91,7 +91,7 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 
 	<!-- Empty State -->
 	<div id="emptyState" class="hidden flex-col items-center justify-center py-24 text-center">
-		<div class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-border-main border-dashed">
+		<div class="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-6 text-text-secondary border border-outline border-dashed">
 			<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>
 		</div>
 		<h3 class="text-2xl font-bold font-['Outfit'] text-text-main mb-2">Sem resultados</h3>
