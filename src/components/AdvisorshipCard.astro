@@ -38,10 +38,10 @@ const formatDate = (dateStr: string | null) => {
  * These are used to style the status badge.
  */
 const statusColors = {
-    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-    Concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+    active: "bg-emerald-surface text-emerald-text border-emerald-500/20",
+    Active: "bg-emerald-surface text-emerald-text border-emerald-500/20",
+    concluded: "bg-text-muted/10 text-text-muted border-text-muted/20",
+    Concluded: "bg-text-muted/10 text-text-muted border-text-muted/20",
     unknown: "bg-amber-500/10 text-amber-500 border-amber-500/20",
 };
 
@@ -51,7 +51,7 @@ const currentStatusStyle =
 
 const fellowshipColor = advisorship.fellowship
     ? "bg-premium-accent/10 text-premium-accent border-premium-accent/20"
-    : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700";
+    : "bg-tag-bg text-text-muted border-outline";
 
 const studentName = advisorship.student_name || "Estudante Desconhecido";
 const supervisorName = advisorship.supervisor_name || "Supervisor Desconhecido";
@@ -163,7 +163,7 @@ const hasFellowship = !!advisorship.fellowship;
         </div>
 
         <!-- Meta Grid -->
-        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-border-main/50">
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-outline/50">
             <!-- Fellowship & Sponsor Badges -->
             <div class="col-span-2 flex flex-wrap gap-2">
                 <div
@@ -268,7 +268,7 @@ const hasFellowship = !!advisorship.fellowship;
     </div>
 
     <!-- Action Action (Appears separate or enhances clickable area) -->
-    <div class="mt-5 pt-3 border-t border-border-main flex justify-end">
+    <div class="mt-5 pt-3 border-t border-outline flex justify-end">
         <a
             href={`${import.meta.env.BASE_URL}advisorships/${advisorship.id}`}
             class="text-xs font-bold text-premium-accent flex items-center gap-1.5 hover:gap-2 transition-all group-hover:translate-x-0.5 focus:outline-none focus:ring-2 focus:ring-premium-accent/50 rounded-md px-2 py-1 -mr-2"

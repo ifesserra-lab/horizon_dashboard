@@ -648,15 +648,15 @@ const datasetSectionsMeta: DatasetSectionMeta[] = [
         description: "Entidades normalizadas, recortes de pessoas e vínculos estruturantes do portal.",
         chipLabel: "Canonical",
         badgeClass:
-            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+            "border border-emerald-border bg-emerald-surface text-emerald-text",
         countClass:
-            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
-        hoverClass: "hover:border-emerald-400/40",
+            "border border-emerald-border bg-emerald-surface text-emerald-text",
+        hoverClass: "hover:border-emerald-border",
         buttonClass:
-            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950",
+            "border border-emerald-border bg-emerald-surface text-emerald-text hover:bg-emerald-surface-alpha",
         summarySurfaceClass:
-            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
-        summaryValueClass: "text-emerald-400",
+            "rounded-2xl border border-outline bg-white/[0.03] p-4",
+        summaryValueClass: "text-emerald-text",
         summaryDescription:
             "Entidades prontas para reconciliação, navegação e joins.",
     },
@@ -667,15 +667,15 @@ const datasetSectionsMeta: DatasetSectionMeta[] = [
         description: "Arquivos de auditoria, tracking e histórico de mudanças da pipeline.",
         chipLabel: "Tracking",
         badgeClass:
-            "border-sky-400/20 bg-sky-400/10 text-sky-300",
+            "border border-sky-border bg-sky-surface text-sky-text",
         countClass:
-            "border-sky-400/20 bg-sky-400/10 text-sky-300",
-        hoverClass: "hover:border-sky-400/40",
+            "border border-sky-border bg-sky-surface text-sky-text",
+        hoverClass: "hover:border-sky-border",
         buttonClass:
-            "border-sky-400/20 bg-sky-400/10 text-sky-300 hover:bg-sky-400 hover:text-slate-950",
+            "border border-sky-border bg-sky-surface text-sky-text hover:bg-sky-surface-alpha",
         summarySurfaceClass:
-            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
-        summaryValueClass: "text-sky-300",
+            "rounded-2xl border border-outline bg-white/[0.03] p-4",
+        summaryValueClass: "text-sky-text",
         summaryDescription:
             "Fontes, assertivas, matches e alterações para auditoria.",
     },
@@ -693,7 +693,7 @@ const datasetSectionsMeta: DatasetSectionMeta[] = [
         buttonClass:
             "border-premium-purple/20 bg-premium-purple/10 text-premium-purple hover:bg-premium-purple hover:text-white",
         summarySurfaceClass:
-            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+            "rounded-2xl border border-outline bg-white/[0.03] p-4",
         summaryValueClass: "text-premium-purple",
         summaryDescription:
             "Recortes relacionais e manifests para exploração de redes.",
@@ -712,7 +712,7 @@ const datasetSectionsMeta: DatasetSectionMeta[] = [
         buttonClass:
             "border-amber-400/20 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950",
         summarySurfaceClass:
-            "rounded-2xl border border-border-main bg-white/[0.03] p-4",
+            "rounded-2xl border border-outline bg-white/[0.03] p-4",
         summaryValueClass: "text-amber-300",
         summaryDescription:
             "Agregações prontas para séries, comparativos e dashboards.",
@@ -778,8 +778,8 @@ const catalogHighlights = [
         label: "Entradas catalogadas",
         value: totalItems.toLocaleString("pt-BR"),
         description: "Registros, nós ou grafos somados entre as categorias catalogadas.",
-        accentClass: "text-emerald-400",
-        surfaceClass: "bg-emerald-400/[0.08] border-emerald-400/20",
+        accentClass: "text-emerald-text",
+        surfaceClass: "bg-emerald-surface border border-emerald-border",
     },
     {
         label: "Peso do catálogo",
@@ -792,8 +792,8 @@ const catalogHighlights = [
         label: "Última ingestão",
         value: formatDateTime(latestIngestionDate),
         description: "Referência temporal da última execução catalogada na base canônica.",
-        accentClass: "text-sky-300",
-        surfaceClass: "bg-sky-400/[0.08] border-sky-400/20",
+        accentClass: "text-sky-text",
+        surfaceClass: "bg-sky-surface border border-sky-border",
     },
 ];
 
@@ -823,7 +823,7 @@ const guideCards = [
 
 <Layout title="Dados Abertos">
     <div class="space-y-10 pb-12" id="open-data-catalog">
-        <header class="relative overflow-hidden glass-card border border-border-main p-8 md:p-10">
+        <header class="relative overflow-hidden glass-card border border-outline p-8 md:p-10">
             <div class="absolute inset-0 pointer-events-none">
                 <div class="absolute -top-24 right-0 h-56 w-56 rounded-full bg-premium-accent/10 blur-3xl"></div>
                 <div class="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-premium-purple/10 blur-3xl"></div>
@@ -834,7 +834,7 @@ const guideCards = [
                     <span class="inline-flex items-center gap-2 rounded-full border border-premium-accent/20 bg-premium-accent/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
                         Catálogo técnico
                     </span>
-                    <span class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-400">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-emerald-border bg-emerald-surface px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-text">
                         Download direto JSON
                     </span>
                 </div>
@@ -855,21 +855,21 @@ const guideCards = [
                             {datasetSections.map((section) => (
                                 <a
                                     href={`#${section.anchorId}`}
-                                    class="inline-flex items-center gap-2 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-accent/20 hover:bg-premium-accent/[0.08]"
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-outline bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-accent/20 hover:bg-premium-accent/[0.08]"
                                 >
                                     {section.title}
                                 </a>
                             ))}
                             <a
                                 href="#open-data-guide"
-                                class="inline-flex items-center gap-2 rounded-2xl border border-border-main bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-purple/20 hover:bg-premium-purple/[0.06]"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-outline bg-white/[0.02] px-4 py-2 text-sm font-bold text-text-main transition-colors hover:border-premium-purple/20 hover:bg-premium-purple/[0.06]"
                             >
                                 Como usar
                             </a>
                         </div>
                     </div>
 
-                    <div class="rounded-[2rem] border border-border-main bg-black/10 p-5 backdrop-blur-sm">
+                    <div class="rounded-[2rem] border border-outline bg-black/10 p-5 backdrop-blur-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-muted">
                             Leitura rápida
                         </p>
@@ -913,7 +913,7 @@ const guideCards = [
             id="open-data-guide"
             class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] gap-6"
         >
-            <article class="glass-card border border-border-main p-6 md:p-8">
+            <article class="glass-card border border-outline p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-5">
                     <div class="w-11 h-11 rounded-2xl bg-premium-accent/10 border border-premium-accent/20 flex items-center justify-center text-premium-accent">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"></path><path d="m17 8-5-5-5 5"></path><path d="M20 21H4"></path></svg>
@@ -926,7 +926,7 @@ const guideCards = [
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {guideCards.map((card, index) => (
-                        <article class="rounded-3xl border border-border-main bg-white/[0.03] p-5">
+                        <article class="rounded-3xl border border-outline bg-white/[0.03] p-5">
                             <div class="w-9 h-9 rounded-2xl bg-premium-purple/10 border border-premium-purple/20 flex items-center justify-center text-sm font-bold text-premium-purple">
                                 {index + 1}
                             </div>
@@ -937,20 +937,20 @@ const guideCards = [
                 </div>
             </article>
 
-            <article class="glass-card border border-border-main p-6 md:p-8">
+            <article class="glass-card border border-outline p-6 md:p-8">
                 <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-premium-accent">
                     Convenções
                 </p>
                 <div class="mt-5 space-y-4">
                     {datasetSections.map((section) => (
-                        <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                        <div class="rounded-2xl border border-outline bg-white/[0.03] p-4">
                             <p class="text-sm font-bold text-text-main">{section.title}</p>
                             <p class="mt-1 text-sm text-text-secondary">
                                 {section.summaryDescription}
                             </p>
                         </div>
                     ))}
-                    <div class="rounded-2xl border border-border-main bg-white/[0.03] p-4">
+                    <div class="rounded-2xl border border-outline bg-white/[0.03] p-4">
                         <p class="text-sm font-bold text-text-main">Prévia estrutural</p>
                         <p class="mt-1 text-sm text-text-secondary">
                             Mostra o primeiro registro, amostra de grafo ou bloco raiz para servir como contrato rápido do arquivo.
@@ -960,7 +960,7 @@ const guideCards = [
             </article>
         </section>
 
-        <section class="glass-card border border-border-main p-6 md:p-8 space-y-6">
+        <section class="glass-card border border-outline p-6 md:p-8 space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-text-muted">
@@ -982,7 +982,7 @@ const guideCards = [
                         type="text"
                         id="datasetSearch"
                         placeholder="Buscar por nome, descrição ou campos..."
-                        class="w-full bg-glass-bg border border-border-main rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
+                        class="w-full bg-glass-bg border border-outline rounded-2xl px-12 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-premium-accent/50 focus:border-premium-accent transition-all text-text-main shadow-lg shadow-premium-accent/5"
                     />
                     <svg
                         aria-hidden="true"
@@ -1014,25 +1014,25 @@ const guideCards = [
                         Todos
                     </button>
                     <button
-                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-accent/20 hover:text-text-main"
                         data-dataset-filter="canonical"
                     >
                         Canonical
                     </button>
                     <button
-                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-sky-400/20 hover:text-text-main"
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-sky-border hover:text-text-main"
                         data-dataset-filter="tracking"
                     >
                         Tracking
                     </button>
                     <button
-                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-purple/20 hover:text-text-main"
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-premium-purple/20 hover:text-text-main"
                         data-dataset-filter="graph"
                     >
                         Grafos
                     </button>
                     <button
-                        class="dataset-filter-chip inline-flex items-center rounded-full border border-border-main bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-amber-400/20 hover:text-text-main"
+                        class="dataset-filter-chip inline-flex items-center rounded-full border border-outline bg-white/[0.03] px-4 py-2 text-sm font-bold text-text-secondary transition-colors hover:border-amber-400/20 hover:text-text-main"
                         data-dataset-filter="mart"
                     >
                         Mart
@@ -1088,11 +1088,11 @@ const guideCards = [
                             </p>
 
                             <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <div class="rounded-2xl border border-outline bg-white/[0.03] px-4 py-3">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Tamanho</p>
                                     <p class="mt-1 font-semibold text-text-main">{dataset.sizeLabel}</p>
                                 </div>
-                                <div class="rounded-2xl border border-border-main bg-white/[0.03] px-4 py-3">
+                                <div class="rounded-2xl border border-outline bg-white/[0.03] px-4 py-3">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Origem</p>
                                     <p class="mt-1 font-mono text-xs text-text-main">src/data</p>
                                 </div>
@@ -1105,7 +1105,7 @@ const guideCards = [
                                 <div class="flex flex-wrap gap-2">
                                     {dataset.sampleKeys.length > 0 ? (
                                         dataset.sampleKeys.map((field) => (
-                                            <span class="inline-flex items-center rounded-full border border-border-main bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
+                                            <span class="inline-flex items-center rounded-full border border-outline bg-[var(--tag-bg)] px-2.5 py-1 text-[10px] font-bold text-text-secondary">
                                                 {field}
                                             </span>
                                         ))
@@ -1126,7 +1126,7 @@ const guideCards = [
                                 </div>
                             </details>
 
-                            <div class="mt-auto pt-4 border-t border-border-main flex items-center justify-between gap-3">
+                            <div class="mt-auto pt-4 border-t border-outline flex items-center justify-between gap-3">
                                 <span class="text-xs text-text-secondary">
                                     Arquivo JSON
                                 </span>
@@ -1147,9 +1147,9 @@ const guideCards = [
 
         <div
             id="datasetEmptyState"
-            class="hidden flex-col items-center justify-center py-20 text-center glass-card border border-dashed border-border-main"
+            class="hidden flex-col items-center justify-center py-20 text-center glass-card border border-dashed border-outline"
         >
-            <div class="w-16 h-16 rounded-3xl bg-white/[0.03] border border-border-main flex items-center justify-center text-text-secondary mb-5">
+            <div class="w-16 h-16 rounded-3xl bg-white/[0.03] border border-outline flex items-center justify-center text-text-secondary mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path><path d="M8 11h6"></path></svg>
             </div>
             <h3 class="text-xl font-bold font-['Outfit'] text-text-main">Nenhum dataset encontrado</h3>
@@ -1192,7 +1192,7 @@ const guideCards = [
                 button.classList.toggle("border-premium-accent/20", isActive);
                 button.classList.toggle("bg-premium-accent/[0.08]", isActive);
                 button.classList.toggle("text-premium-accent", isActive);
-                button.classList.toggle("border-border-main", !isActive);
+                button.classList.toggle("border-outline", !isActive);
                 button.classList.toggle("bg-white/[0.03]", !isActive);
                 button.classList.toggle("text-text-secondary", !isActive);
             });
