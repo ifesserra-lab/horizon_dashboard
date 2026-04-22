@@ -1,439 +1,348 @@
 {
     "metadata": {
-        "generated_at": "2026-04-04T20:12:20.275498+00:00",
+        "generated_at": "2026-04-22T12:43:59.909491+00:00",
         "sources": {
-            "researchers": "data/exports/researchers_canonical.json",
-            "initiatives": "data/exports/initiatives_canonical.json",
-            "research_groups": "data/exports/research_groups_canonical.json",
-            "advisorships": "data/exports/advisorships_canonical.json"
+            "researchers": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/researchers_canonical.json",
+            "initiatives": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/initiatives_canonical.json",
+            "research_groups": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/research_groups_canonical.json",
+            "advisorships": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/advisorships_canonical.json"
         },
         "scope": {
             "type": "research_group",
-            "graph_type": "membership",
             "research_group": {
                 "id": 163,
-                "name": "Grupo de Pesquisa em Energias Renováveis",
-                "short_name": " GPER",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "member_count": 8
+                "name": "Grupo de pesquisa em educação, cidadania e informação",
+                "short_name": "Educin",
+                "member_count": 6,
+                "expanded_node_count": 6,
+                "advisorship_neighbor_count": 0
             }
         },
-        "weight_definition": "Each edge represents one present_in relationship from a person node to the research group node.",
+        "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
         "relation_types": {
-            "present_in": "Person is present in the research group node."
+            "initiative": "People who appear together in the same initiative team.",
+            "research_group": "People who belong to the same research group.",
+            "advisorship": "Supervisor and student connected by an advisorship."
+        },
+        "compatibility_alias": {
+            "kind": "legacy_membership_graph",
+            "source": "research_group_relationship_graphs/research_group_163_relationship_graph.json"
         }
     },
     "graph_stats": {
-        "nodes": 9,
-        "edges": 8,
+        "nodes": 6,
+        "edges": 15,
         "isolated_nodes": 0,
         "connected_components": 1,
-        "largest_component_size": 9,
+        "largest_component_size": 6,
         "relation_event_totals": {
-            "present_in": 8
+            "initiative": 0,
+            "research_group": 22,
+            "advisorship": 0
         },
         "edge_relation_presence": {
-            "present_in": 8
+            "initiative": 0,
+            "research_group": 15,
+            "advisorship": 0
         },
         "classification_distribution": {
-            "researcher": 5,
-            "student": 3
-        },
-        "campus_distribution": {
-            "Cachoeiro de Itapemirim": 8
+            "researcher": 4,
+            "student": 2
         },
         "top_people_by_weighted_degree": [
             {
-                "id": 229,
-                "name": "Julio Cesar Madureira Silva",
+                "id": 19,
+                "name": "Sabrine Lino Pinto",
                 "classification": "researcher",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 9,
+                "degree": 5
             },
             {
-                "id": 230,
-                "name": "Fabielle Castelan Marques",
+                "id": 1226,
+                "name": "Adriana Luisa Lourenço Falcão",
                 "classification": "researcher",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 9,
+                "degree": 5
             },
             {
-                "id": 3288,
-                "name": "Gabriel Antônio Taquêti Silva",
+                "id": 18,
+                "name": "Eduardo Fausto Kuster Cid",
                 "classification": "researcher",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 8,
+                "degree": 5
             },
             {
-                "id": 432,
-                "name": "Bruno Missi Xavier",
+                "id": 1229,
+                "name": "Lucas Rodrigues Barreto",
                 "classification": "researcher",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 8,
+                "degree": 5
             },
             {
-                "id": 4428,
-                "name": "Rafael Michalsky Campinhos",
-                "classification": "researcher",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 4429,
-                "name": "Eduardo Reis Sampaio Filho",
+                "id": 5180,
+                "name": "Elizabeth Bicalho do Amaral",
                 "classification": "student",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             },
             {
-                "id": 4430,
-                "name": "Gabriel Mendonça Valane",
+                "id": 5181,
+                "name": "Fabio Flores dos Anjos",
                 "classification": "student",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 4431,
-                "name": "Josias Paulucio Tiburcio",
-                "classification": "student",
-                "campus_name": "Cachoeiro de Itapemirim",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             }
         ]
     },
     "graph": {
-        "directed": true,
+        "directed": false,
         "multigraph": false,
         "graph": {},
         "nodes": [
             {
-                "node_type": "research_group",
-                "research_group_id": 163,
-                "name": "Grupo de Pesquisa em Energias Renováveis",
-                "short_name": " GPER",
-                "description": "As pesquisas do grupo concentram-se atualmente em 2 linhas: 1) Geração de hidrogênio por fotocatálise e fotoeletrocatálise 2) Análise de parâmetros de degradação e vida útil de células fotovoltaicas poliméricas orgânicas (3ª geração de dispositivos fotovoltaicos)",
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "organization_name": "Instituto Federal do Espirito Santo",
-                "member_count": 8,
-                "degree": 8,
+                "name": "Adriana Luisa Lourenço Falcão",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Vitória",
+                "degree": 5,
+                "weighted_degree": 9,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 1226
+            },
+            {
+                "name": "Lucas Rodrigues Barreto",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": true,
+                "was_staff": true,
+                "campus_name": "Vitória",
+                "degree": 5,
                 "weighted_degree": 8,
-                "classification": null,
-                "id": "research_group:163"
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 1229
             },
             {
-                "name": "Julio Cesar Madureira Silva",
-                "node_type": "person",
+                "name": "Eduardo Fausto Kuster Cid",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000403,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 219,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 229
+                "campus_name": "Vitória",
+                "degree": 5,
+                "weighted_degree": 8,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 18
             },
             {
-                "name": "Fabielle Castelan Marques",
-                "node_type": "person",
+                "name": "Sabrine Lino Pinto",
                 "classification": "researcher",
                 "classification_confidence": "high",
-                "was_student": false,
+                "was_student": true,
                 "was_staff": true,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.011833,
-                "betweenness_centrality": 0.003466,
-                "clustering_coefficient": 0.463166,
-                "community_id": 9,
-                "is_articulation_point": false,
-                "is_hub": true,
-                "id": 230
+                "campus_name": "Vila Velha",
+                "degree": 5,
+                "weighted_degree": 9,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 19
             },
             {
-                "name": "Bruno Missi Xavier",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00632,
-                "betweenness_centrality": 0.007151,
-                "clustering_coefficient": 0.172988,
-                "community_id": 12,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 432
-            },
-            {
-                "name": "Gabriel Antônio Taquêti Silva",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.005916,
-                "betweenness_centrality": 0.000195,
-                "clustering_coefficient": 0.839323,
-                "community_id": 47,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 3288
-            },
-            {
-                "name": "Rafael Michalsky Campinhos",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.001345,
-                "betweenness_centrality": 0.000389,
-                "clustering_coefficient": 0.533333,
-                "community_id": 219,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4428
-            },
-            {
-                "name": "Eduardo Reis Sampaio Filho",
-                "node_type": "person",
+                "name": "Elizabeth Bicalho do Amaral",
                 "classification": "student",
                 "classification_confidence": "medium",
                 "was_student": true,
                 "was_staff": false,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.001614,
-                "betweenness_centrality": 0.000179,
-                "clustering_coefficient": 0.515152,
-                "community_id": 12,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4429
+                "campus_name": "Vitória",
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5180
             },
             {
-                "name": "Gabriel Mendonça Valane",
-                "node_type": "person",
+                "name": "Fabio Flores dos Anjos",
                 "classification": "student",
                 "classification_confidence": "medium",
                 "was_student": true,
                 "was_staff": false,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.002017,
-                "betweenness_centrality": 0.000134,
-                "clustering_coefficient": 0.695238,
-                "community_id": 12,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4430
-            },
-            {
-                "name": "Josias Paulucio Tiburcio",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 9,
-                "campus_name": "Cachoeiro de Itapemirim",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000538,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 0.833333,
-                "community_id": 12,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4431
+                "campus_name": "Vitória",
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5181
             }
         ],
         "edges": [
             {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 229,
-                "target": "research_group:163"
+                "source": 1226,
+                "target": 18
+            },
+            {
+                "weight": 3,
+                "initiative_count": 0,
+                "research_group_count": 3,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 1226,
+                "target": 19
+            },
+            {
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 1226,
+                "target": 1229
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 230,
-                "target": "research_group:163"
+                "source": 1226,
+                "target": 5180
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2017-11-17",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 432,
-                "target": "research_group:163"
+                "source": 1226,
+                "target": 5181
+            },
+            {
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 1229,
+                "target": 18
+            },
+            {
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 1229,
+                "target": 19
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador (Egresso)"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2017-11-27",
-                        "end_date": "2020-04-05"
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 3288,
-                "target": "research_group:163"
+                "source": 1229,
+                "target": 5180
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2022-04-20",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4428,
-                "target": "research_group:163"
+                "source": 1229,
+                "target": 5181
+            },
+            {
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 18,
+                "target": 19
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante (Egresso)"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2020-04-05",
-                        "end_date": "2022-03-11"
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4429,
-                "target": "research_group:163"
+                "source": 18,
+                "target": 5180
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante (Egresso)"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2020-05-08",
-                        "end_date": "2022-03-11"
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4430,
-                "target": "research_group:163"
+                "source": 18,
+                "target": 5181
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante (Egresso)"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2020-04-05",
-                        "end_date": "2022-03-11"
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4431,
-                "target": "research_group:163"
+                "source": 19,
+                "target": 5180
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 19,
+                "target": 5181
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 5180,
+                "target": 5181
             }
         ]
     }

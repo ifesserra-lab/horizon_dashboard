@@ -1,347 +1,347 @@
 {
     "metadata": {
-        "generated_at": "2026-04-04T20:12:20.118195+00:00",
+        "generated_at": "2026-04-22T12:43:59.209568+00:00",
         "sources": {
-            "researchers": "data/exports/researchers_canonical.json",
-            "initiatives": "data/exports/initiatives_canonical.json",
-            "research_groups": "data/exports/research_groups_canonical.json",
-            "advisorships": "data/exports/advisorships_canonical.json"
+            "researchers": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/researchers_canonical.json",
+            "initiatives": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/initiatives_canonical.json",
+            "research_groups": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/research_groups_canonical.json",
+            "advisorships": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/advisorships_canonical.json"
         },
         "scope": {
             "type": "research_group",
-            "graph_type": "membership",
             "research_group": {
                 "id": 139,
                 "name": "Grupo de Estudos Multidisciplinares e Análises Territoriais ",
                 "short_name": "GMAT - IFES PKe",
-                "campus_name": "Presidente Kennedy",
-                "member_count": 6
+                "member_count": 6,
+                "expanded_node_count": 6,
+                "advisorship_neighbor_count": 0
             }
         },
-        "weight_definition": "Each edge represents one present_in relationship from a person node to the research group node.",
+        "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
         "relation_types": {
-            "present_in": "Person is present in the research group node."
+            "initiative": "People who appear together in the same initiative team.",
+            "research_group": "People who belong to the same research group.",
+            "advisorship": "Supervisor and student connected by an advisorship."
+        },
+        "compatibility_alias": {
+            "kind": "legacy_membership_graph",
+            "source": "research_group_relationship_graphs/research_group_139_relationship_graph.json"
         }
     },
     "graph_stats": {
-        "nodes": 7,
-        "edges": 6,
+        "nodes": 6,
+        "edges": 15,
         "isolated_nodes": 0,
         "connected_components": 1,
-        "largest_component_size": 7,
+        "largest_component_size": 6,
         "relation_event_totals": {
-            "present_in": 6
+            "initiative": 0,
+            "research_group": 16,
+            "advisorship": 0
         },
         "edge_relation_presence": {
-            "present_in": 6
+            "initiative": 0,
+            "research_group": 15,
+            "advisorship": 0
         },
         "classification_distribution": {
             "researcher": 6
         },
-        "campus_distribution": {
-            "Presidente Kennedy": 5,
-            "Alegre": 1
-        },
         "top_people_by_weighted_degree": [
             {
                 "id": 202,
+                "name": "Marcos Aloízio França da Fonseca",
+                "classification": "researcher",
+                "weighted_degree": 6,
+                "degree": 5
+            },
+            {
+                "id": 2205,
+                "name": "José Alexandre de Souza Gadioli",
+                "classification": "researcher",
+                "weighted_degree": 6,
+                "degree": 5
+            },
+            {
+                "id": 201,
                 "name": "FLAVIA FERREIRA BATISTA",
                 "classification": "researcher",
-                "campus_name": "Presidente Kennedy",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             },
             {
                 "id": 203,
-                "name": "Marcos Aloízio França da Fonseca",
-                "classification": "researcher",
-                "campus_name": "Presidente Kennedy",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 204,
                 "name": "Luís Alberto Miranda Goveia",
                 "classification": "researcher",
-                "campus_name": "Presidente Kennedy",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             },
             {
-                "id": 2886,
-                "name": "José Alexandre de Souza Gadioli",
-                "classification": "researcher",
-                "campus_name": "Presidente Kennedy",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 3361,
+                "id": 2692,
                 "name": "Oséias Soares Ferreira",
                 "classification": "researcher",
-                "campus_name": "Alegre",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             },
             {
-                "id": 4160,
+                "id": 4705,
                 "name": "Leonardo Carretta da Silva",
                 "classification": "researcher",
-                "campus_name": "Presidente Kennedy",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 5
             }
         ]
     },
     "graph": {
-        "directed": true,
+        "directed": false,
         "multigraph": false,
         "graph": {},
         "nodes": [
             {
-                "node_type": "research_group",
-                "research_group_id": 139,
-                "name": "Grupo de Estudos Multidisciplinares e Análises Territoriais ",
-                "short_name": "GMAT - IFES PKe",
-                "description": "O GMAT ¿ IFES PKe terá como principal repercussão a produção de estudos aplicados sobre o território, integrando informações ambientais, climáticas, sociais e educacionais. O grupo contribuirá para o apoio ao planejamento e à tomada de decisão em nível local e regional, além de fortalecer a formação acadêmica dos estudantes por meio de atividades de pesquisa, ensino e extensão. Também busca ampliar parcerias institucionais e gerar produtos científicos e técnicos com impacto social.",
-                "campus_id": 18,
-                "campus_name": "Presidente Kennedy",
-                "organization_name": "Instituto Federal do Espirito Santo",
-                "member_count": 6,
-                "degree": 6,
-                "weighted_degree": 6,
-                "classification": null,
-                "id": "research_group:139"
-            },
-            {
-                "name": "FLAVIA FERREIRA BATISTA",
-                "node_type": "person",
+                "name": "Leonardo Carretta da Silva",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 18,
                 "campus_name": "Presidente Kennedy",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000672,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 100,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 202
-            },
-            {
-                "name": "Marcos Aloízio França da Fonseca",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 18,
-                "campus_name": "Presidente Kennedy",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.004437,
-                "betweenness_centrality": 0.000118,
-                "clustering_coefficient": 0.789773,
-                "community_id": 100,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 203
-            },
-            {
-                "name": "Luís Alberto Miranda Goveia",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 18,
-                "campus_name": "Presidente Kennedy",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000672,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 100,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 204
-            },
-            {
-                "name": "José Alexandre de Souza Gadioli",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 18,
-                "campus_name": "Presidente Kennedy",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.004437,
-                "betweenness_centrality": 0.000118,
-                "clustering_coefficient": 0.789773,
-                "community_id": 100,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 2886
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 4705
             },
             {
                 "name": "Oséias Soares Ferreira",
-                "node_type": "person",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 5,
                 "campus_name": "Alegre",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.007261,
-                "betweenness_centrality": 0.00018,
-                "clustering_coefficient": 0.830189,
-                "community_id": 62,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 3361
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 2692
             },
             {
-                "name": "Leonardo Carretta da Silva",
-                "node_type": "person",
+                "name": "FLAVIA FERREIRA BATISTA",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 18,
                 "campus_name": "Presidente Kennedy",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000672,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 100,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4160
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 201
+            },
+            {
+                "name": "Marcos Aloízio França da Fonseca",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Presidente Kennedy",
+                "degree": 5,
+                "weighted_degree": 6,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 202
+            },
+            {
+                "name": "Luís Alberto Miranda Goveia",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Presidente Kennedy",
+                "degree": 5,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 203
+            },
+            {
+                "name": "José Alexandre de Souza Gadioli",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Presidente Kennedy",
+                "degree": 5,
+                "weighted_degree": 6,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 2205
             }
         ],
         "edges": [
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
+                ],
+                "source": 4705,
+                "target": 201
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 4705,
+                "target": 202
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 4705,
+                "target": 203
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 4705,
+                "target": 2205
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 4705,
+                "target": 2692
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 2692,
+                "target": 201
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 2692,
+                "target": 202
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 2692,
+                "target": 203
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 2692,
+                "target": 2205
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 201,
+                "target": 202
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 201,
+                "target": 203
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 201,
+                "target": 2205
+            },
+            {
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
                 ],
                 "source": 202,
-                "target": "research_group:139"
+                "target": 2205
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
+                ],
+                "source": 202,
+                "target": 203
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
                 ],
                 "source": 203,
-                "target": "research_group:139"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 204,
-                "target": "research_group:139"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-02-02",
-                        "end_date": null
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 2886,
-                "target": "research_group:139"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-02-02",
-                        "end_date": null
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 3361,
-                "target": "research_group:139"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-02-02",
-                        "end_date": null
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 4160,
-                "target": "research_group:139"
+                "target": 2205
             }
         ]
     }

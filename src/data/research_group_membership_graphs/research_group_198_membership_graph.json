@@ -1,209 +1,208 @@
 {
     "metadata": {
-        "generated_at": "2026-04-04T20:12:20.502761+00:00",
+        "generated_at": "2026-04-22T12:44:00.983383+00:00",
         "sources": {
-            "researchers": "data/exports/researchers_canonical.json",
-            "initiatives": "data/exports/initiatives_canonical.json",
-            "research_groups": "data/exports/research_groups_canonical.json",
-            "advisorships": "data/exports/advisorships_canonical.json"
+            "researchers": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/researchers_canonical.json",
+            "initiatives": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/initiatives_canonical.json",
+            "research_groups": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/research_groups_canonical.json",
+            "advisorships": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/advisorships_canonical.json"
         },
         "scope": {
             "type": "research_group",
-            "graph_type": "membership",
             "research_group": {
                 "id": 198,
-                "name": "História, Memória, Educação tecnológica e Práticas de Turismo no Espírito Santo",
-                "short_name": null,
-                "campus_name": "Vitória",
-                "member_count": 3
+                "name": "Grupo Transdisciplinar de Estudos da Antiguidade",
+                "short_name": "GTEA",
+                "member_count": 4,
+                "expanded_node_count": 4,
+                "advisorship_neighbor_count": 0
             }
         },
-        "weight_definition": "Each edge represents one present_in relationship from a person node to the research group node.",
+        "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
         "relation_types": {
-            "present_in": "Person is present in the research group node."
+            "initiative": "People who appear together in the same initiative team.",
+            "research_group": "People who belong to the same research group.",
+            "advisorship": "Supervisor and student connected by an advisorship."
+        },
+        "compatibility_alias": {
+            "kind": "legacy_membership_graph",
+            "source": "research_group_relationship_graphs/research_group_198_relationship_graph.json"
         }
     },
     "graph_stats": {
         "nodes": 4,
-        "edges": 3,
+        "edges": 6,
         "isolated_nodes": 0,
         "connected_components": 1,
         "largest_component_size": 4,
         "relation_event_totals": {
-            "present_in": 3
+            "initiative": 0,
+            "research_group": 6,
+            "advisorship": 0
         },
         "edge_relation_presence": {
-            "present_in": 3
+            "initiative": 0,
+            "research_group": 6,
+            "advisorship": 0
         },
         "classification_distribution": {
-            "researcher": 3
-        },
-        "campus_distribution": {
-            "Vitória": 2,
-            "Colatina": 1
+            "researcher": 4
         },
         "top_people_by_weighted_degree": [
             {
+                "id": 275,
+                "name": "Natan Henrique Taveira Baptista",
+                "classification": "researcher",
+                "weighted_degree": 3,
+                "degree": 3
+            },
+            {
                 "id": 276,
-                "name": "Dinorah Lopes Rubim Almeida",
+                "name": "Marihá Barbosa E Castro",
                 "classification": "researcher",
-                "campus_name": "Vitória",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 3,
+                "degree": 3
             },
             {
-                "id": 297,
-                "name": "Bruno Dos Santos Prado Moura",
+                "id": 5723,
+                "name": "Katia Regina Giesen",
                 "classification": "researcher",
-                "campus_name": "Vitória",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 3,
+                "degree": 3
             },
             {
-                "id": 4359,
-                "name": "Iuri Campos de Souza",
+                "id": 5724,
+                "name": "Luiza Helena Rodrigues de Abreu Carvalho",
                 "classification": "researcher",
-                "campus_name": "Colatina",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 3,
+                "degree": 3
             }
         ]
     },
     "graph": {
-        "directed": true,
+        "directed": false,
         "multigraph": false,
         "graph": {},
         "nodes": [
             {
-                "node_type": "research_group",
-                "research_group_id": 198,
-                "name": "História, Memória, Educação tecnológica e Práticas de Turismo no Espírito Santo",
-                "short_name": null,
-                "description": "Projeto de pesquisa O público e o privado na história capixaba: integração do Parque Residência Oficial do Governador do Espírito Santo na Praia da Costa por meio da visitação turística, que integra o projeto interinstitucional coordenado pela Universidade Federal do Espírito Santo (Ufes) em parceria com o Governo do Estado do Espírito Santo e o Instituto Federal do Espírito Santo (Ifes), que tem por objetivo geral desenvolver os projetos básicos necessários para a efetiva criação da infraestrutura adequada na área denominada como Parque Residência do Governador, visando abrigar atividades relacionadas à cultura, à arte, ao turismo e à educação, bem como de cunho preservacionista do ambiente natural e construído.",
-                "campus_id": 2,
-                "campus_name": "Vitória",
-                "organization_name": "Instituto Federal do Espirito Santo",
-                "member_count": 3,
-                "degree": 3,
-                "weighted_degree": 3,
-                "classification": null,
-                "id": "research_group:198"
-            },
-            {
-                "name": "Dinorah Lopes Rubim Almeida",
-                "node_type": "person",
+                "name": "Katia Regina Giesen",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 2,
-                "campus_name": "Vitória",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.001076,
-                "betweenness_centrality": 7.4e-05,
-                "clustering_coefficient": 0.75,
-                "community_id": 195,
-                "is_articulation_point": false,
-                "is_hub": false,
+                "campus_name": "Venda Nova do Imigrante",
+                "degree": 3,
+                "weighted_degree": 3,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5723
+            },
+            {
+                "name": "Natan Henrique Taveira Baptista",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Venda Nova do Imigrante",
+                "degree": 3,
+                "weighted_degree": 3,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 275
+            },
+            {
+                "name": "Marihá Barbosa E Castro",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Venda Nova do Imigrante",
+                "degree": 3,
+                "weighted_degree": 3,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
                 "id": 276
             },
             {
-                "name": "Bruno Dos Santos Prado Moura",
-                "node_type": "person",
+                "name": "Luiza Helena Rodrigues de Abreu Carvalho",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 2,
-                "campus_name": "Vitória",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 8.2e-05,
-                "clustering_coefficient": 0.777778,
-                "community_id": 195,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 297
-            },
-            {
-                "name": "Iuri Campos de Souza",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 4,
-                "campus_name": "Colatina",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.001614,
-                "betweenness_centrality": 0.000123,
-                "clustering_coefficient": 0.681818,
-                "community_id": 226,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4359
+                "campus_name": "Venda Nova do Imigrante",
+                "degree": 3,
+                "weighted_degree": 3,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5724
             }
         ],
         "edges": [
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
+                ],
+                "source": 5723,
+                "target": 275
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 5723,
+                "target": 276
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 5723,
+                "target": 5724
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 275,
+                "target": 276
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 275,
+                "target": 5724
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
                 ],
                 "source": 276,
-                "target": "research_group:198"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador (Egresso)"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2021-05-03",
-                        "end_date": "2025-11-10"
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 297,
-                "target": "research_group:198"
-            },
-            {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2022-03-17",
-                        "end_date": null
-                    }
-                ],
-                "relation_types": [
-                    "present_in"
-                ],
-                "source": 4359,
-                "target": "research_group:198"
+                "target": 5724
             }
         ]
     }

@@ -1,532 +1,272 @@
 {
     "metadata": {
-        "generated_at": "2026-04-04T20:12:20.594652+00:00",
+        "generated_at": "2026-04-22T12:44:01.471594+00:00",
         "sources": {
-            "researchers": "data/exports/researchers_canonical.json",
-            "initiatives": "data/exports/initiatives_canonical.json",
-            "research_groups": "data/exports/research_groups_canonical.json",
-            "advisorships": "data/exports/advisorships_canonical.json"
+            "researchers": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/researchers_canonical.json",
+            "initiatives": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/initiatives_canonical.json",
+            "research_groups": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/research_groups_canonical.json",
+            "advisorships": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/advisorships_canonical.json"
         },
         "scope": {
             "type": "research_group",
-            "graph_type": "membership",
             "research_group": {
                 "id": 213,
-                "name": "Laboratório de Estudos em Ciência, Tecnologia e Inovação",
-                "short_name": "Scientia Lab",
-                "campus_name": "Centro-Serrano",
-                "member_count": 10
+                "name": "Laboratório de Educação para as Relações Étnico-Raciais",
+                "short_name": "LERER",
+                "member_count": 5,
+                "expanded_node_count": 5,
+                "advisorship_neighbor_count": 0
             }
         },
-        "weight_definition": "Each edge represents one present_in relationship from a person node to the research group node.",
+        "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
         "relation_types": {
-            "present_in": "Person is present in the research group node."
+            "initiative": "People who appear together in the same initiative team.",
+            "research_group": "People who belong to the same research group.",
+            "advisorship": "Supervisor and student connected by an advisorship."
+        },
+        "compatibility_alias": {
+            "kind": "legacy_membership_graph",
+            "source": "research_group_relationship_graphs/research_group_213_relationship_graph.json"
         }
     },
     "graph_stats": {
-        "nodes": 11,
+        "nodes": 5,
         "edges": 10,
         "isolated_nodes": 0,
         "connected_components": 1,
-        "largest_component_size": 11,
+        "largest_component_size": 5,
         "relation_event_totals": {
-            "present_in": 10
+            "initiative": 0,
+            "research_group": 11,
+            "advisorship": 0
         },
         "edge_relation_presence": {
-            "present_in": 10
+            "initiative": 0,
+            "research_group": 10,
+            "advisorship": 0
         },
         "classification_distribution": {
-            "researcher": 3,
-            "student": 7
-        },
-        "campus_distribution": {
-            "Centro-Serrano": 9,
-            "Cefor": 1
+            "researcher": 5
         },
         "top_people_by_weighted_degree": [
             {
-                "id": 2775,
-                "name": "Gabriela de Oliveira Gobbi",
+                "id": 294,
+                "name": "Renata Gandra De Melo",
                 "classification": "researcher",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 4
             },
             {
-                "id": 296,
-                "name": "Felipe Ferreira Barros Carneiro",
+                "id": 1443,
+                "name": "Nanine Renata Passos dos Santos Pereira",
                 "classification": "researcher",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 5,
+                "degree": 4
             },
             {
-                "id": 5027,
-                "name": "Adilson Oliveira Cruz",
+                "id": 293,
+                "name": "Mauricio Soares Do Vale",
                 "classification": "researcher",
-                "campus_name": "Cefor",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 4,
+                "degree": 4
             },
             {
-                "id": 5305,
-                "name": "Elen Romanha Epefani",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
+                "id": 2788,
+                "name": "Patrícia Teixeira Moschen Lievore",
+                "classification": "researcher",
+                "weighted_degree": 4,
+                "degree": 4
             },
             {
-                "id": 5306,
-                "name": "Elis Rossini",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 5307,
-                "name": "Jéssica Dettmann",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 5308,
-                "name": "Larissa Vitória Rocha Martins",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 5309,
-                "name": "Leonardo Dalla Bernardina Santos",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 5310,
-                "name": "Nicoly Schreiber Fick",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
-            },
-            {
-                "id": 5311,
-                "name": "Rayra da Silva Föeger",
-                "classification": "student",
-                "campus_name": "Centro-Serrano",
-                "weighted_degree": 1,
-                "degree": 1
+                "id": 6000,
+                "name": "Rosane Rosa Dias Fernandes",
+                "classification": "researcher",
+                "weighted_degree": 4,
+                "degree": 4
             }
         ]
     },
     "graph": {
-        "directed": true,
+        "directed": false,
         "multigraph": false,
         "graph": {},
         "nodes": [
             {
-                "node_type": "research_group",
-                "research_group_id": 213,
-                "name": "Laboratório de Estudos em Ciência, Tecnologia e Inovação",
-                "short_name": "Scientia Lab",
-                "description": null,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "organization_name": "Instituto Federal do Espirito Santo",
-                "member_count": 10,
-                "degree": 10,
-                "weighted_degree": 10,
-                "classification": null,
-                "id": "research_group:213"
-            },
-            {
-                "name": "Felipe Ferreira Barros Carneiro",
-                "node_type": "person",
+                "name": "Nanine Renata Passos dos Santos Pereira",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.002689,
-                "betweenness_centrality": 0.000195,
-                "clustering_coefficient": 0.489474,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 296
+                "campus_name": "Colatina",
+                "degree": 4,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 1443
             },
             {
-                "name": "Gabriela de Oliveira Gobbi",
-                "node_type": "person",
+                "name": "Patrícia Teixeira Moschen Lievore",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": true,
+                "was_staff": true,
+                "campus_name": "Alegre",
+                "degree": 4,
+                "weighted_degree": 4,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 2788
+            },
+            {
+                "name": "Mauricio Soares Do Vale",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.002286,
-                "betweenness_centrality": 0.000177,
-                "clustering_coefficient": 0.477941,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 2775
+                "campus_name": "Colatina",
+                "degree": 4,
+                "weighted_degree": 4,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 293
             },
             {
-                "name": "Adilson Oliveira Cruz",
-                "node_type": "person",
+                "name": "Renata Gandra De Melo",
                 "classification": "researcher",
                 "classification_confidence": "high",
-                "was_student": true,
+                "was_student": false,
                 "was_staff": true,
-                "campus_id": 16,
-                "campus_name": "Cefor",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00753,
-                "betweenness_centrality": 0.005253,
-                "clustering_coefficient": 0.337662,
-                "community_id": 81,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5027
+                "campus_name": "Colatina",
+                "degree": 4,
+                "weighted_degree": 5,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 294
             },
             {
-                "name": "Elen Romanha Epefani",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5305
-            },
-            {
-                "name": "Elis Rossini",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5306
-            },
-            {
-                "name": "Jéssica Dettmann",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5307
-            },
-            {
-                "name": "Larissa Vitória Rocha Martins",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5308
-            },
-            {
-                "name": "Leonardo Dalla Bernardina Santos",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5309
-            },
-            {
-                "name": "Nicoly Schreiber Fick",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5310
-            },
-            {
-                "name": "Rayra da Silva Föeger",
-                "node_type": "person",
-                "classification": "student",
-                "classification_confidence": "medium",
-                "was_student": true,
-                "was_staff": false,
-                "campus_id": 17,
-                "campus_name": "Centro-Serrano",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.00121,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 198,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 5311
+                "name": "Rosane Rosa Dias Fernandes",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Colatina",
+                "degree": 4,
+                "weighted_degree": 4,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 6000
             }
         ],
         "edges": [
             {
-                "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "weight": 2,
+                "initiative_count": 0,
+                "research_group_count": 2,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 296,
-                "target": "research_group:213"
+                "source": 1443,
+                "target": 294
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2024-03-18",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 2775,
-                "target": "research_group:213"
+                "source": 1443,
+                "target": 293
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2023-04-11",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5027,
-                "target": "research_group:213"
+                "source": 1443,
+                "target": 2788
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2025-12-05",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5305,
-                "target": "research_group:213"
+                "source": 1443,
+                "target": 6000
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2023-04-05",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5306,
-                "target": "research_group:213"
+                "source": 2788,
+                "target": 293
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2025-12-05",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5307,
-                "target": "research_group:213"
+                "source": 2788,
+                "target": 294
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2025-08-01",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5308,
-                "target": "research_group:213"
+                "source": 2788,
+                "target": 6000
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2025-12-05",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5309,
-                "target": "research_group:213"
+                "source": 293,
+                "target": 294
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2024-03-18",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5310,
-                "target": "research_group:213"
+                "source": 293,
+                "target": 6000
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Estudante"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2023-04-05",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 5311,
-                "target": "research_group:213"
+                "source": 294,
+                "target": 6000
             }
         ]
     }

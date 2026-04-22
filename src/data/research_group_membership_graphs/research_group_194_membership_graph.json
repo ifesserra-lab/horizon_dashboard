@@ -1,210 +1,155 @@
 {
     "metadata": {
-        "generated_at": "2026-04-04T20:12:20.481400+00:00",
+        "generated_at": "2026-04-22T12:44:00.868072+00:00",
         "sources": {
-            "researchers": "data/exports/researchers_canonical.json",
-            "initiatives": "data/exports/initiatives_canonical.json",
-            "research_groups": "data/exports/research_groups_canonical.json",
-            "advisorships": "data/exports/advisorships_canonical.json"
+            "researchers": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/researchers_canonical.json",
+            "initiatives": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/initiatives_canonical.json",
+            "research_groups": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/research_groups_canonical.json",
+            "advisorships": "/home/paulossjunior/projects/horizon_project/horizon_dashboard_worspace/horizon_etl/data/exports/advisorships_canonical.json"
         },
         "scope": {
             "type": "research_group",
-            "graph_type": "membership",
             "research_group": {
                 "id": 194,
-                "name": "Grupo Interdisciplinar de Pesquisa em Meio Ambiente",
-                "short_name": null,
-                "campus_name": "Vila Velha",
-                "member_count": 3
+                "name": "Grupo de Poímeros e Compósitos",
+                "short_name": "PoCo",
+                "member_count": 3,
+                "expanded_node_count": 3,
+                "advisorship_neighbor_count": 0
             }
         },
-        "weight_definition": "Each edge represents one present_in relationship from a person node to the research group node.",
+        "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
         "relation_types": {
-            "present_in": "Person is present in the research group node."
+            "initiative": "People who appear together in the same initiative team.",
+            "research_group": "People who belong to the same research group.",
+            "advisorship": "Supervisor and student connected by an advisorship."
+        },
+        "compatibility_alias": {
+            "kind": "legacy_membership_graph",
+            "source": "research_group_relationship_graphs/research_group_194_relationship_graph.json"
         }
     },
     "graph_stats": {
-        "nodes": 4,
+        "nodes": 3,
         "edges": 3,
         "isolated_nodes": 0,
         "connected_components": 1,
-        "largest_component_size": 4,
+        "largest_component_size": 3,
         "relation_event_totals": {
-            "present_in": 3
+            "initiative": 0,
+            "research_group": 3,
+            "advisorship": 0
         },
         "edge_relation_presence": {
-            "present_in": 3
+            "initiative": 0,
+            "research_group": 3,
+            "advisorship": 0
         },
         "classification_distribution": {
             "researcher": 3
         },
-        "campus_distribution": {
-            "Alegre": 1,
-            "Colatina": 1,
-            "Vila Velha": 1
-        },
         "top_people_by_weighted_degree": [
             {
-                "id": 273,
-                "name": "Miquelina Aparecida Deina",
+                "id": 271,
+                "name": "Kinglston Soares",
                 "classification": "researcher",
-                "campus_name": "Alegre",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 2,
+                "degree": 2
             },
             {
-                "id": 4306,
-                "name": "Hiáscara Alves Pereira Jardim",
+                "id": 1012,
+                "name": "Paola Angélica Dias dos Santos",
                 "classification": "researcher",
-                "campus_name": "Colatina",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 2,
+                "degree": 2
             },
             {
-                "id": 4962,
-                "name": "Sonia Wenceslau Flores Rodrigues",
+                "id": 5671,
+                "name": "Samira Gomes Brandão",
                 "classification": "researcher",
-                "campus_name": "Vila Velha",
-                "weighted_degree": 1,
-                "degree": 1
+                "weighted_degree": 2,
+                "degree": 2
             }
         ]
     },
     "graph": {
-        "directed": true,
+        "directed": false,
         "multigraph": false,
         "graph": {},
         "nodes": [
             {
-                "node_type": "research_group",
-                "research_group_id": 194,
-                "name": "Grupo Interdisciplinar de Pesquisa em Meio Ambiente",
-                "short_name": null,
-                "description": "O grupo atua em projetos de pesquisas interdisciplinares que tem como objetivo principal trabalhar as questões ambientais nas diferentes áreas do conhecimento de forma integrada e com ações voltadas para a educação ambiental. A meta é reunir e integrar as pesquisas de professores de diferentes áreas do conhecimento, cujo foco esteja voltado para as problemáticas ambientais em curso, a fim de compartilhar saberes, experiências e fomentar ações no campo teórico e prático que coloquem às questões ambientais em evidência na sociedade e no meio acadêmico, tendo em vista a relação amplamente predatória que a sociedade estabelece com o meio ambiente.",
-                "campus_id": 1,
+                "name": "Paola Angélica Dias dos Santos",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": true,
+                "was_staff": true,
                 "campus_name": "Vila Velha",
-                "organization_name": "Instituto Federal do Espirito Santo",
-                "member_count": 3,
-                "degree": 3,
-                "weighted_degree": 3,
-                "classification": null,
-                "id": "research_group:194"
+                "degree": 2,
+                "weighted_degree": 2,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 1012
             },
             {
-                "name": "Miquelina Aparecida Deina",
-                "node_type": "person",
+                "name": "Samira Gomes Brandão",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 5,
-                "campus_name": "Alegre",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.008471,
-                "betweenness_centrality": 0.000462,
-                "clustering_coefficient": 0.854583,
-                "community_id": 29,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 273
+                "campus_name": "Vitória",
+                "degree": 2,
+                "weighted_degree": 2,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5671
             },
             {
-                "name": "Hiáscara Alves Pereira Jardim",
-                "node_type": "person",
+                "name": "Kinglston Soares",
                 "classification": "researcher",
                 "classification_confidence": "high",
                 "was_student": false,
                 "was_staff": true,
-                "campus_id": 4,
-                "campus_name": "Colatina",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.003227,
-                "betweenness_centrality": 0.00061,
-                "clustering_coefficient": 0.449275,
-                "community_id": 168,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4306
-            },
-            {
-                "name": "Sonia Wenceslau Flores Rodrigues",
-                "node_type": "person",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_id": 1,
-                "campus_name": "Vila Velha",
-                "degree": 1,
-                "weighted_degree": 1,
-                "degree_centrality": 0.000269,
-                "betweenness_centrality": 0.0,
-                "clustering_coefficient": 1.0,
-                "community_id": 168,
-                "is_articulation_point": false,
-                "is_hub": false,
-                "id": 4962
+                "campus_name": "Vitória",
+                "degree": 2,
+                "weighted_degree": 2,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 271
             }
         ],
         "edges": [
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Leader"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2026-03-30",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 273,
-                "target": "research_group:194"
+                "source": 1012,
+                "target": 271
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2023-09-27",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4306,
-                "target": "research_group:194"
+                "source": 1012,
+                "target": 5671
             },
             {
                 "weight": 1,
-                "present_in_count": 1,
-                "membership_count": 1,
-                "group_roles": [
-                    "Pesquisador"
-                ],
-                "membership_periods": [
-                    {
-                        "start_date": "2023-09-27",
-                        "end_date": null
-                    }
-                ],
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
                 "relation_types": [
-                    "present_in"
+                    "research_group"
                 ],
-                "source": 4962,
-                "target": "research_group:194"
+                "source": 5671,
+                "target": 271
             }
         ]
     }
