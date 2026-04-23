@@ -234,7 +234,7 @@ const toggleChipState = (button: HTMLButtonElement, isActive: boolean) => {
     button.classList.toggle("bg-premium-accent/[0.10]", isActive);
     button.classList.toggle("text-text-main", isActive);
     button.classList.toggle("shadow-[0_0_0_1px_rgba(56,189,248,0.18)]", isActive);
-    button.classList.toggle("border-border-main", !isActive);
+    button.classList.toggle("border-outline", !isActive);
     button.classList.toggle("bg-white/[0.03]", !isActive);
     button.classList.toggle("text-text-secondary", !isActive);
     button.setAttribute("aria-pressed", String(isActive));
@@ -572,7 +572,7 @@ export const initializeResearchGroupInteractionGraph = ({
 
             if (selectedNode.isGroupMember) {
                 badges.push(
-                    '<span class="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-sky-700">Membro do grupo</span>',
+                    '<span class="inline-flex items-center rounded-full border border-sky-border bg-sky-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-sky-text">Membro do grupo</span>',
                 );
             }
 

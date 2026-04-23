@@ -46,16 +46,16 @@ const accentByKey: Record<
     }
 > = {
     membership: {
-        badge: "border-sky-400/25 bg-sky-400/10 text-sky-700",
-        border: "border-sky-200/80",
-        surface: "bg-sky-50/80",
-        accent: "text-sky-700",
+        badge: "border border-sky-border bg-sky-surface text-sky-text",
+        border: "border-sky-border",
+        surface: "bg-sky-surface",
+        accent: "text-sky-text",
     },
     relationship: {
-        badge: "border-emerald-400/25 bg-emerald-400/10 text-emerald-700",
-        border: "border-emerald-200/80",
-        surface: "bg-emerald-50/80",
-        accent: "text-emerald-700",
+        badge: "border border-emerald-border bg-emerald-surface text-emerald-text",
+        border: "border-emerald-border",
+        surface: "bg-emerald-surface",
+        accent: "text-emerald-text",
     },
 };
 ---
@@ -91,7 +91,7 @@ const accentByKey: Record<
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                        <div class="rounded-2xl border border-outline bg-page-bg/70 p-4">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Nos
                             </p>
@@ -99,7 +99,7 @@ const accentByKey: Record<
                                 {dataset.stats.nodes}
                             </p>
                         </div>
-                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                        <div class="rounded-2xl border border-outline bg-page-bg/70 p-4">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Arestas
                             </p>
@@ -107,7 +107,7 @@ const accentByKey: Record<
                                 {dataset.stats.edges}
                             </p>
                         </div>
-                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                        <div class="rounded-2xl border border-outline bg-page-bg/70 p-4">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Membros
                             </p>
@@ -115,7 +115,7 @@ const accentByKey: Record<
                                 {dataset.stats.memberCount}
                             </p>
                         </div>
-                        <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                        <div class="rounded-2xl border border-outline bg-page-bg/70 p-4">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Componentes
                             </p>
@@ -125,9 +125,9 @@ const accentByKey: Record<
                         </div>
                     </div>
 
-                    <div class="rounded-2xl border border-border-main bg-white/70 p-4 space-y-3">
+                    <div class="rounded-2xl border border-outline bg-page-bg/70 p-4 space-y-3">
                         <div class="flex flex-wrap gap-2">
-                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            <span class="inline-flex items-center rounded-full border border-outline bg-tag-bg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 tipo: {dataset.graphType ?? "desconhecido"}
                             </span>
                         </div>
@@ -149,7 +149,7 @@ const accentByKey: Record<
                                 {
                                     dataset.relationTotals.length > 0 ? (
                                         dataset.relationTotals.map((item) => (
-                                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                            <span class="inline-flex items-center rounded-full border border-outline bg-tag-bg px-3 py-1 text-xs font-medium text-text-main">
                                                 {item.label}: {item.value}
                                             </span>
                                         ))
@@ -170,7 +170,7 @@ const accentByKey: Record<
                                 {
                                     dataset.classificationDistribution.length > 0 ? (
                                         dataset.classificationDistribution.map((item) => (
-                                            <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                            <span class="inline-flex items-center rounded-full border border-outline bg-tag-bg px-3 py-1 text-xs font-medium text-text-main">
                                                 {item.label}: {item.value}
                                             </span>
                                         ))
@@ -184,7 +184,7 @@ const accentByKey: Record<
                         </div>
                     </div>
 
-                    <div class="rounded-2xl border border-border-main bg-white/70 p-4">
+                    <div class="rounded-2xl border border-outline bg-page-bg/70 p-4">
                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                             Pessoas em destaque
                         </p>

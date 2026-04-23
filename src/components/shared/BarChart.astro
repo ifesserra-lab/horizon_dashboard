@@ -60,7 +60,7 @@ const getColorClasses = (c: string) => {
     switch (c) {
         case "emerald-500":
             return {
-                text: "text-emerald-500",
+                text: "text-emerald-text",
                 bar: "from-emerald-500/40 to-emerald-500",
                 hover: "hover:to-emerald-400", // valid contrast
             };
@@ -85,7 +85,7 @@ const maxValue = Math.max(...continuousData.map((d) => d.value), 1);
 ---
 
 <div
-    class={`glass-card border border-border-main rounded-3xl p-6 ${height} flex flex-col`}
+    class={`glass-card border border-outline rounded-3xl p-6 ${height} flex flex-col`}
 >
     {
         showTitle && (
@@ -144,7 +144,7 @@ const maxValue = Math.max(...continuousData.map((d) => d.value), 1);
                 </div>
 
                 {/* Legend - Labels */}
-                <div class="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-tight border-t border-border-main pt-2">
+                <div class="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-tight border-t border-outline pt-2">
                     {(() => {
                         // Logic to show reasonable amount of labels
                         const count = continuousData.length;

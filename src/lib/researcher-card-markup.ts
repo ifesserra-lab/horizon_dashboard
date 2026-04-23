@@ -82,7 +82,7 @@ const renderKnowledgeAreaPills = (knowledgeAreaNames: string[]) => {
             ${visibleAreas
                 .map(
                     (areaName) => `
-                        <span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary border border-border-main truncate max-w-[120px]">
+                        <span class="px-2 py-0.5 rounded-md bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary border border-outline truncate max-w-[120px]">
                             ${escapeHtml(areaName)}
                         </span>
                     `,
@@ -208,7 +208,7 @@ export const renderResearcherCardMarkup = (card: ResearcherCardView) => `
         data-campus-ids="${escapeHtml(card.campusIds.join("|"))}"
     >
         <div
-            class="w-24 h-24 rounded-full bg-gradient-to-br from-premium-accent/20 to-premium-purple/20 border-2 border-border-main flex items-center justify-center text-premium-accent font-bold text-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-premium-accent/5"
+            class="w-24 h-24 rounded-full bg-gradient-to-br from-premium-accent/20 to-premium-purple/20 border-2 border-outline flex items-center justify-center text-premium-accent font-bold text-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-premium-accent/5"
         >
             ${escapeHtml(card.initial)}
         </div>
@@ -276,7 +276,7 @@ export const renderResearcherCardMarkup = (card: ResearcherCardView) => `
                     Projetos
                 </span>
             </div>
-            <div class="w-px h-6 bg-border-main"></div>
+            <div class="w-px h-6 bg-outline"></div>
             <div class="flex flex-col items-center">
                 <span class="text-xs font-bold text-text-main">
                     ${card.articles}
@@ -287,7 +287,7 @@ export const renderResearcherCardMarkup = (card: ResearcherCardView) => `
                     Artigos
                 </span>
             </div>
-            <div class="w-px h-6 bg-border-main"></div>
+            <div class="w-px h-6 bg-outline"></div>
             <div
                 class="flex flex-col items-center cursor-help"
                 title="${escapeHtml(card.advisorshipsTooltip)}"
@@ -304,7 +304,7 @@ export const renderResearcherCardMarkup = (card: ResearcherCardView) => `
             ${
                 card.isSupervisor || card.isStudent
                     ? `
-                        <div class="w-px h-6 bg-border-main"></div>
+                        <div class="w-px h-6 bg-outline"></div>
                         <div class="flex gap-1">
                             ${
                                 card.isSupervisor
@@ -361,7 +361,7 @@ export const renderResearcherCardMarkup = (card: ResearcherCardView) => `
         </div>
 
         <div
-            class="mt-auto pt-4 border-t border-border-main w-full flex flex-col gap-3"
+            class="mt-auto pt-4 border-t border-outline w-full flex flex-col gap-3"
         >
             <div class="flex justify-between items-center w-full">
                 <div class="flex gap-2">

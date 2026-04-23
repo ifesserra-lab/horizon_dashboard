@@ -39,7 +39,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
 ---
 
 <section aria-labelledby="student-fellowships-title" class="space-y-6">
-    <div class="py-4 border-b border-border-main">
+    <div class="py-4 border-b border-outline">
         <h3
             id="student-fellowships-title"
             class="text-2xl font-bold font-['Outfit'] text-text-main"
@@ -56,7 +56,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
         fellowships.length > 0 ? (
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {fellowships.map((fellowshipItem) => (
-                    <article class="glass-card p-5 border border-border-main space-y-4">
+                    <article class="glass-card p-5 border border-outline space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div>
                                 <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -66,7 +66,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                                     <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                                         fellowshipItem.status?.toLowerCase() ===
                                         "active"
-                                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                            ? "bg-emerald-surface border-emerald-500/20 text-emerald-text"
                                             : "bg-slate-500/10 border-slate-500/20 text-slate-500"
                                     }`}>
                                         {fellowshipItem.status || "Status não informado"}
@@ -97,7 +97,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                            <div class="rounded-2xl border border-outline bg-white/[0.02] px-4 py-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Período
                                 </p>
@@ -107,7 +107,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                                     {formatDate(fellowshipItem.endDate)}
                                 </p>
                             </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                            <div class="rounded-2xl border border-outline bg-white/[0.02] px-4 py-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Financiador
                                 </p>
@@ -116,7 +116,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                                         "Não informado"}
                                 </p>
                             </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                            <div class="rounded-2xl border border-outline bg-white/[0.02] px-4 py-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Orientador
                                 </p>
@@ -125,7 +125,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                                         "Não informado"}
                                 </p>
                             </div>
-                            <div class="rounded-2xl border border-border-main bg-white/[0.02] px-4 py-3">
+                            <div class="rounded-2xl border border-outline bg-white/[0.02] px-4 py-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Campus
                                 </p>
@@ -135,7 +135,7 @@ const formatProjectPeriod = (startDate: string | null, endDate: string | null) =
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border-main/50">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-outline/50">
                             <p class="text-xs text-text-secondary">
                                 {fellowshipItem.fellowship.description ||
                                     fellowshipItem.description ||
