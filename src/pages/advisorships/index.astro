@@ -339,7 +339,10 @@ const advisorshipCatalogByCampus = {
             <div data-campus-view="">
                 <AdvisorshipKpiCards summary={summary} />
                 <div class="grid grid-cols-1 gap-8">
-                    <AdvisorshipCharts analytics={analytics} />
+                    <AdvisorshipCharts
+                        analytics={analytics}
+                        chartId="advisorships-all"
+                    />
                 </div>
             </div>
                 {
@@ -347,7 +350,10 @@ const advisorshipCatalogByCampus = {
                     <div data-campus-view={campusId} class="hidden">
                         <AdvisorshipKpiCards summary={view.summary} />
                         <div class="grid grid-cols-1 gap-8">
-                            <AdvisorshipCharts analytics={view.analytics} />
+                            <AdvisorshipCharts
+                                analytics={view.analytics}
+                                chartId={`advisorships-campus-${campusId}`}
+                            />
                         </div>
                     </div>
                 ))

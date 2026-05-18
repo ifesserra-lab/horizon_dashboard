@@ -20,9 +20,11 @@ interface Props {
         top_supervisors: { name: string; count: number }[];
     };
     visibleTabs?: ('general' | 'fellowships' | 'financial' | 'supervisors')[];
+    chartId?: string;
 }
 
-const { analytics, visibleTabs = ['general', 'fellowships', 'financial', 'supervisors'] } = Astro.props;
+const { analytics, visibleTabs = ['general', 'fellowships', 'financial', 'supervisors'], chartId = 'advisorship-chart' } = Astro.props;
+const chartUid = chartId;
 
 const totalStatus = analytics.status_distribution.reduce(
     (acc, curr) => acc + curr.value,
@@ -38,7 +40,7 @@ const maxSupervisorCount =
         : 1;
 ---
 
-<div class="space-y-6">
+<div class="space-y-6" data-advisorship-chart>
     <!-- Tabs Header -->
     <div
         class="flex items-center justify-between border-b border-border-main/50 pb-px overflow-x-auto no-scrollbar"
@@ -52,8 +54,8 @@ const maxSupervisorCount =
             <button
                 role="tab"
                 aria-selected={visibleTabs[0] === 'general' ? "true" : "false"}
-                aria-controls="panel-general"
-                id="tab-general"
+                aria-controls={`${chartUid}-panel-general`}
+                id={`${chartUid}-tab-general`}
                 class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'general' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Visão Geral</span>
@@ -65,8 +67,8 @@ const maxSupervisorCount =
             <button
                 role="tab"
                 aria-selected={visibleTabs[0] === 'fellowships' ? "true" : "false"}
-                aria-controls="panel-fellowships"
-                id="tab-fellowships"
+                aria-controls={`${chartUid}-panel-fellowships`}
+                id={`${chartUid}-tab-fellowships`}
                 class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'fellowships' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Evolução de Bolsas</span>
@@ -78,8 +80,8 @@ const maxSupervisorCount =
             <button
                 role="tab"
                 aria-selected={visibleTabs[0] === 'financial' ? "true" : "false"}
-                aria-controls="panel-financial"
-                id="tab-financial"
+                aria-controls={`${chartUid}-panel-financial`}
+                id={`${chartUid}-tab-financial`}
                 class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'financial' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Investimento</span>
@@ -91,8 +93,8 @@ const maxSupervisorCount =
             <button
                 role="tab"
                 aria-selected={visibleTabs[0] === 'supervisors' ? "true" : "false"}
-                aria-controls="panel-supervisors"
-                id="tab-supervisors"
+                aria-controls={`${chartUid}-panel-supervisors`}
+                id={`${chartUid}-tab-supervisors`}
                 class={`pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative group cursor-pointer whitespace-nowrap ${visibleTabs[0] === 'supervisors' ? 'text-premium-accent border-b-2 border-premium-accent' : 'text-text-muted hover:text-text-main border-b-2 border-transparent'}`}
             >
                 <span class="hidden sm:inline">Top Orientadores</span>
@@ -107,9 +109,9 @@ const maxSupervisorCount =
         <!-- 1. General Status Panel -->
         {visibleTabs.includes('general') && (
         <div
-            id="panel-general"
+            id={`${chartUid}-panel-general`}
             role="tabpanel"
-            aria-labelledby="tab-general"
+            aria-labelledby={`${chartUid}-tab-general`}
             class={`transition-all duration-300 ${visibleTabs[0] === 'general' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
             <div
@@ -197,9 +199,9 @@ const maxSupervisorCount =
         <!-- 2. Fellowships Panel (Evolution) -->
         {visibleTabs.includes('fellowships') && (
         <div
-            id="panel-fellowships"
+            id={`${chartUid}-panel-fellowships`}
             role="tabpanel"
-            aria-labelledby="tab-fellowships"
+            aria-labelledby={`${chartUid}-tab-fellowships`}
             class={`transition-all duration-300 ${visibleTabs[0] === 'fellowships' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
@@ -269,13 +271,13 @@ const maxSupervisorCount =
                                      {seriesList.map((series, i) => {
                                          if (!series) return null;
                                          const points = series.data.map((d, i) => {
-                                            const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                            const x = paddingX + (i / Math.max(series.data.length - 1, 1)) * graphWidth;
                                             const y = height - paddingY - (d.value / maxValue) * graphHeight;
                                             return `${x},${y}`;
                                          }).join(" ");
 
                                          return (
-                                            <g id={`series-fellowship-${i}`} class="transition-opacity duration-300">
+                                            <g data-series-id={`series-fellowship-${i}`} class="transition-opacity duration-300">
                                                 <!-- Line -->
                                                 <polyline 
                                                     points={points} 
@@ -290,7 +292,7 @@ const maxSupervisorCount =
                                                 <!-- Points and Labels -->
                                                 {series.data.map((d, i) => {
                                                      if (d.value === 0) return null; // Don't show confusing 0 points/labels? Or maybe just small dot.
-                                                     const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                                     const x = paddingX + (i / Math.max(series.data.length - 1, 1)) * graphWidth;
                                                      const y = height - paddingY - (d.value / maxValue) * graphHeight;
                                                      return (
                                                          <g class="group">
@@ -314,7 +316,7 @@ const maxSupervisorCount =
 
                                      <!-- X Axis Labels (Years) -->
                                      {sampleData.map((d, i) => {
-                                         const x = paddingX + (i / (sampleData.length - 1)) * graphWidth;
+                                         const x = paddingX + (i / Math.max(sampleData.length - 1, 1)) * graphWidth;
                                          return (
                                              <text x={x} y={height - paddingY + 20} text-anchor="middle" class="text-[10px] fill-text-muted font-bold">
                                                  {d.year}
@@ -333,9 +335,9 @@ const maxSupervisorCount =
         <!-- 3. Financial Evolution Panel -->
         {visibleTabs.includes('financial') && (
         <div
-            id="panel-financial"
+            id={`${chartUid}-panel-financial`}
             role="tabpanel"
-            aria-labelledby="tab-financial"
+            aria-labelledby={`${chartUid}-tab-financial`}
             class={`transition-all duration-300 ${visibleTabs[0] === 'financial' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
@@ -414,13 +416,13 @@ const maxSupervisorCount =
                                          if (!series) return null;
                                          
                                          const points = series.data.map((d, i) => {
-                                            const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                            const x = paddingX + (i / Math.max(series.data.length - 1, 1)) * graphWidth;
                                             const y = height - paddingY - (d.value / maxValue) * graphHeight;
                                             return `${x},${y}`;
                                          }).join(" ");
 
                                          return (
-                                            <g id={`series-financial-${i}`} class="transition-opacity duration-300">
+                                            <g data-series-id={`series-financial-${i}`} class="transition-opacity duration-300">
                                                 <!-- Line -->
                                                 <polyline 
                                                     points={points} 
@@ -436,7 +438,7 @@ const maxSupervisorCount =
                                                 {series.data.map((d, i) => {
                                                      if(d.value === 0) return null; // Hide 0 values to reduce clutter
 
-                                                     const x = paddingX + (i / (series.data.length - 1)) * graphWidth;
+                                                     const x = paddingX + (i / Math.max(series.data.length - 1, 1)) * graphWidth;
                                                      const y = height - paddingY - (d.value / maxValue) * graphHeight;
                                                      return (
                                                          <g class="group relative">
@@ -475,7 +477,7 @@ const maxSupervisorCount =
 
                                      <!-- X Axis Labels (Years) -->
                                      {sampleData.map((d, i) => {
-                                         const x = paddingX + (i / (sampleData.length - 1)) * graphWidth;
+                                         const x = paddingX + (i / Math.max(sampleData.length - 1, 1)) * graphWidth;
                                          return (
                                              <text x={x} y={height - paddingY + 20} text-anchor="middle" class="text-[10px] fill-text-muted font-bold">
                                                  {d.year}
@@ -494,9 +496,9 @@ const maxSupervisorCount =
         <!-- 4. Top Supervisors Panel -->
         {visibleTabs.includes('supervisors') && (
         <div
-            id="panel-supervisors"
+            id={`${chartUid}-panel-supervisors`}
             role="tabpanel"
-            aria-labelledby="tab-supervisors"
+            aria-labelledby={`${chartUid}-tab-supervisors`}
             class={`transition-all duration-300 ${visibleTabs[0] === 'supervisors' ? 'opacity-100 scale-100' : 'hidden opacity-0 scale-95'}`}
         >
             <div class="glass-card p-8 flex flex-col min-h-[450px]">
@@ -579,66 +581,76 @@ const maxSupervisorCount =
 
 <script>
     const setupTabs = () => {
-        const tabs = document.querySelectorAll('[role="tab"]');
-        const panels = document.querySelectorAll('[role="tabpanel"]');
+        const chartRoots = document.querySelectorAll('[data-advisorship-chart]');
 
-        tabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-                const targetId = tab.getAttribute("aria-controls");
+        chartRoots.forEach((root) => {
+            const tabs = root.querySelectorAll('[role="tab"]');
+            const panels = root.querySelectorAll('[role="tabpanel"]');
 
-                // Update tab states
-                tabs.forEach((t) => {
-                    t.setAttribute("aria-selected", "false");
-                    t.classList.remove(
+            tabs.forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    const targetId = tab.getAttribute("aria-controls");
+
+                    // Update tab states
+                    tabs.forEach((t) => {
+                        t.setAttribute("aria-selected", "false");
+                        t.classList.remove(
+                            "text-premium-accent",
+                            "border-premium-accent",
+                        );
+                        t.classList.add("text-text-muted", "border-transparent");
+                    });
+                    tab.setAttribute("aria-selected", "true");
+                    tab.classList.add(
                         "text-premium-accent",
                         "border-premium-accent",
                     );
-                    t.classList.add("text-text-muted", "border-transparent");
-                });
-                tab.setAttribute("aria-selected", "true");
-                tab.classList.add(
-                    "text-premium-accent",
-                    "border-premium-accent",
-                );
-                tab.classList.remove("text-text-muted", "border-transparent");
+                    tab.classList.remove("text-text-muted", "border-transparent");
 
-                // Switch panels
-                panels.forEach((panel) => {
-                    if (panel.id === targetId) {
-                        panel.classList.remove("hidden");
-                        setTimeout(() => {
-                            panel.classList.add("opacity-100", "scale-100");
-                            panel.classList.remove("opacity-0", "scale-95");
-                        }, 10);
-                    } else {
-                        panel.classList.add("hidden", "opacity-0", "scale-95");
-                        panel.classList.remove("opacity-100", "scale-100");
-                    }
+                    // Switch panels
+                    panels.forEach((panel) => {
+                        if (panel.id === targetId) {
+                            panel.classList.remove("hidden");
+                            setTimeout(() => {
+                                panel.classList.add("opacity-100", "scale-100");
+                                panel.classList.remove("opacity-0", "scale-95");
+                            }, 10);
+                        } else {
+                            panel.classList.add("hidden", "opacity-0", "scale-95");
+                            panel.classList.remove("opacity-100", "scale-100");
+                        }
+                    });
                 });
             });
         });
     };
 
     const setupChartToggles = () => {
-        const toggles = document.querySelectorAll('.chart-legend-toggle');
-        
-        toggles.forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const targetId = toggle.getAttribute('data-target');
-                const seriesElement = document.getElementById(targetId || '');
-                
-                if (seriesElement) {
-                    const isHidden = seriesElement.classList.contains('opacity-0');
-                    if (isHidden) {
-                        // Show
-                        seriesElement.classList.remove('opacity-0');
-                        toggle.classList.remove('opacity-50', 'grayscale');
-                    } else {
-                        // Hide
-                        seriesElement.classList.add('opacity-0');
-                        toggle.classList.add('opacity-50', 'grayscale');
+        const chartRoots = document.querySelectorAll('[data-advisorship-chart]');
+
+        chartRoots.forEach((root) => {
+            const toggles = root.querySelectorAll('.chart-legend-toggle');
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.getAttribute('data-target');
+                    const seriesElement = root.querySelector(
+                        `[data-series-id="${targetId || ''}"]`,
+                    );
+
+                    if (seriesElement) {
+                        const isHidden = seriesElement.classList.contains('opacity-0');
+                        if (isHidden) {
+                            // Show
+                            seriesElement.classList.remove('opacity-0');
+                            toggle.classList.remove('opacity-50', 'grayscale');
+                        } else {
+                            // Hide
+                            seriesElement.classList.add('opacity-0');
+                            toggle.classList.add('opacity-50', 'grayscale');
+                        }
                     }
-                }
+                });
             });
         });
     };

@@ -2,11 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import KpiCard from "../components/KpiCard.astro";
 import HomeCharts from "../components/home/HomeCharts.astro";
-import PeopleNetworkOverview from "../components/home/PeopleNetworkOverview.astro";
 import groupsData from "../data/research_groups_canonical.json";
 import advisorshipsData from "../data/advisorships_canonical.json";
-import peopleCollaborationGraphData from "../data/people_collaboration_graph.json";
-import peopleRelationshipGraphData from "../data/people_relationship_graph.json";
 import AdvisorshipCharts from "../components/advisorships/AdvisorshipCharts.astro";
 import type { ResearchGroup } from "../types/groups";
 import type { ProjectAdvisorship } from "../types/advisorships";
@@ -19,10 +16,6 @@ import {
 	getRealCampuses,
 } from "../lib/tenant-data";
 import { researcherCollectionCounts } from "../lib/researcher-collections";
-import {
-	buildPeopleNetworkOverview,
-	type PeopleGraphRawFile,
-} from "../lib/people-network";
 
 const groups = groupsData as ResearchGroup[];
 const totalGroups = groups.length;
@@ -35,13 +28,6 @@ const totalKnowledgeAreas = new Set(
 	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
 ).size;
 const baseUrl = import.meta.env.BASE_URL;
-const peopleNetworkOverview = buildPeopleNetworkOverview(
-	peopleCollaborationGraphData as PeopleGraphRawFile,
-	peopleRelationshipGraphData as PeopleGraphRawFile,
-	{
-		baseUrl,
-	},
-);
 
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
@@ -56,28 +42,27 @@ const allAdvisorships = allProjects
 	.filter(Boolean);
 
 // --- Chart Data Calculation (Logic Duplicated from advisorships/index.astro for Home Page reuse) ---
+const currentYear = new Date().getFullYear();
+const parseAdvisorshipYear = (value: string | null | undefined) => {
+	if (!value || value === "None") return null;
+	const year = new Date(value.replace(" ", "T")).getFullYear();
+	return Number.isFinite(year) ? year : null;
+};
+
 const minYearCalculated = Math.min(
 	...allAdvisorships
-		.map((a) => {
-			const dateStr = a.start_date;
-			if (!dateStr || dateStr === "None") return null;
-			return new Date(dateStr.replace(" ", "T")).getFullYear();
-		})
+		.map((a) => parseAdvisorshipYear(a.start_date))
 		.filter((y): y is number => y !== null),
 );
 const maxYearCalculated = Math.max(
 	...allAdvisorships
-		.map((a) => {
-			const dateStr = a.end_date;
-			if (!dateStr || dateStr === "None") return null;
-			return new Date(dateStr.replace(" ", "T")).getFullYear();
-		})
+		.map((a) => parseAdvisorshipYear(a.end_date))
 		.filter((y): y is number => y !== null),
 );
 
 // Limit range to last 10 years for better readability as requested
-const maxYear = maxYearCalculated;
-const minYear = Math.max(minYearCalculated, maxYear - 9);
+const maxYear = Math.max(maxYearCalculated || currentYear, currentYear);
+const minYear = Math.max(minYearCalculated || maxYear, maxYear - 9);
 
 const yearsRange =
 	minYear <= maxYear
@@ -114,12 +99,8 @@ const fellowshipEvolution = uniqueFellowshipNames
 		const data = yearsRange.map((year) => {
 			const count = allAdvisorships.filter((a) => {
 				if (a.fellowship?.name !== name) return false;
-				const start = a.start_date
-					? new Date(a.start_date.replace(" ", "T")).getFullYear()
-					: 9999;
-				const end = a.end_date
-					? new Date(a.end_date.replace(" ", "T")).getFullYear()
-					: 0;
+				const start = parseAdvisorshipYear(a.start_date) ?? 9999;
+				const end = parseAdvisorshipYear(a.end_date) ?? currentYear;
 				return start <= year && end >= year;
 			}).length;
 			return { year, value: count };
@@ -442,6 +423,7 @@ const campusHomeViews = Object.fromEntries(
 			<AdvisorshipCharts
 				analytics={analytics}
 				visibleTabs={["financial", "fellowships"]}
+				chartId="home-advisorship-all"
 			/>
 		</section>
 		{
@@ -453,13 +435,12 @@ const campusHomeViews = Object.fromEntries(
 					<AdvisorshipCharts
 						analytics={view.advisorship.analytics}
 						visibleTabs={["financial", "fellowships"]}
+						chartId={`home-advisorship-campus-${campusId}`}
 					/>
 				</section>
 			))
 		}
 	</div>
-
-	<PeopleNetworkOverview overview={peopleNetworkOverview} />
 
 	<script define:vars={{ campusStats, defaultStats: { totalGroups, totalMembers, totalCampus, totalKnowledgeAreas } }}>
 		window.__homeCampusStats = campusStats;
