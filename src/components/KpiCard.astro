@@ -89,7 +89,8 @@ const countTo = canCount ? Number(raw.replace(/\./g, "")) : null;
     const fmt = (n: number) => n.toLocaleString("pt-BR");
 
     const run = (el: HTMLElement) => {
-      const to = Number(el.dataset.countTo);
+      // Alvo lido do texto atual (respeita atualizações por filtro de campus).
+      const to = Number((el.textContent || "").replace(/\./g, "").trim());
       if (!Number.isFinite(to)) return;
       const duration = 1200;
       let start: number | null = null;

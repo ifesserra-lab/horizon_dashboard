@@ -215,7 +215,7 @@ const icons = {
 const quickAccessPeopleLinks = [
 	{
 		title: "Pesquisadores",
-		description: "Visão completa dos perfis com vínculo institucional.",
+		description: "Perfis com vínculo institucional no Ifes.",
 		count: researcherCollectionCounts.researchers,
 		href: `${baseUrl}researchers`,
 		icon: icons.members,
@@ -224,7 +224,7 @@ const quickAccessPeopleLinks = [
 	},
 	{
 		title: "Estudantes",
-		description: "Recorte dedicado aos classificados como student.",
+		description: "Perfis classificados como estudante.",
 		count: researcherCollectionCounts.students,
 		href: `${baseUrl}students`,
 		icon: icons.student,
@@ -233,7 +233,7 @@ const quickAccessPeopleLinks = [
 	},
 	{
 		title: "Externos ao Ifes",
-		description: "Colaboradores sem sinais institucionais no Ifes.",
+		description: "Colaboradores sem vínculo institucional no Ifes.",
 		count: researcherCollectionCounts.outsideIfes,
 		href: `${baseUrl}outside-ifes`,
 		icon: icons.external,
@@ -242,7 +242,7 @@ const quickAccessPeopleLinks = [
 	},
 	{
 		title: "Não reconhecidos",
-		description: "Perfis sem evidência suficiente para classificação final.",
+		description: "Perfis sem dados suficientes para classificar.",
 		count: researcherCollectionCounts.unrecognized,
 		href: `${baseUrl}unrecognized`,
 		icon: icons.unrecognized,
@@ -286,18 +286,16 @@ const campusHomeViews = Object.fromEntries(
 );
 ---
 
-<Layout title="Dashboard Overview">
+<Layout title="Painel">
 	<header class="mb-10">
 		<h1
 			class="text-4xl font-extrabold font-display tracking-tight text-text-main text-balance"
 		>
-			Panorama da pesquisa
+			Painel de indicadores
 		</h1>
 		<p class="text-text-secondary mt-2 max-w-2xl text-balance">
-			Sua plataforma central para explorar o horizonte de <strong
-				>pesquisa</strong
-			>, <strong>extensão</strong> e <strong>pós-graduação</strong> da nossa
-			instituição.
+			Grupos, produção, fomento e orientações do Ifes em pesquisa, extensão e
+			pós-graduação.
 		</p>
 	</header>
 
@@ -328,27 +326,25 @@ const campusHomeViews = Object.fromEntries(
 		id="home-kpis"
 	>
 		<KpiCard
-			title="Total de Grupos"
+			title="Grupos de pesquisa"
 			value={totalGroups}
 			icon={icons.groups}
+			highlight={true}
 		/>
 		<KpiCard
 			title="Pesquisadores"
 			value={totalMembers}
 			icon={icons.members}
-			color="premium-purple"
 		/>
 		<KpiCard
-			title="Campus"
+			title="Campi"
 			value={totalCampus}
 			icon={icons.campus}
-			color="text-secondary"
 		/>
 		<KpiCard
-			title="Áreas de Conhecimento"
+			title="Áreas de conhecimento"
 			value={totalKnowledgeAreas}
 			icon={icons.areas}
-			color="premium-accent"
 		/>
 	</div>
 
@@ -359,11 +355,10 @@ const campusHomeViews = Object.fromEntries(
 					id="quick-access-title"
 					class="text-2xl font-bold font-display text-text-main"
 				>
-					Acesso rápido a pessoas
+					Pessoas
 				</h2>
 				<p class="text-text-secondary mt-1 max-w-2xl">
-					Entre direto nos recortes principais de perfis já classificados no
-					export canônico.
+					Listagens de perfis por tipo de vínculo.
 				</p>
 			</div>
 		</div>
@@ -440,7 +435,7 @@ const campusHomeViews = Object.fromEntries(
 	<div id="home-advisorship-views">
 		<section class="mt-12 mb-12" data-campus-view="">
 			<h2 class="text-2xl font-bold font-display text-text-main mb-6">
-				Investimento e Bolsas
+				Investimento e bolsas
 			</h2>
 			<AdvisorshipCharts
 				analytics={analytics}
@@ -452,7 +447,7 @@ const campusHomeViews = Object.fromEntries(
 			Object.entries(campusHomeViews).map(([campusId, view]) => (
 				<section class="mt-12 mb-12 hidden" data-campus-view={campusId}>
 					<h2 class="text-2xl font-bold font-display text-text-main mb-6">
-						Investimento e Bolsas
+						Investimento e bolsas
 					</h2>
 					<AdvisorshipCharts
 						analytics={view.advisorship.analytics}
@@ -483,10 +478,10 @@ const campusHomeViews = Object.fromEntries(
 				const title = card.getAttribute('data-kpi-card');
 				const valueNode = card.querySelector('[data-kpi-value]');
 				if (!valueNode) return;
-				if (title === 'Total de Grupos') valueNode.textContent = String(stats.totalGroups);
+				if (title === 'Grupos de pesquisa') valueNode.textContent = String(stats.totalGroups);
 				if (title === 'Pesquisadores') valueNode.textContent = String(stats.totalMembers);
-				if (title === 'Campus') valueNode.textContent = String(stats.totalCampus);
-				if (title === 'Áreas de Conhecimento') valueNode.textContent = String(stats.totalKnowledgeAreas);
+				if (title === 'Campi') valueNode.textContent = String(stats.totalCampus);
+				if (title === 'Áreas de conhecimento') valueNode.textContent = String(stats.totalKnowledgeAreas);
 			});
 		}
 
