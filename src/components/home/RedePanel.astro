@@ -1,0 +1,78 @@
+---
+import collab from "../../data/collab_summary.json";
+
+const s = (collab as any).stats ?? {};
+const hubs = ((collab as any).hubs ?? []) as {
+    nome: string;
+    grau: number;
+    papers?: number;
+    area?: string;
+}[];
+const nf = (v: number) => new Intl.NumberFormat("pt-BR").format(v);
+const maxHub = Math.max(...hubs.map((h) => h.grau), 1);
+
+const pctConnected = s.n_docentes
+    ? Math.round((s.n_conectados / s.n_docentes) * 100)
+    : 0;
+
+const kpis = [
+    { value: nf(s.n_conectados ?? 0), label: "Docentes conectados", hint: `${pctConnected}% da rede` },
+    { value: nf(s.n_arestas ?? 0), label: "Coautorias", hint: "laços de colaboração" },
+    { value: nf(s.n_comunidades ?? 0), label: "Comunidades", hint: "clusters de pesquisa" },
+    { value: nf(s.aresta_mais_forte ?? 0), label: "Laço mais forte", hint: "trabalhos em coautoria" },
+];
+---
+
+<section aria-labelledby="rede-title" class="py-4">
+    <div class="flex items-baseline justify-between border-b border-border-main pb-3 mb-6">
+        <h2 id="rede-title" class="font-display text-xl font-semibold text-text-main">
+            Rede de colaboração
+        </h2>
+        <span class="text-xs text-text-muted">coautoria entre docentes</span>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-main border border-border-main mb-8">
+        {
+            kpis.map((kpi) => (
+                <div class="bg-page-bg p-4">
+                    <div class="font-display text-2xl font-semibold text-text-main tabular-nums">
+                        {kpi.value}
+                    </div>
+                    <div class="text-xs font-medium text-text-main mt-1">{kpi.label}</div>
+                    <div class="text-[11px] text-text-muted mt-0.5">{kpi.hint}</div>
+                </div>
+            ))
+        }
+    </div>
+
+    <div>
+        <h3 class="text-xs uppercase tracking-wider text-text-muted mb-4">
+            Conectores centrais (grau de colaboração)
+        </h3>
+        <div class="space-y-2.5">
+            {
+                hubs.map((h) => (
+                    <div>
+                        <div class="flex items-baseline justify-between gap-3 text-sm">
+                            <span class="text-text-main truncate">
+                                {h.nome}
+                                {h.area && (
+                                    <span class="text-text-muted"> · {h.area}</span>
+                                )}
+                            </span>
+                            <span class="tabular-nums text-text-muted flex-none">
+                                {h.grau}
+                            </span>
+                        </div>
+                        <div class="mt-1 h-1 bg-border-main">
+                            <div
+                                class="h-full bg-premium-accent/70"
+                                style={`width:${(h.grau / maxHub) * 100}%`}
+                            />
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
