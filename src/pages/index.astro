@@ -1,488 +1,508 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import KpiCard from "../components/KpiCard.astro";
-import HomeCharts from "../components/home/HomeCharts.astro";
-import groupsData from "../data/research_groups_canonical.json";
-import advisorshipsData from "../data/advisorships_canonical.json";
-import AdvisorshipCharts from "../components/advisorships/AdvisorshipCharts.astro";
-import type { ResearchGroup } from "../types/groups";
-import type { ProjectAdvisorship } from "../types/advisorships";
-import {
-	buildAdvisorshipDashboard,
-	buildProjectMart,
-	getAdvisorshipProjectsByCampusId,
-	getGroupsByCampusId,
-	getProjectsByCampusId,
-	getRealCampuses,
-} from "../lib/tenant-data";
-import { researcherCollectionCounts } from "../lib/researcher-collections";
 
-const groups = groupsData as ResearchGroup[];
-const totalGroups = groups.length;
-const totalMembers = groups.reduce(
-	(acc, g) => acc + (g.members?.length || 0),
-	0,
-);
-const totalCampus = new Set(groups.map((g) => g.campus.id)).size;
-const totalKnowledgeAreas = new Set(
-	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
-).size;
-const baseUrl = import.meta.env.BASE_URL;
-
-const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
-
-// Flatten all advisorships with safeguards
-const allAdvisorships = allProjects
-	.flatMap((project) =>
-		(project.advisorships || []).map((adv) => ({
-			...adv,
-			projectName: project.name,
-		})),
-	)
-	.filter(Boolean);
-
-// --- Chart Data Calculation (Logic Duplicated from advisorships/index.astro for Home Page reuse) ---
-const currentYear = new Date().getFullYear();
-const parseAdvisorshipYear = (value: string | null | undefined) => {
-	if (!value || value === "None") return null;
-	const year = new Date(value.replace(" ", "T")).getFullYear();
-	return Number.isFinite(year) ? year : null;
-};
-
-const minYearCalculated = Math.min(
-	...allAdvisorships
-		.map((a) => parseAdvisorshipYear(a.start_date))
-		.filter((y): y is number => y !== null),
-);
-const maxYearCalculated = Math.max(
-	...allAdvisorships
-		.map((a) => parseAdvisorshipYear(a.end_date))
-		.filter((y): y is number => y !== null),
-);
-
-// Limit range to last 10 years for better readability as requested
-const maxYear = Math.max(maxYearCalculated || currentYear, currentYear);
-const minYear = Math.max(minYearCalculated || maxYear, maxYear - 9);
-
-const yearsRange =
-	minYear <= maxYear
-		? Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i)
-		: [];
-
-const uniqueFellowshipNames = [
-	...new Set(
-		allAdvisorships
-			.map((a) => a.fellowship?.name)
-			.filter(Boolean) as string[],
-	),
-].sort();
-
-const fellowshipColorsMap: Record<string, string> = {
-	PIBIC: "#38bdf8",
-	PIBITI: "#fbbf24",
-	"PIBIC-JR": "#a855f7",
-	PIVIC: "#94a3b8",
-	PROBIC: "#f472b6",
-	Voluntário: "#cbd5e1",
-};
-const fallbackColors = [
-	"#ef4444",
-	"#22c55e",
-	"#3b82f6",
-	"#eab308",
-	"#ec4899",
-	"#8b5cf6",
-];
-
-const fellowshipEvolution = uniqueFellowshipNames
-	.map((name, index) => {
-		const data = yearsRange.map((year) => {
-			const count = allAdvisorships.filter((a) => {
-				if (a.fellowship?.name !== name) return false;
-				const start = parseAdvisorshipYear(a.start_date) ?? 9999;
-				const end = parseAdvisorshipYear(a.end_date) ?? currentYear;
-				return start <= year && end >= year;
-			}).length;
-			return { year, value: count };
-		});
-		if (data.every((d) => d.value === 0)) return null;
-		return {
-			label: name,
-			data: data,
-			color:
-				fellowshipColorsMap[name] ||
-				fallbackColors[index % fallbackColors.length],
-		};
-	})
-	.filter(Boolean) as {
-	label: string;
-	data: { year: number; value: number }[];
-	color: string;
-}[];
-
-const uniqueSponsors = [
-	...new Set(
-		allAdvisorships
-			.map((a) => a.fellowship?.sponsor_name)
-			.filter(Boolean) as string[],
-	),
-].sort();
-const sponsorColorsMap: Record<string, string> = {
-	Fapes: "#10b981",
-	CNPq: "#3b82f6",
-	Capes: "#ef4444",
-	Facitec: "#f59e0b",
-	Ifes: "#8b5cf6",
-	MEC: "#06b6d4",
-};
-const fallbackSponsorColors = ["#ec4899", "#6366f1", "#84cc16"];
-
-const fellowshipFinancialEvolution = uniqueSponsors
-	.map((sponsor, index) => {
-		const data = yearsRange.map((year) => {
-			const totalValue = allAdvisorships.reduce((acc, curr) => {
-				if (!curr.fellowship || !curr.fellowship.value) return acc;
-				if (curr.fellowship.sponsor_name !== sponsor) return acc;
-				const start = curr.start_date
-					? new Date(curr.start_date.replace(" ", "T"))
-					: new Date(year, 0, 1);
-				const end = curr.end_date
-					? new Date(curr.end_date.replace(" ", "T"))
-					: new Date(year, 11, 31);
-				const yearStart = new Date(year, 0, 1);
-				const yearEnd = new Date(year, 11, 31);
-				const effectiveStart = start > yearStart ? start : yearStart;
-				const effectiveEnd = end < yearEnd ? end : yearEnd;
-				if (effectiveStart > effectiveEnd) return acc;
-				const monthsActive = Math.max(
-					0,
-					effectiveEnd.getFullYear() * 12 +
-						effectiveEnd.getMonth() -
-						(effectiveStart.getFullYear() * 12 +
-							effectiveStart.getMonth()) +
-						1,
-				);
-				return (
-					acc +
-					parseFloat(String(curr.fellowship.value)) * monthsActive
-				);
-			}, 0);
-			return { year, value: totalValue };
-		});
-		if (data.every((d) => d.value === 0)) return null;
-		return {
-			label: sponsor,
-			color:
-				sponsorColorsMap[sponsor] ||
-				fallbackSponsorColors[index % fallbackSponsorColors.length],
-			data,
-		};
-	})
-	.filter(Boolean) as {
-	label: string;
-	data: { year: number; value: number }[];
-	color: string;
-}[];
-
-// Mock other analytics to satisfy prop types (unused tabs)
-const analytics = {
-	status_distribution: [],
-	fellowship_distribution: [],
-	fellowship_evolution: fellowshipEvolution,
-	fellowship_financial_evolution: fellowshipFinancialEvolution,
-	top_supervisors: [],
-};
-
-const icons = {
-	groups: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-	members:
-		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-	campus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
-	areas: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
-	student:
-		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7 12 4l8 3-8 3-8-3Z"/><path d="M6 10.5v4.5c0 1.2 2.7 3 6 3s6-1.8 6-3v-4.5"/><path d="M12 13v5"/></svg>',
-	external:
-		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>',
-	unrecognized:
-		'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
-};
-
-const quickAccessPeopleLinks = [
-	{
-		title: "Pesquisadores",
-		description: "Visão completa dos perfis com vínculo institucional.",
-		count: researcherCollectionCounts.researchers,
-		href: `${baseUrl}researchers`,
-		icon: icons.members,
-		accentClass:
-			"text-premium-accent border-premium-accent/20 bg-premium-accent/[0.06]",
-	},
-	{
-		title: "Estudantes",
-		description: "Recorte dedicado aos classificados como student.",
-		count: researcherCollectionCounts.students,
-		href: `${baseUrl}students`,
-		icon: icons.student,
-		accentClass:
-			"text-premium-purple border-premium-purple/20 bg-premium-purple/[0.06]",
-	},
-	{
-		title: "Externos ao Ifes",
-		description: "Colaboradores sem sinais institucionais no Ifes.",
-		count: researcherCollectionCounts.outsideIfes,
-		href: `${baseUrl}outside-ifes`,
-		icon: icons.external,
-		accentClass:
-			"text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.08]",
-	},
-	{
-		title: "Não reconhecidos",
-		description: "Perfis sem evidência suficiente para classificação final.",
-		count: researcherCollectionCounts.unrecognized,
-		href: `${baseUrl}unrecognized`,
-		icon: icons.unrecognized,
-		accentClass:
-			"text-amber-400 border-amber-400/20 bg-amber-400/[0.08]",
-	},
-];
-
-const campusStats = Object.fromEntries(
-	getRealCampuses().map((campus) => {
-		const campusGroups = groups.filter((group) => group.campus.id === campus.id);
-		return [
-			campus.id,
-			{
-				totalGroups: campusGroups.length,
-				totalMembers: campusGroups.reduce(
-					(acc, group) => acc + (group.members?.length || 0),
-					0,
-				),
-				totalCampus: 1,
-				totalKnowledgeAreas: new Set(
-					campusGroups.flatMap((group) =>
-						group.knowledge_areas.map((area) => area.id),
-					),
-				).size,
-			},
-		];
-	}),
-);
-const campusHomeViews = Object.fromEntries(
-	getRealCampuses().map((campus) => [
-		campus.id,
-		{
-			groups: getGroupsByCampusId(campus.id),
-			projectMart: buildProjectMart(getProjectsByCampusId(campus.id)),
-			advisorship: buildAdvisorshipDashboard(
-				getAdvisorshipProjectsByCampusId(campus.id),
-			),
-		},
-	]),
-);
+const base = import.meta.env.BASE_URL;
+const indexUrl = `${base}search-index.json`;
 ---
 
-<Layout title="Dashboard Overview">
-	<header class="mb-10">
-		<h1
-			class="text-4xl font-extrabold font-['Outfit'] tracking-tight text-text-main text-balance"
-		>
-			Bem-vindo ao <span
-				class="text-transparent bg-clip-text bg-gradient-to-r from-premium-accent to-premium-purple"
-				>Horizon</span
-			>
-		</h1>
-		<p class="text-text-secondary mt-2 max-w-2xl text-balance">
-			Sua plataforma central para explorar o horizonte de <strong
-				>pesquisa</strong
-			>, <strong>extensão</strong> e <strong>pós-graduação</strong> da nossa
-			instituição.
-		</p>
-	</header>
+<Layout title="Buscar pesquisa">
+    <div class="max-w-5xl mx-auto" data-base={base} data-index-url={indexUrl}>
+        <!-- Hero -->
+        <section class="text-center pt-6 pb-8">
+            <h1
+                class="text-3xl md:text-4xl font-bold font-['Outfit'] text-text-main text-balance"
+            >
+                O que você quer encontrar na pesquisa do Ifes?
+            </h1>
+            <p class="mt-3 text-text-secondary max-w-2xl mx-auto">
+                Busque por tema, pessoa ou grupo. Escolha sua perspectiva — os
+                resultados se adaptam a quem está procurando.
+            </p>
 
-	<div
-		class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-		role="region"
-		aria-label="Métricas principais"
-		id="home-kpis"
-	>
-		<KpiCard
-			title="Total de Grupos"
-			value={totalGroups}
-			icon={icons.groups}
-		/>
-		<KpiCard
-			title="Pesquisadores"
-			value={totalMembers}
-			icon={icons.members}
-			color="premium-purple"
-		/>
-		<KpiCard
-			title="Campus"
-			value={totalCampus}
-			icon={icons.campus}
-			color="text-secondary"
-		/>
-		<KpiCard
-			title="Áreas de Conhecimento"
-			value={totalKnowledgeAreas}
-			icon={icons.areas}
-			color="premium-accent"
-		/>
-	</div>
+            <!-- Persona -->
+            <div
+                class="mt-6 inline-flex bg-glass-bg border border-border-main rounded-xl p-1 gap-1"
+                role="group"
+                aria-label="Quem está buscando"
+                id="personaSwitch"
+            >
+                <button
+                    type="button"
+                    data-persona="aluno"
+                    aria-pressed="true"
+                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                    >Aluno</button
+                >
+                <button
+                    type="button"
+                    data-persona="professor"
+                    aria-pressed="false"
+                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                    >Professor</button
+                >
+                <button
+                    type="button"
+                    data-persona="empresa"
+                    aria-pressed="false"
+                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                    >Empresa</button
+                >
+            </div>
 
-	<section class="mb-12" aria-labelledby="quick-access-title">
-		<div class="flex items-end justify-between gap-4 mb-6">
-			<div>
-				<h2
-					id="quick-access-title"
-					class="text-2xl font-bold font-['Outfit'] text-text-main"
-				>
-					Acesso rápido a pessoas
-				</h2>
-				<p class="text-text-secondary mt-1 max-w-2xl">
-					Entre direto nos recortes principais de perfis já classificados no
-					export canônico.
-				</p>
-			</div>
-		</div>
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-			{
-				quickAccessPeopleLinks.map((item) => (
-					<a
-						href={item.href}
-						class="glass-card p-6 border border-border-main hover:border-premium-accent/40 transition-all duration-300 hover:-translate-y-1 group"
-					>
-						<div class="flex items-start justify-between gap-4">
-							<div
-								class={`w-12 h-12 rounded-2xl border flex items-center justify-center ${item.accentClass}`}
-								aria-hidden="true"
-							>
-								<Fragment set:html={item.icon} />
-							</div>
-							<span
-								class="text-3xl font-bold font-['Outfit'] text-text-main"
-							>
-								{item.count}
-							</span>
-						</div>
-						<div class="mt-6">
-							<h3
-								class="text-lg font-bold text-text-main group-hover:text-premium-accent transition-colors"
-							>
-								{item.title}
-							</h3>
-							<p class="text-sm text-text-secondary mt-2">
-								{item.description}
-							</p>
-						</div>
-						<div
-							class="mt-6 pt-4 border-t border-border-main text-sm font-bold text-premium-accent flex items-center gap-2"
-						>
-							Abrir listagem
-							<svg
-								aria-hidden="true"
-								xmlns="http://www.w3.org/2000/svg"
-								class="w-4 h-4 transition-transform group-hover:translate-x-1"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="M5 12h14"></path>
-								<path d="m12 5 7 7-7 7"></path>
-							</svg>
-						</div>
-					</a>
-				))
-			}
-		</div>
-	</section>
+            <!-- Search box -->
+            <div class="mt-5 relative max-w-2xl mx-auto">
+                <svg
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    ><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
+                    ></path></svg
+                >
+                <input
+                    type="search"
+                    id="q"
+                    autocomplete="off"
+                    class="w-full bg-glass-bg border border-border-main rounded-2xl pl-12 pr-4 py-4 text-lg text-text-main focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all"
+                />
+            </div>
+            <p id="lens" class="mt-3 text-sm text-text-secondary italic"></p>
+            <div id="suggest" class="mt-4 flex flex-wrap gap-2 justify-center"></div>
+            <p class="mt-5 text-sm">
+                <a
+                    href={`${base}painel`}
+                    class="text-text-secondary hover:text-premium-purple transition-colors underline underline-offset-4 decoration-border-main"
+                    >Ver painel de indicadores e gráficos →</a
+                >
+            </p>
+        </section>
 
-	<!-- Analytics Charts (US-035) -->
-	<div id="home-charts-views">
-		<div data-campus-view="">
-			<HomeCharts />
-		</div>
-		{
-			Object.entries(campusHomeViews).map(([campusId, view]) => (
-				<div data-campus-view={campusId} class="hidden">
-					<HomeCharts martData={view.projectMart} groupsData={view.groups} />
-				</div>
-			))
-		}
-	</div>
+        <!-- Results area -->
+        <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 pb-20">
+            <aside class="space-y-6 lg:sticky lg:top-24 self-start">
+                <div>
+                    <h4
+                        class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2"
+                    >
+                        Tipo
+                    </h4>
+                    <div id="facetType" class="flex flex-col gap-1"></div>
+                </div>
+                <div>
+                    <h4
+                        class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2"
+                    >
+                        Campus
+                    </h4>
+                    <div id="facetCampus" class="flex flex-col gap-1"></div>
+                </div>
+            </aside>
 
-	<!-- Fellowship & Investment Charts (Home Integration) -->
-	<div id="home-advisorship-views">
-		<section class="mt-12 mb-12" data-campus-view="">
-			<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
-				Investimento e Bolsas
-			</h2>
-			<AdvisorshipCharts
-				analytics={analytics}
-				visibleTabs={["financial", "fellowships"]}
-				chartId="home-advisorship-all"
-			/>
-		</section>
-		{
-			Object.entries(campusHomeViews).map(([campusId, view]) => (
-				<section class="mt-12 mb-12 hidden" data-campus-view={campusId}>
-					<h2 class="text-2xl font-bold font-['Outfit'] text-text-main mb-6">
-						Investimento e Bolsas
-					</h2>
-					<AdvisorshipCharts
-						analytics={view.advisorship.analytics}
-						visibleTabs={["financial", "fellowships"]}
-						chartId={`home-advisorship-campus-${campusId}`}
-					/>
-				</section>
-			))
-		}
-	</div>
+            <main>
+                <div
+                    class="flex items-baseline justify-between mb-4 pb-3 border-b border-border-main"
+                >
+                    <h2
+                        id="resultsTitle"
+                        class="text-lg font-semibold text-text-secondary"
+                    >
+                        Em destaque
+                    </h2>
+                    <span
+                        id="resultsCount"
+                        class="text-xs font-mono text-text-muted"></span>
+                </div>
+                <div id="results" class="space-y-3"></div>
+                <div
+                    id="loadingState"
+                    class="text-center py-16 text-text-secondary"
+                >
+                    Carregando índice de busca…
+                </div>
+                <div
+                    id="emptyState"
+                    class="hidden text-center py-16 text-text-secondary"
+                >
+                    <p class="text-lg text-text-main mb-1">Nada encontrado</p>
+                    <p class="text-sm">Tente outro termo ou explore uma área acima.</p>
+                </div>
+            </main>
+        </div>
+    </div>
 
-	<script define:vars={{ campusStats, defaultStats: { totalGroups, totalMembers, totalCampus, totalKnowledgeAreas } }}>
-		window.__homeCampusStats = campusStats;
-		window.__homeDefaultStats = defaultStats;
-	</script>
+    <script>
+        import { normalizeSearchText } from "../lib/search";
 
-	<script>
-		import { getCampusFilterValue, updateCampusViews } from '../lib/campus-ui';
+        interface Entry {
+            i: string;
+            t: string;
+            n: string;
+            c?: string | null;
+            a?: string[];
+            g?: string[];
+            l?: string[];
+            team?: string[];
+            na?: number;
+            ni?: number;
+            nm?: number;
+            st?: string | null;
+            v?: string | null;
+            y?: number | null;
+            pt?: string | null;
+            _s?: string;
+        }
 
-		function updateHomeKpis(selectedCampus) {
-			const campusStats = (window as any).__homeCampusStats || {};
-			const defaultStats = (window as any).__homeDefaultStats || {};
-			const stats = selectedCampus && campusStats[selectedCampus]
-				? campusStats[selectedCampus]
-				: defaultStats;
-			const cards = document.querySelectorAll('[data-kpi-card]');
-			cards.forEach((card) => {
-				const title = card.getAttribute('data-kpi-card');
-				const valueNode = card.querySelector('[data-kpi-value]');
-				if (!valueNode) return;
-				if (title === 'Total de Grupos') valueNode.textContent = String(stats.totalGroups);
-				if (title === 'Pesquisadores') valueNode.textContent = String(stats.totalMembers);
-				if (title === 'Campus') valueNode.textContent = String(stats.totalCampus);
-				if (title === 'Áreas de Conhecimento') valueNode.textContent = String(stats.totalKnowledgeAreas);
-			});
-		}
+        const root = document.querySelector("[data-index-url]") as HTMLElement;
+        const base = root.dataset.base || "/";
+        const indexUrl = root.dataset.indexUrl as string;
 
-		function updateHomeViews(selectedCampus) {
-			updateCampusViews(
-				'#home-charts-views [data-campus-view], #home-advisorship-views [data-campus-view]',
-				selectedCampus
-			);
-		}
+        const TYPE_LABEL: Record<string, string> = {
+            pesquisador: "Pesquisador",
+            aluno: "Aluno",
+            grupo: "Grupo",
+            projeto: "Projeto",
+            publicacao: "Publicação",
+        };
+        const TYPE_URL: Record<string, (i: string) => string | null> = {
+            pesquisador: (i) => `${base}researchers/${i}/`,
+            aluno: (i) => `${base}students/${i}/`,
+            grupo: (i) => `${base}groups/${i}/`,
+            projeto: (i) => `${base}projects/${i}/`,
+            publicacao: () => `${base}publications/`,
+        };
 
-		window.addEventListener('campus-filter-change', (event) => {
-			const campusId = getCampusFilterValue(event);
-			updateHomeKpis(campusId);
-			updateHomeViews(campusId);
-		});
+        const PERSONAS: Record<
+            string,
+            {
+                lens: string;
+                placeholder: string;
+                w: Record<string, number>;
+            }
+        > = {
+            aluno: {
+                lens: "Mostrando quem pode te orientar e grupos de pesquisa pra entrar.",
+                placeholder:
+                    "Busque um tema — ex.: robótica, educação inclusiva, energia solar…",
+                w: {
+                    pesquisador: 1,
+                    aluno: 0.6,
+                    grupo: 1.2,
+                    projeto: 1.1,
+                    publicacao: 0.5,
+                },
+            },
+            professor: {
+                lens: "Mostrando pares, produção científica e parcerias possíveis.",
+                placeholder: "Busque uma área, pesquisador ou tema de colaboração…",
+                w: {
+                    pesquisador: 1.2,
+                    aluno: 0.5,
+                    grupo: 1.05,
+                    projeto: 0.95,
+                    publicacao: 1.05,
+                },
+            },
+            empresa: {
+                lens: "Mostrando quem domina o assunto e pode apoiar sua empresa.",
+                placeholder:
+                    "Descreva o problema ou tecnologia — ex.: visão computacional…",
+                w: {
+                    grupo: 1.25,
+                    pesquisador: 1.1,
+                    projeto: 1.2,
+                    aluno: 0.4,
+                    publicacao: 0.4,
+                },
+            },
+        };
 
-		const initialCampus = localStorage.getItem('preferred-campus') || '';
-		updateHomeKpis(initialCampus);
-		updateHomeViews(initialCampus);
-	</script>
+        let persona = "aluno";
+        let query = "";
+        let fType: string | null = null;
+        let fCampus: string | null = null;
+        let entries: Entry[] = [];
+
+        const $ = (id: string) => document.getElementById(id)!;
+        const esc = (s: unknown) =>
+            String(s ?? "").replace(
+                /[&<>"']/g,
+                (c) =>
+                    ({
+                        "&": "&amp;",
+                        "<": "&lt;",
+                        ">": "&gt;",
+                        '"': "&quot;",
+                        "'": "&#39;",
+                    })[c] as string,
+            );
+
+        function searchText(e: Entry): string {
+            return [
+                e.n,
+                ...(e.a || []),
+                ...(e.g || []),
+                ...(e.l || []),
+                ...(e.team || []),
+                e.c,
+                e.v,
+            ]
+                .filter(Boolean)
+                .join(" ");
+        }
+
+        function score(e: Entry, tokens: string[]): number {
+            const w = PERSONAS[persona].w[e.t] ?? 1;
+            if (tokens.length === 0) {
+                // featured: richer entries first
+                const base =
+                    (e.na || 0) * 2 +
+                    (e.ni || 0) * 2 +
+                    (e.nm || 0) +
+                    (e.a?.length || 0) * 2 +
+                    1;
+                return base * w;
+            }
+            const name = normalizeSearchText(e.n);
+            let s = 0;
+            for (const t of tokens) {
+                if (!t) continue;
+                if (name.includes(t)) s += 12;
+                if (e._s!.includes(t)) s += 5;
+                for (const a of e.a || [])
+                    if (normalizeSearchText(a).includes(t)) s += 6;
+            }
+            return s === 0 ? 0 : s * w;
+        }
+
+        function currentResults(): Entry[] {
+            const tokens = normalizeSearchText(query)
+                .split(" ")
+                .filter(Boolean);
+            let list = entries
+                .map((e) => ({ e, s: score(e, tokens) }))
+                .filter((x) => x.s > 0);
+            if (fType) list = list.filter((x) => x.e.t === fType);
+            if (fCampus) list = list.filter((x) => x.e.c === fCampus);
+            list.sort((a, b) => b.s - a.s);
+            return list.map((x) => x.e);
+        }
+
+        function roleLine(e: Entry): string {
+            const area = (e.a && e.a[0]) || (e.g && e.g[0]) || "";
+            if (e.t === "pesquisador" || e.t === "aluno") {
+                if (persona === "empresa")
+                    return area
+                        ? `Especialista em <b class="text-premium-purple">${esc(area)}</b>`
+                        : "";
+                if (persona === "aluno")
+                    return area
+                        ? `Pode orientar em <b class="text-premium-purple">${esc(area)}</b>`
+                        : "";
+                return area
+                    ? `Área: <b class="text-premium-purple">${esc(area)}</b>`
+                    : "";
+            }
+            if (e.t === "grupo")
+                return e.l && e.l[0]
+                    ? `Liderado por <b class="text-premium-purple">${esc(e.l[0])}</b>`
+                    : "";
+            if (e.t === "projeto")
+                return e.st ? `Situação: ${esc(e.st)}` : "";
+            if (e.t === "publicacao")
+                return [e.v, e.y].filter(Boolean).map(esc).join(" · ");
+            return "";
+        }
+
+        function metaLine(e: Entry): string {
+            const bits: string[] = [];
+            if (e.t === "pesquisador" || e.t === "aluno") {
+                if (e.na) bits.push(`${e.na} publicações`);
+                if (e.ni) bits.push(`${e.ni} projetos`);
+            }
+            if (e.t === "grupo" && e.nm) bits.push(`${e.nm} integrantes`);
+            if (e.c) bits.push(esc(e.c));
+            return bits.join(" · ");
+        }
+
+        function cardHtml(e: Entry): string {
+            const url = TYPE_URL[e.t]?.(e.i) ?? null;
+            const areas = (e.a || [])
+                .slice(0, 4)
+                .map(
+                    (a) =>
+                        `<span class="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-border-main text-text-secondary">${esc(a)}</span>`,
+                )
+                .join("");
+            const role = roleLine(e);
+            const meta = metaLine(e);
+            const inner = `
+                <div class="flex items-start gap-3">
+                    <span class="flex-shrink-0 mt-0.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-premium-purple/10 text-premium-purple">${esc(TYPE_LABEL[e.t] || e.t)}</span>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-bold text-text-main leading-snug">${esc(e.n)}</h3>
+                        ${role ? `<p class="text-sm text-text-secondary mt-0.5">${role}</p>` : ""}
+                        ${areas ? `<div class="flex flex-wrap gap-1.5 mt-2">${areas}</div>` : ""}
+                        ${meta ? `<p class="text-xs text-text-muted mt-2">${meta}</p>` : ""}
+                    </div>
+                </div>`;
+            const cls =
+                "block glass-card p-4 border border-border-main hover:border-premium-purple/40 transition-all";
+            return url
+                ? `<a href="${esc(url)}" class="${cls}">${inner}</a>`
+                : `<div class="${cls}">${inner}</div>`;
+        }
+
+        function render() {
+            const cfg = PERSONAS[persona];
+            ($("q") as HTMLInputElement).placeholder = cfg.placeholder;
+            $("lens").textContent = cfg.lens;
+
+            const res = currentResults();
+            const tokens = normalizeSearchText(query).split(" ").filter(Boolean);
+
+            // type facet counts (respect campus + query, ignore type)
+            const forType = entries
+                .filter((e) => score(e, tokens) > 0)
+                .filter((e) => !fCampus || e.c === fCampus);
+            const counts: Record<string, number> = {};
+            for (const e of forType) counts[e.t] = (counts[e.t] || 0) + 1;
+            $("facetType").innerHTML = Object.keys(TYPE_LABEL)
+                .map((t) => {
+                    const active = fType === t;
+                    return `<button data-ftype="${t}" aria-pressed="${active}" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm ${active ? "bg-premium-purple/15 text-premium-purple font-semibold" : "text-text-secondary hover:bg-white/5"}"><span>${TYPE_LABEL[t]}</span><span class="font-mono text-xs">${counts[t] || 0}</span></button>`;
+                })
+                .join("");
+
+            $("resultsTitle").textContent = query
+                ? `Resultados para “${query}”`
+                : fType || fCampus
+                  ? "Filtrado"
+                  : "Em destaque";
+            $("resultsCount").textContent = `${res.length} ${res.length === 1 ? "resultado" : "resultados"}`;
+
+            const box = $("results");
+            $("loadingState").classList.add("hidden");
+            if (res.length === 0) {
+                box.innerHTML = "";
+                $("emptyState").classList.remove("hidden");
+            } else {
+                $("emptyState").classList.add("hidden");
+                box.innerHTML = res
+                    .slice(0, 50)
+                    .map(cardHtml)
+                    .join("");
+            }
+        }
+
+        function setQuery(v: string) {
+            query = v;
+            ($("q") as HTMLInputElement).value = v;
+            fType = null;
+            render();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function buildFacetsStatic() {
+            // campus options
+            const campusCount: Record<string, number> = {};
+            for (const e of entries)
+                if (e.c) campusCount[e.c] = (campusCount[e.c] || 0) + 1;
+            const campuses = Object.entries(campusCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            $("facetCampus").innerHTML =
+                `<button data-fcampus="" aria-pressed="true" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm text-text-secondary hover:bg-white/5"><span>Todos</span></button>` +
+                campuses
+                    .map(
+                        ([c, n]) =>
+                            `<button data-fcampus="${esc(c)}" aria-pressed="false" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm text-text-secondary hover:bg-white/5"><span>${esc(c)}</span><span class="font-mono text-xs">${n}</span></button>`,
+                    )
+                    .join("");
+
+            // top-area suggestion chips
+            const areaCount: Record<string, number> = {};
+            for (const e of entries)
+                for (const a of e.a || [])
+                    areaCount[a] = (areaCount[a] || 0) + 1;
+            const topAreas = Object.entries(areaCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            $("suggest").innerHTML = topAreas
+                .map(
+                    ([a]) =>
+                        `<button data-suggest="${esc(a)}" class="text-sm px-3 py-1.5 rounded-full border border-border-main text-text-secondary hover:border-premium-purple hover:text-premium-purple transition-colors">${esc(a)}</button>`,
+                )
+                .join("");
+        }
+
+        // Events
+        document.querySelectorAll(".persona-btn").forEach((b) =>
+            b.addEventListener("click", () => {
+                persona = (b as HTMLElement).dataset.persona!;
+                document.querySelectorAll(".persona-btn").forEach((x) => {
+                    const on = x === b;
+                    x.setAttribute("aria-pressed", String(on));
+                    x.classList.toggle("bg-glass-bg", on);
+                    x.classList.toggle("text-text-main", on);
+                    x.classList.toggle("shadow", on);
+                    x.classList.toggle("text-text-secondary", !on);
+                });
+                render();
+            }),
+        );
+
+        $("q").addEventListener("input", (ev) => {
+            query = (ev.target as HTMLInputElement).value;
+            render();
+        });
+
+        document.body.addEventListener("click", (ev) => {
+            const el = ev.target as HTMLElement;
+            const ft = el.closest("[data-ftype]") as HTMLElement | null;
+            const fc = el.closest("[data-fcampus]") as HTMLElement | null;
+            const sg = el.closest("[data-suggest]") as HTMLElement | null;
+            if (sg) {
+                setQuery(sg.dataset.suggest!);
+            } else if (ft) {
+                const t = ft.dataset.ftype!;
+                fType = fType === t ? null : t;
+                render();
+            } else if (fc) {
+                fCampus = fc.dataset.fcampus || null;
+                document
+                    .querySelectorAll("[data-fcampus]")
+                    .forEach((x) =>
+                        x.setAttribute(
+                            "aria-pressed",
+                            String(
+                                (x as HTMLElement).dataset.fcampus ===
+                                    (fCampus || ""),
+                            ),
+                        ),
+                    );
+                render();
+            }
+        });
+
+        // Init persona button styling
+        document
+            .querySelector('.persona-btn[data-persona="aluno"]')
+            ?.classList.add("bg-glass-bg", "text-text-main", "shadow");
+
+        // Load index
+        fetch(indexUrl)
+            .then((r) => r.json())
+            .then((data: Entry[]) => {
+                entries = data;
+                for (const e of entries)
+                    e._s = normalizeSearchText(searchText(e));
+                buildFacetsStatic();
+                render();
+            })
+            .catch(() => {
+                $("loadingState").textContent =
+                    "Não foi possível carregar o índice de busca.";
+            });
+    </script>
 </Layout>
