@@ -8,10 +8,27 @@ import students from "../data/students_canonical.json";
 import groups from "../data/research_groups_canonical.json";
 import initiatives from "../data/initiatives_canonical.json";
 import articles from "../data/articles_canonical.json";
+import impact from "../data/researcher_impact.json";
+import { normalizeSearchText } from "../lib/search";
 
 export const prerender = true;
 
 type Entry = Record<string, unknown>;
+
+// FWCI / impact lookups (OpenAlex-derived, ~93 docentes). Joined by Lattes id
+// (extracted from cnpq_url) first, then by normalized name.
+const impactByLattes = new Map<string, { fwci: number; h: number }>();
+const impactByName = new Map<string, { fwci: number; h: number }>();
+for (const d of impact as any[]) {
+    const rec = { fwci: Number(d.fwci) || 0, h: Number(d.h) || 0 };
+    if (d.lattes_id) impactByLattes.set(String(d.lattes_id), rec);
+    if (d.nome) impactByName.set(normalizeSearchText(d.nome), rec);
+}
+
+const lattesIdFromUrl = (url: unknown): string | null => {
+    const m = String(url ?? "").match(/(\d{16})/);
+    return m ? m[1] : null;
+};
 
 const names = (list: any): string[] =>
     Array.isArray(list)
@@ -21,7 +38,12 @@ const names = (list: any): string[] =>
 function personEntry(p: any, type: "pesquisador" | "aluno"): Entry {
     const areas = names(p.knowledge_areas).slice(0, 6);
     const grp = names(p.research_groups).slice(0, 4);
-    return {
+    const lattesId = lattesIdFromUrl(p.cnpq_url);
+    const imp =
+        (lattesId && impactByLattes.get(lattesId)) ||
+        impactByName.get(normalizeSearchText(p.name ?? "")) ||
+        null;
+    const entry: Entry = {
         i: String(p.id),
         t: type,
         n: p.name ?? "",
@@ -31,6 +53,11 @@ function personEntry(p: any, type: "pesquisador" | "aluno"): Entry {
         na: Array.isArray(p.articles) ? p.articles.length : 0,
         ni: Array.isArray(p.initiatives) ? p.initiatives.length : 0,
     };
+    if (imp && imp.fwci > 0) {
+        entry.f = imp.fwci;
+        entry.h = imp.h;
+    }
+    return entry;
 }
 
 function groupEntry(g: any): Entry {

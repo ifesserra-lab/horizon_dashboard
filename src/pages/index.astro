@@ -150,6 +150,8 @@ const indexUrl = `${base}search-index.json`;
             v?: string | null;
             y?: number | null;
             pt?: string | null;
+            f?: number;
+            h?: number;
             _s?: string;
         }
 
@@ -254,8 +256,11 @@ const indexUrl = `${base}search-index.json`;
         function score(e: Entry, tokens: string[]): number {
             const w = PERSONAS[persona].w[e.t] ?? 1;
             if (tokens.length === 0) {
-                // featured: richer entries first
+                // featured: richer + higher-impact entries first.
+                // FWCI (field-weighted citation impact) is the strongest
+                // signal when present (only the ~93 docentes with OpenAlex).
                 const base =
+                    (e.f || 0) * 15 +
                     (e.na || 0) * 2 +
                     (e.ni || 0) * 2 +
                     (e.nm || 0) +
@@ -317,6 +322,8 @@ const indexUrl = `${base}search-index.json`;
         function metaLine(e: Entry): string {
             const bits: string[] = [];
             if (e.t === "pesquisador" || e.t === "aluno") {
+                if (e.f) bits.push(`FWCI ${e.f.toFixed(2)}`);
+                if (e.h) bits.push(`índice h ${e.h}`);
                 if (e.na) bits.push(`${e.na} publicações`);
                 if (e.ni) bits.push(`${e.ni} projetos`);
             }
