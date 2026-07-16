@@ -538,8 +538,8 @@ export const buildAdvisorshipDashboard = (projectList: ProjectAdvisorship[]) => 
     };
 
     const statusColors = {
-        active: "var(--color-premium-accent, #38bdf8)",
-        concluded: "var(--color-text-muted, #94a3b8)",
+        active: "var(--color-premium-accent, var(--color-chart-2))",
+        concluded: "var(--color-text-muted, var(--color-chart-6))",
         unknown: "#f59e0b",
     };
 
@@ -553,7 +553,7 @@ export const buildAdvisorshipDashboard = (projectList: ProjectAdvisorship[]) => 
         ([label, value]) => ({
             label: label.charAt(0).toUpperCase() + label.slice(1),
             value: value as number,
-            color: statusColors[label as keyof typeof statusColors] || "#e2e8f0",
+            color: statusColors[label as keyof typeof statusColors] || "var(--color-track)",
         }),
     );
 
@@ -567,7 +567,7 @@ export const buildAdvisorshipDashboard = (projectList: ProjectAdvisorship[]) => 
 
     const fellowshipColors = [
         "#0ea5e9",
-        "#8b5cf6",
+        "var(--color-chart-4)",
         "#ec4899",
         "#f59e0b",
         "#10b981",

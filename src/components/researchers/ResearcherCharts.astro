@@ -56,8 +56,8 @@ if (coordinators === 0 && members === 0 && researchers.length > 0)
     members = researchers.length;
 const totalRoles = coordinators + members;
 const roleData = [
-    { label: "Coordenadores", value: coordinators, color: "#38bdf8" }, // sky-400
-    { label: memberLabel, value: members, color: "#818cf8" }, // indigo-400
+    { label: "Coordenadores", value: coordinators, color: "var(--color-chart-2)" }, // sky-400
+    { label: memberLabel, value: members, color: "var(--color-chart-4)" }, // indigo-400
 ];
 
 // 3. Engagement Data
@@ -72,10 +72,10 @@ researchers.forEach((r) => {
     else engagementCounts["3+"]++;
 });
 const engagementData = [
-    { label: "0 Projetos", value: engagementCounts[0], color: "#94a3b8" },
-    { label: "1 Projeto", value: engagementCounts[1], color: "#38bdf8" },
-    { label: "2 Projetos", value: engagementCounts[2], color: "#818cf8" },
-    { label: "3+ Projetos", value: engagementCounts["3+"], color: "#c084fc" },
+    { label: "0 Projetos", value: engagementCounts[0], color: "var(--color-chart-6)" },
+    { label: "1 Projeto", value: engagementCounts[1], color: "var(--color-chart-2)" },
+    { label: "2 Projetos", value: engagementCounts[2], color: "var(--color-chart-4)" },
+    { label: "3+ Projetos", value: engagementCounts["3+"], color: "var(--color-chart-5)" },
 ];
 const maxEngagement = Math.max(...Object.values(engagementCounts), 1);
 

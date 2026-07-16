@@ -12,9 +12,9 @@ const concluded = totalStatus - active;
 const other = 0; // Mart summary doesn't explicit 'other' yet, so we assume 0 if everything is active
 
 const statusData = [
-	{ label: 'Ativos', value: active, color: 'var(--color-premium-accent, #38bdf8)' },
+	{ label: 'Ativos', value: active, color: 'var(--color-premium-accent, var(--color-chart-2))' },
 ];
-if (concluded > 0) statusData.push({ label: 'Concluídos', value: concluded, color: 'var(--color-text-muted, #94a3b8)' });
+if (concluded > 0) statusData.push({ label: 'Concluídos', value: concluded, color: 'var(--color-text-muted, var(--color-chart-6))' });
 
 // 2. Evolution Data (Direct from Mart)
 const evolutionData = martData.evolution.map((d: any) => ({ year: d.year, count: d.start }));
@@ -209,7 +209,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                 y1={150 - padding}
                                                 x2={400 - padding}
                                                 y2={150 - padding}
-                                                stroke="#334155"
+                                                stroke="var(--color-border-main)"
                                                 stroke-opacity="0.2"
                                                 stroke-width="1"
                                             />
@@ -292,7 +292,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                 y1={150 - padding}
                                                 x2={400 - padding}
                                                 y2={150 - padding}
-                                                stroke="#334155"
+                                                stroke="var(--color-border-main)"
                                                 stroke-opacity="0.2"
                                                 stroke-width="1"
                                             />
@@ -382,7 +382,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                 y1={150 - padding}
                                                 x2={chartWidth - padding}
                                                 y2={150 - padding}
-                                                stroke="#334155"
+                                                stroke="var(--color-border-main)"
                                                 stroke-opacity="0.2"
                                                 stroke-width="1"
                                             />

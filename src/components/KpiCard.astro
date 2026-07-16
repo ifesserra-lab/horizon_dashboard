@@ -7,32 +7,116 @@ interface Props {
     isUp: boolean;
   };
   icon: string;
-  color?: string;
+  /** KPI de destaque: fundo verde-escuro sólido com texto branco. */
+  highlight?: boolean;
 }
 
-const { title, value, trend, icon, color = "premium-accent" } = Astro.props;
+const { title, value, trend, icon, highlight = false } = Astro.props;
+
+// Contagem crescente só para valores inteiros simples (sem sufixo/prefixo).
+const raw = String(value);
+const canCount = /^\d{1,3}(\.\d{3})*$|^\d+$/.test(raw.replace(/\s/g, ""));
+const countTo = canCount ? Number(raw.replace(/\./g, "")) : null;
 ---
 
-<div class="glass-card p-6 flex flex-col gap-4 group hover:border-premium-accent/50 transition-all duration-300" data-kpi-card={title}>
+<div
+  class:list={[
+    "kpi-card p-6 flex flex-col gap-4 rounded-2xl border border-border-main border-l-4 border-l-brand-green shadow-sm transition-all duration-300",
+    highlight
+      ? "bg-brand-green-dark text-white"
+      : "bg-surface hover:border-l-brand-green-dark",
+  ]}
+  data-kpi-card={title}
+>
   <div class="flex justify-between items-start">
-    <div 
-      class={`p-3 rounded-xl bg-${color}/10 text-${color} group-hover:scale-110 transition-transform`}
+    <div
+      class:list={[
+        "p-3 rounded-xl transition-transform",
+        highlight ? "bg-white/15 text-white" : "bg-brand-green/10 text-brand-green",
+      ]}
       aria-hidden="true"
     >
       <Fragment set:html={icon} />
     </div>
     {trend && (
-      <div 
-        class={`flex items-center gap-1 text-xs font-bold ${trend.isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
-        aria-label={`${trend.isUp ? 'Aumento' : 'Redução'} de ${trend.value}%`}
+      <div
+        class:list={[
+          "flex items-center gap-1 text-xs font-bold font-mono",
+          highlight
+            ? "text-white/90"
+            : trend.isUp
+              ? "text-brand-green-dark"
+              : "text-brand-red",
+        ]}
+        aria-label={`${trend.isUp ? "Aumento" : "Redução"} de ${trend.value}%`}
       >
-        <span aria-hidden="true">{trend.isUp ? '↑' : '↓'}</span>
+        <span aria-hidden="true">{trend.isUp ? "↑" : "↓"}</span>
         <span>{trend.value}%</span>
       </div>
     )}
   </div>
   <div>
-    <p class="text-text-muted text-sm font-medium tracking-wide">{title}</p>
-    <h3 class="text-3xl font-bold font-display mt-1 tracking-tight text-text-main" data-kpi-value>{value}</h3>
+    <p
+      class:list={[
+        "font-mono text-xs uppercase tracking-wider",
+        highlight ? "text-white/80" : "text-text-muted",
+      ]}
+    >
+      {title}
+    </p>
+    <h3
+      class:list={[
+        "text-3xl font-display font-bold mt-1 tracking-tight tabular-nums",
+        highlight ? "text-white" : "text-premium-accent",
+      ]}
+      data-kpi-value
+      data-count-to={countTo ?? undefined}
+    >
+      {value}
+    </h3>
   </div>
 </div>
+
+<script>
+  // Contagem crescente ao entrar na viewport. Desligada com reduzir-movimento.
+  const prefersReduced =
+    document.documentElement.classList.contains("reduce-motion") ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const targets = document.querySelectorAll<HTMLElement>("[data-count-to]");
+
+  if (!prefersReduced && targets.length && "IntersectionObserver" in window) {
+    const fmt = (n: number) => n.toLocaleString("pt-BR");
+
+    const run = (el: HTMLElement) => {
+      const to = Number(el.dataset.countTo);
+      if (!Number.isFinite(to)) return;
+      const duration = 1200;
+      let start: number | null = null;
+      const tick = (ts: number) => {
+        if (start === null) start = ts;
+        const p = Math.min((ts - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(Math.round(to * eased));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.textContent = "0";
+            run(el);
+            io.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.3 },
+    );
+
+    targets.forEach((el) => io.observe(el));
+  }
+</script>

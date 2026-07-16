@@ -63,14 +63,14 @@ const donutData = finalDistribution.map((d, index) => {
     const startAngle = accumulatedAngle;
     accumulatedAngle += angle;
     
-    // Colors for the slices
+    // Rampa institucional (verde escuro -> verde -> amarelo -> azul -> ...).
     const colors = [
-        '#38bdf8', // premium-accent
-        '#818cf8', 
-        '#c084fc', // premium-purple
-        '#e879f9',
-        '#f472b6',
-        '#94a3b8'  // text-muted for 'Others'
+        'var(--color-chart-1)',
+        'var(--color-chart-2)',
+        'var(--color-chart-3)',
+        'var(--color-chart-4)',
+        'var(--color-chart-5)',
+        'var(--color-chart-6)',
     ];
 
     return {
@@ -78,7 +78,7 @@ const donutData = finalDistribution.map((d, index) => {
         percentage,
         startAngle,
         endAngle: startAngle + angle,
-        color: d.name === 'Outras' ? '#334155' : colors[index % colors.length]
+        color: d.name === 'Outras' ? 'var(--color-chart-6)' : colors[index % colors.length]
     };
 });
 
@@ -139,8 +139,8 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
         <div class="relative z-10 w-full h-48 mt-auto">
             <svg viewBox={`0 0 ${width} ${height}`} class="w-full h-full overflow-visible">
                 <!-- Grid Lines -->
-                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#334155" stroke-width="1" />
-                <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="#334155" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="var(--color-border-main)" stroke-width="1" />
+                <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="var(--color-border-main)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
 
                 <!-- Area Path -->
                 <path 
@@ -157,13 +157,13 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
                     stroke-width="3" 
                     stroke-linecap="round" 
                     stroke-linejoin="round"
-                    class="drop-shadow-[0_0_10px_rgba(56,189,248,0.3)]"
+                    class="drop-shadow-[0_0_10px_rgba(0,150,64,0.25)]"
                 />
 
                 <!-- Points & Labels -->
                 {points.map((p, i) => (
                     <g class="group/point hover:opacity-100 transition-opacity">
-                        <circle cx={p.x} cy={p.y} r="4" class="fill-bg-main stroke-premium-accent stroke-2" />
+                        <circle cx={p.x} cy={p.y} r="4" class="fill-surface stroke-premium-accent stroke-2" />
                         
                         <!-- Tooltip-like Label (only visible on hover of group/point, simplified here to typical rendering) -->
                         <foreignObject x={p.x - 20} y={p.y - 35} width="40" height="25" class="opacity-0 group-hover/point:opacity-100 transition-opacity">
@@ -212,7 +212,7 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
                             <path 
                                 d={getPiePath(slice.startAngle, slice.endAngle, 35, 50)} 
                                 fill={slice.color}
-                                stroke="#0f172a" 
+                                stroke="var(--color-surface)" 
                                 stroke-width="1"
                                 class="hover:opacity-90 transition-opacity cursor-pointer group-hover/slice:scale-105 origin-center"
                             >

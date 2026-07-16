@@ -26,7 +26,7 @@ const relationLabels: Record<StudentInteractionRelationType, string> = {
 const relationColors: Record<StudentInteractionRelationType, string> = {
     project: "#0f766e",
     orientation: "#d97706",
-    article: "#0284c7",
+    article: "var(--color-chart-1)",
     initiative: "#0891b2",
     research_group: "#475569",
     advisorship: "#d97706",
@@ -97,7 +97,7 @@ const getRelationColor = (relationTypes: StudentInteractionRelationType[]) => {
     if (relationTypes.length > 1) return "#7c3aed";
 
     const firstRelationType = relationTypes[0];
-    return firstRelationType ? relationColors[firstRelationType] : "#94a3b8";
+    return firstRelationType ? relationColors[firstRelationType] : "var(--color-chart-6)";
 };
 
 const truncateLabel = (value: string, maxLength: number) =>
@@ -175,7 +175,7 @@ const createGraphLayout = (
         x: 0,
         y: 0,
         radius: 22,
-        stroke: "#0f172a",
+        stroke: "var(--color-surface)",
     });
 
     let placed = 0;
@@ -402,7 +402,7 @@ const getEdgeLabelPlacement = (
                 <defs>
                     <radialGradient id={`${graph.graphKind}-focus-fill-${graph.focusId}`}>
                         <stop offset="0%" stop-color="#f8fafc"></stop>
-                        <stop offset="100%" stop-color="#38bdf8"></stop>
+                        <stop offset="100%" stop-color="var(--color-chart-2)"></stop>
                     </radialGradient>
                 </defs>
 
@@ -479,7 +479,7 @@ const getEdgeLabelPlacement = (
                     const fill = node.isFocus
                         ? `url(#${graph.graphKind}-focus-fill-${graph.focusId})`
                         : "#ffffff";
-                    const stroke = node.isFocus ? "#0f172a" : position.stroke;
+                    const stroke = node.isFocus ? "var(--color-surface)" : position.stroke;
 
                     return (
                         <a href={node.profileHref ?? undefined}>

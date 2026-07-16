@@ -356,12 +356,12 @@ export const buildPublicationsMart = (
             {
                 label: "Periódicos",
                 value: journalPublications,
-                color: "var(--color-premium-accent, #38bdf8)",
+                color: "var(--color-chart-2)",
             },
             {
                 label: "Eventos",
                 value: conferencePublications,
-                color: "var(--color-premium-purple, #8b5cf6)",
+                color: "var(--color-chart-3)",
             },
         ].filter((item) => item.value > 0),
         evolution: fullYearRange.map((year) => ({

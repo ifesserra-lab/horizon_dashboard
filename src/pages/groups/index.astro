@@ -51,10 +51,10 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 				])}
 			>
 				<div class="flex items-start justify-between mb-4">
-					<div aria-hidden="true" class="w-12 h-12 rounded-xl bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-border-main flex items-center justify-center text-premium-accent font-bold overflow-hidden text-xs text-center p-1 leading-tight">
+					<div aria-hidden="true" class="w-12 h-12 rounded-lg bg-brand-green-dark flex items-center justify-center text-white font-bold overflow-hidden text-xs text-center p-1 leading-tight">
 						{group.short_name || group.name.charAt(0)}
 					</div>
-					<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] text-[10px] font-bold text-text-secondary uppercase tracking-wider border border-border-main">
+					<span class="px-3 py-1 rounded-full bg-[var(--tag-bg)] font-mono text-[10px] text-text-secondary uppercase tracking-wider border border-border-main">
 						{group.campus.name}
 					</span>
 				</div>
@@ -79,7 +79,12 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 					)}
 				</div>
 
-				<div class="pt-6 border-t border-border-main flex justify-end items-center mt-auto">
+				<div class="pt-6 border-t border-border-main flex justify-between items-center mt-auto gap-3">
+					<div class="flex items-center gap-2 font-mono text-[11px] text-text-muted uppercase tracking-wide">
+						<span>{group.knowledge_areas.length} áreas</span>
+						<span aria-hidden="true" class="text-text-muted-2">·</span>
+						<span>{group.leaders.length} {group.leaders.length === 1 ? "líder" : "líderes"}</span>
+					</div>
 					<a href={`${import.meta.env.BASE_URL}groups/${group.id}`} class="text-xs font-bold text-premium-accent flex items-center gap-1 hover:translate-x-1 transition-transform focus:ring-2 focus:ring-premium-accent rounded px-1" aria-label={`Detalhes de ${group.name}`}>
 						Detalhes
 						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
