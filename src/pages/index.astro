@@ -259,8 +259,9 @@ const indexUrl = `${base}search-index.json`;
                 // featured: richer + higher-impact entries first.
                 // FWCI (field-weighted citation impact) is the strongest
                 // signal when present (only the ~93 docentes with OpenAlex).
+                // sqrt dampens outliers (one freak FWCI shouldn't dominate).
                 const base =
-                    (e.f || 0) * 15 +
+                    Math.sqrt(e.f || 0) * 18 +
                     (e.na || 0) * 2 +
                     (e.ni || 0) * 2 +
                     (e.nm || 0) +
