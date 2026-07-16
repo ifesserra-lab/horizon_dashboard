@@ -29,6 +29,16 @@ import ResearcherProfileArticles from "../../components/researchers/ResearcherPr
 import ResearcherProfileStats from "../../components/researchers/ResearcherProfileStats.astro";
 import PersonInteractionGraph from "../../components/researchers/PersonInteractionGraph.astro";
 import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
+import ResearcherProfileAwards from "../../components/researchers/ResearcherProfileAwards.astro";
+import ResearcherProfileLanguages from "../../components/researchers/ResearcherProfileLanguages.astro";
+import ResearcherProfileActivities from "../../components/researchers/ResearcherProfileActivities.astro";
+import ResearcherProfileProductions from "../../components/researchers/ResearcherProfileProductions.astro";
+import {
+    getResearcherAwards,
+    getResearcherProficiencies,
+    getResearcherActivities,
+    getResearcherProductions,
+} from "../../lib/researcher-lattes-extras";
 
 export function getStaticPaths() {
     const researchers = researchersData as unknown as Researcher[];
@@ -60,6 +70,12 @@ const enrichedResearcher = {
     ...researcher,
     initiatives: enrichedInitiatives,
 };
+
+// Lattes-derived datasets (stored as separate canonical files).
+const researcherAwards = getResearcherAwards(researcher.id);
+const researcherProficiencies = getResearcherProficiencies(researcher.id);
+const researcherActivities = getResearcherActivities(researcher.id);
+const researcherProductions = getResearcherProductions(researcher.id);
 
 const profileHeaderSources = toInlineSourceItems([
     ...getAttributeSources("researcher", researcher.id, [
@@ -223,6 +239,18 @@ const researcherDetailSections = [
     { id: "researcher-initiatives", label: "Iniciativas" },
     { id: "researcher-advisorships", label: "Orientacoes" },
     { id: "researcher-articles", label: "Publicacoes" },
+    ...(researcherProductions.length
+        ? [{ id: "researcher-productions", label: "Producao tecnica" }]
+        : []),
+    ...(researcherActivities.length
+        ? [{ id: "researcher-activities", label: "Atuacao profissional" }]
+        : []),
+    ...(researcherAwards.length
+        ? [{ id: "researcher-awards", label: "Premios" }]
+        : []),
+    ...(researcherProficiencies.length
+        ? [{ id: "researcher-languages", label: "Idiomas" }]
+        : []),
     ...(researcherCollaborationGraph
         ? [{ id: "researcher-collaboration-graph", label: "Grafo de colaboracao" }]
         : []),
@@ -307,6 +335,44 @@ const researcherDetailSections = [
                     articleSourcesById={articleSourcesById}
                 />
             </section>
+
+            {
+                researcherProductions.length > 0 && (
+                    <section id="researcher-productions" class="scroll-mt-28">
+                        <ResearcherProfileProductions
+                            productions={researcherProductions}
+                        />
+                    </section>
+                )
+            }
+
+            {
+                researcherActivities.length > 0 && (
+                    <section id="researcher-activities" class="scroll-mt-28">
+                        <ResearcherProfileActivities
+                            activities={researcherActivities}
+                        />
+                    </section>
+                )
+            }
+
+            {
+                researcherAwards.length > 0 && (
+                    <section id="researcher-awards" class="scroll-mt-28">
+                        <ResearcherProfileAwards awards={researcherAwards} />
+                    </section>
+                )
+            }
+
+            {
+                researcherProficiencies.length > 0 && (
+                    <section id="researcher-languages" class="scroll-mt-28">
+                        <ResearcherProfileLanguages
+                            proficiencies={researcherProficiencies}
+                        />
+                    </section>
+                )
+            }
 
             {
                 researcherCollaborationGraph && (

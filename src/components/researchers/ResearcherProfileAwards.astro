@@ -1,0 +1,46 @@
+---
+import type { ResearcherAward } from "../../lib/researcher-lattes-extras";
+
+interface Props {
+    awards: ResearcherAward[];
+}
+
+const { awards } = Astro.props;
+---
+
+<section aria-labelledby="awards-title" class="space-y-6">
+    <div class="py-4 border-b border-border-main">
+        <h3
+            id="awards-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Prêmios e Títulos ({awards.length})
+        </h3>
+    </div>
+
+    <div class="space-y-4">
+        {
+            awards.map((award) => (
+                <div class="glass-card p-5 border border-border-main hover:border-premium-purple/30 transition-all flex items-start gap-4">
+                    <span class="flex-shrink-0 mt-0.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-premium-purple/10 text-premium-purple text-xs font-bold">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="12" cy="8" r="6" />
+                            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                        </svg>
+                        {award.year ?? "—"}
+                    </span>
+                    <p class="text-sm text-text-main leading-snug">{award.title}</p>
+                </div>
+            ))
+        }
+    </div>
+</section>

@@ -1,0 +1,54 @@
+---
+import type { ResearcherActivity } from "../../lib/researcher-lattes-extras";
+
+interface Props {
+    activities: ResearcherActivity[];
+}
+
+const { activities } = Astro.props;
+---
+
+<section aria-labelledby="activities-title" class="space-y-6">
+    <div class="py-4 border-b border-border-main">
+        <h3
+            id="activities-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Atuação Profissional ({activities.length})
+        </h3>
+    </div>
+
+    <div class="space-y-4">
+        {
+            activities.map((activity) => (
+                <div class="glass-card p-5 border border-border-main hover:border-premium-purple/30 transition-all">
+                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                        {activity.period && (
+                            <span class="text-xs font-bold text-text-secondary">
+                                {activity.period}
+                            </span>
+                        )}
+                        {activity.current && (
+                            <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                                Atual
+                            </span>
+                        )}
+                        {activity.bond && (
+                            <span class="px-2 py-0.5 rounded-md bg-premium-purple/10 text-premium-purple text-[10px] font-bold uppercase tracking-wider">
+                                {activity.bond}
+                            </span>
+                        )}
+                    </div>
+                    <h4 class="text-sm font-bold text-text-main leading-snug">
+                        {activity.institution}
+                    </h4>
+                    {activity.roleFunction && (
+                        <p class="text-xs text-text-secondary mt-1 italic">
+                            {activity.roleFunction}
+                        </p>
+                    )}
+                </div>
+            ))
+        }
+    </div>
+</section>

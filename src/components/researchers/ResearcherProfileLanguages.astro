@@ -1,0 +1,61 @@
+---
+import type { ResearcherProficiency } from "../../lib/researcher-lattes-extras";
+
+interface Props {
+    proficiencies: ResearcherProficiency[];
+}
+
+const { proficiencies } = Astro.props;
+
+const LEVEL_STYLE: Record<string, string> = {
+    Alto: "bg-emerald-500/15 text-emerald-400",
+    Medio: "bg-amber-500/15 text-amber-400",
+    Basico: "bg-sky-500/15 text-sky-400",
+    NaoSeAplica: "bg-white/5 text-text-muted",
+};
+const levelClass = (level: string | null) =>
+    LEVEL_STYLE[level ?? "NaoSeAplica"] ?? "bg-white/5 text-text-muted";
+const SKILLS: Array<[keyof ResearcherProficiency, string]> = [
+    ["comprehension", "Compreende"],
+    ["speaking", "Fala"],
+    ["reading", "Lê"],
+    ["writing", "Escreve"],
+];
+---
+
+<section aria-labelledby="languages-title" class="space-y-6">
+    <div class="py-4 border-b border-border-main">
+        <h3
+            id="languages-title"
+            class="text-2xl font-bold font-['Outfit'] text-text-main"
+        >
+            Idiomas ({proficiencies.length})
+        </h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {
+            proficiencies.map((prof) => (
+                <div class="glass-card p-5 border border-border-main">
+                    <p class="text-base font-bold text-text-main mb-3">
+                        {prof.language}
+                    </p>
+                    <div class="grid grid-cols-2 gap-2">
+                        {SKILLS.map(([field, label]) => (
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs text-text-secondary">
+                                    {label}
+                                </span>
+                                <span
+                                    class={`px-2 py-0.5 rounded-md text-[11px] font-bold ${levelClass(prof[field] as string | null)}`}
+                                >
+                                    {(prof[field] as string | null) ?? "—"}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))
+        }
+    </div>
+</section>
