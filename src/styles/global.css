@@ -12,27 +12,35 @@
     --color-tag-bg-accent: var(--tag-bg-accent);
     --color-glass-bg: var(--glass-surface);
 
-    /* Brand/Accent Defaults */
-    --color-premium-accent: #0284c7;
-    --color-premium-purple: #7c3aed;
+    /* Brand/Accent Defaults — Apple "Action Blue" (single accent) */
+    --color-premium-accent: #0066cc;
+    --color-premium-purple: #0066cc;
 
     --background-image-premium-gradient: var(--page-gradient);
+
+    /* Typography — Apple system stack (SF Pro on Apple devices) */
+    --font-sans: "SF Pro Text", "SF Pro Display", -apple-system,
+        BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial,
+        sans-serif;
+    --font-display: "SF Pro Display", "SF Pro Text", -apple-system,
+        BlinkMacSystemFont, system-ui, sans-serif;
+    --default-font-family: var(--font-sans);
 }
 
 @layer base {
     :root {
-        /* Light Mode Variables */
-        --bg-primary: #f8fafc;
-        --text-primary: #0f172a;
-        --text-secondary: #475569;
-        --border-primary: rgba(15, 23, 42, 0.1);
-        --glass-surface: rgba(255, 255, 255, 0.7);
-        --page-gradient: radial-gradient(circle at 50% 50%, #f1f5f9 0%, #cbd5e1 100%);
-        --tag-bg: #f1f5f9;
-        --tag-bg-accent: #f1f5f9;
+        /* Light Mode — Apple canvas: white + parchment, ink text, hairlines */
+        --bg-primary: #ffffff;
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --border-primary: #d2d2d7;
+        --glass-surface: rgba(255, 255, 255, 0.72);
+        --page-gradient: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+        --tag-bg: #f5f5f7;
+        --tag-bg-accent: #e8e8ed;
 
         /* Light Mode Override for Accent */
-        --color-premium-accent: #0369a1;
+        --color-premium-accent: #0066cc;
 
         /* Text Scaling */
         --base-font-size: 100%;
@@ -60,18 +68,19 @@
     }
 
     :root.dark {
-        /* Dark Mode Variables */
-        --bg-primary: #0f172a;
-        --text-primary: #f1f5f9;
-        --text-secondary: #94a3b8;
-        --border-primary: rgba(255, 255, 255, 0.1);
-        --glass-surface: rgba(15, 23, 42, 0.4);
-        --page-gradient: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%);
-        --tag-bg: #1e293b;
-        --tag-bg-accent: #1e293b;
+        /* Dark Mode — Apple: true black canvas, near-white ink, faint hairline */
+        --bg-primary: #000000;
+        --text-primary: #f5f5f7;
+        --text-secondary: #a1a1a6;
+        --border-primary: rgba(255, 255, 255, 0.12);
+        --glass-surface: rgba(29, 29, 31, 0.72);
+        --page-gradient: linear-gradient(180deg, #1d1d1f 0%, #000000 100%);
+        --tag-bg: #1d1d1f;
+        --tag-bg-accent: #2a2a2c;
 
         /* Dark Mode Override for Accent */
-        --color-premium-accent: #38bdf8;
+        --color-premium-accent: #2997ff;
+        --color-premium-purple: #2997ff;
     }
 
     :root.contrast-high {

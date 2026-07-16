@@ -6,130 +6,133 @@ const indexUrl = `${base}search-index.json`;
 ---
 
 <Layout title="Buscar pesquisa">
-    <div class="max-w-5xl mx-auto" data-base={base} data-index-url={indexUrl}>
-        <!-- Hero -->
-        <section class="text-center pt-6 pb-8">
-            <h1
-                class="text-3xl md:text-4xl font-bold font-['Outfit'] text-text-main text-balance"
+    <div class="max-w-4xl mx-auto px-1" data-base={base} data-index-url={indexUrl}>
+        <!-- Hero — editorial, left-aligned, restrained -->
+        <section class="pt-10 pb-8">
+            <p
+                class="text-xs uppercase tracking-[0.18em] text-text-muted font-medium mb-3"
             >
-                O que você quer encontrar na pesquisa do Ifes?
+                Pesquisa · Ifes
+            </p>
+            <h1
+                class="font-display text-4xl md:text-5xl font-semibold tracking-tight text-text-main leading-[1.05] text-balance"
+            >
+                Encontre pesquisas, pessoas e grupos.
             </h1>
-            <p class="mt-3 text-text-secondary max-w-2xl mx-auto">
-                Busque por tema, pessoa ou grupo. Escolha sua perspectiva — os
-                resultados se adaptam a quem está procurando.
+            <p class="mt-4 text-lg text-text-muted max-w-xl leading-relaxed">
+                Uma busca, três perspectivas. Os resultados se ajustam a quem
+                procura.
             </p>
 
-            <!-- Persona -->
-            <div
-                class="mt-6 inline-flex bg-glass-bg border border-border-main rounded-xl p-1 gap-1"
-                role="group"
-                aria-label="Quem está buscando"
-                id="personaSwitch"
-            >
-                <button
-                    type="button"
-                    data-persona="aluno"
-                    aria-pressed="true"
-                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                    >Aluno</button
-                >
-                <button
-                    type="button"
-                    data-persona="professor"
-                    aria-pressed="false"
-                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                    >Professor</button
-                >
-                <button
-                    type="button"
-                    data-persona="empresa"
-                    aria-pressed="false"
-                    class="persona-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                    >Empresa</button
-                >
-            </div>
-
-            <!-- Search box -->
-            <div class="mt-5 relative max-w-2xl mx-auto">
-                <svg
-                    class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    ><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"
-                    ></path></svg
-                >
+            <!-- Search field: single hairline-underlined input -->
+            <div class="mt-8 relative border-b-2 border-text-main/80 focus-within:border-premium-accent transition-colors">
                 <input
                     type="search"
                     id="q"
                     autocomplete="off"
-                    class="w-full bg-glass-bg border border-border-main rounded-2xl pl-12 pr-4 py-4 text-lg text-text-main focus:outline-none focus:ring-2 focus:ring-premium-purple/50 focus:border-premium-purple transition-all"
+                    class="w-full bg-transparent py-3 pr-8 text-2xl font-display text-text-main placeholder:text-text-muted/60 focus:outline-none"
                 />
-            </div>
-            <p id="lens" class="mt-3 text-sm text-text-secondary italic"></p>
-            <div id="suggest" class="mt-4 flex flex-wrap gap-2 justify-center"></div>
-            <p class="mt-5 text-sm">
-                <a
-                    href={`${base}painel`}
-                    class="text-text-secondary hover:text-premium-purple transition-colors underline underline-offset-4 decoration-border-main"
-                    >Ver painel de indicadores e gráficos →</a
+                <svg
+                    class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    ><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"
+                    ></path></svg
                 >
+            </div>
+
+            <!-- Persona — quiet inline segmented text -->
+            <div
+                class="mt-5 flex items-center gap-1 text-sm"
+                role="group"
+                aria-label="Quem está buscando"
+            >
+                <span class="text-text-muted mr-1">Busco como</span>
+                <button type="button" data-persona="aluno" class="persona-btn"
+                    >aluno</button
+                >
+                <span class="text-text-muted/40">·</span>
+                <button type="button" data-persona="professor" class="persona-btn"
+                    >professor</button
+                >
+                <span class="text-text-muted/40">·</span>
+                <button type="button" data-persona="empresa" class="persona-btn"
+                    >empresa</button
+                >
+            </div>
+            <p id="lens" class="mt-2 text-sm text-text-muted"></p>
+
+            <!-- Suggestions as plain text links -->
+            <p
+                id="suggest"
+                class="mt-6 text-sm text-text-muted flex flex-wrap gap-x-4 gap-y-1"
+            >
             </p>
         </section>
 
-        <!-- Results area -->
-        <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 pb-20">
-            <aside class="space-y-6 lg:sticky lg:top-24 self-start">
-                <div>
-                    <h4
-                        class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2"
-                    >
-                        Tipo
-                    </h4>
-                    <div id="facetType" class="flex flex-col gap-1"></div>
-                </div>
-                <div>
-                    <h4
-                        class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2"
-                    >
-                        Campus
-                    </h4>
-                    <div id="facetCampus" class="flex flex-col gap-1"></div>
-                </div>
-            </aside>
-
-            <main>
-                <div
-                    class="flex items-baseline justify-between mb-4 pb-3 border-b border-border-main"
-                >
+        <!-- Results -->
+        <section class="pb-24 pt-2">
+            <div
+                class="flex items-baseline justify-between border-t border-border-main pt-4 mb-1"
+            >
+                <div class="flex items-center gap-4">
                     <h2
                         id="resultsTitle"
-                        class="text-lg font-semibold text-text-secondary"
+                        class="text-sm font-semibold text-text-main"
                     >
                         Em destaque
                     </h2>
-                    <span
-                        id="resultsCount"
-                        class="text-xs font-mono text-text-muted"></span>
+                    <div
+                        id="facetType"
+                        class="hidden md:flex items-center gap-3 text-sm"
+                    >
+                    </div>
                 </div>
-                <div id="results" class="space-y-3"></div>
-                <div
-                    id="loadingState"
-                    class="text-center py-16 text-text-secondary"
+                <span
+                    id="resultsCount"
+                    class="text-xs tabular-nums text-text-muted"></span>
+            </div>
+
+            <div id="results" class="divide-y divide-border-main"></div>
+
+            <div id="loadingState" class="py-16 text-text-muted text-sm">
+                Carregando…
+            </div>
+            <div id="emptyState" class="hidden py-16 text-text-muted">
+                <p class="text-text-main">Nada encontrado.</p>
+                <p class="text-sm mt-1">Tente outro termo.</p>
+            </div>
+
+            <p class="mt-10 text-sm">
+                <a
+                    href={`${base}painel`}
+                    class="text-text-muted hover:text-premium-accent transition-colors"
+                    >Painel de indicadores e gráficos →</a
                 >
-                    Carregando índice de busca…
-                </div>
-                <div
-                    id="emptyState"
-                    class="hidden text-center py-16 text-text-secondary"
-                >
-                    <p class="text-lg text-text-main mb-1">Nada encontrado</p>
-                    <p class="text-sm">Tente outro termo ou explore uma área acima.</p>
-                </div>
-            </main>
-        </div>
+            </p>
+        </section>
     </div>
+
+    <style>
+        .persona-btn {
+            color: var(--text-secondary);
+            padding: 0 2px;
+            transition: color 0.15s;
+        }
+        .persona-btn:hover {
+            color: var(--text-primary);
+        }
+        .persona-btn[aria-pressed="true"] {
+            color: var(--color-premium-accent);
+            font-weight: 600;
+        }
+        .facet-btn[aria-pressed="true"] {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+    </style>
 
     <script>
         import { normalizeSearchText } from "../lib/search";
@@ -176,53 +179,28 @@ const indexUrl = `${base}search-index.json`;
 
         const PERSONAS: Record<
             string,
-            {
-                lens: string;
-                placeholder: string;
-                w: Record<string, number>;
-            }
+            { lens: string; placeholder: string; w: Record<string, number> }
         > = {
             aluno: {
-                lens: "Mostrando quem pode te orientar e grupos de pesquisa pra entrar.",
-                placeholder:
-                    "Busque um tema — ex.: robótica, educação inclusiva, energia solar…",
-                w: {
-                    pesquisador: 1,
-                    aluno: 0.6,
-                    grupo: 1.2,
-                    projeto: 1.1,
-                    publicacao: 0.5,
-                },
+                lens: "Priorizando orientadores e grupos para ingressar.",
+                placeholder: "robótica, educação inclusiva, energia solar…",
+                w: { pesquisador: 1, aluno: 0.6, grupo: 1.2, projeto: 1.1, publicacao: 0.5 },
             },
             professor: {
-                lens: "Mostrando pares, produção científica e parcerias possíveis.",
-                placeholder: "Busque uma área, pesquisador ou tema de colaboração…",
-                w: {
-                    pesquisador: 1.2,
-                    aluno: 0.5,
-                    grupo: 1.05,
-                    projeto: 0.95,
-                    publicacao: 1.05,
-                },
+                lens: "Priorizando pares, produção e parcerias.",
+                placeholder: "uma área, pesquisador ou tema de colaboração…",
+                w: { pesquisador: 1.2, aluno: 0.5, grupo: 1.05, projeto: 0.95, publicacao: 1.05 },
             },
             empresa: {
-                lens: "Mostrando quem domina o assunto e pode apoiar sua empresa.",
-                placeholder:
-                    "Descreva o problema ou tecnologia — ex.: visão computacional…",
-                w: {
-                    grupo: 1.25,
-                    pesquisador: 1.1,
-                    projeto: 1.2,
-                    aluno: 0.4,
-                    publicacao: 0.4,
-                },
+                lens: "Priorizando especialistas e grupos que podem apoiar.",
+                placeholder: "um problema ou tecnologia…",
+                w: { grupo: 1.25, pesquisador: 1.1, projeto: 1.2, aluno: 0.4, publicacao: 0.4 },
             },
         };
 
         let persona = "aluno";
         let query = "";
         let fType: string | null = null;
-        let fCampus: string | null = null;
         let entries: Entry[] = [];
 
         const $ = (id: string) => document.getElementById(id)!;
@@ -230,25 +208,13 @@ const indexUrl = `${base}search-index.json`;
             String(s ?? "").replace(
                 /[&<>"']/g,
                 (c) =>
-                    ({
-                        "&": "&amp;",
-                        "<": "&lt;",
-                        ">": "&gt;",
-                        '"': "&quot;",
-                        "'": "&#39;",
-                    })[c] as string,
+                    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+                        c
+                    ] as string,
             );
 
         function searchText(e: Entry): string {
-            return [
-                e.n,
-                ...(e.a || []),
-                ...(e.g || []),
-                ...(e.l || []),
-                ...(e.team || []),
-                e.c,
-                e.v,
-            ]
+            return [e.n, ...(e.a || []), ...(e.g || []), ...(e.l || []), ...(e.team || []), e.c, e.v]
                 .filter(Boolean)
                 .join(" ");
         }
@@ -256,10 +222,6 @@ const indexUrl = `${base}search-index.json`;
         function score(e: Entry, tokens: string[]): number {
             const w = PERSONAS[persona].w[e.t] ?? 1;
             if (tokens.length === 0) {
-                // featured: richer + higher-impact entries first.
-                // FWCI (field-weighted citation impact) is the strongest
-                // signal when present (only the ~93 docentes with OpenAlex).
-                // sqrt dampens outliers (one freak FWCI shouldn't dominate).
                 const base =
                     Math.sqrt(e.f || 0) * 18 +
                     (e.na || 0) * 2 +
@@ -275,90 +237,64 @@ const indexUrl = `${base}search-index.json`;
                 if (!t) continue;
                 if (name.includes(t)) s += 12;
                 if (e._s!.includes(t)) s += 5;
-                for (const a of e.a || [])
-                    if (normalizeSearchText(a).includes(t)) s += 6;
+                for (const a of e.a || []) if (normalizeSearchText(a).includes(t)) s += 6;
             }
             return s === 0 ? 0 : s * w;
         }
 
         function currentResults(): Entry[] {
-            const tokens = normalizeSearchText(query)
-                .split(" ")
-                .filter(Boolean);
-            let list = entries
-                .map((e) => ({ e, s: score(e, tokens) }))
-                .filter((x) => x.s > 0);
+            const tokens = normalizeSearchText(query).split(" ").filter(Boolean);
+            let list = entries.map((e) => ({ e, s: score(e, tokens) })).filter((x) => x.s > 0);
             if (fType) list = list.filter((x) => x.e.t === fType);
-            if (fCampus) list = list.filter((x) => x.e.c === fCampus);
             list.sort((a, b) => b.s - a.s);
             return list.map((x) => x.e);
         }
 
-        function roleLine(e: Entry): string {
-            const area = (e.a && e.a[0]) || (e.g && e.g[0]) || "";
-            if (e.t === "pesquisador" || e.t === "aluno") {
-                if (persona === "empresa")
-                    return area
-                        ? `Especialista em <b class="text-premium-purple">${esc(area)}</b>`
-                        : "";
-                if (persona === "aluno")
-                    return area
-                        ? `Pode orientar em <b class="text-premium-purple">${esc(area)}</b>`
-                        : "";
-                return area
-                    ? `Área: <b class="text-premium-purple">${esc(area)}</b>`
-                    : "";
-            }
-            if (e.t === "grupo")
-                return e.l && e.l[0]
-                    ? `Liderado por <b class="text-premium-purple">${esc(e.l[0])}</b>`
-                    : "";
-            if (e.t === "projeto")
-                return e.st ? `Situação: ${esc(e.st)}` : "";
-            if (e.t === "publicacao")
-                return [e.v, e.y].filter(Boolean).map(esc).join(" · ");
-            return "";
-        }
-
-        function metaLine(e: Entry): string {
+        function metaBits(e: Entry): string[] {
             const bits: string[] = [];
             if (e.t === "pesquisador" || e.t === "aluno") {
+                const area = (e.a && e.a[0]) || (e.g && e.g[0]);
+                if (area) {
+                    const verb =
+                        persona === "empresa"
+                            ? "Especialista em"
+                            : persona === "aluno"
+                              ? "Orienta em"
+                              : "Área:";
+                    bits.push(`${verb} ${esc(area)}`);
+                }
                 if (e.f) bits.push(`FWCI ${e.f.toFixed(2)}`);
-                if (e.h) bits.push(`índice h ${e.h}`);
+                if (e.h) bits.push(`h ${e.h}`);
                 if (e.na) bits.push(`${e.na} publicações`);
-                if (e.ni) bits.push(`${e.ni} projetos`);
+            } else if (e.t === "grupo") {
+                if (e.l && e.l[0]) bits.push(`Líder ${esc(e.l[0])}`);
+                if (e.nm) bits.push(`${e.nm} integrantes`);
+            } else if (e.t === "projeto") {
+                if (e.a && e.a[0]) bits.push(esc(e.a[0]));
+                if (e.st) bits.push(esc(e.st));
+            } else if (e.t === "publicacao") {
+                if (e.v) bits.push(esc(e.v));
+                if (e.y) bits.push(String(e.y));
             }
-            if (e.t === "grupo" && e.nm) bits.push(`${e.nm} integrantes`);
             if (e.c) bits.push(esc(e.c));
-            return bits.join(" · ");
+            return bits;
         }
 
-        function cardHtml(e: Entry): string {
+        function rowHtml(e: Entry): string {
             const url = TYPE_URL[e.t]?.(e.i) ?? null;
-            const areas = (e.a || [])
-                .slice(0, 4)
-                .map(
-                    (a) =>
-                        `<span class="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-border-main text-text-secondary">${esc(a)}</span>`,
-                )
-                .join("");
-            const role = roleLine(e);
-            const meta = metaLine(e);
+            const meta = metaBits(e).join("  ·  ");
             const inner = `
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 mt-0.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-premium-purple/10 text-premium-purple">${esc(TYPE_LABEL[e.t] || e.t)}</span>
-                    <div class="min-w-0">
-                        <h3 class="text-base font-bold text-text-main leading-snug">${esc(e.n)}</h3>
-                        ${role ? `<p class="text-sm text-text-secondary mt-0.5">${role}</p>` : ""}
-                        ${areas ? `<div class="flex flex-wrap gap-1.5 mt-2">${areas}</div>` : ""}
-                        ${meta ? `<p class="text-xs text-text-muted mt-2">${meta}</p>` : ""}
+                <div class="flex items-baseline gap-4 py-4 group">
+                    <span class="w-24 flex-none text-[11px] uppercase tracking-wider text-text-muted pt-0.5">${esc(TYPE_LABEL[e.t] || e.t)}</span>
+                    <div class="min-w-0 flex-1">
+                        <span class="font-display text-lg text-text-main group-hover:text-premium-accent transition-colors">${esc(e.n)}</span>
+                        ${meta ? `<div class="text-sm text-text-muted mt-0.5">${meta}</div>` : ""}
                     </div>
+                    ${url ? `<span class="flex-none text-text-muted/50 group-hover:text-premium-accent group-hover:translate-x-0.5 transition-all pt-1">→</span>` : ""}
                 </div>`;
-            const cls =
-                "block glass-card p-4 border border-border-main hover:border-premium-purple/40 transition-all";
             return url
-                ? `<a href="${esc(url)}" class="${cls}">${inner}</a>`
-                : `<div class="${cls}">${inner}</div>`;
+                ? `<a href="${esc(url)}" class="block">${inner}</a>`
+                : `<div>${inner}</div>`;
         }
 
         function render() {
@@ -369,25 +305,21 @@ const indexUrl = `${base}search-index.json`;
             const res = currentResults();
             const tokens = normalizeSearchText(query).split(" ").filter(Boolean);
 
-            // type facet counts (respect campus + query, ignore type)
-            const forType = entries
-                .filter((e) => score(e, tokens) > 0)
-                .filter((e) => !fCampus || e.c === fCampus);
+            const forType = entries.filter((e) => score(e, tokens) > 0);
             const counts: Record<string, number> = {};
             for (const e of forType) counts[e.t] = (counts[e.t] || 0) + 1;
-            $("facetType").innerHTML = Object.keys(TYPE_LABEL)
-                .map((t) => {
-                    const active = fType === t;
-                    return `<button data-ftype="${t}" aria-pressed="${active}" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm ${active ? "bg-premium-purple/15 text-premium-purple font-semibold" : "text-text-secondary hover:bg-white/5"}"><span>${TYPE_LABEL[t]}</span><span class="font-mono text-xs">${counts[t] || 0}</span></button>`;
-                })
-                .join("");
+            $("facetType").innerHTML =
+                `<button data-ftype="" aria-pressed="${!fType}" class="facet-btn text-text-muted hover:text-text-main transition-colors">Tudo</button>` +
+                Object.keys(TYPE_LABEL)
+                    .filter((t) => counts[t])
+                    .map(
+                        (t) =>
+                            `<button data-ftype="${t}" aria-pressed="${fType === t}" class="facet-btn text-text-muted hover:text-text-main transition-colors">${TYPE_LABEL[t]} <span class="tabular-nums text-text-muted/60">${counts[t]}</span></button>`,
+                    )
+                    .join("");
 
-            $("resultsTitle").textContent = query
-                ? `Resultados para “${query}”`
-                : fType || fCampus
-                  ? "Filtrado"
-                  : "Em destaque";
-            $("resultsCount").textContent = `${res.length} ${res.length === 1 ? "resultado" : "resultados"}`;
+            $("resultsTitle").textContent = query ? "Resultados" : "Em destaque";
+            $("resultsCount").textContent = `${res.length}`;
 
             const box = $("results");
             $("loadingState").classList.add("hidden");
@@ -396,10 +328,7 @@ const indexUrl = `${base}search-index.json`;
                 $("emptyState").classList.remove("hidden");
             } else {
                 $("emptyState").classList.add("hidden");
-                box.innerHTML = res
-                    .slice(0, 50)
-                    .map(cardHtml)
-                    .join("");
+                box.innerHTML = res.slice(0, 40).map(rowHtml).join("");
             }
         }
 
@@ -411,106 +340,66 @@ const indexUrl = `${base}search-index.json`;
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
-        function buildFacetsStatic() {
-            // campus options
-            const campusCount: Record<string, number> = {};
-            for (const e of entries)
-                if (e.c) campusCount[e.c] = (campusCount[e.c] || 0) + 1;
-            const campuses = Object.entries(campusCount)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            $("facetCampus").innerHTML =
-                `<button data-fcampus="" aria-pressed="true" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm text-text-secondary hover:bg-white/5"><span>Todos</span></button>` +
-                campuses
-                    .map(
-                        ([c, n]) =>
-                            `<button data-fcampus="${esc(c)}" aria-pressed="false" class="facet-btn flex justify-between items-center px-2.5 py-1.5 rounded-lg text-sm text-text-secondary hover:bg-white/5"><span>${esc(c)}</span><span class="font-mono text-xs">${n}</span></button>`,
-                    )
-                    .join("");
-
-            // top-area suggestion chips
+        function buildSuggest() {
             const areaCount: Record<string, number> = {};
             for (const e of entries)
-                for (const a of e.a || [])
-                    areaCount[a] = (areaCount[a] || 0) + 1;
-            const topAreas = Object.entries(areaCount)
+                for (const a of e.a || []) areaCount[a] = (areaCount[a] || 0) + 1;
+            const top = Object.entries(areaCount)
                 .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            $("suggest").innerHTML = topAreas
-                .map(
-                    ([a]) =>
-                        `<button data-suggest="${esc(a)}" class="text-sm px-3 py-1.5 rounded-full border border-border-main text-text-secondary hover:border-premium-purple hover:text-premium-purple transition-colors">${esc(a)}</button>`,
-                )
-                .join("");
+                .slice(0, 7);
+            $("suggest").innerHTML =
+                `<span class="text-text-muted/70">Sugestões:</span>` +
+                top
+                    .map(
+                        ([a]) =>
+                            `<button data-suggest="${esc(a)}" class="text-text-main hover:text-premium-accent underline underline-offset-4 decoration-border-main hover:decoration-premium-accent transition-colors">${esc(a)}</button>`,
+                    )
+                    .join("");
         }
 
-        // Events
+        function syncPersonaButtons() {
+            document.querySelectorAll(".persona-btn").forEach((x) =>
+                x.setAttribute(
+                    "aria-pressed",
+                    String((x as HTMLElement).dataset.persona === persona),
+                ),
+            );
+        }
+
         document.querySelectorAll(".persona-btn").forEach((b) =>
             b.addEventListener("click", () => {
                 persona = (b as HTMLElement).dataset.persona!;
-                document.querySelectorAll(".persona-btn").forEach((x) => {
-                    const on = x === b;
-                    x.setAttribute("aria-pressed", String(on));
-                    x.classList.toggle("bg-glass-bg", on);
-                    x.classList.toggle("text-text-main", on);
-                    x.classList.toggle("shadow", on);
-                    x.classList.toggle("text-text-secondary", !on);
-                });
+                syncPersonaButtons();
                 render();
             }),
         );
-
         $("q").addEventListener("input", (ev) => {
             query = (ev.target as HTMLInputElement).value;
             render();
         });
-
         document.body.addEventListener("click", (ev) => {
             const el = ev.target as HTMLElement;
             const ft = el.closest("[data-ftype]") as HTMLElement | null;
-            const fc = el.closest("[data-fcampus]") as HTMLElement | null;
             const sg = el.closest("[data-suggest]") as HTMLElement | null;
-            if (sg) {
-                setQuery(sg.dataset.suggest!);
-            } else if (ft) {
-                const t = ft.dataset.ftype!;
-                fType = fType === t ? null : t;
-                render();
-            } else if (fc) {
-                fCampus = fc.dataset.fcampus || null;
-                document
-                    .querySelectorAll("[data-fcampus]")
-                    .forEach((x) =>
-                        x.setAttribute(
-                            "aria-pressed",
-                            String(
-                                (x as HTMLElement).dataset.fcampus ===
-                                    (fCampus || ""),
-                            ),
-                        ),
-                    );
+            if (sg) setQuery(sg.dataset.suggest!);
+            else if (ft) {
+                fType = ft.dataset.ftype || null;
                 render();
             }
         });
 
-        // Init persona button styling
-        document
-            .querySelector('.persona-btn[data-persona="aluno"]')
-            ?.classList.add("bg-glass-bg", "text-text-main", "shadow");
+        syncPersonaButtons();
 
-        // Load index
         fetch(indexUrl)
             .then((r) => r.json())
             .then((data: Entry[]) => {
                 entries = data;
-                for (const e of entries)
-                    e._s = normalizeSearchText(searchText(e));
-                buildFacetsStatic();
+                for (const e of entries) e._s = normalizeSearchText(searchText(e));
+                buildSuggest();
                 render();
             })
             .catch(() => {
-                $("loadingState").textContent =
-                    "Não foi possível carregar o índice de busca.";
+                $("loadingState").textContent = "Não foi possível carregar o índice.";
             });
     </script>
 </Layout>

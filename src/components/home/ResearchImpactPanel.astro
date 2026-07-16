@@ -1,0 +1,81 @@
+---
+import summary from "../../data/research_impact_summary.json";
+import impact from "../../data/researcher_impact.json";
+
+const base = import.meta.env.BASE_URL;
+const k = (summary as any).kpis ?? {};
+
+// Top researchers by FWCI (drop the extreme single-paper outlier so the
+// leaderboard stays informative rather than freak-driven).
+const top = (impact as any[])
+    .filter((r) => r.fwci < 50)
+    .sort((a, b) => b.fwci - a.fwci)
+    .slice(0, 6);
+
+const nf = (v: number, d = 0) =>
+    new Intl.NumberFormat("pt-BR", { maximumFractionDigits: d }).format(v);
+
+const kpis = [
+    { label: "FWCI mediano", value: nf(k.fwci_mediano ?? 0, 2), hint: "impacto vs. média mundial da área" },
+    { label: "Citações", value: nf(k.citacoes_total ?? 0), hint: "total (OpenAlex)" },
+    { label: "Top 10% mundial", value: nf(k.top10_total ?? 0), hint: "artigos no decil superior" },
+    { label: "Índice h mediano", value: nf(k.h_mediano ?? 0), hint: "produtividade × impacto" },
+    { label: "Concentração (Gini)", value: nf(k.gini_citacoes ?? 0, 2), hint: "0 = igual · 1 = concentrado" },
+    { label: "Com perfil OpenAlex", value: `${nf(k.com_openalex ?? 0)}/${nf(k.n_docentes ?? 0)}`, hint: "cobertura bibliométrica" },
+];
+---
+
+<section aria-labelledby="impact-title" class="py-4">
+    <div class="flex items-baseline justify-between border-b border-border-main pb-3 mb-6">
+        <h2 id="impact-title" class="font-display text-xl font-semibold text-text-main">
+            Impacto científico
+        </h2>
+        <span class="text-xs text-text-muted">docentes com OpenAlex</span>
+    </div>
+
+    <!-- KPI row: numbers first, quiet labels, hairline grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border-main border border-border-main">
+        {
+            kpis.map((kpi) => (
+                <div class="bg-page-bg p-4">
+                    <div class="font-display text-2xl font-semibold text-text-main tabular-nums">
+                        {kpi.value}
+                    </div>
+                    <div class="text-xs font-medium text-text-main mt-1">{kpi.label}</div>
+                    <div class="text-[11px] text-text-muted mt-0.5 leading-snug">{kpi.hint}</div>
+                </div>
+            ))
+        }
+    </div>
+
+    <!-- Leaderboard: hairline rows, no cards -->
+    <div class="mt-8">
+        <h3 class="text-xs uppercase tracking-wider text-text-muted mb-1">
+            Maior impacto relativo (FWCI)
+        </h3>
+        <div class="divide-y divide-border-main">
+            {
+                top.map((r, idx) => (
+                    <a
+                        href={`${base}researchers/`}
+                        class="flex items-baseline gap-4 py-3 group"
+                    >
+                        <span class="w-5 flex-none text-sm tabular-nums text-text-muted">
+                            {idx + 1}
+                        </span>
+                        <span class="flex-1 font-display text-base text-text-main group-hover:text-premium-accent transition-colors">
+                            {r.nome}
+                        </span>
+                        <span class="flex-none text-sm text-text-muted tabular-nums">
+                            FWCI <b class="text-text-main">{r.fwci.toFixed(2)}</b>
+                            <span class="mx-2 text-border-main">·</span>
+                            h {r.h}
+                            <span class="mx-2 text-border-main">·</span>
+                            {r.cit} cit.
+                        </span>
+                    </a>
+                ))
+            }
+        </div>
+    </div>
+</section>
