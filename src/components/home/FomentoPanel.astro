@@ -1,0 +1,88 @@
+---
+import fomento from "../../data/fomento_summary.json";
+
+const f = (fomento as any).fapes;
+const facto = (fomento as any).facto;
+const bolsistas = (fomento as any).bolsistas;
+
+const brl = (v: number) =>
+    new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        maximumFractionDigits: 0,
+        notation: v >= 1_000_000 ? "compact" : "standard",
+    }).format(v);
+const nf = (v: number) => new Intl.NumberFormat("pt-BR").format(v);
+
+const kpis = [
+    { value: brl(f.orcamento_contratado), label: "Orçamento FAPES contratado", hint: `${nf(f.projetos)} projetos` },
+    { value: brl(f.valor_bolsas), label: "Investido em bolsas", hint: `${nf(f.bolsas)} bolsas` },
+    { value: nf(bolsistas.unicos), label: "Bolsistas únicos", hint: `${nf(bolsistas.projetos)} projetos (recorte)` },
+    { value: nf(facto.projetos), label: "Projetos FACTO", hint: "fundação de apoio" },
+];
+
+// Alert: FAPES projects still "in progress" but past their deadline.
+const overdue = f.prazo_encerrado;
+---
+
+<section aria-labelledby="fomento-title" class="py-4">
+    <div class="flex items-baseline justify-between border-b border-border-main pb-3 mb-6">
+        <h2 id="fomento-title" class="font-display text-xl font-semibold text-text-main">
+            Fomento & captação
+        </h2>
+        <span class="text-xs text-text-muted">FAPES · FACTO</span>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-main border border-border-main">
+        {
+            kpis.map((kpi) => (
+                <div class="bg-page-bg p-4">
+                    <div class="font-display text-2xl font-semibold text-text-main tabular-nums">
+                        {kpi.value}
+                    </div>
+                    <div class="text-xs font-medium text-text-main mt-1">{kpi.label}</div>
+                    <div class="text-[11px] text-text-muted mt-0.5">{kpi.hint}</div>
+                </div>
+            ))
+        }
+    </div>
+
+    <!-- Status split + deadline alert -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2">
+            <h3 class="text-xs uppercase tracking-wider text-text-muted mb-3">
+                Situação dos projetos FAPES
+            </h3>
+            <dl class="divide-y divide-border-main text-sm">
+                <div class="flex justify-between py-2">
+                    <dt class="text-text-muted">Concluídos</dt>
+                    <dd class="tabular-nums text-text-main">{nf(f.concluidos)}</dd>
+                </div>
+                <div class="flex justify-between py-2">
+                    <dt class="text-text-muted">Em andamento (no prazo)</dt>
+                    <dd class="tabular-nums text-text-main">{nf(f.em_andamento)}</dd>
+                </div>
+                <div class="flex justify-between py-2">
+                    <dt class="text-text-muted">Em andamento (prazo encerrado)</dt>
+                    <dd class="tabular-nums font-semibold text-text-main">
+                        {nf(overdue.projetos)}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="border-l-2 border-text-main/70 pl-4 py-1">
+            <div class="text-xs uppercase tracking-wider text-text-muted">
+                Atenção
+            </div>
+            <div class="font-display text-3xl font-semibold text-text-main tabular-nums mt-1">
+                {nf(overdue.projetos)}
+            </div>
+            <p class="text-sm text-text-muted mt-1 leading-snug">
+                projetos ainda “em andamento” com prazo já encerrado —
+                {brl(overdue.orcamento)} contratados e {nf(overdue.bolsas)} bolsas
+                pendentes de encerramento.
+            </p>
+        </div>
+    </div>
+</section>
