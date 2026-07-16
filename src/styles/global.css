@@ -3,44 +3,76 @@
 @theme {
     /* Semantic Colors Maps */
     --color-page-bg: var(--bg-primary);
+    --color-surface: var(--surface);
     --color-text-main: var(--text-primary);
     --color-text-muted: var(--text-secondary);
+    --color-text-muted-2: var(--text-tertiary);
     --color-border-main: var(--border-primary);
+    --color-track: var(--track);
 
     /* Tag Colors */
     --color-tag-bg: var(--tag-bg);
     --color-tag-bg-accent: var(--tag-bg-accent);
     --color-glass-bg: var(--glass-surface);
 
-    /* Brand/Accent Defaults — Apple "Action Blue" (single accent) */
-    --color-premium-accent: #0066cc;
-    --color-premium-purple: #0066cc;
+    /* Institutional brand palette — Rede Federal / Ifes
+       AJUSTAR: confirmar todos os hex no manual de identidade do Ifes. */
+    --color-brand-green: var(--brand-green);
+    --color-brand-green-dark: var(--brand-green-dark);
+    --color-brand-yellow: var(--brand-yellow);
+    --color-brand-red: var(--brand-red);
+    --color-brand-blue: var(--brand-blue);
+
+    /* Accent aliases kept for backward compat with existing components.
+       Both now resolve to institutional greens (see :root). */
+    --color-premium-accent: var(--accent);
+    --color-premium-purple: var(--accent-2);
 
     --background-image-premium-gradient: var(--page-gradient);
 
-    /* Typography — Apple system stack (SF Pro on Apple devices) */
-    --font-sans: "SF Pro Text", "SF Pro Display", -apple-system,
-        BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial,
-        sans-serif;
-    --font-display: "SF Pro Display", "SF Pro Text", -apple-system,
-        BlinkMacSystemFont, system-ui, sans-serif;
+    /* Typography — Ubuntu (fonte digital da Rede Federal).
+       AJUSTAR: confirmar com a comunicação do Ifes se Ubuntu é a fonte oficial.
+       Ubuntu só tem 400/500/700 — não usar 600. Ubuntu Mono p/ números, ticks
+       de eixo e rótulos de KPI. Arquivos self-hosted em /public/fonts
+       (@font-face montado no Layout respeitando o base path). */
+    --font-sans: "Ubuntu", "Segoe UI", system-ui, -apple-system,
+        BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    --font-display: "Ubuntu", "Segoe UI", system-ui, -apple-system,
+        BlinkMacSystemFont, sans-serif;
+    --font-mono: "Ubuntu Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+        monospace;
     --default-font-family: var(--font-sans);
 }
 
 @layer base {
     :root {
-        /* Light Mode — Apple canvas: white + parchment, ink text, hairlines */
-        --bg-primary: #ffffff;
-        --text-primary: #1d1d1f;
-        --text-secondary: #6e6e73;
-        --border-primary: #d2d2d7;
-        --glass-surface: rgba(255, 255, 255, 0.72);
-        --page-gradient: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
-        --tag-bg: #f5f5f7;
-        --tag-bg-accent: #e8e8ed;
+        /* ── Light mode: verde Ifes sobre off-white. Experiência padrão. ── */
 
-        /* Light Mode Override for Accent */
-        --color-premium-accent: #0066cc;
+        /* AJUSTAR: confirmar no manual do Ifes.
+           Verde primário para preenchimentos/gráficos (contraste gráfico ≥3:1).
+           Verde escuro para texto/links/títulos (passa AA 4.5:1 sobre branco). */
+        --brand-green: #009640; /* AJUSTAR: verde Ifes primário */
+        --brand-green-dark: #006b3f; /* AJUSTAR: verde Ifes escuro */
+        --brand-yellow: #fdb913; /* AJUSTAR: amarelo da faixa */
+        --brand-red: #e30613; /* AJUSTAR: vermelho da faixa */
+        --brand-blue: #0072bc; /* AJUSTAR: azul da faixa */
+
+        /* Acentos semânticos: usam verde escuro no texto para não reprovar AA. */
+        --accent: var(--brand-green-dark);
+        --accent-2: var(--brand-green);
+
+        /* Superfícies e texto */
+        --bg-primary: #f5f7f5; /* fundo base */
+        --surface: #ffffff; /* superfícies/cards */
+        --text-primary: #1a2b22; /* AJUSTAR: tinta institucional */
+        --text-secondary: #5a6b61; /* muted — passa AA para texto normal */
+        --text-tertiary: #8a9990; /* muted-2 — só decorativo/rótulos grandes */
+        --border-primary: #e1e7e2; /* linhas/bordas */
+        --track: #eaefea; /* trilho de barras sobre card branco */
+        --glass-surface: #ffffff;
+        --page-gradient: linear-gradient(180deg, #ffffff 0%, #f5f7f5 100%);
+        --tag-bg: #eef2ef;
+        --tag-bg-accent: #e1e7e2;
 
         /* Text Scaling */
         --base-font-size: 100%;
@@ -68,45 +100,72 @@
     }
 
     :root.dark {
-        /* Dark Mode — Apple: true black canvas, near-white ink, faint hairline */
-        --bg-primary: #000000;
-        --text-primary: #f5f5f7;
-        --text-secondary: #a1a1a6;
-        --border-primary: rgba(255, 255, 255, 0.12);
-        --glass-surface: rgba(29, 29, 31, 0.72);
-        --page-gradient: linear-gradient(180deg, #1d1d1f 0%, #000000 100%);
-        --tag-bg: #1d1d1f;
-        --tag-bg-accent: #2a2a2c;
+        /* ── Dark mode: variantes correspondentes do verde Ifes. ── */
+        --brand-green: #12b24a; /* AJUSTAR: verde primário (mais vivo p/ fundo escuro) */
+        --brand-green-dark: #0b8a3c; /* AJUSTAR */
+        --brand-yellow: #ffc73a; /* AJUSTAR: amarelo da faixa (dark) */
+        --brand-red: #ff5a4d; /* AJUSTAR: vermelho da faixa (dark) */
+        --brand-blue: #3ba0e0; /* AJUSTAR: azul da faixa (dark) */
 
-        /* Dark Mode Override for Accent */
-        --color-premium-accent: #2997ff;
-        --color-premium-purple: #2997ff;
+        /* No escuro o acento de texto precisa ser claro para passar AA. */
+        --accent: #3ddc84; /* verde claro p/ texto/links sobre fundo escuro */
+        --accent-2: var(--brand-green);
+
+        --bg-primary: #0e1512;
+        --surface: #16201b;
+        --text-primary: #eaf1ec;
+        --text-secondary: #9fb0a6;
+        --text-tertiary: #7e9187;
+        --border-primary: rgba(255, 255, 255, 0.12);
+        --track: #24322b;
+        --glass-surface: #16201b;
+        --page-gradient: linear-gradient(180deg, #16201b 0%, #0e1512 100%);
+        --tag-bg: #1b2721;
+        --tag-bg-accent: #24322b;
     }
 
     :root.contrast-high {
         --bg-primary: #0a0a0a;
+        --surface: #101410;
         --text-primary: #ffffff;
         --text-secondary: #e0e0e0;
+        --text-tertiary: #c8d2cc;
         --border-primary: rgba(255, 255, 255, 0.3);
-        --glass-surface: rgba(10, 10, 10, 0.8);
+        --track: #23291f;
+        --glass-surface: #101410;
         --page-gradient: none;
-        --tag-bg: #1a1a1a;
-        --tag-bg-accent: #2a2a2a;
-        --color-premium-accent: #60d5ff;
-        --color-premium-purple: #a78bfa;
+        --tag-bg: #151a15;
+        --tag-bg-accent: #23291f;
+        /* Verde de alta visibilidade sobre fundo quase preto (passa AA). */
+        --accent: #3ddc84; /* AJUSTAR: verde de alto contraste */
+        --accent-2: #5be09a;
+        --brand-green: #3ddc84;
+        --brand-green-dark: #2ec06f;
+        --brand-yellow: #ffd23a;
+        --brand-red: #ff6a5d;
+        --brand-blue: #57b6ee;
     }
 
     :root.contrast-maximum {
         --bg-primary: #000000;
+        --surface: #000000;
         --text-primary: #ffffff;
         --text-secondary: #ffff00;
+        --text-tertiary: #ffff00;
         --border-primary: #ffffff;
+        --track: #333333;
         --glass-surface: #000000;
         --page-gradient: none;
         --tag-bg: #000000;
         --tag-bg-accent: #ffffff;
-        --color-premium-accent: #ffff00;
-        --color-premium-purple: #ffffff;
+        /* Máximo contraste: convenção amarelo/branco sobre preto. */
+        --accent: #ffff00;
+        --accent-2: #ffffff;
+        --brand-green: #00ff6a;
+        --brand-green-dark: #00e05c;
+        --brand-yellow: #ffff00;
+        --brand-red: #ff5a4d;
+        --brand-blue: #57b6ee;
     }
 
     /* Accessibility: Reduce Motion */
@@ -123,7 +182,7 @@
     :root.enhanced-focus :focus-visible {
         outline: 4px solid var(--color-premium-accent) !important;
         outline-offset: 4px !important;
-        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2) !important;
+        box-shadow: 0 0 0 4px rgba(0, 150, 64, 0.25) !important;
     }
 
     /* Accessibility: Screen Reader Optimization */

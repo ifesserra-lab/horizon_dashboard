@@ -16,6 +16,17 @@ const campuses = getRealCampuses();
 const campusCatalog = campuses.map(({ id, name, slug }) => ({ id, name, slug }));
 const baseUrlValue = import.meta.env.BASE_URL;
 const navBasePath = import.meta.env.BASE_URL;
+
+// Fontes institucionais (Ubuntu / Ubuntu Mono) self-hosted.
+// @font-face montado aqui para respeitar o base path do GitHub Pages.
+const fontBase = `${import.meta.env.BASE_URL}fonts/`;
+const fontFaceCss = `
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;font-display:swap;src:url('${fontBase}Ubuntu-400.woff2') format('woff2');}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:500;font-display:swap;src:url('${fontBase}Ubuntu-500.woff2') format('woff2');}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:700;font-display:swap;src:url('${fontBase}Ubuntu-700.woff2') format('woff2');}
+@font-face{font-family:'Ubuntu Mono';font-style:normal;font-weight:400;font-display:swap;src:url('${fontBase}UbuntuMono-400.woff2') format('woff2');}
+@font-face{font-family:'Ubuntu Mono';font-style:normal;font-weight:700;font-display:swap;src:url('${fontBase}UbuntuMono-700.woff2') format('woff2');}
+`;
 const pathSegments = Astro.url.pathname
 	.replace(import.meta.env.BASE_URL, "/")
 	.split("/")
@@ -27,7 +38,7 @@ const currentCampusId =
 ---
 
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 	<head>
 		<meta charset="UTF-8" />
 		<meta
@@ -75,12 +86,22 @@ const currentCampusId =
 			)}
 		/>
 
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<!-- Fontes institucionais self-hosted (sem chamada a CDN externa) -->
 		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			href={`${fontBase}Ubuntu-400.woff2`}
+			as="font"
+			type="font/woff2"
+			crossorigin
 		/>
+		<link
+			rel="preload"
+			href={`${fontBase}Ubuntu-700.woff2`}
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<style is:global set:html={fontFaceCss}></style>
 		<title>{title} | Horizon</title>
 
 		<script is:inline>
@@ -88,9 +109,10 @@ const currentCampusId =
 			function applyThemeSettings() {
 				if (typeof localStorage === "undefined") return;
 
-				// 1. Theme
+				// 1. Theme — claro é o padrão canônico (Ifes / Rede Federal).
+				// O modo escuro continua disponível pelo botão e persiste.
 				const themePreference =
-					localStorage.getItem("theme-preference") || "auto";
+					localStorage.getItem("theme-preference") || "light";
 				let theme = themePreference;
 
 				if (theme === "auto") {
@@ -222,7 +244,7 @@ const currentCampusId =
 		</script>
 	</head>
 	<body
-		class="bg-page-bg text-text-main font-['Inter'] min-h-screen selection:bg-premium-accent/30 transition-colors duration-300"
+		class="bg-page-bg text-text-main font-sans min-h-screen selection:bg-premium-accent/30 transition-colors duration-300"
 	>
 		<a
 			href={`#main-content`}
