@@ -1,15 +1,67 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import HomeHero from "../components/home/HomeHero.astro";
+import groupsData from "../data/research_groups_canonical.json";
+import projectsData from "../data/initiatives_canonical.json";
+import { researcherCollectionCounts } from "../lib/researcher-collections";
+import {
+    getAggregatedPublications,
+    buildPublicationsMart,
+} from "../lib/publications-data";
 
 const base = import.meta.env.BASE_URL;
 const indexUrl = `${base}search-index.json`;
+
+// Números do acervo (dado canônico) — coerentes com as páginas de seção.
+const nf = (n: number) => n.toLocaleString("pt-BR");
+const nGroups = (groupsData as any[]).length;
+const nProjects = (projectsData as any[]).length;
+const nResearchers = researcherCollectionCounts.researchers;
+const nPublications = buildPublicationsMart(
+    getAggregatedPublications(),
+).summary.total_publications;
+const nAreas = new Set(
+    (groupsData as any[]).flatMap((g) =>
+        (g.knowledge_areas || []).map((a: any) => a.id),
+    ),
+).size;
+
+// type = tipo no índice de busca (para os números baterem com as facetas).
+// "area" não existe no índice → usa o valor do servidor (data-areas).
+const stats = [
+    { type: "publicacao", n: nPublications, label: "publicações" },
+    { type: "pesquisador", n: nResearchers, label: "pesquisadores" },
+    { type: "projeto", n: nProjects, label: "projetos" },
+    { type: "area", n: nAreas, label: "áreas de conhecimento" },
+];
+
+const ICON = {
+    groups: `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>`,
+    people: `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>`,
+    projects: `<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path>`,
+    book: `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>`,
+    download: `<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line>`,
+};
+
+const tiles = [
+    { label: "Grupos", href: `${base}groups`, type: "grupo", n: nGroups, word: "grupos", icon: ICON.groups },
+    { label: "Pesquisadores", href: `${base}researchers`, type: "pesquisador", n: nResearchers, word: "perfis", icon: ICON.people },
+    { label: "Projetos", href: `${base}projects`, type: "projeto", n: nProjects, word: "iniciativas", icon: ICON.projects },
+    { label: "Publicações", href: `${base}publications`, type: "publicacao", n: nPublications, word: "trabalhos", icon: ICON.book },
+    { label: "Áreas", href: `${base}knowledge-areas`, type: "area", n: nAreas, word: "áreas", icon: ICON.book },
+    { label: "Dados abertos", href: `${base}download`, type: null, sub: "baixar bases", icon: ICON.download },
+];
 ---
 
 <Layout title="Buscar pesquisa">
-    <div class="max-w-4xl mx-auto px-1" data-base={base} data-index-url={indexUrl}>
+    <div
+        class="max-w-4xl mx-auto px-1"
+        data-base={base}
+        data-index-url={indexUrl}
+        data-areas={nAreas}
+    >
         <!-- Hero — editorial, left-aligned -->
-        <section class="pt-12 pb-10">
+        <section class="pt-12 pb-8">
             <p
                 class="font-mono text-xs uppercase tracking-[0.2em] text-text-muted mb-4"
             >
@@ -27,36 +79,29 @@ const indexUrl = `${base}search-index.json`;
                     class="text-premium-accent">Ifes</span
                 >.
             </p>
-            <p class="mt-3 text-base text-text-muted max-w-xl leading-relaxed">
-                Uma busca, três perspectivas. Os resultados se ajustam a quem
-                procura.
-            </p>
 
-            <!-- Assinatura: publicações por ano (linha do horizonte) -->
-            <HomeHero />
-
-            <!-- Search field: single hairline-underlined input -->
-            <div class="mt-8 relative border-b-2 border-text-main/80 focus-within:border-premium-accent transition-colors">
+            <!-- Busca — ação principal, no topo -->
+            <div class="home-search mt-8">
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                    ><circle cx="11" cy="11" r="7"></circle><path
+                        d="m21 21-4.3-4.3"></path></svg
+                >
                 <input
                     type="search"
                     id="q"
                     autocomplete="off"
-                    class="w-full bg-transparent py-3 pr-8 text-2xl font-display text-text-main placeholder:text-text-muted/60 focus:outline-none"
+                    aria-label="Buscar pesquisas, pessoas e grupos"
                 />
-                <svg
-                    class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    ><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"
-                    ></path></svg
-                >
             </div>
 
-            <!-- Persona — quiet inline segmented text -->
+            <!-- Personas -->
             <div
-                class="mt-5 flex items-center gap-1 text-sm"
+                class="mt-4 flex items-center flex-wrap gap-2 text-sm"
                 role="group"
                 aria-label="Quem está buscando"
             >
@@ -64,23 +109,73 @@ const indexUrl = `${base}search-index.json`;
                 <button type="button" data-persona="aluno" class="persona-btn"
                     >aluno</button
                 >
-                <span class="text-text-muted/40">·</span>
                 <button type="button" data-persona="professor" class="persona-btn"
                     >professor</button
                 >
-                <span class="text-text-muted/40">·</span>
                 <button type="button" data-persona="empresa" class="persona-btn"
                     >empresa</button
                 >
             </div>
             <p id="lens" class="mt-2 text-sm text-text-muted"></p>
-
-            <!-- Suggestions as plain text links -->
             <p
                 id="suggest"
-                class="mt-6 text-sm text-text-muted flex flex-wrap gap-x-4 gap-y-1"
+                class="mt-4 text-sm text-text-muted flex flex-wrap gap-x-4 gap-y-1"
             >
             </p>
+
+            <!-- Números do acervo -->
+            <div class="home-stats mt-8" aria-label="Números do acervo">
+                {
+                    stats.map((s) => (
+                        <div>
+                            <div class="n" data-count={s.type}>
+                                {nf(s.n)}
+                            </div>
+                            <div class="l">{s.label}</div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Entradas por seção -->
+            <div class="home-tiles mt-4">
+                {
+                    tiles.map((t) => (
+                        <a class="home-tile" href={t.href}>
+                            <span class="ic">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                    set:html={t.icon}
+                                />
+                            </span>
+                            <span class="tx">
+                                <span class="t">{t.label}</span>
+                                <span class="c">
+                                    {t.type ? (
+                                        <>
+                                            <span data-count={t.type}>{nf(t.n)}</span> {t.word}
+                                        </>
+                                    ) : (
+                                        t.sub
+                                    )}
+                                </span>
+                            </span>
+                            <span class="arw" aria-hidden="true">
+                                →
+                            </span>
+                        </a>
+                    ))
+                }
+            </div>
+
+            <!-- Assinatura: publicações por ano (linha do horizonte) -->
+            <HomeHero />
         </section>
 
         <!-- Results -->
@@ -128,20 +223,162 @@ const indexUrl = `${base}search-index.json`;
 
     <style>
         .persona-btn {
+            border: 1px solid var(--border-primary);
+            border-radius: 999px;
+            padding: 5px 13px;
+            line-height: 1.2;
             color: var(--text-secondary);
-            padding: 0 2px;
-            transition: color 0.15s;
+            background: var(--surface);
+            transition: all 0.15s;
         }
         .persona-btn:hover {
-            color: var(--text-primary);
+            color: var(--color-premium-accent);
+            border-color: var(--color-premium-accent);
         }
         .persona-btn[aria-pressed="true"] {
-            color: var(--color-premium-accent);
-            font-weight: 600;
+            background: var(--brand-green-dark);
+            color: #fff;
+            border-color: var(--brand-green-dark);
+            font-weight: 500;
         }
         .facet-btn[aria-pressed="true"] {
             color: var(--text-primary);
-            font-weight: 600;
+            font-weight: 700;
+        }
+
+        /* Busca — ação principal, no topo */
+        .home-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface);
+            border: 1.5px solid var(--border-primary);
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 6px 20px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.15s;
+        }
+        .home-search:focus-within {
+            border-color: var(--brand-green);
+        }
+        .home-search svg {
+            width: 22px;
+            height: 22px;
+            color: var(--text-secondary);
+            flex: none;
+        }
+        .home-search input {
+            border: 0;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 1.2rem;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        .home-search input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Números do acervo */
+        .home-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--border-primary);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .home-stats > div {
+            padding: 16px 18px;
+        }
+        .home-stats > div + div {
+            border-left: 1px solid var(--border-primary);
+        }
+        .home-stats .n {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--color-premium-accent);
+            font-variant-numeric: tabular-nums;
+        }
+        .home-stats .l {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        @media (max-width: 640px) {
+            .home-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .home-stats > div:nth-child(3) {
+                border-left: 0;
+            }
+            .home-stats > div:nth-child(3),
+            .home-stats > div:nth-child(4) {
+                border-top: 1px solid var(--border-primary);
+            }
+        }
+
+        /* Entradas por seção */
+        .home-tiles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .home-tiles {
+                grid-template-columns: 1fr;
+            }
+        }
+        .home-tile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border-primary);
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: border-color 0.15s, transform 0.15s;
+        }
+        .home-tile:hover {
+            border-color: var(--color-premium-accent);
+            transform: translateY(-1px);
+        }
+        .home-tile .ic {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            flex: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in srgb, var(--brand-green) 12%, transparent);
+            color: var(--brand-green-dark);
+        }
+        .home-tile .ic svg {
+            width: 20px;
+            height: 20px;
+        }
+        .home-tile .tx {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .home-tile .t {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .home-tile .c {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+        .home-tile .arw {
+            margin-left: auto;
+            color: var(--text-tertiary);
         }
     </style>
 
@@ -172,6 +409,21 @@ const indexUrl = `${base}search-index.json`;
         const root = document.querySelector("[data-index-url]") as HTMLElement;
         const base = root.dataset.base || "/";
         const indexUrl = root.dataset.indexUrl as string;
+        const areasCount = Number(root.dataset.areas) || 0;
+
+        // Preenche os números do acervo (stats + tiles) a partir do índice,
+        // para baterem com as facetas. "area" não está no índice → valor do servidor.
+        function fillCounts() {
+            const counts: Record<string, number> = { area: areasCount };
+            for (const e of entries) counts[e.t] = (counts[e.t] || 0) + 1;
+            document
+                .querySelectorAll<HTMLElement>("[data-count]")
+                .forEach((el) => {
+                    const t = el.dataset.count as string;
+                    if (typeof counts[t] === "number")
+                        el.textContent = counts[t].toLocaleString("pt-BR");
+                });
+        }
 
         const TYPE_LABEL: Record<string, string> = {
             pesquisador: "Pesquisador",
@@ -406,6 +658,7 @@ const indexUrl = `${base}search-index.json`;
             .then((data: Entry[]) => {
                 entries = data;
                 for (const e of entries) e._s = normalizeSearchText(searchText(e));
+                fillCounts();
                 buildSuggest();
                 render();
             })
