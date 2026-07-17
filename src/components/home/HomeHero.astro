@@ -68,6 +68,10 @@ const ariaLabel =
 {
 	series.length > 1 && (
 		<figure class="home-hero not-sr-only" role="img" aria-label={ariaLabel}>
+			<div class="home-hero-head">
+				<span class="hero-title">Publicações por ano</span>
+				<span class="hero-total">{total.toLocaleString("pt-BR")} no total</span>
+			</div>
 			<svg
 				viewBox={`0 0 ${W} ${H}`}
 				preserveAspectRatio="none"
@@ -146,7 +150,30 @@ const ariaLabel =
 
 <style>
 	.home-hero {
-		margin-top: 1.75rem;
+		margin-top: 2rem;
+		padding: 1rem 1.25rem 0.75rem;
+		border: 1px solid var(--border-primary);
+		border-radius: 1rem;
+		background: var(--surface);
+	}
+	.home-hero-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.5rem;
+	}
+	.hero-title {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--text-secondary);
+	}
+	.hero-total {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		color: var(--brand-green-dark);
 	}
 	.home-hero-caption {
 		display: flex;
