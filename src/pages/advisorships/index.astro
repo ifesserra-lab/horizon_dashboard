@@ -217,21 +217,41 @@ const fellowshipEvolution = uniqueFellowships.map((fName, i) => {
 
 const fellowshipFinancialEvolution = uniqueFellowships.map((fName, i) => {
     const data = yearRange.map((year) => {
+        // Investimento anual = valor mensal da bolsa × meses ativos no ano.
+        const yearStart = new Date(year, 0, 1);
+        const yearEnd = new Date(year, 11, 31);
         const total = allAdvisorships
             .filter((a) => {
                 if (a.fellowship?.name !== fName) return false;
                 if (!a.start_date) return false;
-
-                const start = new Date(a.start_date).getFullYear();
+                const start = new Date(
+                    String(a.start_date).replace(" ", "T"),
+                ).getFullYear();
                 const end = a.end_date
-                    ? new Date(a.end_date).getFullYear()
+                    ? new Date(String(a.end_date).replace(" ", "T")).getFullYear()
                     : currentYear;
-
                 return year >= start && year <= end;
             })
             .reduce((acc, curr) => {
                 const val = parseFloat(String(curr.fellowship?.value || "0"));
-                return acc + val;
+                if (!val) return acc;
+                const s = curr.start_date
+                    ? new Date(String(curr.start_date).replace(" ", "T"))
+                    : yearStart;
+                const e = curr.end_date
+                    ? new Date(String(curr.end_date).replace(" ", "T"))
+                    : yearEnd;
+                const es = s > yearStart ? s : yearStart;
+                const ee = e < yearEnd ? e : yearEnd;
+                if (es > ee) return acc;
+                const months = Math.max(
+                    0,
+                    ee.getFullYear() * 12 +
+                        ee.getMonth() -
+                        (es.getFullYear() * 12 + es.getMonth()) +
+                        1,
+                );
+                return acc + val * months;
             }, 0);
         return { year, value: total };
     });

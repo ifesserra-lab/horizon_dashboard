@@ -467,7 +467,7 @@ const groupDetailSections = [
 					<p class="text-text-secondary leading-relaxed">
 						{
 							group.description ||
-								"Este grupo de pesquisa foca em estudos avançados e desenvolvimento científico na sua respectiva área, contribuindo para o ecossistema acadêmico da instituição."
+								"Este grupo ainda não cadastrou uma descrição."
 						}
 					</p>
 				</div>
@@ -1031,24 +1031,29 @@ const groupDetailSections = [
 					id="additional-info-title"
 					class="text-text-main font-bold mb-4"
 				>
-					Informações Adicionais
+					Informações adicionais
 				</h4>
 				<div class="space-y-4">
 					<div class="flex justify-between text-xs">
 						<span class="text-text-secondary font-bold"
-							>Site Oficial</span
+							>Site oficial</span
 						>
-						<span class="text-text-main truncate ml-4"
-							>{group.site || "Não informado"}</span
-						>
-					</div>
-					<div class="flex justify-between text-xs">
-						<span class="text-text-secondary font-bold"
-							>Ano de Início</span
-						>
-						<span class="text-text-main font-bold"
-							>2023 (Exemplo)</span
-						>
+						{
+							group.site ? (
+								<a
+									href={group.site}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="text-premium-accent truncate ml-4 hover:underline"
+								>
+									{group.site}
+								</a>
+							) : (
+								<span class="text-text-main truncate ml-4">
+									Não informado
+								</span>
+							)
+						}
 					</div>
 				</div>
 			</section>
