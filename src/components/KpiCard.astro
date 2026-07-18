@@ -90,8 +90,10 @@ const countTo = canCount ? Number(raw.replace(/\./g, "")) : null;
 
     const run = (el: HTMLElement) => {
       // Alvo lido do texto atual (respeita atualizações por filtro de campus).
+      // Ler ANTES de zerar, senão anima de 0 até 0.
       const to = Number((el.textContent || "").replace(/\./g, "").trim());
       if (!Number.isFinite(to)) return;
+      el.textContent = "0";
       const duration = 1200;
       let start: number | null = null;
       const tick = (ts: number) => {
@@ -108,10 +110,8 @@ const countTo = canCount ? Number(raw.replace(/\./g, "")) : null;
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            el.textContent = "0";
-            run(el);
-            io.unobserve(el);
+            run(entry.target as HTMLElement);
+            io.unobserve(entry.target);
           }
         });
       },

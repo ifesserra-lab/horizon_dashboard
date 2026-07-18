@@ -5,10 +5,36 @@ import type { ResearchGroup } from '../../types/groups';
 import { buildSearchIndex } from '../../lib/search';
 
 const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompare(b.name));
+
+// Indicadores dos grupos (reagem ao filtro de campus).
+const nf = (n: number) => n.toLocaleString("pt-BR");
+const distinctAreas = (gs: ResearchGroup[]) =>
+	new Set(gs.flatMap((g) => (g.knowledge_areas || []).map((a) => a.id))).size;
+const statFor = (gs: ResearchGroup[]) => ({
+	grupos: gs.length,
+	membros: gs.reduce((acc, g) => acc + (g.members?.length || 0), 0),
+	lideres: gs.reduce((acc, g) => acc + (g.leaders?.length || 0), 0),
+	areas: distinctAreas(gs),
+});
+const globalStats = statFor(groups);
+const byCampus: Record<string, ResearchGroup[]> = {};
+for (const g of groups) {
+	const id = String(g.campus?.id ?? "");
+	if (id) (byCampus[id] ||= []).push(g);
+}
+const campusStatsMap = Object.fromEntries(
+	Object.entries(byCampus).map(([id, gs]) => [id, statFor(gs)]),
+);
+const kpiDefs = [
+	{ key: "grupos", label: "grupos" },
+	{ key: "membros", label: "integrantes" },
+	{ key: "lideres", label: "líderes" },
+	{ key: "areas", label: "áreas" },
+];
 ---
 
-<Layout title="Grupos de Pesquisa">
-	<header class="mb-10">
+<Layout title="Grupos de pesquisa">
+	<header class="mb-8">
 		<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
 			<div>
 				<h1 class="text-4xl font-bold font-display tracking-tight text-text-main">
@@ -33,6 +59,28 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 			</div>
 		</div>
 	</header>
+
+	<div
+		class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border-main border border-border-main rounded-2xl overflow-hidden mb-10"
+		id="groupKpis"
+		role="region"
+		aria-label="Indicadores dos grupos"
+		data-group-stats={JSON.stringify({ global: globalStats, campus: campusStatsMap })}
+	>
+		{
+			kpiDefs.map((k) => (
+				<div class="bg-surface p-4">
+					<div
+						class="font-mono text-2xl font-bold text-premium-accent tabular-nums"
+						data-gstat={k.key}
+					>
+						{nf(globalStats[k.key as keyof typeof globalStats])}
+					</div>
+					<div class="text-xs text-text-secondary mt-1">{k.label}</div>
+				</div>
+			))
+		}
+	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="groupsGrid" role="region" aria-label="Catálogo de grupos">
 		{groups.map(group => (
@@ -115,7 +163,27 @@ const groups = (groupsData as ResearchGroup[]).sort((a, b) => a.name.localeCompa
 		const groupCards = document.querySelectorAll('.group-card');
 		let currentCampusId = localStorage.getItem('preferred-campus') || '';
 
+		// Indicadores reagem ao campus selecionado.
+		const kpiEl = document.getElementById('groupKpis');
+		const groupStats = kpiEl
+			? JSON.parse(kpiEl.dataset.groupStats || '{}')
+			: { global: {}, campus: {} };
+		function updateGroupKpis(campusId: string) {
+			const s =
+				(campusId && groupStats.campus?.[campusId]) ||
+				groupStats.global ||
+				{};
+			document
+				.querySelectorAll<HTMLElement>('[data-gstat]')
+				.forEach((el) => {
+					const v = s[el.dataset.gstat as string];
+					if (typeof v === 'number')
+						el.textContent = v.toLocaleString('pt-BR');
+				});
+		}
+
 		function filterGroups() {
+			updateGroupKpis(currentCampusId);
 			const query = normalizeSearchText(searchInput?.value || '');
 			let visibleCount = 0;
 
