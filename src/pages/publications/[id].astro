@@ -8,6 +8,7 @@ import {
     researchersOnly,
     studentsResearchers,
 } from "../../lib/researcher-collections";
+import { getArticleImpact, oaLabel } from "../../lib/article-impact";
 
 export function getStaticPaths() {
     const publications = getAggregatedPublications();
@@ -44,6 +45,24 @@ const typeLabel =
 const doiUrl = publication.doi
     ? `https://doi.org/${String(publication.doi).replace(/^https?:\/\/(dx\.)?doi\.org\//i, "")}`
     : null;
+
+const impact = getArticleImpact(publication.id);
+const impactStats = impact
+    ? [
+          impact.cited_by_count != null && {
+              value: impact.cited_by_count.toLocaleString("pt-BR"),
+              label: "citações",
+              hint: "OpenAlex",
+          },
+          impact.fwci != null && {
+              value: impact.fwci.toLocaleString("pt-BR", {
+                  maximumFractionDigits: 2,
+              }),
+              label: "FWCI",
+              hint: "1,0 = média mundial",
+          },
+      ].filter(Boolean)
+    : [];
 
 const venue = String(publication.journal_conference || "").trim();
 const meta: string[] = [];
@@ -151,6 +170,58 @@ if (publication.campus_name) meta.push(publication.campus_name);
                             </span>
                         </a>
                     </div>
+                )
+            }
+
+            {
+                impact && (
+                    <section class="space-y-3">
+                        {impact.is_retracted && (
+                            <p class="text-sm font-bold text-brand-red">
+                                ⚠ Artigo retratado (retracted).
+                            </p>
+                        )}
+                        <div class="flex flex-wrap items-center gap-3">
+                            {impact.is_oa && impact.oa_url && (
+                                <a
+                                    href={impact.oa_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Ler em acesso aberto (abre em nova aba)"
+                                    class="inline-flex items-center gap-2 text-sm font-bold text-white bg-brand-green hover:bg-brand-green-dark rounded-lg px-4 py-2 transition-colors"
+                                >
+                                    Ler (acesso aberto)
+                                </a>
+                            )}
+                            {impact.oa_status && (
+                                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-premium-accent bg-brand-green/10 border border-brand-green/20 rounded-full px-3 py-1">
+                                    {oaLabel(impact.oa_status)}
+                                </span>
+                            )}
+                            {impact.topic && (
+                                <span class="text-xs text-text-muted">
+                                    Tópico: {impact.topic}
+                                </span>
+                            )}
+                        </div>
+                        {impactStats.length > 0 && (
+                            <div class="flex flex-wrap gap-6">
+                                {impactStats.map((s: any) => (
+                                    <div>
+                                        <div class="font-display text-2xl font-bold text-premium-accent tabular-nums">
+                                            {s.value}
+                                        </div>
+                                        <div class="text-[11px] text-text-muted uppercase tracking-wide">
+                                            {s.label}{" "}
+                                            <span class="text-text-muted-2">
+                                                · {s.hint}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </section>
                 )
             }
 
