@@ -1,0 +1,14 @@
+# Deploy do Horizon como site estático no Render, na raiz (base = /).
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: horizon-dashboard
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: SITE_BASE
+        value: /
+      # Opcional: defina a URL pública para OG/canonical corretos.
+      # - key: SITE_URL
+      #   value: https://horizon-dashboard.onrender.com
