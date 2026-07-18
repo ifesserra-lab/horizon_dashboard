@@ -9,7 +9,7 @@ interface Props {
 
 const {
     articles,
-    title = "Produção Científica por Ano",
+    title = "Produção científica por ano",
     showTitle = true,
 } = Astro.props;
 
@@ -52,6 +52,13 @@ if (yearData.length > 0) {
 }
 
 const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
+
+// Accessible description for the (non-SVG) bar chart region.
+const totalArticles = continuousData.reduce((sum, d) => sum + d.count, 0);
+const chartAriaLabel =
+    continuousData.length > 0
+        ? `Gráfico de barras da produção científica por ano, de ${continuousData[0].year} a ${continuousData[continuousData.length - 1].year}, com ${totalArticles} ${totalArticles === 1 ? "publicação" : "publicações"} no total.`
+        : "Gráfico de produção científica por ano sem dados.";
 ---
 
 <div
@@ -62,7 +69,8 @@ const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
             <h4 class="text-sm font-bold text-text-main uppercase tracking-wider mb-6 flex items-center gap-2">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-blue-500"
+                    aria-hidden="true"
+                    class="w-4 h-4 text-premium-accent"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -84,26 +92,30 @@ const maxCount = Math.max(...continuousData.map((d) => d.count), 1);
     {
         continuousData.length > 0 ? (
             <div class="flex-1 flex flex-col">
-                <div class="flex-1 flex items-end gap-1 min-h-[150px] mb-4 mt-8 group/chart">
+                <div
+                    class="flex-1 flex items-end gap-1 min-h-[150px] mb-4 mt-8 group/chart"
+                    role="img"
+                    aria-label={chartAriaLabel}
+                >
                     {continuousData.map((data) => {
                         const height = (data.count / maxCount) * 100;
                         return (
                             <div class="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
                                 {/* Bar Label (Visible always) */}
-                                <span class="absolute -top-6 text-[10px] font-bold text-blue-500 opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                <span class="absolute -top-6 text-[10px] font-bold text-premium-accent opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                                     {data.count}
                                 </span>
 
                                 {/* Tooltip */}
-                                <div class="absolute bottom-full mb-2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-xl border border-white/10">
+                                <div class="absolute bottom-full mb-2 bg-text-main text-page-bg text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-xl border border-border-main">
                                     {data.year}: {data.count}{" "}
                                     {data.count === 1 ? "artigo" : "artigos"}
-                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45" />
+                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-text-main rotate-45" />
                                 </div>
 
                                 {/* Bar */}
                                 <div
-                                    class="w-full bg-gradient-to-t from-blue-500/40 to-blue-500 hover:to-blue-400 transition-all duration-500 rounded-t-sm shadow-sm opacity-90 hover:!opacity-100"
+                                    class="w-full bg-gradient-to-t from-brand-green/40 to-brand-green hover:to-brand-green-dark transition-all duration-500 rounded-t-sm shadow-sm opacity-90 hover:!opacity-100"
                                     style={`height: ${Math.max(height, 4)}%`}
                                 />
                             </div>

@@ -38,7 +38,6 @@ const graphTitle =
         : "Grafo de relacionamento";
 const graphBadge =
     graph.graphKind === "collaboration" ? "Colaboração direta" : "Relacionamento direto";
-const graphDataSource = graph.graphDataSource;
 const focusEntityLabel =
     graph.focusClassification === "student"
         ? "estudante"
@@ -49,20 +48,20 @@ const focusEntityLabel =
             : "perfil";
 const graphDescriptionTail =
     graph.graphKind === "collaboration"
-        ? `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas as colaborações diretas registradas no export.`
-        : `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas os relacionamentos diretos registrados no export.`;
+        ? `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas as colaborações diretas registradas nos dados.`
+        : `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas os relacionamentos diretos registrados nos dados.`;
 const graphEmptyDescription =
     graph.graphKind === "collaboration"
-        ? `Nenhuma colaboração direta foi registrada para este ${focusEntityLabel} neste recorte.`
-        : `Nenhum relacionamento direto foi registrado para este ${focusEntityLabel} neste recorte.`;
+        ? `Nenhuma colaboração direta foi registrada para este ${focusEntityLabel} nesta rede.`
+        : `Nenhum relacionamento direto foi registrado para este ${focusEntityLabel} nesta rede.`;
 const graphConceptHeading =
     graph.graphKind === "collaboration"
         ? "Como ler o grafo de colaboração"
         : "Como ler o grafo de relacionamento";
 const graphConceptText =
     graph.graphKind === "collaboration"
-        ? "Este recorte prioriza trabalho conjunto explícito, como projeto, artigo e orientação. Por isso ele tende a ser menor e mais seletivo."
-        : "Este recorte é mais amplo e registra vínculos acadêmicos ou institucionais. Dependendo do export, ele pode incluir projeto, artigo, orientação, iniciativa compartilhada e sobreposição em grupos, então costuma ser mais denso que o grafo de colaboração.";
+        ? "Esta visão prioriza trabalho conjunto explícito, como projeto, artigo e orientação. Por isso ela tende a ser menor e mais seletiva."
+        : "Esta visão é mais ampla e registra vínculos acadêmicos ou institucionais. Dependendo dos dados, ela pode incluir projeto, artigo, orientação, iniciativa compartilhada e sobreposição em grupos, então costuma ser mais densa que o grafo de colaboração.";
 
 const focusNode = graph.nodes.find((node) => node.isFocus) ?? graph.nodes[0];
 const edgeByTargetId = new Map(graph.edges.map((edge) => [edge.target, edge]));
@@ -234,7 +233,7 @@ const createGraphLayout = (
 const layout = createGraphLayout(focusNode, neighborNodes);
 const graphDescriptionText =
     graph.stats.edgeCount > 0
-        ? `${graph.focusName} possui ${graph.stats.edgeCount} conexões diretas neste recorte.`
+        ? `${graph.focusName} possui ${graph.stats.edgeCount} conexões diretas nesta rede.`
         : graphEmptyDescription;
 
 const getNodeLabelPlacement = (
@@ -328,7 +327,7 @@ const getEdgeLabelPlacement = (
                 {graphTitle}
             </h3>
             <p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
-                Rede ego-centrada derivada de <code>{graphDataSource}</code>.{" "}
+                Rede centrada neste perfil.{" "}
                 {graphDescriptionTail}
             </p>
         </div>
@@ -338,7 +337,7 @@ const getEdgeLabelPlacement = (
         </div>
     </div>
 
-    <div class="rounded-3xl border border-slate-200/80 bg-slate-50/90 p-4 shadow-[0_16px_40px_rgba(148,163,184,0.08)]">
+    <div class="rounded-3xl border border-border-main bg-track p-4 shadow-sm">
         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
             {graphConceptHeading}
         </p>
@@ -349,7 +348,7 @@ const getEdgeLabelPlacement = (
 
     <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {metrics.map((metric) => (
-            <article class="rounded-3xl border border-border-main bg-white/80 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+            <article class="rounded-3xl border border-border-main bg-surface p-4 shadow-sm">
                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     {metric.label}
                 </p>
@@ -364,7 +363,7 @@ const getEdgeLabelPlacement = (
         {availableRelationTypes.length > 0 ? (
             availableRelationTypes.map((relationType) => (
                 <span
-                    class="inline-flex items-center gap-2 rounded-full border border-border-main bg-white/80 px-3 py-1.5 text-xs font-bold text-text-main"
+                    class="inline-flex items-center gap-2 rounded-full border border-border-main bg-surface px-3 py-1.5 text-xs font-bold text-text-main"
                 >
                     <span
                         class="h-2.5 w-2.5 rounded-full"
@@ -384,11 +383,10 @@ const getEdgeLabelPlacement = (
     </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)] xl:items-start">
-        <div class="rounded-[2rem] border border-slate-200/80 bg-white/92 p-4 shadow-[0_28px_80px_rgba(148,163,184,0.14)] md:p-6">
+        <div class="rounded-[2rem] border border-border-main bg-surface p-4 shadow-sm md:p-6">
             <svg
                 viewBox={`0 0 ${layout.size} ${layout.size}`}
                 class="h-auto w-full"
-                role="img"
                 aria-labelledby={`${graph.graphKind}-graph-svg-title-${graph.focusId}`}
                 aria-describedby={`${graph.graphKind}-graph-svg-desc-${graph.focusId}`}
             >
@@ -452,15 +450,14 @@ const getEdgeLabelPlacement = (
                                 width={label.width}
                                 height={label.height}
                                 rx="999"
-                                fill="rgba(255,255,255,0.92)"
-                                stroke="rgba(148,163,184,0.35)"
+                                class="fill-surface stroke-border-main"
                             ></rect>
                             <text
                                 x={label.x}
                                 y={label.y}
                                 text-anchor="middle"
                                 dominant-baseline="middle"
-                                class={`fill-slate-700 font-bold ${usesDenseLabels ? "text-[9px]" : "text-[11px]"}`}
+                                class={`fill-text-muted font-bold ${usesDenseLabels ? "text-[9px]" : "text-[11px]"}`}
                             >
                                 {label.text}
                             </text>
@@ -511,9 +508,8 @@ const getEdgeLabelPlacement = (
                             text-anchor={label.textAnchor}
                             dominant-baseline="middle"
                             paint-order="stroke"
-                            stroke="rgba(255,255,255,0.96)"
                             stroke-width={node.isFocus ? 7 : 5}
-                            class={`fill-slate-900 ${node.isFocus ? "text-[24px] font-bold" : usesDenseLabels ? "text-[10px] font-bold" : "text-[12px] font-bold"}`}
+                            class={`fill-text-main stroke-surface ${node.isFocus ? "text-[24px] font-bold" : usesDenseLabels ? "text-[10px] font-bold" : "text-[12px] font-bold"}`}
                         >
                             {label.text}
                         </text>
@@ -528,7 +524,7 @@ const getEdgeLabelPlacement = (
         </div>
 
         <aside class="space-y-4">
-            <article class="rounded-3xl border border-border-main bg-white/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+            <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     Como ler
                 </p>
@@ -538,17 +534,17 @@ const getEdgeLabelPlacement = (
                         O nó central é o perfil atual.
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="h-3 w-3 rounded-full border-2 border-slate-500 bg-white"></span>
+                        <span class="h-3 w-3 rounded-full border-2 border-border-main bg-surface"></span>
                         Os nós periféricos são conexões diretas.
                     </div>
                     <p class="leading-relaxed">
                         A espessura da aresta acompanha o peso da conexão. Nós
-                        maiores indicam vínculos mais fortes dentro deste recorte.
+                        maiores indicam vínculos mais fortes dentro desta rede.
                     </p>
                 </div>
             </article>
 
-            <article class="rounded-3xl border border-border-main bg-white/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+            <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     Conexões em destaque
                 </p>
@@ -556,7 +552,7 @@ const getEdgeLabelPlacement = (
                 {topConnections.length > 0 ? (
                     <div class="mt-4 space-y-3">
                         {topConnections.map((connection) => (
-                            <div class="rounded-2xl border border-border-main bg-white/90 p-4">
+                            <div class="rounded-2xl border border-border-main bg-surface p-4">
                                 <div class="flex items-start justify-between gap-4">
                                     <div class="min-w-0">
                                         <a
@@ -577,7 +573,7 @@ const getEdgeLabelPlacement = (
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     {connection.relationTypes.map((relationType) => (
                                         <span
-                                            class="inline-flex items-center gap-2 rounded-full border border-border-main bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-text-main"
+                                            class="inline-flex items-center gap-2 rounded-full border border-border-main bg-track px-2.5 py-1 text-[11px] font-bold text-text-main"
                                         >
                                             <span
                                                 class="h-2 w-2 rounded-full"

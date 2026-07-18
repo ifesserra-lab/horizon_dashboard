@@ -10,7 +10,7 @@ const { project } = Astro.props;
 
 const formatDate = (dateStr: string) => {
 	if (!dateStr) return "N/A";
-	const date = new Date(dateStr);
+	const date = new Date(dateStr.replace(" ", "T"));
 	return date.toLocaleDateString("pt-BR", {
 		day: "2-digit",
 		month: "2-digit",
@@ -19,17 +19,25 @@ const formatDate = (dateStr: string) => {
 };
 
 const statusStyles = {
-	active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-	concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+	active: "bg-brand-green/10 text-brand-green-dark border-brand-green/20",
+	concluded: "bg-track text-text-muted border-border-main",
 };
 
+const statusLabels: Record<string, string> = {
+	active: "Ativo",
+	concluded: "Concluído",
+	unknown: "Indefinido",
+};
+
+const statusKey = (project.status || "unknown").toLowerCase();
 const currentStatusStyle =
-	statusStyles[project.status as keyof typeof statusStyles] ||
-	"bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+	statusStyles[statusKey as keyof typeof statusStyles] ||
+	"bg-brand-yellow/10 text-text-main border-brand-yellow/30";
+const statusLabel = statusLabels[statusKey] || statusLabels.unknown;
 ---
 
 <article
-	class="project-card glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col h-full"
+	class="project-card group glass-card p-6 hover:border-premium-accent/40 hover:bg-premium-accent/[0.02] transition-all flex flex-col h-full"
 	data-name={project.name.toLowerCase()}
 	data-status={project.status.toLowerCase()}
 	data-search={buildSearchIndex([
@@ -41,7 +49,7 @@ const currentStatusStyle =
 	<div class="flex items-start justify-between mb-4">
 		<div
 			aria-hidden="true"
-			class="w-10 h-10 rounded-lg bg-gradient-to-br from-premium-accent/10 to-premium-purple/10 border border-border-main flex items-center justify-center text-premium-accent"
+			class="w-10 h-10 rounded-lg bg-brand-green flex items-center justify-center text-white"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -60,13 +68,7 @@ const currentStatusStyle =
 		<span
 			class={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${currentStatusStyle}`}
 		>
-			{
-				project.status === "active"
-					? "Ativo"
-					: project.status === "concluded"
-						? "Concluído"
-						: project.status
-			}
+			{statusLabel}
 		</span>
 	</div>
 

@@ -76,7 +76,7 @@ const serializedGraphData = hasGraphData
 <section
     id={sectionId}
     data-group-interaction-root
-    class="glass-card border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))] p-6 md:p-8 space-y-6 shadow-[0_24px_80px_rgba(148,163,184,0.14)]"
+    class="glass-card p-6 md:p-8 space-y-6"
     aria-labelledby={`group-interaction-title-${groupId}`}
 >
     <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
@@ -87,7 +87,7 @@ const serializedGraphData = hasGraphData
                 </span>
                 {
                     graphData?.hasExpandedMode && (
-                        <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-300">
+                        <span class="inline-flex items-center rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-text-main">
                             Vizinhos de orientação disponíveis
                         </span>
                     )
@@ -100,7 +100,7 @@ const serializedGraphData = hasGraphData
                 Interações em {groupName}
             </h3>
             <p class="text-sm leading-relaxed text-text-secondary max-w-3xl">
-                Visualização derivada do export de relações do grupo. Use os filtros
+                Visualização das relações registradas para o grupo. Use os filtros
                 para alternar entre membros, vizinhos de orientação e diferentes
                 tipos de vínculo.
             </p>
@@ -118,7 +118,7 @@ const serializedGraphData = hasGraphData
         hasGraphData ? (
             <>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    <article class="rounded-3xl border border-sky-200/80 bg-sky-50/90 p-5 shadow-[0_18px_50px_rgba(125,211,252,0.18)]">
+                    <article class="rounded-3xl border border-premium-accent/20 bg-premium-accent/5 p-5 shadow-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Pessoas no grafo
                         </p>
@@ -126,11 +126,11 @@ const serializedGraphData = hasGraphData
                             {graphData?.stats.nodes}
                         </div>
                         <p class="mt-2 text-sm text-text-secondary">
-                            Total de nós presentes no export desta rede.
+                            Total de nós presentes nesta rede.
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Membros do grupo
                         </p>
@@ -142,7 +142,7 @@ const serializedGraphData = hasGraphData
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Vizinhos de orientação
                         </p>
@@ -154,7 +154,7 @@ const serializedGraphData = hasGraphData
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                             Componentes conectados
                         </p>
@@ -162,14 +162,14 @@ const serializedGraphData = hasGraphData
                             {graphData?.stats.connectedComponents}
                         </div>
                         <p class="mt-2 text-sm text-text-secondary">
-                            Componentes e isolamento calculados no export.
+                            Componentes e isolamento calculados para esta rede.
                         </p>
                     </article>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,0.5fr)] gap-7 items-start">
                     <div class="space-y-4">
-                        <div class="rounded-3xl border border-slate-200/80 bg-white/90 p-5 space-y-4 shadow-[0_22px_60px_rgba(148,163,184,0.12)]">
+                        <div class="rounded-3xl border border-border-main bg-surface p-5 space-y-4 shadow-sm">
                             <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4">
                                 <div class="relative">
                                     <label for={`group-interaction-search-${groupId}`} class="sr-only">
@@ -247,7 +247,7 @@ const serializedGraphData = hasGraphData
                                             type="button"
                                             data-mode-button
                                             data-mode="members"
-                                            class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
+                                            class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main"
                                         >
                                             Somente membros
                                         </button>
@@ -280,8 +280,8 @@ const serializedGraphData = hasGraphData
                                                     initialModeSummary?.defaultRelationTypes.includes(
                                                         relationType,
                                                     )
-                                                        ? "border-premium-accent/25 bg-premium-accent/[0.10] text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
-                                                        : "border-slate-200/80 bg-slate-50/85 text-text-secondary hover:border-premium-accent/20 hover:text-text-main"
+                                                        ? "border-premium-accent/25 bg-premium-accent/[0.10] text-text-main"
+                                                        : "border-border-main bg-track text-text-secondary hover:border-premium-accent/20 hover:text-text-main"
                                                 }`}
                                             >
                                                 {relationLabels[relationType]}
@@ -300,7 +300,7 @@ const serializedGraphData = hasGraphData
                                                 type="button"
                                                 data-classification-filter
                                                 data-classification={classification}
-                                                class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main shadow-[0_0_0_1px_rgba(56,189,248,0.18)]"
+                                                class="inline-flex items-center rounded-full border border-premium-accent/25 bg-premium-accent/[0.10] px-4 py-2 text-sm font-bold text-text-main"
                                             >
                                                 {classificationLabels[classification]}
                                             </button>
@@ -310,20 +310,21 @@ const serializedGraphData = hasGraphData
                             </div>
                         </div>
 
-                        <div class="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-white shadow-[0_28px_80px_rgba(148,163,184,0.18)]">
+                        <div class="relative overflow-hidden rounded-[2rem] border border-border-main bg-surface shadow-sm">
                             <canvas
                                 data-graph-canvas
-                                class="block h-[620px] w-full cursor-grab touch-none bg-white md:h-[760px] xl:h-[900px]"
+                                aria-label={`Grafo interativo de interações do grupo ${groupName}. Uma alternativa em texto com o resumo, a distribuição por classificação e o detalhe de cada pessoa é apresentada ao lado.`}
+                                class="block h-[620px] w-full cursor-grab touch-none bg-transparent md:h-[760px] xl:h-[900px]"
                             ></canvas>
 
                             <div
                                 data-hover-tooltip
-                                class="pointer-events-none absolute hidden min-w-[200px] rounded-2xl border border-slate-200/90 bg-white/95 px-3 py-2 text-xs text-slate-900 shadow-[0_18px_50px_rgba(148,163,184,0.22)] backdrop-blur-md"
+                                class="pointer-events-none absolute hidden min-w-[200px] rounded-2xl border border-border-main bg-surface px-3 py-2 text-xs text-text-main shadow-lg backdrop-blur-md"
                             ></div>
 
                             <div
                                 data-canvas-empty
-                                class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-white/72 px-6 text-center backdrop-blur-sm"
+                                class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-surface/80 px-6 text-center backdrop-blur-sm"
                             >
                                 <div class="max-w-sm space-y-2">
                                     <p
@@ -336,42 +337,42 @@ const serializedGraphData = hasGraphData
                                         data-empty-body
                                         class="text-sm leading-relaxed text-text-secondary"
                                     >
-                                        Sem dados suficientes para desenhar o grafo neste recorte.
+                                        Sem dados suficientes para desenhar o grafo com os filtros atuais.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <div class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Como ler o grafo
                             </p>
                             <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div class="space-y-3">
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-3 w-3 rounded-full bg-premium-purple"></span>
+                                        <span class="h-3 w-3 rounded-full bg-chart-4"></span>
                                         Estudantes
                                     </div>
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-3 w-3 rounded-full bg-premium-accent"></span>
+                                        <span class="h-3 w-3 rounded-full bg-chart-1"></span>
                                         Pesquisadores
                                     </div>
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-3 w-3 rounded-full bg-amber-400"></span>
+                                        <span class="h-3 w-3 rounded-full bg-chart-2"></span>
                                         Externos ao Ifes
                                     </div>
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-3 w-3 rounded-full bg-slate-400"></span>
+                                        <span class="h-3 w-3 rounded-full bg-chart-6"></span>
                                         Sem classificação
                                     </div>
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-4 w-4 rounded-full border-2 border-sky-500 bg-white"></span>
+                                        <span class="h-4 w-4 rounded-full border-2 border-brand-blue bg-surface"></span>
                                         Membro do grupo
                                     </div>
                                     <div class="flex items-center gap-3 text-sm text-text-secondary">
-                                        <span class="h-4 w-4 rounded-full border-2 border-amber-500 bg-white"></span>
+                                        <span class="h-4 w-4 rounded-full border-2 border-brand-yellow bg-surface"></span>
                                         Vizinho via orientação
                                     </div>
                                     <p class="text-sm leading-relaxed text-text-secondary">
@@ -383,12 +384,12 @@ const serializedGraphData = hasGraphData
                     </div>
 
                     <aside class="space-y-4">
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Resumo visível
                             </p>
                             <div class="mt-4 grid grid-cols-2 gap-3">
-                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                <div class="rounded-2xl border border-border-main bg-track p-4">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                         Nós visíveis
                                     </p>
@@ -399,7 +400,7 @@ const serializedGraphData = hasGraphData
                                         {initialModeSummary?.nodeCount ?? 0}
                                     </p>
                                 </div>
-                                <div class="rounded-2xl border border-border-main bg-black/10 p-4">
+                                <div class="rounded-2xl border border-border-main bg-track p-4">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                         Arestas filtradas
                                     </p>
@@ -443,7 +444,7 @@ const serializedGraphData = hasGraphData
 
                             <div
                                 data-dense-indicator
-                                class={`mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200 ${
+                                class={`mt-4 rounded-2xl border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-3 text-sm text-text-main ${
                                     initialModeSummary?.usesDenseModeByDefault
                                         ? ""
                                         : "hidden"
@@ -457,7 +458,7 @@ const serializedGraphData = hasGraphData
                             </div>
                         </article>
 
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Distribuição visível
                             </p>
@@ -482,7 +483,7 @@ const serializedGraphData = hasGraphData
                             </div>
                         </article>
 
-                        <article class="rounded-3xl border border-slate-200/80 bg-white/88 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                        <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
                             <div data-selection-empty class="space-y-3">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                     Detalhe do nó
@@ -580,14 +581,14 @@ const serializedGraphData = hasGraphData
                 ></script>
             </>
         ) : (
-            <div class="rounded-3xl border border-dashed border-slate-200/80 bg-white/88 px-6 py-10 text-center shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+            <div class="rounded-3xl border border-dashed border-border-main bg-surface px-6 py-10 text-center shadow-sm">
                 <h4 class="text-xl font-bold text-text-main">
                     Grafo indisponível
                 </h4>
                 <p class="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary mx-auto">
                     Este grupo ainda não tem nós e arestas suficientes para uma
-                    visualização interativa. Quando o export de relações trouxer mais
-                    conexões, este bloco passará a exibir a rede do grupo.
+                    visualização interativa. Quando houver mais relações registradas,
+                    este bloco passará a exibir a rede do grupo.
                 </p>
             </div>
         )

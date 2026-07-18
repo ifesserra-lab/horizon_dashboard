@@ -56,14 +56,17 @@ const CLASSIFICATION_LABELS: Record<
     null: "Sem classificação",
 };
 
+// Cores institucionais (Rede Federal / Ifes). Mantêm a distinção entre tipos:
+// pesquisador em verde escuro, estudante em azul, externo em verde e sem
+// classificação em cinza neutro. Espelham a legenda (chart-1/chart-4/chart-2/chart-6).
 const CLASSIFICATION_COLORS: Record<
     ResearchGroupInteractionClassificationKey,
     string
 > = {
-    student: "#8b5cf6",
-    researcher: "#38bdf8",
-    outside_ifes: "#f59e0b",
-    null: "#94a3b8",
+    student: "#0072BC",
+    researcher: "#006B3F",
+    outside_ifes: "#009640",
+    null: "#7E8C84",
 };
 
 const MIN_SCALE = 0.25;
@@ -233,7 +236,6 @@ const toggleChipState = (button: HTMLButtonElement, isActive: boolean) => {
     button.classList.toggle("border-premium-accent/25", isActive);
     button.classList.toggle("bg-premium-accent/[0.10]", isActive);
     button.classList.toggle("text-text-main", isActive);
-    button.classList.toggle("shadow-[0_0_0_1px_rgba(56,189,248,0.18)]", isActive);
     button.classList.toggle("border-border-main", !isActive);
     button.classList.toggle("bg-white/[0.03]", !isActive);
     button.classList.toggle("text-text-secondary", !isActive);
@@ -572,13 +574,13 @@ export const initializeResearchGroupInteractionGraph = ({
 
             if (selectedNode.isGroupMember) {
                 badges.push(
-                    '<span class="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-sky-700">Membro do grupo</span>',
+                    '<span class="inline-flex items-center rounded-full border border-brand-blue/30 bg-brand-blue/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-blue">Membro do grupo</span>',
                 );
             }
 
             if (selectedNode.isAdvisorshipNeighbor && !selectedNode.isGroupMember) {
                 badges.push(
-                    '<span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-700">Vizinho via orientação</span>',
+                    '<span class="inline-flex items-center rounded-full border border-brand-yellow/40 bg-brand-yellow/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-text-main">Vizinho via orientação</span>',
                 );
             }
 
@@ -696,28 +698,9 @@ export const initializeResearchGroupInteractionGraph = ({
 
     const draw = () => {
         context.setTransform(viewport.dpr, 0, 0, viewport.dpr, 0, 0);
+        // Fundo transparente: a superfície tematizada (bg-surface) do contêiner
+        // aparece por baixo e mantém o grafo legível nos temas claro e escuro.
         context.clearRect(0, 0, viewport.width, viewport.height);
-
-        const backgroundGradient = context.createLinearGradient(0, 0, 0, viewport.height);
-        backgroundGradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-        backgroundGradient.addColorStop(0.55, "rgba(248, 250, 252, 0.995)");
-        backgroundGradient.addColorStop(1, "rgba(255, 255, 255, 1)");
-        context.fillStyle = backgroundGradient;
-        context.fillRect(0, 0, viewport.width, viewport.height);
-
-        const accentGlow = context.createRadialGradient(
-            viewport.width * 0.22,
-            viewport.height * 0.18,
-            24,
-            viewport.width * 0.22,
-            viewport.height * 0.18,
-            viewport.width * 0.56,
-        );
-        accentGlow.addColorStop(0, "rgba(125, 211, 252, 0.12)");
-        accentGlow.addColorStop(0.5, "rgba(191, 219, 254, 0.07)");
-        accentGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
-        context.fillStyle = accentGlow;
-        context.fillRect(0, 0, viewport.width, viewport.height);
 
         context.save();
         context.translate(transform.x, transform.y);
@@ -780,7 +763,7 @@ export const initializeResearchGroupInteractionGraph = ({
             if (node.isAdvisorshipNeighbor && !node.isGroupMember) {
                 context.beginPath();
                 context.arc(position.x, position.y, radius + 3, 0, Math.PI * 2);
-                context.strokeStyle = hexToRgba("#f59e0b", opacity);
+                context.strokeStyle = hexToRgba("#FDB913", opacity);
                 context.lineWidth = 1.8;
                 context.stroke();
             }
@@ -796,7 +779,7 @@ export const initializeResearchGroupInteractionGraph = ({
             context.beginPath();
             context.arc(position.x, position.y, radius, 0, Math.PI * 2);
             context.strokeStyle = node.isGroupMember
-                ? hexToRgba("#2563eb", opacity)
+                ? hexToRgba("#0072BC", opacity)
                 : hexToRgba("#94a3b8", opacity);
             context.lineWidth = node.isGroupMember ? 2.1 : 1.2;
             context.stroke();
@@ -896,7 +879,7 @@ export const initializeResearchGroupInteractionGraph = ({
                     : hexToRgba("#cbd5e1", opacity);
                 context.lineWidth = isSelected || isHovered ? 1.2 : 1;
                 context.stroke();
-                context.fillStyle = hexToRgba("#0f172a", opacity);
+                context.fillStyle = hexToRgba("#334155", opacity);
                 context.fillText(label, screenPoint.x, labelY + 0.5);
             });
         }

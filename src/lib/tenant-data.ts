@@ -540,7 +540,7 @@ export const buildAdvisorshipDashboard = (projectList: ProjectAdvisorship[]) => 
     const statusColors = {
         active: "var(--color-premium-accent, var(--color-chart-2))",
         concluded: "var(--color-text-muted, var(--color-chart-6))",
-        unknown: "#f59e0b",
+        unknown: "var(--color-chart-3, #f59e0b)",
     };
 
     const statusCounts = allAdvisorships.reduce((acc: any, curr) => {
@@ -566,12 +566,12 @@ export const buildAdvisorshipDashboard = (projectList: ProjectAdvisorship[]) => 
         }, {});
 
     const fellowshipColors = [
-        "#0ea5e9",
+        "var(--color-chart-1)",
+        "var(--color-chart-2)",
+        "var(--color-chart-3)",
         "var(--color-chart-4)",
-        "#ec4899",
-        "#f59e0b",
-        "#10b981",
-        "#6366f1",
+        "var(--color-chart-5)",
+        "var(--color-chart-6)",
     ];
 
     const fellowshipDistribution = Object.entries(fellowshipCounts)

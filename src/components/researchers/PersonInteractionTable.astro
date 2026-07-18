@@ -15,11 +15,11 @@ const { graphKind, rows } = Astro.props;
 
 const relationLabels: Record<StudentInteractionTableRowRelation["type"], string> = {
     project: "Projeto",
-    orientation: "Orientacao",
+    orientation: "Orientação",
     article: "Artigo",
     initiative: "Iniciativa",
     research_group: "Grupo de pesquisa",
-    advisorship: "Orientacao",
+    advisorship: "Orientação",
 };
 
 const classificationLabels: Record<
@@ -29,24 +29,24 @@ const classificationLabels: Record<
     student: "Estudante",
     researcher: "Pesquisador",
     outside_ifes: "Externo ao Ifes",
-    null: "Sem classificacao",
+    null: "Sem classificação",
 };
 
 const tableTitle =
     graphKind === "collaboration"
-        ? "Tabela de colaboracoes diretas"
+        ? "Tabela de colaborações diretas"
         : "Tabela de relacionamentos diretos";
 const tableDescription =
     graphKind === "collaboration"
-        ? "Cada linha representa uma aresta do grafo de colaboracao, com as pessoas envolvidas, os tipos de colaboracao e o peso acumulado dessa conexao."
-        : "Cada linha representa uma aresta do grafo de relacionamento, com as pessoas envolvidas, os tipos de vinculo e o peso acumulado dessa conexao.";
+        ? "Cada linha representa uma aresta do grafo de colaboração, com as pessoas envolvidas, os tipos de colaboração e o peso acumulado dessa conexão."
+        : "Cada linha representa uma aresta do grafo de relacionamento, com as pessoas envolvidas, os tipos de vínculo e o peso acumulado dessa conexão.";
 const tableCountLabel =
     graphKind === "collaboration"
-        ? `${rows.length} colaboracoes mapeadas neste recorte`
+        ? `${rows.length} colaborações mapeadas neste recorte`
         : `${rows.length} relacionamentos mapeados neste recorte`;
 const emptyLabel =
     graphKind === "collaboration"
-        ? "Nenhuma colaboracao direta foi registrada neste recorte."
+        ? "Nenhuma colaboração direta foi registrada neste recorte."
         : "Nenhum relacionamento direto foi registrado neste recorte.";
 
 const formatRelationChip = (relation: StudentInteractionTableRowRelation) => {
@@ -85,10 +85,10 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
 };
 ---
 
-<section class="rounded-3xl border border-slate-200/80 bg-white/82 p-6 shadow-[0_18px_50px_rgba(148,163,184,0.08)]">
+<section class="rounded-3xl border border-border-main bg-surface/82 p-6 shadow-[0_18px_50px_rgba(148,163,184,0.08)]">
     <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div class="space-y-2">
-            <span class="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-700">
+            <span class="inline-flex items-center rounded-full border border-border-main bg-tag-bg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                 Tabela
             </span>
             <div>
@@ -111,19 +111,19 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
                 <table class="min-w-full border-separate border-spacing-0">
                     <thead>
                         <tr>
-                            <th class="rounded-tl-2xl border border-border-main bg-slate-50 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            <th class="rounded-tl-2xl border border-border-main bg-track px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Pessoa A
                             </th>
-                            <th class="border border-l-0 border-border-main bg-slate-50 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            <th class="border border-l-0 border-border-main bg-track px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Pessoa B
                             </th>
-                            <th class="border border-l-0 border-border-main bg-slate-50 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                                Relacoes
+                            <th class="border border-l-0 border-border-main bg-track px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Relações
                             </th>
-                            <th class="border border-l-0 border-border-main bg-slate-50 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            <th class="border border-l-0 border-border-main bg-track px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Eventos
                             </th>
-                            <th class="rounded-tr-2xl border border-l-0 border-border-main bg-slate-50 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                            <th class="rounded-tr-2xl border border-l-0 border-border-main bg-track px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                                 Peso
                             </th>
                         </tr>
@@ -131,7 +131,7 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
                     <tbody>
                         {
                             rows.map((row, index) => (
-                                <tr class={index % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+                                <tr class={index % 2 === 0 ? "bg-surface" : "bg-track/50"}>
                                     <td class="border border-t-0 border-border-main px-4 py-4 align-top">
                                         <div class="min-w-[14rem]">
                                             <p class="text-sm font-bold text-text-main leading-snug">
@@ -193,8 +193,8 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
                                                     );
 
                                                 return (
-                                                    <div class="rounded-2xl border border-border-main bg-white/80 p-3">
-                                                        <span class="inline-flex items-center rounded-full border border-border-main bg-white px-3 py-1 text-xs font-medium text-text-main">
+                                                    <div class="rounded-2xl border border-border-main bg-surface/80 p-3">
+                                                        <span class="inline-flex items-center rounded-full border border-border-main bg-surface px-3 py-1 text-xs font-medium text-text-main">
                                                             {formatRelationChip(relation)}
                                                         </span>
 
@@ -240,12 +240,12 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
                                         </div>
                                     </td>
                                     <td class="border border-l-0 border-t-0 border-border-main px-4 py-4 align-top">
-                                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
+                                        <span class="inline-flex items-center rounded-full border border-border-main bg-tag-bg px-3 py-1 text-xs font-bold text-text-main">
                                             {row.totalRelationEvents}
                                         </span>
                                     </td>
                                     <td class="border border-l-0 border-t-0 border-border-main px-4 py-4 align-top">
-                                        <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+                                        <span class="inline-flex items-center rounded-full border border-brand-green/30 bg-brand-green/10 px-3 py-1 text-xs font-bold text-brand-green-dark">
                                             {row.weight}
                                         </span>
                                     </td>
@@ -256,7 +256,7 @@ const resolveNamedItemHref = (relation: StudentInteractionTableRowRelation, item
                 </table>
             </div>
         ) : (
-            <div class="mt-6 rounded-2xl border border-dashed border-border-main bg-white/60 p-6 text-sm text-text-secondary">
+            <div class="mt-6 rounded-2xl border border-dashed border-border-main bg-surface/60 p-6 text-sm text-text-secondary">
                 {emptyLabel}
             </div>
         )

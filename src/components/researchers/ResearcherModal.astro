@@ -376,8 +376,8 @@
                 <div class="w-1.5 h-1.5 rounded-full bg-premium-accent shadow-[0_0_6px_rgba(2,132,199,0.4)] group-hover:scale-125 transition-transform"></div>
                 ${projectsCount} <span class="text-text-secondary font-medium opacity-60">Projetos</span>
             </div>
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/5 border border-amber-500/10 text-[11px] font-bold text-text-main transition-all group">
-                <div class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)] group-hover:scale-125 transition-transform"></div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-yellow/5 border border-brand-yellow/10 text-[11px] font-bold text-text-main transition-all group">
+                <div class="w-1.5 h-1.5 rounded-full bg-brand-yellow shadow-[0_0_6px_rgba(245,158,11,0.4)] group-hover:scale-125 transition-transform"></div>
                 ${advisorshipsCount} <span class="text-text-secondary font-medium opacity-60">Orientações</span>
             </div>
         `;
@@ -386,14 +386,14 @@
         linksContainer.innerHTML = "";
         if (researcher.lattes_url && researcher.lattes_url !== "None") {
             linksContainer.innerHTML += `
-                <a href="${researcher.lattes_url}" target="_blank" class="p-2 bg-slate-500/5 hover:bg-slate-500/10 rounded-xl text-text-secondary hover:text-text-main transition-all" title="Ver Currículo Lattes">
+                <a href="${researcher.lattes_url}" target="_blank" rel="noopener noreferrer" class="p-2 bg-tag-bg hover:bg-tag-bg-accent rounded-xl text-text-secondary hover:text-text-main transition-all" title="Ver currículo Lattes">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 2v20"/></svg>
                 </a>
             `;
         }
         if (researcher.email && researcher.email !== "None") {
             linksContainer.innerHTML += `
-                <a href="mailto:${researcher.email}" class="p-2 bg-slate-500/5 hover:bg-slate-500/10 rounded-xl text-text-secondary hover:text-text-main transition-all" title="Enviar Email">
+                <a href="mailto:${researcher.email}" class="p-2 bg-tag-bg hover:bg-tag-bg-accent rounded-xl text-text-secondary hover:text-text-main transition-all" title="Enviar e-mail">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                 </a>
             `;
@@ -484,7 +484,7 @@
             const statusHtml =
                 event.status && event.status !== "None"
                     ? `<div class="mt-2 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full ${event.status.toLowerCase().includes("active") || event.status.toLowerCase().includes("progress") || event.status.toLowerCase().includes("running") ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400"}"></span>
+                    <span class="w-1.5 h-1.5 rounded-full ${event.status.toLowerCase().includes("active") || event.status.toLowerCase().includes("progress") || event.status.toLowerCase().includes("running") ? "bg-brand-green shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-text-muted-2"}"></span>
                     <span class="text-[9px] uppercase tracking-widest font-bold text-text-secondary opacity-70">${event.status === "Concluded" ? "Concluído" : "Em Andamento"}</span>
                   </div>`
                     : "";
@@ -538,8 +538,8 @@
 
             const statusClass =
                 adv.status && adv.status.toLowerCase().includes("concluded")
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+                    ? "bg-brand-green/10 text-brand-green-dark dark:text-brand-green"
+                    : "bg-brand-blue/10 text-brand-blue";
 
             const statusText =
                 adv.status === "Concluded" ? "Concluído" : "Em Andamento";
@@ -650,7 +650,7 @@
             const height = (data.count / maxCount) * 100;
             barsHtml += `
                 <div class="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                    <div class="absolute bottom-full mb-2 bg-text-main text-background-main text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none shadow-xl border border-white/10">
+                    <div class="absolute bottom-full mb-2 bg-text-main text-page-bg text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none shadow-xl border border-border-main">
                         ${data.year}: ${data.count} ${data.count === 1 ? "artigo" : "artigos"}
                     </div>
                     <div class="w-full bg-gradient-to-t from-premium-purple/40 to-premium-purple hover:to-premium-accent transition-all duration-500 rounded-t-sm" 
@@ -665,7 +665,7 @@
             </div>
             <div class="flex justify-between text-[10px] text-text-secondary mt-4 font-bold font-mono tracking-tighter opacity-80">
                 <span>${minYear}</span>
-                <span class="text-[9px] font-medium opacity-50 uppercase tracking-widest">Produção Anual</span>
+                <span class="text-[9px] font-medium opacity-50 uppercase tracking-widest">Produção anual</span>
                 <span>${maxYear}</span>
             </div>
         `;
@@ -708,8 +708,9 @@
                     ${
                         article.doi
                             ? `
-                        <a href="${article.doi.startsWith("http") ? article.doi : `https://doi.org/${article.doi}`}" 
-                           target="_blank" 
+                        <a href="${article.doi.startsWith("http") ? article.doi : `https://doi.org/${article.doi}`}"
+                           target="_blank"
+                           rel="noopener noreferrer"
                            class="flex-shrink-0 p-2 bg-premium-purple/5 hover:bg-premium-purple/10 rounded-lg text-premium-purple transition-colors"
                            title="Ver DOI">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>

@@ -7,7 +7,7 @@ interface Props {
     fields: ProvenanceField[];
 }
 
-const { title = "Fontes dos Dados", intro, fields } = Astro.props;
+const { title = "Fontes dos dados", intro, fields } = Astro.props;
 const visibleFields = (fields || []).filter((field) => field.sources.length > 0);
 
 const formatDateTime = (value: string | null) => {
@@ -77,7 +77,7 @@ const formatDateTime = (value: string | null) => {
                                     <div class="flex flex-wrap gap-2">
                                         {
                                             systemLabels.map((label) => (
-                                                <span class="px-2.5 py-1 rounded-full bg-white/5 border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                                                <span class="px-2.5 py-1 rounded-full bg-track border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                                                     {label}
                                                 </span>
                                             ))
@@ -88,17 +88,17 @@ const formatDateTime = (value: string | null) => {
                                 <div class="mt-4 pt-4 border-t border-border-main space-y-3">
                                     {
                                         field.sources.map((source) => (
-                                            <article class="rounded-xl border border-border-main/70 bg-white/5 p-4 space-y-2">
+                                            <article class="rounded-xl border border-border-main/70 bg-surface p-4 space-y-2">
                                                 <div class="flex flex-wrap gap-2">
                                                     <span class="px-2 py-0.5 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-wider">
                                                         {source.sourceSystemLabel}
                                                     </span>
-                                                    <span class="px-2 py-0.5 rounded-full bg-white/5 text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                    <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
                                                         {source.sourceEntityLabel}
                                                     </span>
                                                     {
                                                         source.flowName && (
-                                                            <span class="px-2 py-0.5 rounded-full bg-white/5 text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                            <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
                                                                 {source.flowName}
                                                             </span>
                                                         )
@@ -134,7 +134,7 @@ const formatDateTime = (value: string | null) => {
                                                         source.extractedAt && (
                                                             <p>
                                                                 <span class="font-bold text-text-main">
-                                                                    Extraido em:
+                                                                    Extraído em:
                                                                 </span>{" "}
                                                                 {formatDateTime(source.extractedAt)}
                                                             </p>

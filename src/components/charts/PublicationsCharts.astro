@@ -67,7 +67,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                 id="publications-tab-top"
                 class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative cursor-pointer text-premium-accent border-b-2 border-premium-accent whitespace-nowrap"
             >
-                Top Pesquisadores
+                Top pesquisadores
             </button>
             <button
                 role="tab"
@@ -76,7 +76,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                 id="publications-tab-evolution"
                 class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
             >
-                Evolução Temporal
+                Evolução temporal
             </button>
             <button
                 role="tab"
@@ -85,7 +85,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                 id="publications-tab-types"
                 class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
             >
-                Distribuição por Tipo
+                Distribuição por tipo
             </button>
             <button
                 role="tab"
@@ -94,7 +94,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                 id="publications-tab-venues"
                 class="pb-3 md:pb-4 text-xs md:text-sm font-bold tracking-wide transition-all relative cursor-pointer text-text-muted hover:text-text-main border-b-2 border-transparent whitespace-nowrap"
             >
-                Veículos em Destaque
+                Veículos em destaque
             </button>
         </div>
     </div>
@@ -109,7 +109,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
             <section class="glass-card p-6 flex flex-col relative overflow-hidden">
                 <header class="relative z-10 mb-6">
                     <h3 class="text-xl font-bold font-display text-text-main">
-                        Top Pesquisadores
+                        Top pesquisadores
                     </h3>
                     <p class="text-sm text-text-secondary mt-1">
                         Autores com maior volume de publicações vinculadas.
@@ -120,9 +120,8 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                     topResearchers.length > 0 ? (
                         <div class="relative z-10 space-y-4">
                             {topResearchers.map((item: any, index: number) => {
-                                const width = Math.max(
-                                    10,
-                                    Math.round((item.count / maxPublications) * 100),
+                                const width = Math.round(
+                                    (item.count / maxPublications) * 100,
                                 );
 
                                 return (
@@ -141,9 +140,9 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                                                 #{index + 1}
                                             </span>
 
-                                            <div class="relative h-2 w-full rounded-full bg-slate-200/65 dark:bg-white/[0.06] overflow-hidden">
+                                            <div class="relative h-2 w-full rounded-full bg-track overflow-hidden">
                                                 <div
-                                                    class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-sky-500/75 via-cyan-400/70 to-indigo-500/70"
+                                                    class="absolute inset-y-0 left-0 rounded-full bg-brand-green"
                                                     style={`width:${width}%`}
                                                 ></div>
                                             </div>
@@ -154,7 +153,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                         </div>
                     ) : (
                         <p class="text-text-secondary">
-                            Nenhuma publicação encontrada para este recorte.
+                            Nenhuma publicação encontrada para os filtros atuais.
                         </p>
                     )
                 }
@@ -170,7 +169,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
             <section class="glass-card p-6 flex flex-col relative overflow-hidden">
                 <header class="relative z-10 mb-6">
                     <h3 class="text-xl font-bold font-display text-text-main">
-                        Evolução Temporal
+                        Evolução temporal
                     </h3>
                     <p class="text-sm text-text-secondary mt-1">
                         Distribuição anual da produção acadêmica.
@@ -183,7 +182,24 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                             <svg
                                 viewBox={`0 0 ${evoWidth} ${evoHeight}`}
                                 class="w-full h-full overflow-visible"
+                                role="img"
+                                aria-label="Evolução temporal da produção acadêmica: número de publicações por ano."
                             >
+                                <title>
+                                    Evolução temporal da produção acadêmica
+                                </title>
+                                <desc>Número de publicações por ano.</desc>
+
+                                <text
+                                    x="12"
+                                    y={evoHeight / 2}
+                                    text-anchor="middle"
+                                    transform={`rotate(-90 12 ${evoHeight / 2})`}
+                                    class="text-[10px] fill-text-muted font-medium"
+                                >
+                                    Publicações
+                                </text>
+
                                 {xAxisLabels.map((point: any) => (
                                     <line
                                         x1={point.x}
@@ -217,7 +233,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                                     stroke-width="3.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
-                                    class="drop-shadow-[0_10px_24px_rgba(56,189,248,0.18)]"
+                                    class="drop-shadow-[0_10px_24px_rgba(0,150,64,0.18)]"
                                 />
 
                                 {points.map((point: any) => (
@@ -226,7 +242,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                                             cx={point.x}
                                             cy={point.y}
                                             r="4.5"
-                                            class="fill-bg-main stroke-premium-accent stroke-2"
+                                            class="fill-surface stroke-premium-accent stroke-2"
                                         />
                                         <text
                                             x={point.x}
@@ -253,7 +269,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                         </div>
                     ) : (
                         <p class="text-text-secondary">
-                            Nenhuma série histórica disponível para este recorte.
+                            Nenhuma série histórica disponível para os filtros atuais.
                         </p>
                     )
                 }
@@ -269,7 +285,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
             <section class="glass-card p-6">
                 <header class="mb-6">
                     <h3 class="text-xl font-bold font-display text-text-main">
-                        Distribuição por Tipo
+                        Distribuição por tipo
                     </h3>
                     <p class="text-sm text-text-secondary mt-1">
                         Peso relativo entre periódicos e eventos.
@@ -296,7 +312,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                                         {item.value} ({width}%)
                                     </span>
                                 </div>
-                                <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                                <div class="h-3 rounded-full bg-track overflow-hidden">
                                     <div
                                         class="h-full rounded-full"
                                         style={`width:${width}%; background:${item.color}`}
@@ -318,7 +334,7 @@ const xAxisLabels = points.filter((_: any, index: number) => {
             <section class="glass-card p-6">
                 <header class="mb-6">
                     <h3 class="text-xl font-bold font-display text-text-main">
-                        Veículos em Destaque
+                        Veículos em destaque
                     </h3>
                     <p class="text-sm text-text-secondary mt-1">
                         Periódicos e eventos com maior recorrência.
@@ -327,9 +343,8 @@ const xAxisLabels = points.filter((_: any, index: number) => {
 
                 <div class="space-y-4">
                     {topVenues.map((venue: any) => {
-                        const width = Math.max(
-                            8,
-                            Math.round((venue.count / maxVenueCount) * 100),
+                        const width = Math.round(
+                            (venue.count / maxVenueCount) * 100,
                         );
                         return (
                             <div class="space-y-2">
@@ -341,9 +356,9 @@ const xAxisLabels = points.filter((_: any, index: number) => {
                                         {venue.count}
                                     </span>
                                 </div>
-                                <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                                <div class="h-2 rounded-full bg-track overflow-hidden">
                                     <div
-                                        class="h-full rounded-full bg-gradient-to-r from-premium-accent to-premium-purple"
+                                        class="h-full rounded-full bg-brand-green"
                                         style={`width:${width}%`}
                                     ></div>
                                 </div>

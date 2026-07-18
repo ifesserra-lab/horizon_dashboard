@@ -105,6 +105,8 @@ const renderExternalLinks = (card: ResearcherCardView) => {
             <a
                 href="${escapeHtml(card.cnpqUrl)}"
                 target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Abrir Currículo Lattes de ${escapeHtml(card.name)} em nova aba"
                 class="text-text-secondary hover:text-premium-accent transition-colors p-1"
                 title="Lattes"
             >
@@ -131,6 +133,8 @@ const renderExternalLinks = (card: ResearcherCardView) => {
             <a
                 href="${escapeHtml(card.scholarUrl)}"
                 target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Abrir Google Scholar de ${escapeHtml(card.name)} em nova aba"
                 class="text-text-secondary hover:text-premium-purple transition-colors p-1"
                 title="Google Scholar"
             >

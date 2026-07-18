@@ -26,7 +26,7 @@ const { advisorship, projectName, projectId } = Astro.props;
 
 const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
+    const date = new Date(dateStr.replace(" ", "T"));
     return date.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
@@ -34,28 +34,35 @@ const formatDate = (dateStr: string | null) => {
     });
 };
 
-const statusStyles = {
-    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-    Concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+const statusStyles: Record<string, string> = {
+    active: "bg-brand-green/10 text-brand-green-dark border-brand-green/20",
+    concluded: "bg-track text-text-muted border-border-main",
+    unknown: "bg-brand-yellow/10 text-text-main border-brand-yellow/30",
 };
 
+const statusLabels: Record<string, string> = {
+    active: "Ativo",
+    concluded: "Concluído",
+    unknown: "Indefinido",
+};
+
+const statusKey = (advisorship.status || "unknown").toLowerCase();
 const currentStatusStyle =
-    statusStyles[advisorship.status as keyof typeof statusStyles] ||
+    statusStyles[statusKey] ||
     "bg-premium-accent/10 text-premium-accent border-premium-accent/20";
+const statusLabel = statusLabels[statusKey] || statusLabels.unknown;
 
 const advisorshipSourceFields = buildProvenanceFields([
     {
-        label: "Identidade da orientacao",
-        description: "Nome, status e descricao principal da orientacao exibida.",
+        label: "Identidade da orientação",
+        description: "Nome, status e descrição principal da orientação exibida.",
         entityType: "advisorship",
         entityId: advisorship.id,
         attributeNames: ["name", "status", "description"],
     },
     {
-        label: "Periodo de vigencia",
-        description: "Datas de inicio e termino apresentadas no bloco de execucao.",
+        label: "Período de vigência",
+        description: "Datas de início e término apresentadas no bloco de execução.",
         entityType: "advisorship",
         entityId: advisorship.id,
         attributeNames: ["start_date", "end_date"],
@@ -73,7 +80,7 @@ const advisorshipSourceFields = buildProvenanceFields([
               {
                   label: "Projeto vinculado",
                   description:
-                      "Projeto pai relacionado a esta orientacao na navegacao do site.",
+                      "Projeto pai relacionado a esta orientação na navegação do site.",
                   entityType: "initiative" as const,
                   entityId: projectId,
                   attributeNames: ["name", "status", "start_date", "end_date"],
@@ -83,8 +90,8 @@ const advisorshipSourceFields = buildProvenanceFields([
 ]);
 
 const advisorshipDetailSections = [
-    { id: "advisorship-overview", label: "Visao geral" },
-    { id: "advisorship-execution", label: "Detalhes da execucao" },
+    { id: "advisorship-overview", label: "Visão geral" },
+    { id: "advisorship-execution", label: "Detalhes da execução" },
     { id: "advisorship-sources", label: "Fontes dos dados" },
 ];
 ---
@@ -116,8 +123,8 @@ const advisorshipDetailSections = [
     <div class="max-w-4xl mx-auto space-y-8">
         <DetailPageJumpMenu
             items={advisorshipDetailSections}
-            title="Atalhos da pagina da orientacao"
-            description="Permite ir direto ao resumo da orientacao, aos dados de execucao e a rastreabilidade."
+            title="Atalhos da página da orientação"
+            description="Permite ir direto ao resumo da orientação, aos dados de execução e à rastreabilidade."
         />
 
         <!-- Header Card -->
@@ -133,7 +140,7 @@ const advisorshipDetailSections = [
                         <span
                             class={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${currentStatusStyle}`}
                         >
-                            {advisorship.status}
+                            {statusLabel}
                         </span>
                         {
                             advisorship.fellowship && (
@@ -153,7 +160,7 @@ const advisorshipDetailSections = [
                             projectName !== "Sem Projeto Associado" && (
                                 <div class="flex items-center gap-2 text-text-secondary">
                                     <span class="text-xs font-bold uppercase tracking-wider text-text-muted">
-                                        Projeto Vinculado:
+                                        Projeto vinculado:
                                     </span>
                                     <a
                                         href={`${import.meta.env.BASE_URL}projects/${projectId}`}
@@ -202,7 +209,7 @@ const advisorshipDetailSections = [
                         href={`${import.meta.env.BASE_URL}researchers/${advisorship.student_id}`}
                         class="text-xs font-bold text-premium-accent hover:underline mt-1 inline-block"
                     >
-                        Ver Perfil
+                        Ver perfil
                     </a>
                 </div>
             </article>
@@ -242,7 +249,7 @@ const advisorshipDetailSections = [
                         href={`${import.meta.env.BASE_URL}researchers/${advisorship.supervisor_id}`}
                         class="text-xs font-bold text-premium-purple hover:underline mt-1 inline-block"
                     >
-                        Ver Perfil
+                        Ver perfil
                     </a>
                 </div>
             </article>
@@ -256,14 +263,14 @@ const advisorshipDetailSections = [
             <h3
                 class="text-xl font-bold font-display text-text-main pb-4 border-b border-border-main"
             >
-                Detalhes da Execução
+                Detalhes da execução
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div>
                     <span
                         class="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 block"
-                        >Período de Vigência</span
+                        >Período de vigência</span
                     >
                     <div class="space-y-3">
                         <div class="flex items-center gap-3">
@@ -297,7 +304,7 @@ const advisorshipDetailSections = [
                     advisorship.fellowship && (
                         <div>
                             <span class="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 block">
-                                Dados da Bolsa
+                                Dados da bolsa
                             </span>
                             <div class="space-y-3">
                                 <div class="bg-premium-accent/5 rounded-xl p-4 border border-premium-accent/10">
@@ -362,8 +369,8 @@ const advisorshipDetailSections = [
 
         <section id="advisorship-sources" class="scroll-mt-28">
             <DataSourcesPanel
-                title="Fontes dos Dados da Orientacao"
-                intro="Os blocos abaixo mostram de quais registros de origem a camada canonica montou os dados exibidos nesta orientacao."
+                title="Fontes dos Dados da Orientação"
+                intro="Os blocos abaixo mostram de quais registros de origem a camada canônica montou os dados exibidos nesta orientação."
                 fields={advisorshipSourceFields}
             />
         </section>

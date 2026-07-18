@@ -72,10 +72,10 @@ researchers.forEach((r) => {
     else engagementCounts["3+"]++;
 });
 const engagementData = [
-    { label: "0 Projetos", value: engagementCounts[0], color: "var(--color-chart-6)" },
-    { label: "1 Projeto", value: engagementCounts[1], color: "var(--color-chart-2)" },
-    { label: "2 Projetos", value: engagementCounts[2], color: "var(--color-chart-4)" },
-    { label: "3+ Projetos", value: engagementCounts["3+"], color: "var(--color-chart-5)" },
+    { label: "0 projetos ativos", value: engagementCounts[0], color: "var(--color-chart-6)" },
+    { label: "1 projeto ativo", value: engagementCounts[1], color: "var(--color-chart-2)" },
+    { label: "2 projetos ativos", value: engagementCounts[2], color: "var(--color-chart-4)" },
+    { label: "3+ projetos ativos", value: engagementCounts["3+"], color: "var(--color-chart-5)" },
 ];
 const maxEngagement = Math.max(...Object.values(engagementCounts), 1);
 
@@ -112,7 +112,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                 id={overviewTabId}
                 class="pb-3 text-sm font-bold transition-colors whitespace-nowrap text-premium-accent border-b-2 border-premium-accent"
             >
-                Visão Geral
+                Visão geral
             </button>
             <button
                 role="tab"
@@ -121,7 +121,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                 id={areasTabId}
                 class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
             >
-                Áreas do Conhecimento
+                Áreas do conhecimento
             </button>
             <button
                 role="tab"
@@ -130,7 +130,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                 id={productionTabId}
                 class="pb-3 text-sm font-medium transition-colors whitespace-nowrap text-text-secondary hover:text-text-main border-b-2 border-transparent"
             >
-                Produção Científica
+                Produção científica
             </button>
         </div>
     </div>
@@ -194,7 +194,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                             >
                             <span
                                 class="text-[10px] text-text-muted uppercase tracking-widest font-bold mt-1"
-                                >VÍNCULOS</span
+                                >PESSOAS</span
                             >
                         </div>
                     </div>
@@ -250,7 +250,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center gap-3">
                                             <span
-                                                class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white" : "bg-slate-100 dark:bg-white/10 text-text-muted"}`}
+                                                class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white" : "bg-track text-text-muted"}`}
                                             >
                                                 {index + 1}
                                             </span>
@@ -262,7 +262,7 @@ const allArticles = researchers.flatMap((r) => r.articles || []);
                                             {area.count}
                                         </span>
                                     </div>
-                                    <div class="h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                                    <div class="h-2 bg-track rounded-full overflow-hidden">
                                         <div
                                             class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full"
                                             style={`width: ${percentage}%`}

@@ -84,20 +84,20 @@ const relationshipGraphEntriesById = new Map(
 );
 
 const relationLabels: Record<string, string> = {
-	present_in: "Presenca no grupo",
+	present_in: "Presença no grupo",
 	research_group: "Grupo de pesquisa",
 	project: "Projeto",
 	article: "Artigo",
-	orientation: "Orientacao",
+	orientation: "Orientação",
 	initiative: "Iniciativa",
-	advisorship: "Orientacao",
+	advisorship: "Orientação",
 };
 
 const classificationLabels: Record<string, string> = {
-	student: "Estudantes",
-	researcher: "Pesquisadores",
-	outside_ifes: "Externos ao Ifes",
-	null: "Sem classificacao",
+	student: "Estudante",
+	researcher: "Pesquisador",
+	outside_ifes: "Externo ao Ifes",
+	null: "Sem classificação",
 };
 
 const resolveGraphImporter = <T,>(
@@ -235,29 +235,29 @@ const groupSourceFields = buildProvenanceFields([
 	{
 		label: "Identidade do grupo",
 		description:
-			"Nome, sigla, campus e metadados basicos exibidos no topo da pagina.",
+			"Nome, sigla, campus e metadados básicos exibidos no topo da página.",
 		entityType: "research_group",
 		entityId: group.id,
 		attributeNames: ["name", "short_name", "campus_name", "site_url"],
 	},
 	{
-		label: "Descricao do grupo",
+		label: "Descrição do grupo",
 		description: "Texto descritivo principal do grupo de pesquisa.",
 		entityType: "research_group",
 		entityId: group.id,
 		attributeNames: ["description"],
 	},
 	{
-		label: "Areas de conhecimento",
-		description: "Areas exibidas como tags no perfil do grupo.",
+		label: "Áreas de conhecimento",
+		description: "Áreas exibidas como tags no perfil do grupo.",
 		entityType: "research_group",
 		entityId: group.id,
 		attributeNames: ["area_name"],
 	},
 	{
-		label: "Membros e liderancas",
+		label: "Membros e lideranças",
 		description:
-			"Registros fonte que sustentam as pessoas listadas como membros e lideres do grupo.",
+			"Registros fonte que sustentam as pessoas listadas como membros e líderes do grupo.",
 		entityType: "research_group",
 		entityId: group.id,
 	},
@@ -266,7 +266,7 @@ const groupSourceFields = buildProvenanceFields([
 				{
 					label: "Projetos vinculados ao grupo",
 					description:
-						"Projetos relacionados a este grupo e mostrados nesta rota.",
+						"Projetos relacionados a este grupo e mostrados nesta página.",
 					entities: groupProjects.map((project) => ({
 						entityType: "initiative" as const,
 						entityId: project.id,
@@ -312,7 +312,7 @@ const groupGraphDatasets = [
 		key: "relationship",
 		title: "Grafo relacional",
 		description:
-			"Conecta pessoas por projeto, artigo e orientacao compartilhados e serve de base para a leitura estrutural mais rica da rede.",
+			"Conecta pessoas por projeto, artigo e orientação compartilhados e serve de base para a leitura estrutural mais rica da rede.",
 		path: relationshipGraphPath,
 		manifestEntry: relationshipGraphEntry,
 		graphFile: relationshipGraphFile,
@@ -350,10 +350,10 @@ const relationshipTableRows = groupInteractionGraph
 	? buildResearchGroupRelationshipTableRows(groupInteractionGraph)
 	: [];
 const groupDetailSections = [
-	{ id: "group-overview", label: "Visao geral" },
+	{ id: "group-overview", label: "Visão geral" },
 	{ id: "group-members", label: "Membros" },
 	{ id: "group-projects", label: "Projetos" },
-	{ id: "group-graphs", label: "Grafos e relacoes" },
+	{ id: "group-graphs", label: "Grafos e relações" },
 	{ id: "group-sources", label: "Fontes dos dados" },
 ];
 ---
@@ -381,8 +381,8 @@ const groupDetailSections = [
 
 	<DetailPageJumpMenu
 		items={groupDetailSections}
-		title="Atalhos da pagina do grupo"
-		description="Facilita a navegacao entre visao geral, membros, projetos, grafos e fontes do grupo."
+		title="Atalhos da página do grupo"
+		description="Facilita a navegação entre visão geral, membros, projetos, grafos e fontes do grupo."
 	/>
 
 	<div class="flex flex-col lg:flex-row gap-8 items-start">
@@ -462,7 +462,7 @@ const groupDetailSections = [
 					<h4
 						class="text-text-main text-sm font-bold uppercase tracking-wider mb-3"
 					>
-						Sobre o Grupo
+						Sobre o grupo
 					</h4>
 					<p class="text-text-secondary leading-relaxed">
 						{
@@ -476,7 +476,7 @@ const groupDetailSections = [
 					<h4
 						class="text-text-main text-sm font-bold uppercase tracking-wider mb-4"
 					>
-						Áreas de Conhecimento
+						Áreas de conhecimento
 					</h4>
 					<div
 						class="flex flex-wrap gap-3"
@@ -508,7 +508,7 @@ const groupDetailSections = [
 						id="members-title"
 						class="text-2xl font-bold font-display text-text-main mb-6"
 					>
-						Membros do Grupo
+						Membros do grupo
 					</h3>
 
 					{/* Researchers Section */}
@@ -658,7 +658,7 @@ const groupDetailSections = [
 																		member.name
 																	}
 																</h5>
-																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-track text-text-muted border border-border-main">
 																	Egresso
 																</span>
 															</div>
@@ -838,7 +838,7 @@ const groupDetailSections = [
 																		member.name
 																	}
 																</h5>
-																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+																<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-track text-text-muted border border-border-main">
 																	Egresso
 																</span>
 															</div>
@@ -894,7 +894,7 @@ const groupDetailSections = [
 							<div>
 								<h4 class="text-lg font-bold text-text-main mb-4 flex items-center gap-2">
 									<span class="w-1.5 h-6 bg-slate-400 rounded-full" />
-									Técnicos e Colaboradores
+									Técnicos e colaboradores
 								</h4>
 								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 									{group.members
@@ -946,7 +946,7 @@ const groupDetailSections = [
 														{isAlumni(
 															member.end_date,
 														) && (
-															<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+															<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-track text-text-muted border border-border-main">
 																Egresso
 															</span>
 														)}
@@ -1078,8 +1078,8 @@ const groupDetailSections = [
 				groupProjects.length > 0 ? (
 					<div class="mb-12">
 						<h4 class="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
-							<span class="w-1.5 h-6 bg-emerald-500 rounded-full" />
-							Em Andamento
+							<span class="w-1.5 h-6 bg-brand-green rounded-full" />
+							Em andamento
 						</h4>
 
 						{groupProjects.filter(
@@ -1096,7 +1096,7 @@ const groupDetailSections = [
 									.map((project) => (
 										<a
 											href={`${import.meta.env.BASE_URL}projects/${project.id}`}
-											class="glass-card p-4 flex items-center gap-4 transition-all hover:border-emerald-500/30"
+											class="glass-card p-4 flex items-center gap-4 transition-all hover:border-brand-green/30"
 										>
 											<div
 												aria-hidden="true"
@@ -1222,7 +1222,7 @@ const groupDetailSections = [
 														<h5 class="text-sm font-bold text-text-main truncate">
 															{project.name}
 														</h5>
-														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+														<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-track text-text-muted border border-border-main">
 															Concluído
 														</span>
 													</div>
@@ -1256,42 +1256,42 @@ const groupDetailSections = [
 		<div class="space-y-3">
 			<div class="flex flex-wrap gap-2">
 				<span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-premium-accent">
-					Research Group Graphs
+					Rede do grupo
 				</span>
-				<span class="inline-flex items-center rounded-full border border-border-main bg-white/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-text-secondary">
-					Pastas research_group_*
+				<span class="inline-flex items-center rounded-full border border-border-main bg-surface px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+					Membresia e relações
 				</span>
 			</div>
 			<h3
 				id="group-graphs-title"
 				class="text-2xl font-bold font-display text-text-main"
 			>
-				Grafos do Grupo
+				Grafos do grupo
 			</h3>
 				<p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
-					Esta secao resume os diferentes recortes de rede do grupo e, quando
-					houver conectividade suficiente, oferece a exploracao interativa das
-					interacoes entre pessoas.
+					Esta seção resume as diferentes visões da rede do grupo e, quando
+					houver conectividade suficiente, oferece a exploração interativa das
+					interações entre pessoas.
 				</p>
 		</div>
 
-		<div class="rounded-3xl border border-slate-200/80 bg-white/82 p-5 shadow-[0_18px_50px_rgba(148,163,184,0.08)]">
+		<div class="rounded-3xl border border-border-main bg-track p-5 shadow-sm">
 			<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-				Como ler estes recortes
+				Como ler estes grafos
 			</p>
 			<p class="mt-2 text-sm leading-relaxed text-text-secondary">
 				O <strong>grafo relacional</strong> conecta pessoas por projeto, artigo
-				e orientacao compartilhados e alimenta o ranking e a visualizacao
-				interativa desta pagina. O <strong>grafo de membresia</strong> mostra
-				principalmente quem compoe o grupo no recorte, mesmo quando nao ha
-				colaboracao direta suficiente para formar muitas conexoes.
+				e orientação compartilhados e alimenta o ranking e a visualização
+				interativa desta página. O <strong>grafo de membresia</strong> mostra
+				principalmente quem compõe o grupo, mesmo quando não há
+				colaboração direta suficiente para formar muitas conexões.
 			</p>
 		</div>
 
-		<div class="rounded-3xl border border-emerald-200/80 bg-emerald-50/80 p-6 shadow-[0_20px_60px_rgba(16,185,129,0.10)]">
+		<div class="rounded-3xl border border-brand-green/20 bg-brand-green/5 p-6 shadow-sm">
 			<div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
 				<div class="space-y-2">
-					<span class="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+					<span class="inline-flex items-center rounded-full border border-premium-accent/20 bg-premium-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-premium-accent">
 						Top 5
 					</span>
 					<div>
@@ -1300,15 +1300,15 @@ const groupDetailSections = [
 						</h4>
 						<p class="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">
 							Ranking calculado a partir do grafo relacional do grupo,
-							priorizando pesquisadores com maior peso acumulado de colaboracao.
+							priorizando pesquisadores com maior peso acumulado de colaboração.
 						</p>
 					</div>
 				</div>
 				<div class="text-xs text-text-secondary">
 					{
 						topCollaboratingResearchers.length > 0
-							? `${topCollaboratingResearchers.length} pesquisadores com colaboracoes registradas`
-							: "Nenhuma colaboracao de pesquisador registrada neste recorte"
+							? `${topCollaboratingResearchers.length} pesquisadores com colaborações registradas`
+							: "Nenhuma colaboração de pesquisador registrada no grafo relacional"
 					}
 				</div>
 			</div>
@@ -1317,10 +1317,10 @@ const groupDetailSections = [
 				topCollaboratingResearchers.length > 0 ? (
 					<div class="mt-6 grid grid-cols-1 xl:grid-cols-5 gap-4">
 						{topCollaboratingResearchers.map((researcher, index) => (
-							<article class="rounded-2xl border border-border-main bg-white/80 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+							<article class="rounded-2xl border border-border-main bg-surface p-4 shadow-sm">
 								<div class="flex items-start justify-between gap-3">
 									<div class="min-w-0">
-										<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+										<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-premium-accent">
 											#{index + 1}
 										</p>
 										<h5 class="mt-2 text-sm font-bold text-text-main leading-snug">
@@ -1345,21 +1345,18 @@ const groupDetailSections = [
 											)
 										}
 									</div>
-									<span class="shrink-0 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700">
-										Peso {researcher.weightedDegree}
-									</span>
 								</div>
 
 								<div class="mt-4 grid grid-cols-2 gap-3">
-									<div class="rounded-xl border border-border-main bg-white p-3">
+									<div class="rounded-xl border border-border-main bg-track p-3">
 										<p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
-											Conexoes
+											Conexões
 										</p>
 										<p class="mt-1 text-lg font-bold font-display text-text-main">
 											{researcher.degree}
 										</p>
 									</div>
-									<div class="rounded-xl border border-border-main bg-white p-3">
+									<div class="rounded-xl border border-border-main bg-track p-3">
 										<p class="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
 											Peso total
 										</p>
@@ -1372,9 +1369,9 @@ const groupDetailSections = [
 						))}
 					</div>
 				) : (
-					<div class="mt-6 rounded-2xl border border-dashed border-border-main bg-white/60 p-6 text-sm text-text-secondary">
-						Este grupo ainda nao possui pesquisadores com colaboracoes registradas
-						no grafo relacional atual.
+					<div class="mt-6 rounded-2xl border border-dashed border-border-main bg-track p-6 text-sm text-text-secondary">
+						Ative o grafo relacional ou aguarde novas conexões: este grupo ainda
+						não possui pesquisadores com colaborações registradas.
 					</div>
 				)
 			}
@@ -1395,7 +1392,7 @@ const groupDetailSections = [
 	<section id="group-sources" class="scroll-mt-28">
 		<DataSourcesPanel
 			title="Fontes dos Dados do Grupo"
-			intro="A rastreabilidade abaixo mostra quais registros de origem alimentaram os blocos principais exibidos nesta pagina do grupo."
+			intro="A rastreabilidade abaixo mostra quais registros de origem alimentaram os blocos principais exibidos nesta página do grupo."
 			fields={groupSourceFields}
 		/>
 	</section>

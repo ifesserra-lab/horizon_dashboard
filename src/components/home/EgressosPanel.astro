@@ -9,7 +9,7 @@ const durMonths = e.dur_median_dias ? (e.dur_median_dias / 30).toFixed(0) : null
 const kpis = [
     { value: nf(e.total ?? 0), label: "Formandos analisados", hint: "coortes com dados" },
     { value: `${e.pct_research ?? 0}%`, label: "Com pesquisa", hint: `${nf(e.with_research ?? 0)} fizeram IC/TCC` },
-    { value: `${p.both_pct ?? 0}%`, label: "Pipeline IC → TCC", hint: `${nf(p.both ?? 0)} fizeram IC e TCC` },
+    { value: `${p.both_pct ?? 0}%`, label: "Percurso IC → TCC", hint: `${nf(p.both ?? 0)} fizeram IC e TCC` },
     { value: `${p.same_sup_pct ?? 0}%`, label: "Mesmo orientador", hint: "continuidade IC→TCC" },
 ];
 
@@ -52,7 +52,7 @@ const maxCurso = Math.max(...cursos.map((c) => c.n), 1);
                                 <span class="text-text-main truncate">{c.curso}</span>
                                 <span class="tabular-nums text-text-muted flex-none">{c.n}</span>
                             </div>
-                            <div class="mt-1 h-1 bg-border-main">
+                            <div class="mt-1 h-1 bg-track">
                                 <div
                                     class="h-full bg-premium-accent/70"
                                     style={`width:${(c.n / maxCurso) * 100}%`}

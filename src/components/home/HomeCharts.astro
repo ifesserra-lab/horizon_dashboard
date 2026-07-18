@@ -9,6 +9,13 @@ interface Props {
 
 const { martData = defaultMartData, groupsData = defaultGroupsData } = Astro.props;
 
+const base = import.meta.env.BASE_URL;
+
+// Sufixo único por instância: o componente é renderizado várias vezes na
+// página (visão geral + por campus), então os ids de <title>/<desc> não
+// podem colidir.
+const uid = Math.random().toString(36).slice(2, 8);
+
 // --- Data Preparation: Ecosystem Evolution ---
 // Calculate cumulative active projects (running total)
 let runningTotal = 0;
@@ -36,7 +43,7 @@ groupsData.forEach((group: any) => {
         const areaName = group.knowledge_areas[0].name;
         areaCounts[areaName] = (areaCounts[areaName] || 0) + 1;
     } else {
-        areaCounts['Sem Área'] = (areaCounts['Sem Área'] || 0) + 1;
+        areaCounts['Sem área'] = (areaCounts['Sem área'] || 0) + 1;
     }
 });
 
@@ -137,7 +144,9 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
         </header>
 
         <div class="relative z-10 w-full h-48 mt-auto">
-            <svg viewBox={`0 0 ${width} ${height}`} class="w-full h-full overflow-visible">
+            <svg viewBox={`0 0 ${width} ${height}`} class="w-full h-full overflow-visible" role="img" aria-labelledby={`evo-title-${uid} evo-desc-${uid}`}>
+                <title id={`evo-title-${uid}`}>Projetos ativos por ano</title>
+                <desc id={`evo-desc-${uid}`}>Total acumulado de projetos ativos por ano desde {startYear}.</desc>
                 <!-- Grid Lines -->
                 <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="var(--color-border-main)" stroke-width="1" />
                 <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="var(--color-border-main)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
@@ -167,7 +176,7 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
                         
                         <!-- Tooltip-like Label (only visible on hover of group/point, simplified here to typical rendering) -->
                         <foreignObject x={p.x - 20} y={p.y - 35} width="40" height="25" class="opacity-0 group-hover/point:opacity-100 transition-opacity">
-                             <div class="bg-slate-800 text-white text-[10px] font-bold rounded px-1.5 py-0.5 text-center border border-slate-700 shadow-xl">
+                             <div class="bg-surface text-text-main text-[10px] font-bold rounded px-1.5 py-0.5 text-center border border-border-main shadow-lg">
                                 {p.value}
                              </div>
                         </foreignObject>
@@ -192,7 +201,7 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
             
             <div class="space-y-3">
                 {finalDistribution.slice(0, 5).map((d, i) => ( // Show legend for Top slices
-                    <a href={`/horizon_dashboard/groups?search=${encodeURIComponent(d.name)}`} class="flex items-center justify-between text-xs group/link hover:bg-white/5 p-1 rounded transition-colors">
+                    <a href={`${base}groups?search=${encodeURIComponent(d.name)}`} class="flex items-center justify-between text-xs group/link hover:bg-track p-1 rounded transition-colors">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full" style={`background-color: ${donutData[i].color}`}></span>
                             <span class="text-text-secondary group-hover/link:text-premium-accent transition-colors" title={d.name}>{d.name}</span>
@@ -206,9 +215,11 @@ const linePath = points.reduce((acc: string, p: any, i: number) =>
         <div class="w-full md:w-1/2 flex justify-center relative">
              <div class="relative w-48 h-48">
                 <!-- Expanded viewBox to prevent clipping on hover scale -->
-                <svg viewBox="-10 -10 120 120" class="w-full h-full -rotate-90 overflow-visible">
+                <svg viewBox="-10 -10 120 120" class="w-full h-full -rotate-90 overflow-visible" aria-labelledby={`dist-title-${uid} dist-desc-${uid}`}>
+                    <title id={`dist-title-${uid}`}>Distribuição de grupos por grande área</title>
+                    <desc id={`dist-desc-${uid}`}>Proporção de grupos de pesquisa por grande área de conhecimento, com as demais reunidas em Outras.</desc>
                     {donutData.map(slice => (
-                        <a href={`/horizon_dashboard/groups?search=${encodeURIComponent(slice.name)}`} class="group/slice">
+                        <a href={`${base}groups?search=${encodeURIComponent(slice.name)}`} class="group/slice">
                             <path 
                                 d={getPiePath(slice.startAngle, slice.endAngle, 35, 50)} 
                                 fill={slice.color}

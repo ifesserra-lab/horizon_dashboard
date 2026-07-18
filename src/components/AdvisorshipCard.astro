@@ -13,10 +13,10 @@ import type { AdvisorshipItem } from "../types/advisorships.ts";
  */
 interface Props {
     advisorship: AdvisorshipItem;
-    projectName: string;
+    projectName?: string;
 }
 
-const { advisorship, projectName } = Astro.props;
+const { advisorship, projectName = "" } = Astro.props;
 
 /**
  * Formats a given date string into a localized Brazilian Portuguese string (Month Year).
@@ -26,7 +26,7 @@ const { advisorship, projectName } = Astro.props;
  */
 const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
+    const date = new Date(dateStr.replace(" ", "T"));
     return date.toLocaleDateString("pt-BR", {
         month: "short",
         year: "numeric",
@@ -37,21 +37,25 @@ const formatDate = (dateStr: string | null) => {
  * A mapping of expected advisorship status strings to their corresponding CSS utility classes.
  * These are used to style the status badge.
  */
-const statusColors = {
-    active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    Active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-    Concluded: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-    unknown: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+const statusColors: Record<string, string> = {
+    active: "bg-brand-green/10 text-brand-green-dark border-brand-green/20",
+    concluded: "bg-track text-text-muted border-border-main",
+    unknown: "bg-brand-yellow/10 text-text-main border-brand-yellow/30",
 };
 
-const currentStatusStyle =
-    statusColors[advisorship.status as keyof typeof statusColors] ||
-    statusColors.unknown;
+const statusLabels: Record<string, string> = {
+    active: "Ativo",
+    concluded: "Concluído",
+    unknown: "Indefinido",
+};
+
+const statusKey = (advisorship.status || "unknown").toLowerCase();
+const currentStatusStyle = statusColors[statusKey] || statusColors.unknown;
+const statusLabel = statusLabels[statusKey] || statusLabels.unknown;
 
 const fellowshipColor = advisorship.fellowship
     ? "bg-premium-accent/10 text-premium-accent border-premium-accent/20"
-    : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700";
+    : "bg-track text-text-muted border-border-main";
 
 const studentName = advisorship.student_name || "Estudante Desconhecido";
 const supervisorName = advisorship.supervisor_name || "Supervisor Desconhecido";
@@ -67,7 +71,7 @@ const hasFellowship = !!advisorship.fellowship;
     data-status={advisorship.status?.toLowerCase()}
     data-fellowship={fellowshipName?.toLowerCase()}
     data-year={advisorship.start_date
-        ? new Date(advisorship.start_date).getFullYear()
+        ? new Date(advisorship.start_date.replace(" ", "T")).getFullYear()
         : "unknown"}
 >
     <!-- Card Header: Title & Status -->
@@ -81,7 +85,7 @@ const hasFellowship = !!advisorship.fellowship;
         <span
             class={`shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${currentStatusStyle}`}
         >
-            {advisorship.status}
+            {statusLabel}
         </span>
     </div>
 

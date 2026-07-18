@@ -143,7 +143,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 w-full max-w-xs">
                     {statusData.map(item => (
-                        <div class="glass-card p-4 flex items-center gap-4 bg-white/5 border-white/5">
+                        <div class="glass-card p-4 flex items-center gap-4 bg-track border-border-main">
                             <div class="w-4 h-4 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2)]" style={`background-color: ${item.color}`}></div>
                             <div class="flex flex-col">
                                 <span class="text-sm font-bold text-text-main leading-none mb-1">{item.label}</span>
@@ -169,10 +169,10 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                     <div class="flex flex-col">
                         <div class="flex items-center justify-between mb-8">
                             <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-full bg-gradient-to-r from-premium-accent to-premium-purple shadow-[0_0_10px_rgba(56,189,248,0.4)]"></div>
+                                <div class="w-3 h-3 rounded-full bg-premium-accent"></div>
                                 <span class="text-[10px] font-bold text-text-main uppercase tracking-[0.2em]">Início de Projetos</span>
                             </div>
-                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-white/5 uppercase tracking-wider">Tendência</span>
+                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-track uppercase tracking-wider">Tendência</span>
                         </div>
 
                         <div class="h-64 px-4 flex flex-col items-center justify-center relative">
@@ -269,10 +269,10 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                     <div class="flex flex-col">
                         <div class="flex items-center justify-between mb-8">
                             <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
+                                <div class="w-3 h-3 rounded-full bg-chart-4"></div>
                                 <span class="text-[10px] font-bold text-text-main uppercase tracking-[0.2em]">Términos por ano</span>
                             </div>
-                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-white/5 uppercase tracking-wider">Por ano</span>
+                            <span class="text-[10px] text-text-muted font-bold px-2 py-0.5 rounded-full bg-track uppercase tracking-wider">Por ano</span>
                         </div>
 
                         <div class="h-64 px-4 flex flex-col items-center justify-center relative">
@@ -309,14 +309,14 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                             width={barWidth} 
                                                             height={barHeight} 
                                                             rx="4"
-                                                            fill="#10b981"
+                                                            fill="var(--color-chart-4)"
                                                             class="transition-all duration-500 hover:brightness-110 drop-shadow-[0_4px_6px_rgba(0,0,0,0.1)]"
                                                         />
                                                         <text 
                                                             x={x} 
                                                             y={y - 12} 
                                                             text-anchor="middle" 
-                                                            class="text-[10px] font-bold fill-emerald-500 select-none"
+                                                            class="text-[10px] font-bold fill-chart-4 select-none"
                                                         >
                                                             {d.count}
                                                         </text>
@@ -352,11 +352,11 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                 <!-- Chart Legend -->
                 <div class="flex items-center justify-center gap-6 mb-8">
                     <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-premium-accent shadow-[0_0_10px_rgba(56,189,248,0.4)]"></div>
+                        <div class="w-3 h-3 rounded-full bg-chart-1"></div>
                         <span class="text-[10px] font-bold text-text-main uppercase tracking-widest">Pesquisadores</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-premium-purple shadow-[0_0_10px_rgba(147,51,234,0.4)]"></div>
+                        <div class="w-3 h-3 rounded-full bg-chart-4"></div>
                         <span class="text-[10px] font-bold text-text-main uppercase tracking-widest">Estudantes</span>
                     </div>
                 </div>
@@ -404,7 +404,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                     width={barWidth}
                                                     height={researchersHeight}
                                                     rx="4"
-                                                    fill="var(--color-premium-accent)"
+                                                    fill="var(--color-chart-1)"
                                                     class="opacity-90"
                                                 />
                                                 <rect
@@ -413,7 +413,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                     width={barWidth}
                                                     height={studentsHeight}
                                                     rx="4"
-                                                    fill="var(--color-premium-purple)"
+                                                    fill="var(--color-chart-4)"
                                                     class="opacity-85"
                                                 />
 
@@ -424,7 +424,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                                 x={centerX - groupWidth / 2 + barWidth / 2}
                                                                 y={researchersY - 8}
                                                                 text-anchor="middle"
-                                                                class="text-[10px] font-bold fill-premium-accent select-none"
+                                                                class="text-[10px] font-bold fill-chart-1 select-none"
                                                             >
                                                                 {item.researchers}
                                                             </text>
@@ -432,7 +432,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                                                 x={centerX - groupWidth / 2 + barWidth + 4 + barWidth / 2}
                                                                 y={studentsY - 8}
                                                                 text-anchor="middle"
-                                                                class="text-[10px] font-bold fill-premium-purple select-none"
+                                                                class="text-[10px] font-bold fill-chart-4 select-none"
                                                             >
                                                                 {item.students}
                                                             </text>
@@ -464,7 +464,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-auto">
                     {participantsData.map(item => (
-                        <div class="glass-card p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors group">
+                        <div class="glass-card p-6 flex flex-col gap-4 hover:bg-track transition-colors group">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-bold text-text-muted uppercase tracking-wider">{item.label}</span>
                                 <div class="w-10 h-10 rounded-xl bg-premium-accent/10 flex items-center justify-center text-premium-accent group-hover:scale-110 transition-transform">
@@ -475,7 +475,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                 <span class="text-4xl font-bold text-text-main">{item.value}</span>
                                 <span class="text-xs text-text-muted mb-2">participantes únicos</span>
                             </div>
-                            <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div class="w-full h-2 bg-track rounded-full overflow-hidden">
                                 <div 
                                     class="h-full bg-gradient-to-r from-premium-accent to-premium-purple transition-all duration-1000"
                                     style={`width: ${(item.value / (participantsData.reduce((acc, d) => acc + d.value, 0))) * 100}%`}
@@ -515,7 +515,7 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                             <div class="group">
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-3">
-                                        <span class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white shadow-lg shadow-premium-accent/20" : "bg-white/5 text-text-muted"}`}>
+                                        <span class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white shadow-lg shadow-premium-accent/20" : "bg-track text-text-muted"}`}>
                                             {index + 1}
                                         </span>
                                         <span class="text-sm font-medium text-text-main group-hover:text-premium-accent transition-colors">
@@ -526,12 +526,12 @@ const maxAreaCount = top10Areas.length > 0 ? top10Areas[0].count : 1;
                                         {area.count} <span class="text-xs text-text-muted font-normal">projetos</span>
                                     </span>
                                 </div>
-                                <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div class="h-2 bg-track rounded-full overflow-hidden">
                                     <div 
                                         class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full relative overflow-hidden group-hover:brightness-110 transition-all duration-500 ease-out"
                                         style={`width: ${percentage}%`}
                                     >
-                                        <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                                        <div class="absolute inset-0 bg-track translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                     </div>
                                 </div>
                             </div>

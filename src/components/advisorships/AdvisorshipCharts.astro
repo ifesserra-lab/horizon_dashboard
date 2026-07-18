@@ -168,7 +168,7 @@ const maxSupervisorCount =
                 >
                     {
                         analytics.status_distribution.map((item) => (
-                            <div class="glass-card p-4 flex items-center gap-4 bg-white/5 border-white/5">
+                            <div class="glass-card p-4 flex items-center gap-4 bg-track border-border-main">
                                 <div
                                     class="w-4 h-4 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2)]"
                                     style={`background-color: ${item.color}`}
@@ -206,7 +206,7 @@ const maxSupervisorCount =
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
                 <div class="flex items-center gap-3 mb-8">
-                     <div class="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-500">
+                     <div class="w-10 h-10 rounded-xl bg-chart-4/10 flex items-center justify-center text-chart-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                      </div>
                      <div>
@@ -342,7 +342,7 @@ const maxSupervisorCount =
         >
              <div class="glass-card p-8 flex flex-col min-h-[450px]">
                 <div class="flex items-center gap-3 mb-8">
-                     <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                     <div class="w-10 h-10 rounded-xl bg-chart-2/10 flex items-center justify-center text-chart-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                      </div>
                      <div>
@@ -545,7 +545,7 @@ const maxSupervisorCount =
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center gap-3">
                                             <span
-                                                class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white shadow-lg shadow-premium-accent/20" : "bg-white/5 text-text-muted"}`}
+                                                class={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? "bg-premium-accent text-white shadow-lg shadow-premium-accent/20" : "bg-track text-text-muted"}`}
                                             >
                                                 {index + 1}
                                             </span>
@@ -560,12 +560,12 @@ const maxSupervisorCount =
                                             </span>
                                         </span>
                                     </div>
-                                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-2 bg-track rounded-full overflow-hidden">
                                         <div
                                             class="h-full bg-gradient-to-r from-premium-accent to-premium-purple rounded-full relative overflow-hidden group-hover:brightness-110 transition-all duration-500 ease-out"
                                             style={`width: ${percentage}%`}
                                         >
-                                            <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                            <div class="absolute inset-0 bg-track translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                                         </div>
                                     </div>
                                 </div>
@@ -658,6 +658,12 @@ const maxSupervisorCount =
     // Run on first load
     setupTabs();
     setupChartToggles();
+
+    // Support Astro view transitions if enabled later
+    document.addEventListener("astro:after-swap", () => {
+        setupTabs();
+        setupChartToggles();
+    });
 </script>
 
 <style>
