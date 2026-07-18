@@ -17,8 +17,10 @@ const nf = (v: number, d = 0) =>
 
 const kpis = [
     { label: "FWCI mediano", value: nf(k.fwci_mediano ?? 0, 2), hint: "impacto vs. média mundial da área" },
+    { label: "FWCI médio", value: nf(k.fwci_medio ?? 0, 2), hint: "média (sensível a extremos)" },
     { label: "Citações", value: nf(k.citacoes_total ?? 0), hint: "total (OpenAlex)" },
     { label: "Top 10% mundial", value: nf(k.top10_total ?? 0), hint: "artigos no decil superior" },
+    { label: "Top 1% mundial", value: nf(k.top1_total ?? 0), hint: "artigos no centil superior" },
     { label: "Índice h mediano", value: nf(k.h_mediano ?? 0), hint: "produtividade × impacto" },
     { label: "Concentração (Gini)", value: nf(k.gini_citacoes ?? 0, 2), hint: "0 = igual · 1 = concentrado" },
     { label: "Com perfil OpenAlex", value: `${nf(k.com_openalex ?? 0)}/${nf(k.n_docentes ?? 0)}`, hint: "cobertura bibliométrica" },
@@ -34,7 +36,7 @@ const kpis = [
     </div>
 
     <!-- KPI row: numbers first, quiet labels, hairline grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border-main border border-border-main">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-border-main border border-border-main">
         {
             kpis.map((kpi) => (
                 <div class="bg-page-bg p-4">
@@ -52,6 +54,9 @@ const kpis = [
     <div class="mt-8">
         <h3 class="text-xs uppercase tracking-wider text-text-muted mb-1">
             Maior impacto relativo (FWCI)
+            <span class="normal-case tracking-normal text-text-muted-2"
+                >— exclui casos de artigo único</span
+            >
         </h3>
         <div class="divide-y divide-border-main">
             {

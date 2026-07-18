@@ -21,6 +21,7 @@ import {
 	getRealCampuses,
 } from "../../lib/tenant-data";
 import { researcherCollectionCounts } from "../../lib/researcher-collections";
+import dataMeta from "../../data/_meta.json";
 
 const groups = groupsData as ResearchGroup[];
 const totalGroups = groups.length;
@@ -33,6 +34,18 @@ const totalKnowledgeAreas = new Set(
 	groups.flatMap((g) => g.knowledge_areas.map((ka) => ka.id)),
 ).size;
 const baseUrl = import.meta.env.BASE_URL;
+
+// Frescor do dado (mesma fonte da home: src/data/_meta.json).
+const painelUpdateDate = new Date(
+	(dataMeta as { generated_at?: string }).generated_at ?? "",
+);
+const painelUpdateLabel = Number.isNaN(painelUpdateDate.getTime())
+	? null
+	: painelUpdateDate.toLocaleDateString("pt-BR", {
+			day: "2-digit",
+			month: "long",
+			year: "numeric",
+		});
 
 const allProjects = advisorshipsData as unknown as ProjectAdvisorship[];
 
@@ -301,6 +314,13 @@ const campusHomeViews = Object.fromEntries(
 			Grupos, produção, fomento e orientações do Ifes em pesquisa, extensão e
 			pós-graduação.
 		</p>
+		{
+			painelUpdateLabel && (
+				<p class="font-mono text-xs text-text-muted mt-2">
+					Atualizado em {painelUpdateLabel}
+				</p>
+			)
+		}
 	</header>
 
 	<div class="mb-12">
