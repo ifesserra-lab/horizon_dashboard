@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout.astro";
 import HomeHero from "../components/home/HomeHero.astro";
 import groupsData from "../data/research_groups_canonical.json";
 import projectsData from "../data/initiatives_canonical.json";
+import dataMeta from "../data/_meta.json";
 import { researcherCollectionCounts } from "../lib/researcher-collections";
 import {
     getAggregatedPublications,
@@ -16,16 +17,21 @@ import { getRealCampuses, getGroupsByCampusId } from "../lib/tenant-data";
 const base = import.meta.env.BASE_URL;
 const indexUrl = `${base}search-index.json`;
 
-// Frescor do dado: data do último import ETL, lida do mtime do arquivo
-// canônico de artigos (o pipeline reescreve src/data ao importar). Fallback:
-// data do build. Ver .github/workflows/sync-etl-data.yml.
+// Frescor do dado: data do último import ETL, gravada em src/data/_meta.json
+// pelo pipeline (sync-etl-data.yml) só quando os dados mudam. Fallbacks: mtime
+// do export de artigos e, por fim, a data do build.
 let lastUpdate: Date;
-try {
-    lastUpdate = statSync(
-        fileURLToPath(new URL("../data/articles_canonical.json", import.meta.url)),
-    ).mtime;
-} catch {
-    lastUpdate = new Date();
+const metaDate = new Date((dataMeta as { generated_at?: string }).generated_at ?? "");
+if (!Number.isNaN(metaDate.getTime())) {
+    lastUpdate = metaDate;
+} else {
+    try {
+        lastUpdate = statSync(
+            fileURLToPath(new URL("../data/articles_canonical.json", import.meta.url)),
+        ).mtime;
+    } catch {
+        lastUpdate = new Date();
+    }
 }
 const lastUpdateLabel = lastUpdate.toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -249,13 +255,67 @@ const destaqueFormula =
                     class="text-xs tabular-nums text-text-muted"></span>
             </div>
 
-            <p id="destaqueNote" class="text-xs text-text-muted mb-4 max-w-2xl">
-                <span class="font-mono text-text-main/70"
-                    >índice de destaque =</span
-                >
-                {destaqueFormula} — ponderado pela lente (aluno · professor ·
-                empresa).
-            </p>
+            <details id="destaqueNote" class="destaque-note">
+                <summary>
+                    <span class="font-mono">índice de destaque</span> — como é
+                    calculado?
+                </summary>
+                <div class="destaque-body">
+                    <p class="destaque-formula font-mono">{destaqueFormula}</p>
+                    <ul>
+                        <li>
+                            <strong>√FWCI × 18</strong> — impacto de citação
+                            normalizado por área (FWCI: 1,0 = média mundial para
+                            a mesma área, ano e tipo), via OpenAlex. A raiz
+                            quadrada suaviza a cauda longa das citações; é o sinal
+                            de qualidade, por isso o peso maior.
+                        </li>
+                        <li>
+                            <strong>publicações × 2</strong> — volume de artigos.
+                        </li>
+                        <li>
+                            <strong>projetos × 2</strong> — iniciativas de
+                            pesquisa e extensão.
+                        </li>
+                        <li>
+                            <strong>participações × 1</strong> — vínculos em
+                            grupos de pesquisa.
+                        </li>
+                        <li>
+                            <strong>áreas × 2</strong> — amplitude temática.
+                        </li>
+                        <li><strong>+ 1</strong> — piso, para todo perfil pontuar.</li>
+                    </ul>
+                    <p>
+                        O peso ponderado pela lente (aluno · professor · empresa)
+                        ajusta a ordem ao que cada público procura. A
+                        normalização de citações por campo segue a família de
+                        indicadores <em>crown</em> (Waltman et al., 2011); o
+                        índice h exibido em cada perfil segue Hirsch (2005). Os
+                        pesos são uma calibração editorial do portal, não de um
+                        artigo.
+                    </p>
+                    <p class="destaque-refs">
+                        Referências: FWCI —
+                        <a
+                            href="https://help.openalex.org/hc/en-us/articles/24735753007895-Field-Weighted-Citation-Impact-FWCI"
+                            target="_blank"
+                            rel="noopener">OpenAlex</a
+                        >; Waltman et al. (2011), <em>Scientometrics</em> 87(3):467–481
+                        —
+                        <a
+                            href="https://arxiv.org/abs/1004.1632"
+                            target="_blank"
+                            rel="noopener">arXiv:1004.1632</a
+                        >; Hirsch (2005), <em>PNAS</em> 102(46):16569–72 —
+                        <a
+                            href="https://doi.org/10.1073/pnas.0507655102"
+                            target="_blank"
+                            rel="noopener">doi:10.1073/pnas.0507655102</a
+                        >.
+                    </p>
+                </div>
+            </details>
 
             <div id="results" class="divide-y divide-border-main"></div>
 
@@ -435,6 +495,71 @@ const destaqueFormula =
         .home-tile .arw {
             margin-left: auto;
             color: var(--text-tertiary);
+        }
+
+        /* Metodologia do índice de destaque */
+        .destaque-note {
+            margin-bottom: 1rem;
+            max-width: 46rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .destaque-note > summary {
+            cursor: pointer;
+            list-style: none;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .destaque-note > summary::-webkit-details-marker {
+            display: none;
+        }
+        .destaque-note > summary::after {
+            content: "▸";
+            color: var(--text-tertiary);
+            transition: transform 0.15s;
+        }
+        .destaque-note[open] > summary::after {
+            transform: rotate(90deg);
+        }
+        .destaque-note > summary:hover {
+            color: var(--color-premium-accent);
+        }
+        .destaque-body {
+            margin-top: 0.6rem;
+            padding-left: 0.9rem;
+            border-left: 2px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .destaque-formula {
+            color: var(--text-primary);
+            font-size: 0.78rem;
+            background: var(--tag-bg);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+        .destaque-body ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .destaque-body strong {
+            color: var(--text-primary);
+        }
+        .destaque-refs {
+            color: var(--text-tertiary);
+            font-size: 0.74rem;
+        }
+        .destaque-refs a {
+            color: var(--color-premium-accent);
+            text-decoration: underline;
+            text-underline-offset: 2px;
         }
     </style>
 
