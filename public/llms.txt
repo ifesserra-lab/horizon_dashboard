@@ -1,0 +1,198 @@
+# Horizon — dados abertos de pesquisa do Ifes
+
+> Horizon é o portal público que reúne a produção de pesquisa, extensão e
+> pós-graduação do Instituto Federal do Espírito Santo (Ifes). Este arquivo
+> descreve, para agentes de IA, a semântica dos conjuntos de dados abertos:
+> entidades, campos, relacionamentos (chaves), convenções de valor e a
+> definição das métricas derivadas — o suficiente para entender e processar os
+> dados sem inspeção prévia.
+
+- Portal: https://ifesserra-lab.github.io/horizon_dashboard/
+- Índice de arquivos para download (links atualizados): https://ifesserra-lab.github.io/horizon_dashboard/download/
+- Licença: **CC BY 4.0** — uso livre com atribuição ao Ifes / portal Horizon.
+- Formato: JSON, codificação **UTF-8**. Origem dos dados brutos: Currículo Lattes
+  (CNPq), OpenAlex, e a fundação de apoio FACTO. Pipeline ETL semanal.
+- Os links de cada arquivo têm hash de versão; obtenha-os na página de download
+  acima. Um carimbo de geração está em `_meta.json` (`generated_at`, UTC) e nos
+  campos `generated_at`/`gerado_em` de vários sumários.
+
+## Convenções globais (valem para todos os arquivos)
+
+- **Identificadores** (`id`, `*_id`): tratar sempre como **string**, mesmo quando
+  numéricos. São as chaves para juntar (join) entre arquivos.
+- **Datas**: strings no formato `YYYY-MM-DD HH:MM:SS[.ffffff]` (ex.:
+  `2016-09-26 00:00:00.000000`). Alguns campos trazem só o ano (`year`,
+  `start_year`). Para parsear com segurança, troque o espaço por `T`.
+- **Ausência de valor**: pode vir como `null`, string `"None"` ou `"null"`
+  (herança do export Python). Trate os três como vazio.
+- **`campus`**: a maioria das entidades traz um objeto `campus` `{ id, name }`
+  (ou `campus_name`) indicando a unidade do Ifes. Há uma instituição
+  multicampus; `campuses_canonical.json` lista os campi.
+- **Arrays aninhados** podem estar vazios (`[]`) ou conter objetos parciais.
+- **"canonical"** = entidade consolidada (deduplicada e reconciliada) a partir de
+  vários registros-fonte. **"tracking"/"mart"/"summary"/"graph"** = derivados.
+
+## Entidades canônicas (fatos)
+
+### Pessoas — mesma estrutura, separadas por classificação
+Quatro arquivos com **o mesmo schema**; o campo `classification` distingue o
+tipo, com `classification_confidence` e `classification_note`. Campos: `id`,
+`name`, `identification_id` (pode ser e-mail), `birthday`, `cnpq_url` (URL Lattes;
+o id Lattes de 16 dígitos está embutido), `google_scholar_url`, `resume`,
+`citation_names[]`, `initiatives[]`, `research_groups[]` `{id,name,campus}`,
+`knowledge_areas[]` `{id,name}`, `academic_education[]`, `articles[]` (referências
+mínimas — a fonte completa é `articles_canonical`), `advisorships[]`,
+`classification` (`researcher|student|outside_ifes|null`), `was_student`,
+`was_staff` (booleanos), `campus`.
+
+- `researchers_canonical.json` (10.089) — **todas** as pessoas com evidência de
+  vínculo/atividade (inclui coautores e não-docentes).
+- `researchers_only_canonical.json` (2.472) — subconjunto classificado como
+  **pesquisador** (docentes). É a contagem usada na página /researchers.
+- `students_canonical.json` (6.519) — classificados como **estudante**.
+- `outside_ifes_canonical.json` (849) — colaboradores **sem vínculo** com o Ifes.
+- `null_researchers_canonical.json` (249) — **sem dados suficientes** para
+  classificar (perfis incompletos; não usar as métricas deles como produção).
+
+> Atenção: "quantos pesquisadores" depende da definição. O índice de busca do
+> site conta o bucket amplo (`researchers_canonical`); a seção /researchers usa
+> `researchers_only` (docentes). São métricas diferentes, propositais.
+
+### `research_groups_canonical.json` (18)
+Grupos de pesquisa (CNPq). Campos: `id`, `name`, `short_name`, `description`,
+`organization_id`, `campus_id`, `cnpq_url`, `site`, `organization`, `campus`,
+`knowledge_areas[]` `{id,name}`, `members[]`, `leaders[]`. Membro egresso =
+possui `end_date` preenchido.
+
+### `initiatives_canonical.json` (4.691) — projetos
+Projetos/iniciativas de pesquisa e extensão. Campos: `id`, `name`, `status`
+(`active|concluded|cancelled|in progress`), `description`, `start_date`,
+`end_date`, `initiative_type_id`, `initiative_type`, `organization_id`,
+`organization`, `parent_id`, `team[]`, `demandante`, `campus`, `research_group`
+`{id,...}`, `knowledge_areas[]`, `external_partner`, `external_research_group`.
+Tipos em `initiative_types_canonical.json`.
+
+### `articles_canonical.json` (2.298) — publicações
+Artigos e trabalhos. Campos: `id`, `title`, `doi` (ou null), `year`, `type`
+(`Journal` = periódico; `Conference Event` = evento), `journal_conference`
+(veículo), `volume`, `pages`, `campus`. A página do site
+`/publications/{id}` usa este `id`.
+
+### `research_productions_canonical.json` (1.180) — produção técnica
+Livros, capítulos, softwares, patentes, etc. Campos: `id`, `title`, `year`,
+`production_type_id` (ver `production_types_canonical.json`), `publisher`,
+`isbn`, `edition`, `book_title`, `pages`, `version`, `platform`, `link`,
+`campus`. Autoria em `production_authors_canonical.json`
+(`production_id` ↔ `researcher_id`, relação N:N).
+
+### `advisorships_canonical.json` (173 projetos)
+Array de **projetos**; cada um tem `advisorships[]` (as orientações reais) e
+`team[]`. Cada orientação: `id`, `name`, `status`, `start_date`, `end_date`,
+`type`, `initiative_type`, `person_id`/`person_name` (**orientando**),
+`supervisor_id`/`supervisor_name` (**orientador**), `campus`, `fellowship`
+`{ id, name, value, sponsor_name }`. **`fellowship.value` é MENSAL (R$/mês)** —
+para investimento anual multiplique pelos meses ativos no ano. Bolsas em
+`fellowships_canonical.json`; `value` 0 / `sponsor_name` "Voluntário" = sem bolsa.
+
+### Apoio
+- `knowledge_areas_canonical.json` (1.530) — áreas `{id,name,campus}`.
+- `organizations_canonical.json` (180); `fellowships_canonical.json` (18);
+  `awards_canonical.json` (70, `researcher_id`+`title`+`year`);
+  `professional_activities_canonical.json` (2.790, por `researcher_id`);
+  `proficiencies_canonical.json` (299, idiomas por pessoa);
+  `languages_canonical.json`; `campuses_canonical.json`.
+
+## Relacionamentos (como juntar)
+
+- Pessoa → grupos: `pessoa.research_groups[].id` → `research_groups_canonical.id`.
+- Pessoa → áreas: `pessoa.knowledge_areas[].id` → `knowledge_areas_canonical.id`.
+- Pessoa → publicações: junte por `articles_canonical` (o array `articles` da
+  pessoa é apenas referência; case por id/título+ano).
+- Produção técnica ↔ autor: `production_authors_canonical`
+  (`production_id`, `researcher_id`).
+- Orientação → pessoas: `advisorship.person_id`/`supervisor_id` →
+  `*_canonical` (procure nos 4 arquivos de pessoas).
+- Projeto → grupo/áreas/organização: `initiative.research_group.id`,
+  `knowledge_areas[].id`, `organization_id`.
+- Área → grupos: `knowledge_areas_mart` (`area_id` → `groups[]`).
+- Tudo → campus: campo `campus`/`campus_id` → `campuses_canonical`.
+
+## Derivados: marts e sumários (pré-agregados)
+
+- `initiatives_analytics_mart.json` — `summary` `{total_projects, active_projects,
+  total_participants}`, `evolution` (por ano, com `start`/`end`), `team_composition`,
+  `knowledge_areas`, por campus.
+- `knowledge_areas_mart.json` (312) — `{area_id, area_name, groups_count, groups[],
+  campuses[]}`.
+- `facto_summary.json` — fomento FACTO: `projetos`, `com_info` (com data),
+  `valor_total_aprovado` (R$ aprovado, não necessariamente recebido),
+  `coordenadores_unicos`, `financiadoras`, `top_financiadoras[]`,
+  `por_tipo[]` `{tipo,n}` (Contrato, Convênio, PD&I…), `por_ano[]`.
+- `advisorship_analytics.json` — rankings e stats de orientações/bolsas por campus.
+- `egressos_summary.json` — `{total, with_research, pct_research, dur_median_dias
+  (intervalo IC→TCC, não "até a formatura"), pipeline{both, both_pct, ic_only,
+  tcc_only, same_sup_pct}, cursos[]}`.
+- `collab_summary.json` — `stats` + `hubs[]` `{nome, grau, papers, area}`
+  (grau = vizinhos na rede completa, inclui não-docentes).
+- `research_impact_summary.json` — `kpis` `{n_docentes(93), com_openalex(64),
+  citacoes_total, fwci_medio, fwci_mediano, top10_total, top1_total,
+  gini_citacoes, h_mediano}` + `gerado_em` + `fonte`. Cobre só os 64 docentes com
+  perfil OpenAlex.
+- `researcher_impact.json` (93) — por docente: `{lattes_id, nome, fwci, h, cit}`.
+
+## Grafos de rede (formato node-link, tipo networkx)
+
+Arquivos `*_collaboration_graph.json` (coautoria) e `*_relationship_graph.json`
+(vínculos: grupo, projeto, orientação). Estrutura:
+`{ metadata{generated_at, source, weight_definition, relation_types},
+graph_stats{nodes, edges, connected_components, relation_event_totals},
+graph{directed, multigraph, nodes[], edges[]} }`.
+- **node**: `{id, name, classification, classification_confidence, was_student,
+  was_staff, campus_name, degree, weighted_degree}`.
+- **edge**: `{source, target, weight, initiative_count, article_count,
+  advisorship_count}` (`source`/`target` = `id` de node).
+Variantes por população: `people_*` (todos), `researchers_only_*`, `students_*`,
+`outside_ifes_*`, `null_researchers_*`. Grafos por grupo estão indexados em
+`research_group_membership_graphs_manifest.json` e
+`research_group_relationship_graphs_manifest.json` (campo `graphs[]` com `path`).
+
+## Proveniência / linhagem (rastreabilidade)
+
+Modelo: registros brutos → correspondências → asserções de atributo → entidade
+canônica, com auditoria.
+- `source_records_canonical.json` (17.645) — payload bruto por registro-fonte
+  (`raw_payload_json`, `source_system`, `extracted_at`, `ingestion_run_id`).
+- `entity_matches_canonical.json` (17.501) — liga registro-fonte a entidade
+  canônica com `match_strategy` e `match_confidence`.
+- `attribute_assertions_canonical.json` (88.031) — cada valor de atributo
+  afirmado por uma fonte: `attribute_name`, `value_json`, `is_selected`
+  (o escolhido para o canônico), `selection_reason`, `asserted_at`.
+- `entity_change_logs_canonical.json` (18.448) — histórico de mudanças
+  (`operation`, `before_json`, `after_json`, `reason`).
+- `ingestion_runs_canonical.json` (6) — execuções do ETL (`source_system`,
+  `status`, `started_at`, `finished_at`).
+- `*_tracking.json` — pacote de proveniência consolidado por entidade
+  (`sources`, `attributes`, `matches`, `changes`).
+
+## Métricas derivadas — semântica
+
+- **FWCI** (Field-Weighted Citation Impact) — impacto de citação **normalizado por
+  campo, ano e tipo**; 1,0 = média mundial; >1 acima da média. Fonte OpenAlex.
+  Família do "crown indicator" (Waltman et al., 2011, Scientometrics 87(3):467–481).
+- **Índice h** — Hirsch (2005), PNAS 102(46):16569–72. Nos dados: campo `h`.
+- **Índice de destaque** (ordenação do "Em destaque" na busca) =
+  `√FWCI × 18 + publicações × 2 + projetos × 2 + participações × 1 + áreas × 2 + 1`,
+  ponderado pela lente (aluno/professor/empresa). Pesos = calibração editorial do
+  portal, não de artigo. Ver `docs/metodologia-destaque.md` no repositório.
+- **Gini de citações** — concentração (0 = igual, 1 = concentrado).
+- **Top 10% / Top 1% mundial** — nº de artigos no decil/centil superior de citação.
+
+## Como processar (resumo)
+
+1. Comece por `_meta.json` (frescor) e por este arquivo (semântica).
+2. Carregue as entidades canônicas; trate `id`/`*_id` como string.
+3. Normalize datas (`replace(" ", "T")`) e vazios (`null`/`"None"`/`"null"`).
+4. Junte por ids conforme a seção de relacionamentos.
+5. Para agregados prontos, prefira os `*_mart`/`*_summary`.
+6. Para rede/coautoria, use os `*_graph` (node-link).
+7. Cite a fonte: Ifes / portal Horizon (CC BY 4.0).
