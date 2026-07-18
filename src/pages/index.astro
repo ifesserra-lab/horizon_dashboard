@@ -755,17 +755,8 @@ const destaqueFormula =
 
         function metaBits(e: Entry): string[] {
             const bits: string[] = [];
+            // Áreas viram tags (chips) na linha — ver rowHtml.
             if (e.t === "pesquisador" || e.t === "aluno") {
-                const area = (e.a && e.a[0]) || (e.g && e.g[0]);
-                if (area) {
-                    const verb =
-                        persona === "empresa"
-                            ? "Especialista em"
-                            : persona === "aluno"
-                              ? "Orienta em"
-                              : "Área:";
-                    bits.push(`${verb} ${esc(area)}`);
-                }
                 if (e.f) bits.push(`FWCI ${e.f.toFixed(2)}`);
                 if (e.h) bits.push(`h ${e.h}`);
                 if (e.na) bits.push(`${e.na} publicações`);
@@ -773,7 +764,6 @@ const destaqueFormula =
                 if (e.l && e.l[0]) bits.push(`Líder ${esc(e.l[0])}`);
                 if (e.nm) bits.push(`${e.nm} integrantes`);
             } else if (e.t === "projeto") {
-                if (e.a && e.a[0]) bits.push(esc(e.a[0]));
                 if (e.st) bits.push(esc(e.st));
             } else if (e.t === "publicacao") {
                 if (e.v) bits.push(esc(e.v));
@@ -786,12 +776,37 @@ const destaqueFormula =
         function rowHtml(e: Entry): string {
             const url = TYPE_URL[e.t]?.(e.i) ?? null;
             const meta = metaBits(e).join("  ·  ");
+            const areas = Array.isArray(e.a) ? (e.a as string[]) : [];
+            const areaLabel =
+                e.t === "pesquisador" || e.t === "aluno"
+                    ? persona === "empresa"
+                        ? "Especialista em"
+                        : persona === "aluno"
+                          ? "Orienta em"
+                          : "Atua em"
+                    : e.t === "grupo" || e.t === "projeto"
+                      ? "Áreas"
+                      : "";
+            const chips = areas.length
+                ? `<div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        ${areaLabel ? `<span class="text-[10px] uppercase tracking-wider text-text-muted/70 mr-0.5">${areaLabel}</span>` : ""}
+                        ${areas
+                            .slice(0, 4)
+                            .map(
+                                (a) =>
+                                    `<span class="px-2 py-0.5 rounded-md bg-tag-bg border border-border-main text-[10px] text-text-secondary">${esc(a)}</span>`,
+                            )
+                            .join("")}
+                        ${areas.length > 4 ? `<span class="text-[10px] text-text-muted">+${areas.length - 4}</span>` : ""}
+                    </div>`
+                : "";
             const inner = `
                 <div class="flex items-baseline gap-4 py-4 group">
                     <span class="w-24 flex-none text-[11px] uppercase tracking-wider text-text-muted pt-0.5">${esc(TYPE_LABEL[e.t] || e.t)}</span>
                     <div class="min-w-0 flex-1">
                         <span class="font-display text-lg text-text-main group-hover:text-premium-accent transition-colors">${esc(e.n)}</span>
                         ${meta ? `<div class="text-sm text-text-muted mt-0.5">${meta}</div>` : ""}
+                        ${chips}
                     </div>
                     ${url ? `<span class="flex-none text-text-muted/50 group-hover:text-premium-accent group-hover:translate-x-0.5 transition-all pt-1">→</span>` : ""}
                 </div>`;
