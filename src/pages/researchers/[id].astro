@@ -27,6 +27,7 @@ import ResearcherProfileInitiatives from "../../components/researchers/Researche
 import ResearcherProfileAdvisorships from "../../components/researchers/ResearcherProfileAdvisorships.astro";
 import ResearcherProfileArticles from "../../components/researchers/ResearcherProfileArticles.astro";
 import ResearcherProfileStats from "../../components/researchers/ResearcherProfileStats.astro";
+import ResearcherProfileImpact from "../../components/researchers/ResearcherProfileImpact.astro";
 import PersonInteractionGraph from "../../components/researchers/PersonInteractionGraph.astro";
 import DetailPageJumpMenu from "../../components/navigation/DetailPageJumpMenu.astro";
 import ResearcherProfileAwards from "../../components/researchers/ResearcherProfileAwards.astro";
@@ -291,6 +292,10 @@ const researcherDetailSections = [
                     totalProjects={enrichedResearcher.initiatives.length}
                     totalAdvisorships={researcher.advisorships?.length || 0}
                 />
+            </section>
+
+            <section id="researcher-impact" class="scroll-mt-28">
+                <ResearcherProfileImpact researcher={researcher} />
             </section>
 
             <section id="researcher-dashboard" class="scroll-mt-28">

@@ -1,0 +1,86 @@
+---
+import {
+    getResearcherImpact,
+    openAlexAuthorUrl,
+} from "../../lib/researcher-impact";
+import type { Researcher } from "../../types/researchers";
+
+interface Props {
+    researcher: Researcher;
+}
+
+const { researcher } = Astro.props;
+const impact = getResearcherImpact(researcher);
+const nf = (n: number, d = 0) =>
+    new Intl.NumberFormat("pt-BR", { maximumFractionDigits: d }).format(n);
+
+const cards = impact
+    ? [
+          {
+              value: nf(impact.fwci, 2),
+              label: "FWCI",
+              hint: "1,0 = média mundial da área",
+          },
+          { value: nf(impact.h), label: "Índice h", hint: "Hirsch (2005)" },
+          { value: nf(impact.cit), label: "Citações", hint: "total (OpenAlex)" },
+      ]
+    : [];
+---
+
+{
+    impact && (
+        <div class="glass-card p-6 md:p-8 border border-border-main">
+            <div class="flex items-baseline justify-between gap-4 border-b border-border-main pb-3 mb-5">
+                <h2 class="font-display text-xl font-bold text-text-main">
+                    Impacto científico
+                </h2>
+                <span class="font-mono text-xs text-text-muted">OpenAlex</span>
+            </div>
+            <div class="grid grid-cols-3 gap-px bg-border-main border border-border-main rounded-xl overflow-hidden">
+                {cards.map((c) => (
+                    <div class="bg-surface p-4">
+                        <div class="font-display text-2xl font-bold text-premium-accent tabular-nums">
+                            {c.value}
+                        </div>
+                        <div class="text-xs font-medium text-text-main mt-1">
+                            {c.label}
+                        </div>
+                        <div class="text-[11px] text-text-muted mt-0.5 leading-snug">
+                            {c.hint}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div class="flex items-center justify-between gap-3 mt-4">
+                <p class="text-[11px] text-text-muted-2 leading-snug">
+                    Cobertura bibliométrica casada por DOI; pode não abranger toda
+                    a produção.
+                </p>
+                <a
+                    href={openAlexAuthorUrl(researcher.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Ver perfil no OpenAlex (abre em nova aba)"
+                    class="flex-none inline-flex items-center gap-1.5 text-sm font-bold text-premium-accent hover:underline"
+                >
+                    Ver no OpenAlex
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    )
+}

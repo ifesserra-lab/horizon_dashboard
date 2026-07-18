@@ -113,7 +113,7 @@ if (publication.campus_name) meta.push(publication.campus_name);
 
             {
                 doiUrl && (
-                    <div>
+                    <div class="flex flex-wrap items-center gap-3">
                         <a
                             href={doiUrl}
                             target="_blank"
@@ -137,6 +137,18 @@ if (publication.campus_name) meta.push(publication.campus_name);
                                 <polyline points="15 3 21 3 21 9"></polyline>
                                 <line x1="10" y1="14" x2="21" y2="3"></line>
                             </svg>
+                        </a>
+                        <a
+                            href={`https://openalex.org/works?filter=doi:${encodeURIComponent(doiUrl)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Ver no OpenAlex — citações e acesso aberto (abre em nova aba)"
+                            class="inline-flex items-center gap-2 text-sm font-bold text-premium-accent border border-border-main hover:border-premium-accent rounded-lg px-4 py-2 transition-colors"
+                        >
+                            OpenAlex
+                            <span class="text-text-muted-2 font-normal text-xs">
+                                citações · acesso aberto
+                            </span>
                         </a>
                     </div>
                 )
