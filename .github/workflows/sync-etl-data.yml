@@ -64,7 +64,8 @@ jobs:
             "$exports_api_url" > "$manifest_file"
 
           mkdir -p src/data
-          find src/data -maxdepth 1 -type f -name '*.json' -delete
+          # Preserva o carimbo de frescor (gravado só quando os dados mudam).
+          find src/data -maxdepth 1 -type f -name '*.json' ! -name '_meta.json' -delete
 
           downloaded_count=0
 
@@ -94,7 +95,7 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if git diff --quiet -- src/data; then
+          if git diff --quiet -- src/data ':(exclude)src/data/_meta.json'; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -123,6 +124,9 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Carimbo de frescor do dado (UTC), lido pela home em src/pages/index.astro.
+          printf '{\n  "generated_at": "%s"\n}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > src/data/_meta.json
 
           git add src/data
           git commit -m "chore(data): sync ETL exports"
