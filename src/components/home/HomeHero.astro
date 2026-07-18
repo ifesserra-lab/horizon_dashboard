@@ -63,6 +63,9 @@ const ariaLabel =
 	firstYear && lastYear
 		? `Publicações por ano, de ${firstYear} a ${lastYear}. Total de ${total}. Pico em ${peak.year}, com ${peak.count}.`
 		: "Publicações por ano.";
+
+const pubUrl = `${import.meta.env.BASE_URL}publications`;
+const plural = (n: number) => (n === 1 ? "publicação" : "publicações");
 ---
 
 {
@@ -70,8 +73,11 @@ const ariaLabel =
 		<figure class="home-hero not-sr-only" role="img" aria-label={ariaLabel}>
 			<div class="home-hero-head">
 				<span class="hero-title">Publicações por ano</span>
-				<span class="hero-total">{total.toLocaleString("pt-BR")} no total</span>
+				<a class="hero-total" href={pubUrl}
+					>{total.toLocaleString("pt-BR")} no total →</a
+				>
 			</div>
+			<div class="hero-plot">
 			<svg
 				viewBox={`0 0 ${W} ${H}`}
 				preserveAspectRatio="none"
@@ -134,6 +140,18 @@ const ariaLabel =
 					</g>
 				)}
 			</svg>
+			{/* colunas de hover: tooltip por ano + clique leva a Publicações */}
+			<div class="hero-cols">
+				{series.map((d) => (
+					<a
+						class="hero-col"
+						href={pubUrl}
+						title={`${d.year}: ${d.count} ${plural(d.count)}`}
+						aria-label={`${d.year}: ${d.count} ${plural(d.count)}. Ver publicações.`}
+					/>
+				))}
+			</div>
+			</div>
 
 			{/* rótulos textuais (fonte mono), fora do SVG para não distorcer */}
 			<figcaption class="home-hero-caption">
@@ -174,6 +192,32 @@ const ariaLabel =
 		font-family: var(--font-mono);
 		font-size: 0.7rem;
 		color: var(--brand-green-dark);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.hero-total:hover {
+		color: var(--color-premium-accent);
+	}
+
+	/* Interação: colunas de hover sobre o gráfico */
+	.hero-plot {
+		position: relative;
+	}
+	.hero-cols {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		gap: 1px;
+	}
+	.hero-col {
+		flex: 1;
+		border-radius: 3px;
+		transition: background 0.12s;
+	}
+	.hero-col:hover,
+	.hero-col:focus-visible {
+		background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+		outline: none;
 	}
 	.home-hero-caption {
 		display: flex;

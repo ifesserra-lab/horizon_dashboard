@@ -1,4 +1,6 @@
 ---
+import { statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import Layout from "../layouts/Layout.astro";
 import HomeHero from "../components/home/HomeHero.astro";
 import groupsData from "../data/research_groups_canonical.json";
@@ -7,10 +9,29 @@ import { researcherCollectionCounts } from "../lib/researcher-collections";
 import {
     getAggregatedPublications,
     buildPublicationsMart,
+    getCampusPublicationViews,
 } from "../lib/publications-data";
+import { getRealCampuses, getGroupsByCampusId } from "../lib/tenant-data";
 
 const base = import.meta.env.BASE_URL;
 const indexUrl = `${base}search-index.json`;
+
+// Frescor do dado: data do último import ETL, lida do mtime do arquivo
+// canônico de artigos (o pipeline reescreve src/data ao importar). Fallback:
+// data do build. Ver .github/workflows/sync-etl-data.yml.
+let lastUpdate: Date;
+try {
+    lastUpdate = statSync(
+        fileURLToPath(new URL("../data/articles_canonical.json", import.meta.url)),
+    ).mtime;
+} catch {
+    lastUpdate = new Date();
+}
+const lastUpdateLabel = lastUpdate.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+});
 
 // Números do acervo (dado canônico) — coerentes com as páginas de seção.
 const nf = (n: number) => n.toLocaleString("pt-BR");
@@ -51,6 +72,29 @@ const tiles = [
     { label: "Áreas", href: `${base}knowledge-areas`, type: "area", n: nAreas, word: "áreas", icon: ICON.book },
     { label: "Dados abertos", href: `${base}download`, type: null, sub: "baixar bases", icon: ICON.download },
 ];
+
+// Números por campus (para os atalhos reagirem ao filtro). Chaveado pelo nome
+// do campus — igual ao campo `c` do índice e ao evento campus-filter-change.
+// pesquisadores/projetos/grupos filtram no cliente pelo índice; publicações e
+// áreas (sem campus no índice) vêm daqui, do dado canônico.
+const campusPubViews = getCampusPublicationViews();
+const campusExtra: Record<string, { publicacao: number; area: number }> = {};
+for (const campus of getRealCampuses()) {
+    const cg = getGroupsByCampusId(campus.id);
+    campusExtra[campus.name] = {
+        publicacao:
+            (campusPubViews as any)[campus.id]?.summary?.total_publications ?? 0,
+        area: new Set(
+            cg.flatMap((g: any) =>
+                (g.knowledge_areas || []).map((a: any) => a.id),
+            ),
+        ).size,
+    };
+}
+
+// Fórmula do índice de destaque (mesma do score() da busca, query vazia).
+const destaqueFormula =
+    "√FWCI × 18 + publicações × 2 + projetos × 2 + participações × 1 + áreas × 2 + 1";
 ---
 
 <Layout title="Buscar pesquisa">
@@ -59,6 +103,7 @@ const tiles = [
         data-base={base}
         data-index-url={indexUrl}
         data-areas={nAreas}
+        data-campus-extra={JSON.stringify(campusExtra)}
     >
         <!-- Hero — editorial, left-aligned -->
         <section class="pt-12 pb-8">
@@ -136,6 +181,9 @@ const tiles = [
                     ))
                 }
             </div>
+            <p class="mt-2 font-mono text-xs text-text-muted">
+                Atualizado em {lastUpdateLabel}
+            </p>
 
             <!-- Entradas por seção -->
             <div class="home-tiles mt-4">
@@ -200,6 +248,14 @@ const tiles = [
                     id="resultsCount"
                     class="text-xs tabular-nums text-text-muted"></span>
             </div>
+
+            <p id="destaqueNote" class="text-xs text-text-muted mb-4 max-w-2xl">
+                <span class="font-mono text-text-main/70"
+                    >índice de destaque =</span
+                >
+                {destaqueFormula} — ponderado pela lente (aluno · professor ·
+                empresa).
+            </p>
 
             <div id="results" class="divide-y divide-border-main"></div>
 
@@ -410,18 +466,34 @@ const tiles = [
         const base = root.dataset.base || "/";
         const indexUrl = root.dataset.indexUrl as string;
         const areasCount = Number(root.dataset.areas) || 0;
+        const campusExtra: Record<
+            string,
+            { publicacao: number; area: number }
+        > = JSON.parse(root.dataset.campusExtra || "{}");
+        const activeCampusName = () =>
+            document.documentElement.dataset.activeCampusName || "";
 
-        // Preenche os números do acervo (stats + tiles) a partir do índice,
-        // para baterem com as facetas. "area" não está no índice → valor do servidor.
-        function fillCounts() {
-            const counts: Record<string, number> = { area: areasCount };
-            for (const e of entries) counts[e.t] = (counts[e.t] || 0) + 1;
+        // Preenche os números do acervo (stats + tiles). Sem campus: do índice
+        // (batem com as facetas). Com campus: pesquisadores/projetos/grupos
+        // filtram pelo campo `c` do índice; publicações e áreas (sem campus no
+        // índice) vêm do mapa do servidor.
+        function fillCounts(campusName: string) {
+            const counts: Record<string, number> = {};
+            if (campusName && campusExtra[campusName]) {
+                for (const e of entries)
+                    if (e.c === campusName)
+                        counts[e.t] = (counts[e.t] || 0) + 1;
+                counts.publicacao = campusExtra[campusName].publicacao;
+                counts.area = campusExtra[campusName].area;
+            } else {
+                for (const e of entries) counts[e.t] = (counts[e.t] || 0) + 1;
+                counts.area = areasCount;
+            }
             document
                 .querySelectorAll<HTMLElement>("[data-count]")
                 .forEach((el) => {
                     const t = el.dataset.count as string;
-                    if (typeof counts[t] === "number")
-                        el.textContent = counts[t].toLocaleString("pt-BR");
+                    el.textContent = (counts[t] || 0).toLocaleString("pt-BR");
                 });
         }
 
@@ -510,7 +582,50 @@ const tiles = [
             let list = entries.map((e) => ({ e, s: score(e, tokens) })).filter((x) => x.s > 0);
             if (fType) list = list.filter((x) => x.e.t === fType);
             list.sort((a, b) => b.s - a.s);
-            return list.map((x) => x.e);
+            const ranked = list.map((x) => x.e);
+            // Destaques rotativos: sem busca e sem filtro, alterna tipos
+            // (pesquisadores, grupos, projetos, publicações) e rotaciona a cada
+            // visita para não mostrar sempre os mesmos.
+            if (tokens.length === 0 && !fType) return diversify(ranked);
+            return ranked;
+        }
+
+        function diversify(ranked: Entry[]): Entry[] {
+            const byType: Record<string, Entry[]> = {};
+            for (const e of ranked) (byType[e.t] ||= []).push(e);
+            const order = ["pesquisador", "grupo", "projeto", "publicacao", "aluno"];
+            const rot = Math.floor(Date.now() / 60000); // muda a cada minuto
+            const pools: Record<string, Entry[]> = {};
+            const idx: Record<string, number> = {};
+            for (const t of order) {
+                const p = (byType[t] || []).slice(0, 12); // rotaciona dentro do topo
+                pools[t] = p;
+                idx[t] = p.length ? rot % p.length : 0;
+            }
+            const out: Entry[] = [];
+            const seen = new Set<Entry>();
+            let added = true;
+            while (added && out.length < 40) {
+                added = false;
+                for (const t of order) {
+                    const p = pools[t];
+                    if (!p.length) continue;
+                    let e: Entry | null = null;
+                    for (let tries = 0; tries < p.length; tries++) {
+                        const cand = p[idx[t]++ % p.length];
+                        if (!seen.has(cand)) {
+                            e = cand;
+                            break;
+                        }
+                    }
+                    if (e) {
+                        seen.add(e);
+                        out.push(e);
+                        added = true;
+                    }
+                }
+            }
+            return out;
         }
 
         function metaBits(e: Entry): string[] {
@@ -583,6 +698,8 @@ const tiles = [
 
             $("resultsTitle").textContent = query ? "Resultados" : "Em destaque";
             $("resultsCount").textContent = `${res.length}`;
+            // Fórmula do índice só no modo "Em destaque".
+            $("destaqueNote").style.display = query || fType ? "none" : "block";
 
             const box = $("results");
             $("loadingState").classList.add("hidden");
@@ -653,12 +770,18 @@ const tiles = [
 
         syncPersonaButtons();
 
+        // Atalhos e números reagem ao filtro de campus.
+        window.addEventListener("campus-filter-change", (ev) => {
+            const detail = (ev as CustomEvent).detail || {};
+            fillCounts(detail.campusName || "");
+        });
+
         fetch(indexUrl)
             .then((r) => r.json())
             .then((data: Entry[]) => {
                 entries = data;
                 for (const e of entries) e._s = normalizeSearchText(searchText(e));
-                fillCounts();
+                fillCounts(activeCampusName());
                 buildSuggest();
                 render();
             })
