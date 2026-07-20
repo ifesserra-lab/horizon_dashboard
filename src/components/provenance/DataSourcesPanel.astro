@@ -28,30 +28,42 @@ const formatDateTime = (value: string | null) => {
 
 {
     visibleFields.length > 0 && (
-        <section class="glass-card p-8 space-y-6" aria-labelledby="data-sources-title">
-            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div>
+        <details class="glass-card p-6 group" aria-labelledby="data-sources-title">
+            <summary class="list-none cursor-pointer flex items-center justify-between gap-4">
+                <div class="flex items-baseline gap-3 flex-wrap">
                     <h3
                         id="data-sources-title"
-                        class="text-2xl font-bold font-display text-text-main"
+                        class="text-lg font-bold font-display text-text-main"
                     >
                         {title}
                     </h3>
-                    {
-                        intro && (
-                            <p class="text-sm text-text-secondary mt-2 max-w-3xl">
-                                {intro}
-                            </p>
-                        )
-                    }
+                    <span class="text-xs text-text-secondary">
+                        {visibleFields.length} blocos rastreados
+                    </span>
                 </div>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-text-secondary shrink-0 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </summary>
 
-                <span class="px-3 py-1 rounded-full bg-premium-accent/10 text-premium-accent border border-premium-accent/20 text-[10px] font-bold uppercase tracking-wider w-fit">
-                    {visibleFields.length} blocos rastreados
-                </span>
-            </div>
+            {
+                intro && (
+                    <p class="text-xs text-text-secondary mt-2 max-w-3xl">
+                        {intro}
+                    </p>
+                )
+            }
 
-            <div class="space-y-4">
+            <div class="mt-4 space-y-1.5">
                 {
                     visibleFields.map((field) => {
                         const systemLabels = [
@@ -59,46 +71,55 @@ const formatDateTime = (value: string | null) => {
                         ];
 
                         return (
-                            <details class="rounded-2xl border border-border-main bg-[var(--tag-bg)]/40 p-4">
-                                <summary class="list-none cursor-pointer flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                                    <div>
-                                        <p class="text-sm font-bold text-text-main">
-                                            {field.label}
-                                        </p>
-                                        {
-                                            field.description && (
-                                                <p class="text-sm text-text-secondary mt-1">
-                                                    {field.description}
-                                                </p>
-                                            )
-                                        }
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-2">
+                            <details class="rounded-lg border border-border-main bg-[var(--tag-bg)]/40 px-3 py-2 group/field">
+                                <summary class="list-none cursor-pointer flex items-center justify-between gap-3">
+                                    <span class="text-sm font-bold text-text-main truncate">
+                                        {field.label}
+                                    </span>
+                                    <div class="flex items-center gap-1.5 shrink-0">
                                         {
                                             systemLabels.map((label) => (
-                                                <span class="px-2.5 py-1 rounded-full bg-track border border-border-main text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                                                <span class="px-2 py-0.5 rounded-full bg-track border border-border-main text-[9px] font-bold uppercase tracking-wider text-text-secondary">
                                                     {label}
                                                 </span>
                                             ))
                                         }
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="w-3.5 h-3.5 text-text-secondary transition-transform group-open/field:rotate-180"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
                                     </div>
                                 </summary>
 
-                                <div class="mt-4 pt-4 border-t border-border-main space-y-3">
+                                <div class="mt-3 pt-3 border-t border-border-main space-y-3">
+                                    {
+                                        field.description && (
+                                            <p class="text-xs text-text-secondary">
+                                                {field.description}
+                                            </p>
+                                        )
+                                    }
                                     {
                                         field.sources.map((source) => (
-                                            <article class="rounded-xl border border-border-main/70 bg-surface p-4 space-y-2">
-                                                <div class="flex flex-wrap gap-2">
-                                                    <span class="px-2 py-0.5 rounded-full bg-premium-accent/10 text-premium-accent text-[10px] font-bold uppercase tracking-wider">
+                                            <article class="rounded-lg border border-border-main/70 bg-surface p-3 space-y-2">
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    <span class="px-2 py-0.5 rounded-full bg-premium-accent/10 text-premium-accent text-[9px] font-bold uppercase tracking-wider">
                                                         {source.sourceSystemLabel}
                                                     </span>
-                                                    <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                    <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[9px] font-bold uppercase tracking-wider border border-border-main">
                                                         {source.sourceEntityLabel}
                                                     </span>
                                                     {
                                                         source.flowName && (
-                                                            <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[10px] font-bold uppercase tracking-wider border border-border-main">
+                                                            <span class="px-2 py-0.5 rounded-full bg-track text-text-secondary text-[9px] font-bold uppercase tracking-wider border border-border-main">
                                                                 {source.flowName}
                                                             </span>
                                                         )
@@ -160,6 +181,6 @@ const formatDateTime = (value: string | null) => {
                     })
                 }
             </div>
-        </section>
+        </details>
     )
 }

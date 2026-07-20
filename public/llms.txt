@@ -64,13 +64,27 @@ Grupos de pesquisa (CNPq). Campos: `id`, `name`, `short_name`, `description`,
 `knowledge_areas[]` `{id,name}`, `members[]`, `leaders[]`. Membro egresso =
 possui `end_date` preenchido.
 
-### `initiatives_canonical.json` (4.691) — projetos
+### `initiatives_canonical.json` (4.737) — projetos
 Projetos/iniciativas de pesquisa e extensão. Campos: `id`, `name`, `status`
 (`active|concluded|cancelled|in progress`), `description`, `start_date`,
 `end_date`, `initiative_type_id`, `initiative_type`, `organization_id`,
 `organization`, `parent_id`, `team[]`, `demandante`, `campus`, `research_group`
-`{id,...}`, `knowledge_areas[]`, `external_partner`, `external_research_group`.
-Tipos em `initiative_types_canonical.json`.
+`{id,...}`, `knowledge_areas[]`, `external_partner`, `external_research_group`,
+`enrichment` (objeto ou `null`). Tipos em `initiative_types_canonical.json`.
+
+**Campo `enrichment`** — dados extraídos por LLM dos documentos de projeto do
+SigPesq (planos de projeto em PDF/DOC), presente em ~310 projetos. Estrutura:
+`source`, `project_code` (código SigPesq "PJ NNNN"), `match_strategy`
+(`sigpesq_project_code` = casado por código, projeto aprovado; `title_exact` /
+`title_fuzzy` = casado por título; `new_from_document` = projeto criado a partir
+do documento, sem correspondência prévia na base), `needs_review` (booleano — `true`
+para matches por título aproximado e projetos novos, que merecem verificação
+humana), `objetivos` `{geral, especificos[]}`, `cronograma[]`
+`{atividade, inicio, fim}` (datas em `YYYY-MM`), `linha_pesquisa`,
+`palavras_chave[]`, `area_conhecimento`, `extracted_at`, `extraction_model`
+(modelo LLM usado), `source_file` (arquivo de origem). Os 46 projetos
+`new_from_document` são planos que não constavam no relatório Excel do SigPesq;
+seus metadados vêm apenas do documento e devem ser tratados como `needs_review`.
 
 ### `articles_canonical.json` (2.298) — publicações
 Artigos e trabalhos. Campos: `id`, `title`, `doi` (ou null), `year`, `type`
