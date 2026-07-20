@@ -7,7 +7,7 @@
 // Tables: nested object/list fields are stored as JSON strings by the ETL
 // Parquet export and revived here. Graphs: reassembled from the sibling
 // <name>.nodes.parquet + <name>.edges.parquet + <name>.meta.json.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parquetReadObjects } from "hyparquet";
@@ -26,31 +26,54 @@ function asyncBufferFromFile(path) {
   };
 }
 
-function reviveValue(v) {
-  if (typeof v === "string" && (v[0] === "[" || v[0] === "{")) {
-    try {
-      return JSON.parse(v);
-    } catch {
-      return v;
-    }
-  }
+function normalizeScalar(v) {
   // hyparquet may return BigInt for integer columns; JSON-embed as Number.
-  if (typeof v === "bigint") return Number(v);
-  return v;
+  return typeof v === "bigint" ? Number(v) : v;
 }
 
-function reviveRows(rows) {
-  return rows.map((row) => {
-    const out = {};
-    for (const k in row) out[k] = reviveValue(row[k]);
-    return out;
-  });
+function parseJson(v) {
+  if (typeof v !== "string") return normalizeScalar(v);
+  try {
+    return JSON.parse(v);
+  } catch {
+    return v;
+  }
+}
+
+// jsonCols: Set of column names known (via the .cols.json sidecar) to hold
+// JSON-encoded values. When null (no sidecar) fall back to a heuristic that
+// parses strings starting with "[" or "{".
+function reviveRow(row, jsonCols) {
+  const out = {};
+  for (const k in row) {
+    const v = row[k];
+    if (jsonCols) {
+      out[k] = jsonCols.has(k) ? parseJson(v) : normalizeScalar(v);
+    } else if (typeof v === "string" && (v[0] === "[" || v[0] === "{")) {
+      out[k] = parseJson(v);
+    } else {
+      out[k] = normalizeScalar(v);
+    }
+  }
+  return out;
+}
+
+function loadSidecarColumns(parquetPath) {
+  const sidecar = parquetPath.replace(/\.parquet$/, ".cols.json");
+  if (!existsSync(sidecar)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(sidecar, "utf8"));
+    return new Set(parsed.json_columns || []);
+  } catch {
+    return null;
+  }
 }
 
 async function readTable(path) {
   const file = asyncBufferFromFile(path);
   const rows = await parquetReadObjects({ file, compressors });
-  return reviveRows(rows);
+  const jsonCols = loadSidecarColumns(path);
+  return rows.map((row) => reviveRow(row, jsonCols));
 }
 
 export default function parquetPlugin() {
