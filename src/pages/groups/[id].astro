@@ -20,6 +20,9 @@ import type {
 } from "../../types/groups";
 import type { Project } from "../../types/projects";
 
+// Per-group relationship graphs stay JSON (loaded lazily per page). Converting
+// these 345 files to Parquet made the build embed all of them via the plugin
+// and OOM; JSON's native lazy handling keeps the build within memory.
 const graphModules = import.meta.glob<{
 	default: ResearchGroupInteractionRawGraphFile;
 }>("../../data/research_group_relationship_graphs/*.json");
@@ -107,6 +110,7 @@ const resolveGraphImporter = <T,>(
 	path
 		? Object.entries(modules).find(([modulePath]) => modulePath.endsWith(path))?.[1] ?? null
 		: null;
+
 
 const summarizeCountRecord = (record?: Record<string, number | undefined>) =>
 	Object.entries(record ?? {})
