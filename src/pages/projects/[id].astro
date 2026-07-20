@@ -46,6 +46,30 @@ interface Props {
 
 const { project } = Astro.props;
 
+const enrichment = project.enrichment ?? null;
+const objetivosEspecificos = enrichment?.objetivos?.especificos ?? [];
+const cronograma = enrichment?.cronograma ?? [];
+const palavrasChave = enrichment?.palavras_chave ?? [];
+
+/**
+ * Formats a short schedule date. Values usually come as "YYYY-MM" or
+ * "YYYY-MM-DD"; anything else is shown verbatim (or a dash when empty).
+ */
+const formatScheduleDate = (value: string | null | undefined) => {
+	if (!value) return "—";
+	const monthMatch = /^(\d{4})-(\d{2})$/.exec(value);
+	if (monthMatch) return `${monthMatch[2]}/${monthMatch[1]}`;
+	const fullMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+	if (fullMatch) return `${fullMatch[3]}/${fullMatch[2]}/${fullMatch[1]}`;
+	return value;
+};
+
+const matchStrategyLabels: Record<string, string> = {
+	sigpesq_project_code: "Código SigPesq",
+	title_exact: "Título exato",
+	title_fuzzy: "Título aproximado",
+};
+
 /**
  * Formats a date string into a localized Brazilian Portuguese format (DD/MM/YYYY).
  *
@@ -202,6 +226,9 @@ const teamSections = [
 
 const projectDetailSections = [
 	{ id: "project-overview", label: "Visão geral" },
+	...(enrichment
+		? [{ id: "project-enrichment", label: "Detalhes do projeto" }]
+		: []),
 	{ id: "project-team", label: "Equipe do projeto" },
 	{ id: "project-sources", label: "Fontes dos dados" },
 ];
@@ -355,6 +382,179 @@ const projectDetailSections = [
 					)
 				}
 			</article>
+
+			{
+				enrichment && (
+					<section
+						id="project-enrichment"
+						aria-labelledby="enrichment-title"
+						class="glass-card scroll-mt-28 p-8 space-y-8"
+					>
+						<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+							<div>
+								<h3
+									id="enrichment-title"
+									class="text-2xl font-bold font-display text-text-main"
+								>
+									Detalhes do projeto
+								</h3>
+								<p class="text-sm text-text-secondary mt-1">
+									Informações extraídas do documento do projeto (SigPesq).
+								</p>
+							</div>
+							{enrichment.needs_review && (
+								<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-bold uppercase tracking-wider text-amber-500 h-fit">
+									<span class="w-1.5 h-1.5 rounded-full bg-amber-500" />
+									Revisão pendente
+								</span>
+							)}
+						</div>
+
+						{(enrichment.linha_pesquisa || enrichment.area_conhecimento) && (
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+								{enrichment.linha_pesquisa && (
+									<div>
+										<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-2">
+											Linha de pesquisa
+										</h4>
+										<p class="text-text-secondary text-sm">
+											{enrichment.linha_pesquisa}
+										</p>
+									</div>
+								)}
+								{enrichment.area_conhecimento && (
+									<div>
+										<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-2">
+											Área de conhecimento
+										</h4>
+										<p class="text-text-secondary text-sm">
+											{enrichment.area_conhecimento}
+										</p>
+									</div>
+								)}
+							</div>
+						)}
+
+						{palavrasChave.length > 0 && (
+							<div>
+								<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">
+									Palavras-chave
+								</h4>
+								<div class="flex flex-wrap gap-2">
+									{palavrasChave.map((keyword) => (
+										<span class="inline-flex items-center px-3 py-1 rounded-full bg-premium-accent/10 border border-premium-accent/20 text-xs font-bold text-premium-accent">
+											{keyword}
+										</span>
+									))}
+								</div>
+							</div>
+						)}
+
+						{enrichment.objetivos?.geral && (
+							<div>
+								<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">
+									Objetivo geral
+								</h4>
+								<p class="text-text-secondary leading-relaxed whitespace-pre-wrap">
+									{enrichment.objetivos.geral}
+								</p>
+							</div>
+						)}
+
+						{objetivosEspecificos.length > 0 && (
+							<div>
+								<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">
+									Objetivos específicos ({objetivosEspecificos.length})
+								</h4>
+								<ul class="space-y-2">
+									{objetivosEspecificos.map((objetivo) => (
+										<li class="flex gap-3 text-text-secondary text-sm leading-relaxed">
+											<span
+												aria-hidden="true"
+												class="mt-2 w-1.5 h-1.5 rounded-full bg-premium-purple shrink-0"
+											/>
+											<span>{objetivo}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+
+						{cronograma.length > 0 && (
+							<div>
+								<h4 class="text-text-main text-sm font-bold uppercase tracking-wider mb-3">
+									Cronograma ({cronograma.length} atividades)
+								</h4>
+								<div class="overflow-x-auto rounded-2xl border border-border-main">
+									<table class="w-full text-sm text-left">
+										<thead>
+											<tr class="bg-[var(--tag-bg)] text-text-secondary">
+												<th class="px-4 py-3 font-bold uppercase tracking-wider text-xs">
+													Atividade
+												</th>
+												<th class="px-4 py-3 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
+													Início
+												</th>
+												<th class="px-4 py-3 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
+													Fim
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											{cronograma.map((item) => (
+												<tr class="border-t border-border-main/60">
+													<td class="px-4 py-3 text-text-main">
+														{item.atividade ?? "—"}
+													</td>
+													<td class="px-4 py-3 text-text-secondary whitespace-nowrap">
+														{formatScheduleDate(item.inicio)}
+													</td>
+													<td class="px-4 py-3 text-text-secondary whitespace-nowrap">
+														{formatScheduleDate(item.fim)}
+													</td>
+												</tr>
+											))}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						)}
+
+						<div class="pt-6 border-t border-border-main text-xs text-text-secondary flex flex-wrap gap-x-6 gap-y-2">
+							<span>
+								<span class="font-bold text-text-main">Origem:</span>{" "}
+								Documento SigPesq
+								{enrichment.project_code
+									? ` (PJ ${enrichment.project_code})`
+									: ""}
+							</span>
+							<span>
+								<span class="font-bold text-text-main">Vínculo:</span>{" "}
+								{matchStrategyLabels[enrichment.match_strategy] ??
+									enrichment.match_strategy}
+							</span>
+							{enrichment.extraction_model && (
+								<span>
+									<span class="font-bold text-text-main">Extração:</span>{" "}
+									{enrichment.extraction_model}
+								</span>
+							)}
+							{enrichment.extracted_at && (
+								<span>
+									<span class="font-bold text-text-main">Em:</span>{" "}
+									{formatDate(enrichment.extracted_at)}
+								</span>
+							)}
+							{enrichment.source_file && (
+								<span>
+									<span class="font-bold text-text-main">Arquivo:</span>{" "}
+									{enrichment.source_file}
+								</span>
+							)}
+						</div>
+					</section>
+				)
+			}
 
 			<!-- Members Section -->
 			<section

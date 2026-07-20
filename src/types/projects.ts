@@ -12,6 +12,32 @@ export interface InitiativeType {
     description: string | null;
 }
 
+export interface ProjectScheduleItem {
+    atividade: string | null;
+    inicio: string | null;
+    fim: string | null;
+}
+
+export interface ProjectObjectives {
+    geral?: string | null;
+    especificos?: string[];
+}
+
+export interface ProjectEnrichment {
+    source: string;
+    project_code: string | null;
+    match_strategy: string;
+    needs_review: boolean;
+    objetivos: ProjectObjectives;
+    cronograma: ProjectScheduleItem[];
+    linha_pesquisa: string | null;
+    palavras_chave: string[];
+    area_conhecimento: string | null;
+    extracted_at: string | null;
+    extraction_model: string | null;
+    source_file: string | null;
+}
+
 export interface Project {
     id: number;
     name: string;
@@ -28,4 +54,5 @@ export interface Project {
         name: string;
     } | null;
     team?: TeamMember[];
+    enrichment?: ProjectEnrichment | null;
 }
