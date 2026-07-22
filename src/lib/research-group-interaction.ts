@@ -81,12 +81,32 @@ export const resolveResearchGroupInteractionProfileHref = (
     return `${normalizeBaseUrl(baseUrl)}${prefix}/${personId}`;
 };
 
+const normalizeRelationKey = (relationType: string): string => {
+    if (!relationType) return "";
+    const norm = String(relationType)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/_/g, " ")
+        .trim();
+
+    if (norm === "project" || norm === "projeto") return "projeto";
+    if (norm === "orientation" || norm === "orientacao" || norm === "advisorship") return "orientacao";
+    if (norm === "article" || norm === "artigo") return "artigo";
+    if (norm === "initiative" || norm === "iniciativa") return "iniciativa";
+    if (norm === "research group" || norm === "grupo de pesquisa" || norm === "research_group") return "grupo de pesquisa";
+
+    return norm;
+};
+
 const normalizeRelationTypes = (
     edge: ResearchGroupInteractionRawEdge,
 ): ResearchGroupInteractionRelationType[] => {
-    const declaredTypes = Array.isArray(edge.relation_types)
-        ? RELATION_TYPE_ORDER.filter((type) => edge.relation_types?.includes(type))
-        : [];
+    const rawDeclared = Array.isArray(edge.relation_types) ? edge.relation_types : [];
+    const declaredTypes = RELATION_TYPE_ORDER.filter((type) => {
+        const normType = normalizeRelationKey(type);
+        return rawDeclared.some((raw) => normalizeRelationKey(raw) === normType);
+    });
 
     if (declaredTypes.length > 0) {
         return declaredTypes;

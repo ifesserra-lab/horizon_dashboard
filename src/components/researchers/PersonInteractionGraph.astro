@@ -7,6 +7,7 @@ import type {
     StudentInteractionRelationType,
     StudentInteractionViewModel,
 } from "../../types/student-graphs";
+import GraphLegend from "../graphs/GraphLegend.astro";
 
 interface Props {
     graph: StudentInteractionViewModel;
@@ -14,22 +15,50 @@ interface Props {
 
 const { graph } = Astro.props;
 
-const relationLabels: Record<StudentInteractionRelationType, string> = {
+const normalizeRelationKey = (relationType: string): string => {
+    if (!relationType) return "";
+    const norm = String(relationType)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/_/g, " ")
+        .trim();
+
+    if (norm === "project" || norm === "projeto") return "projeto";
+    if (norm === "orientation" || norm === "orientacao" || norm === "advisorship") return "orientacao";
+    if (norm === "article" || norm === "artigo") return "artigo";
+    if (norm === "initiative" || norm === "iniciativa") return "iniciativa";
+    if (norm === "research group" || norm === "grupo de pesquisa" || norm === "research_group") return "grupo de pesquisa";
+
+    return norm;
+};
+
+const relationLabels: Record<string, string> = {
     project: "Projeto",
+    projeto: "Projeto",
     orientation: "Orientação",
+    orientacao: "Orientação",
     article: "Artigo",
+    artigo: "Artigo",
     initiative: "Iniciativa",
+    iniciativa: "Iniciativa",
     research_group: "Grupo de pesquisa",
+    "grupo de pesquisa": "Grupo de pesquisa",
     advisorship: "Orientação",
 };
 
-const relationColors: Record<StudentInteractionRelationType, string> = {
+const relationColors: Record<string, string> = {
+    projeto: "#0f766e",
     project: "#0f766e",
+    orientacao: "#d97706",
     orientation: "#d97706",
-    article: "var(--color-chart-1)",
-    initiative: "#0891b2",
-    research_group: "#475569",
     advisorship: "#d97706",
+    artigo: "#0284c7",
+    article: "#0284c7",
+    iniciativa: "#0891b2",
+    initiative: "#0891b2",
+    "grupo de pesquisa": "#475569",
+    research_group: "#475569",
 };
 
 const graphTitle =
@@ -38,6 +67,7 @@ const graphTitle =
         : "Grafo de relacionamento";
 const graphBadge =
     graph.graphKind === "collaboration" ? "Colaboração direta" : "Relacionamento direto";
+const graphDataSource = graph.graphDataSource;
 const focusEntityLabel =
     graph.focusClassification === "student"
         ? "estudante"
@@ -48,24 +78,24 @@ const focusEntityLabel =
             : "perfil";
 const graphDescriptionTail =
     graph.graphKind === "collaboration"
-        ? `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas as colaborações diretas registradas nos dados.`
-        : `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas os relacionamentos diretos registrados nos dados.`;
+        ? `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas as colaborações diretas registradas no export.`
+        : `O nó central representa o ${focusEntityLabel} e as arestas mostram apenas os relacionamentos diretos registrados no export.`;
 const graphEmptyDescription =
     graph.graphKind === "collaboration"
-        ? `Nenhuma colaboração direta foi registrada para este ${focusEntityLabel} nesta rede.`
-        : `Nenhum relacionamento direto foi registrado para este ${focusEntityLabel} nesta rede.`;
+        ? `Nenhuma colaboração direta foi registrada para este ${focusEntityLabel} neste recorte.`
+        : `Nenhum relacionamento direto foi registrado para este ${focusEntityLabel} neste recorte.`;
 const graphConceptHeading =
     graph.graphKind === "collaboration"
         ? "Como ler o grafo de colaboração"
         : "Como ler o grafo de relacionamento";
 const graphConceptText =
     graph.graphKind === "collaboration"
-        ? "Esta visão prioriza trabalho conjunto explícito, como projeto, artigo e orientação. Por isso ela tende a ser menor e mais seletiva."
-        : "Esta visão é mais ampla e registra vínculos acadêmicos ou institucionais. Dependendo dos dados, ela pode incluir projeto, artigo, orientação, iniciativa compartilhada e sobreposição em grupos, então costuma ser mais densa que o grafo de colaboração.";
+        ? "Este recorte prioriza trabalho conjunto explícito, como projeto, artigo e orientação. Por isso ele tende a ser menor e mais seletivo."
+        : "Este recorte é mais amplo e registra vínculos acadêmicos ou institucionais. Dependendo do export, ele pode incluir projeto, artigo, orientação, iniciativa compartilhada e sobreposição em grupos, então costuma ser mais denso que o grafo de colaboração.";
 
 const focusNode = graph.nodes.find((node) => node.isFocus) ?? graph.nodes[0];
 const edgeByTargetId = new Map(graph.edges.map((edge) => [edge.target, edge]));
-const neighborNodes = graph.nodes.filter((node) => !node.isFocus);
+const neighborNodes = graph.nodes.filter((node) => !node.isFocus && node.id !== focusNode.id);
 const availableRelationTypes = graph.stats.availableRelationTypes;
 const topConnections = graph.topConnections.slice(0, 8);
 const remainingConnections = Math.max(0, graph.topConnections.length - topConnections.length);
@@ -77,45 +107,43 @@ const metrics = [
     {
         label: "Pessoas exibidas",
         value: graph.stats.nodeCount,
+        key: "displayed-nodes",
     },
     {
         label: "Conexões diretas",
         value: graph.stats.edgeCount,
+        key: "displayed-edges",
     },
     {
         label: "Peso acumulado",
         value: graph.stats.totalWeight,
+        key: "total-weight",
     },
     {
         label: "Tipos de vínculo",
         value: graph.stats.availableRelationTypes.length,
+        key: "relation-types",
     },
 ];
 
-const getRelationColor = (relationTypes: StudentInteractionRelationType[]) => {
+const getRelationColor = (relationTypes: (string | StudentInteractionRelationType)[]) => {
+    if (!relationTypes || relationTypes.length === 0) return "#94a3b8";
     if (relationTypes.length > 1) return "#7c3aed";
 
     const firstRelationType = relationTypes[0];
-    return firstRelationType ? relationColors[firstRelationType] : "var(--color-chart-6)";
+    if (!firstRelationType) return "#94a3b8";
+
+    const normalizedKey = normalizeRelationKey(firstRelationType);
+    return relationColors[normalizedKey] ?? relationColors[firstRelationType] ?? "#94a3b8";
 };
 
 const truncateLabel = (value: string, maxLength: number) =>
     value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
 
-const getEdgeLabelText = (edge: StudentInteractionEdge) => {
-    const relationText = edge.relationTypes
-        .map((type) => relationLabels[type])
-        .join(" + ");
-
-    if (!relationText) {
-        return "Sem relação";
-    }
-
-    return truncateLabel(relationText, usesDenseLabels ? 18 : 28);
-};
-
 const describeEdge = (edge: StudentInteractionEdge) => {
-    const relationText = edge.relationTypes.map((type) => relationLabels[type]).join(" + ");
+    const relationText = edge.relationTypes
+        .map((type) => relationLabels[type] ?? relationLabels[normalizeRelationKey(type)] ?? type)
+        .join(" + ");
 
     if (!relationText) {
         return `Peso ${edge.weight}`;
@@ -140,18 +168,11 @@ interface GraphLayout {
 }
 
 interface NodeLabelPlacement {
+    id: string;
     text: string;
     x: number;
     y: number;
     textAnchor: "start" | "middle" | "end";
-}
-
-interface EdgeLabelPlacement {
-    text: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
 }
 
 const createGraphLayout = (
@@ -170,28 +191,32 @@ const createGraphLayout = (
     const ringRadii: number[] = [];
     const baseNeighborRadius = 8;
 
+    // Pin the central node to the exact center (0,0) initially
     positions.set(focus.id, {
         x: 0,
         y: 0,
         radius: 22,
-        stroke: "var(--color-surface)",
+        stroke: "#0f172a",
     });
+
+    // Exclude the central node from the trigonometric rings distribution loop
+    const peripheralNeighbors = neighbors.filter((node) => node.id !== focus.id);
 
     let placed = 0;
     let ringIndex = 0;
     let furthestRadius = 0;
 
-    while (placed < neighbors.length) {
+    while (placed < peripheralNeighbors.length) {
         const ringRadius = 170 + ringIndex * 96;
         const circumference = Math.max(2 * Math.PI * ringRadius, 1);
         const capacity = Math.max(12, Math.floor(circumference / 76));
-        const count = Math.min(capacity, neighbors.length - placed);
+        const count = Math.min(capacity, peripheralNeighbors.length - placed);
 
         ringRadii.push(ringRadius);
         furthestRadius = ringRadius;
 
         for (let index = 0; index < count; index += 1) {
-            const neighbor = neighbors[placed + index];
+            const neighbor = peripheralNeighbors[placed + index];
             const angle = -Math.PI / 2 + (index / count) * Math.PI * 2;
             const edge = edgeByTargetId.get(neighbor.id);
             const weightScale = edge ? edge.weight / maxEdgeWeight : 0;
@@ -215,10 +240,11 @@ const createGraphLayout = (
     const center = size / 2;
 
     positions.forEach((position, nodeId) => {
+        const isCentral = nodeId === focus.id;
         positions.set(nodeId, {
             ...position,
-            x: position.x + center,
-            y: position.y + center,
+            x: isCentral ? center : position.x + center,
+            y: isCentral ? center : position.y + center,
         });
     });
 
@@ -233,7 +259,7 @@ const createGraphLayout = (
 const layout = createGraphLayout(focusNode, neighborNodes);
 const graphDescriptionText =
     graph.stats.edgeCount > 0
-        ? `${graph.focusName} possui ${graph.stats.edgeCount} conexões diretas nesta rede.`
+        ? `${graph.focusName} possui ${graph.stats.edgeCount} conexões diretas neste recorte.`
         : graphEmptyDescription;
 
 const getNodeLabelPlacement = (
@@ -244,11 +270,13 @@ const getNodeLabelPlacement = (
         radius: number;
     },
 ): NodeLabelPlacement => {
-    const maxLength = node.isFocus ? 44 : usesDenseLabels ? 18 : 26;
+    const isCentral = node.isFocus || node.id === focusNode.id;
+    const maxLength = isCentral ? 44 : usesDenseLabels ? 18 : 26;
     const text = truncateLabel(node.name, maxLength);
 
-    if (node.isFocus) {
+    if (isCentral) {
         return {
+            id: node.id,
             text,
             x: position.x,
             y: position.y + position.radius + 30,
@@ -263,6 +291,7 @@ const getNodeLabelPlacement = (
 
     if (Math.abs(dx) < 40) {
         return {
+            id: node.id,
             text,
             x: position.x,
             y: position.y + (dy >= 0 ? verticalOffset : -verticalOffset),
@@ -271,6 +300,7 @@ const getNodeLabelPlacement = (
     }
 
     return {
+        id: node.id,
         text,
         x: position.x + (dx >= 0 ? horizontalOffset : -horizontalOffset),
         y: position.y + 4,
@@ -278,42 +308,52 @@ const getNodeLabelPlacement = (
     };
 };
 
-const getEdgeLabelPlacement = (
-    edge: StudentInteractionEdge,
-    edgeIndex: number,
-): EdgeLabelPlacement | null => {
-    const sourcePosition = layout.positions.get(edge.source);
-    const targetPosition = layout.positions.get(edge.target);
-
-    if (!sourcePosition || !targetPosition) return null;
-
-    const ratio = usesDenseLabels ? 0.64 : 0.58;
-    const baseX = sourcePosition.x + (targetPosition.x - sourcePosition.x) * ratio;
-    const baseY = sourcePosition.y + (targetPosition.y - sourcePosition.y) * ratio;
-    const dx = targetPosition.x - sourcePosition.x;
-    const dy = targetPosition.y - sourcePosition.y;
-    const length = Math.hypot(dx, dy) || 1;
-    const normalX = -dy / length;
-    const normalY = dx / length;
-    const side = edgeIndex % 2 === 0 ? 1 : -1;
-    const offset = usesDenseLabels ? 10 : 14;
-    const text = getEdgeLabelText(edge);
-    const width = Math.max(54, text.length * (usesDenseLabels ? 5.8 : 6.8));
-    const height = usesDenseLabels ? 18 : 22;
-
-    return {
-        text,
-        x: baseX + normalX * offset * side,
-        y: baseY + normalY * offset * side,
-        width,
-        height,
-    };
+const legendColors = {
+    projeto: "#0f766e",
+    orientacao: "#d97706",
+    artigo: "#0284c7",
+    iniciativa: "#0891b2",
+    "grupo de pesquisa": "#475569",
+    advisorship: "#d97706",
 };
+
+const legendSections = [
+    {
+        title: "Nós (Entidades)",
+        items: [
+            {
+                label: "Você (Nó Central)",
+                type: "node" as const,
+                color: "#38bdf8",
+                strokeColor: "#0f172a"
+            },
+            {
+                label: "Conexões Diretas",
+                type: "node" as const,
+                color: "#ffffff",
+                strokeColor: "#94a3b8"
+            }
+        ]
+    },
+    {
+        title: "Vínculos (Arestas)",
+        items: [
+            { label: "Projeto", type: "line" as const, color: getRelationColor(["projeto"]) },
+            { label: "Orientação", type: "line" as const, color: getRelationColor(["orientacao"]) },
+            { label: "Artigo", type: "line" as const, color: getRelationColor(["artigo"]) },
+            { label: "Iniciativa", type: "line" as const, color: getRelationColor(["iniciativa"]) },
+            { label: "Grupo de pesquisa", type: "line" as const, color: getRelationColor(["grupo de pesquisa"]) },
+            { label: "Múltiplos vínculos", type: "line" as const, color: "#7c3aed" }
+        ]
+    }
+];
 ---
 
 <section
-    class="glass-card border border-border-main p-6 md:p-8 space-y-6"
+    class="glass-card border border-outline p-6 md:p-8 space-y-6"
     aria-labelledby={`${graph.graphKind}-graph-title-${graph.focusId}`}
+    data-graph-container="true"
+    data-focus-id={graph.focusId}
 >
     <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div class="space-y-2">
@@ -322,12 +362,12 @@ const getEdgeLabelPlacement = (
             </span>
             <h3
                 id={`${graph.graphKind}-graph-title-${graph.focusId}`}
-                class="text-2xl font-bold font-display text-text-main"
+                class="text-2xl font-bold font-['Outfit'] text-text-main"
             >
                 {graphTitle}
             </h3>
             <p class="max-w-3xl text-sm leading-relaxed text-text-secondary">
-                Rede centrada neste perfil.{" "}
+                Rede ego-centrada derivada de <code>{graphDataSource}</code>.{" "}
                 {graphDescriptionTail}
             </p>
         </div>
@@ -337,7 +377,7 @@ const getEdgeLabelPlacement = (
         </div>
     </div>
 
-    <div class="rounded-3xl border border-border-main bg-track p-4 shadow-sm">
+    <div class="rounded-3xl border border-outline bg-page-bg/90 p-4 shadow-[0_16px_40px_rgba(148,163,184,0.08)]">
         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
             {graphConceptHeading}
         </p>
@@ -348,11 +388,11 @@ const getEdgeLabelPlacement = (
 
     <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {metrics.map((metric) => (
-            <article class="rounded-3xl border border-border-main bg-surface p-4 shadow-sm">
+            <article class="rounded-3xl border border-outline bg-page-bg/80 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     {metric.label}
                 </p>
-                <div class="mt-2 text-3xl font-bold font-display text-text-main">
+                <div class="mt-2 text-3xl font-extrabold font-['Outfit'] text-text-main" data-metric-value={metric.key}>
                     {metric.value}
                 </div>
             </article>
@@ -363,30 +403,53 @@ const getEdgeLabelPlacement = (
         {availableRelationTypes.length > 0 ? (
             availableRelationTypes.map((relationType) => (
                 <span
-                    class="inline-flex items-center gap-2 rounded-full border border-border-main bg-surface px-3 py-1.5 text-xs font-bold text-text-main"
+                    class="inline-flex items-center gap-2 rounded-full border border-outline bg-page/80 px-3 py-1.5 text-xs font-semibold text-text-main"
                 >
                     <span
                         class="h-2.5 w-2.5 rounded-full"
-                        style={`background:${relationColors[relationType]}`}
+                        style={`background:${getRelationColor([relationType])}`}
                     ></span>
-                    {relationLabels[relationType]}
+                    {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
                     <span class="text-text-secondary">
                         {graph.stats.relationTypeCounts[relationType]}
                     </span>
                 </span>
             ))
         ) : (
-            <span class="inline-flex items-center rounded-full border border-dashed border-border-main px-3 py-1.5 text-xs font-bold text-text-secondary">
+            <span class="inline-flex items-center rounded-full border border-dashed border-outline px-3 py-1.5 text-xs font-semibold text-text-secondary">
                 Sem vínculos diretos registrados
             </span>
         )}
     </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)] xl:items-start">
-        <div class="rounded-[2rem] border border-border-main bg-surface p-4 shadow-sm md:p-6">
+        <div class="relative rounded-[2rem] border border-outline bg-page-bg/92 p-4 shadow-[0_28px_80px_rgba(148,163,184,0.14)] md:p-6">
+            <!-- Filter Toggles -->
+            {availableRelationTypes.length > 0 && (
+                <div class="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border border-outline bg-page-bg/50 p-3" aria-label="Filtros do Grafo">
+                    <span class="text-xs font-bold uppercase tracking-[0.12em] text-text-secondary mr-2">Filtrar por:</span>
+                    {availableRelationTypes.map((relationType) => (
+                        <button
+                            type="button"
+                            class="filter-toggle-btn inline-flex items-center gap-2 rounded-full border border-outline bg-page-bg/60 px-3 py-1.5 text-xs font-semibold text-text-secondary transition-all hover:bg-page-bg hover:text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/40 active:scale-95 cursor-pointer"
+                            data-relation-type={relationType}
+                            aria-pressed="false"
+                            style={`--active-color: ${getRelationColor([relationType])}`}
+                        >
+                            <span
+                                class="h-2 w-2 rounded-full transition-transform"
+                                style={`background: ${getRelationColor([relationType])}; opacity: 0.5;`}
+                            ></span>
+                            {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
+                        </button>
+                    ))}
+                </div>
+            )}
             <svg
                 viewBox={`0 0 ${layout.size} ${layout.size}`}
-                class="h-auto w-full"
+                class="h-auto w-full interaction-graph-svg select-none touch-none"
+                style="cursor: grab; touch-action: none; overflow: hidden;"
+                role="img"
                 aria-labelledby={`${graph.graphKind}-graph-svg-title-${graph.focusId}`}
                 aria-describedby={`${graph.graphKind}-graph-svg-desc-${graph.focusId}`}
             >
@@ -400,122 +463,134 @@ const getEdgeLabelPlacement = (
                 <defs>
                     <radialGradient id={`${graph.graphKind}-focus-fill-${graph.focusId}`}>
                         <stop offset="0%" stop-color="#f8fafc"></stop>
-                        <stop offset="100%" stop-color="var(--color-chart-2)"></stop>
+                        <stop offset="100%" stop-color="#38bdf8"></stop>
                     </radialGradient>
                 </defs>
 
-                {layout.ringRadii.map((ringRadius) => (
-                    <circle
-                        cx={layout.center}
-                        cy={layout.center}
-                        r={ringRadius}
-                        fill="none"
-                        stroke="rgba(148,163,184,0.18)"
-                        stroke-dasharray="8 12"
-                    ></circle>
-                ))}
+                <g class="viewport">
+                    {layout.ringRadii.map((ringRadius) => (
+                        <circle
+                            cx={layout.center}
+                            cy={layout.center}
+                            r={ringRadius}
+                            fill="none"
+                            stroke="rgba(148,163,184,0.18)"
+                            stroke-dasharray="8 12"
+                        ></circle>
+                    ))}
 
-                {graph.edges.map((edge) => {
-                    const focusPosition = layout.positions.get(edge.source);
-                    const neighborPosition = layout.positions.get(edge.target);
+                    {graph.edges.map((edge) => {
+                        const focusPosition = layout.positions.get(edge.source);
+                        const neighborPosition = layout.positions.get(edge.target);
 
-                    if (!focusPosition || !neighborPosition) return null;
+                        if (!focusPosition || !neighborPosition) return null;
 
-                    return (
-                        <line
-                            x1={focusPosition.x}
-                            y1={focusPosition.y}
-                            x2={neighborPosition.x}
-                            y2={neighborPosition.y}
-                            stroke={getRelationColor(edge.relationTypes)}
-                            stroke-opacity="0.45"
-                            stroke-width={1.5 + Math.min(edge.weight, 6) * 0.7}
-                            stroke-linecap="round"
-                        >
-                            <title>{describeEdge(edge)}</title>
-                        </line>
-                    );
-                })}
+                        const tooltipText = edge.relationTypes && edge.relationTypes.length > 0
+                            ? describeEdge(edge)
+                            : "Sem relação";
 
-                {graph.edges.map((edge, edgeIndex) => {
-                    const label = getEdgeLabelPlacement(edge, edgeIndex);
+                        return (
+                            <g class="edge-group" data-source={edge.source} data-target={edge.target} data-relation-types={edge.relationTypes.join(',')} data-weight={edge.weight}>
+                                <line
+                                    x1={focusPosition.x}
+                                    y1={focusPosition.y}
+                                    x2={neighborPosition.x}
+                                    y2={neighborPosition.y}
+                                    stroke={getRelationColor(edge.relationTypes)}
+                                    stroke-opacity="0.45"
+                                    stroke-width={1.5 + Math.min(edge.weight, 6) * 0.7}
+                                    stroke-linecap="round"
+                                />
+                                <line
+                                    x1={focusPosition.x}
+                                    y1={focusPosition.y}
+                                    x2={neighborPosition.x}
+                                    y2={neighborPosition.y}
+                                    stroke="transparent"
+                                    stroke-width="14"
+                                    opacity="0"
+                                    stroke-linecap="round"
+                                    style="cursor: pointer;"
+                                >
+                                    <title>{tooltipText}</title>
+                                </line>
+                            </g>
+                        );
+                    })}
 
-                    if (!label) return null;
+                    {graph.nodes.map((node) => {
+                        const position = layout.positions.get(node.id);
+                        if (!position) return null;
 
-                    return (
-                        <g>
-                            <rect
-                                x={label.x - label.width / 2}
-                                y={label.y - label.height / 2}
-                                width={label.width}
-                                height={label.height}
-                                rx="999"
-                                class="fill-surface stroke-border-main"
-                            ></rect>
+                        const edge = edgeByTargetId.get(node.id);
+                        const isCentral = node.isFocus || node.id === focusNode.id;
+                        const tooltip = isCentral
+                            ? `${node.name} • nó central`
+                            : `${node.name} • ${describeEdge(edge as StudentInteractionEdge)}`;
+                        const fill = isCentral
+                            ? `url(#${graph.graphKind}-focus-fill-${graph.focusId})`
+                            : "#ffffff";
+                        const stroke = isCentral ? "#0f172a" : position.stroke;
+
+                        return (
+                            <a href={node.profileHref ?? undefined} data-node-id={node.id} data-is-focus={isCentral} class="node-link">
+                                <circle
+                                    cx={position.x}
+                                    cy={position.y}
+                                    r={position.radius}
+                                    fill={fill}
+                                    stroke={stroke}
+                                    stroke-width={isCentral ? 3.5 : 2.5}
+                                    class="transition-opacity hover:opacity-85"
+                                >
+                                    <title>{tooltip}</title>
+                                </circle>
+                            </a>
+                        );
+                    })}
+
+                    {graph.nodes.map((node) => {
+                        const position = layout.positions.get(node.id);
+                        if (!position) return null;
+
+                        const label = getNodeLabelPlacement(node, position);
+                        const isCentral = node.isFocus || node.id === focusNode.id;
+
+                        return (
                             <text
                                 x={label.x}
                                 y={label.y}
-                                text-anchor="middle"
+                                data-label-for={label.id}
+                                data-is-focus={isCentral}
+                                text-anchor={label.textAnchor}
                                 dominant-baseline="middle"
-                                class={`fill-text-muted font-bold ${usesDenseLabels ? "text-[9px]" : "text-[11px]"}`}
+                                paint-order="stroke"
+                                stroke="rgba(255,255,255,0.96)"
+                                stroke-width={isCentral ? 7 : 5}
+                                class={`fill-slate-900 ${isCentral ? "text-[24px] font-bold" : usesDenseLabels ? "text-[10px] font-semibold" : "text-[12px] font-semibold"}`}
                             >
                                 {label.text}
                             </text>
-                        </g>
-                    );
-                })}
-
-                {graph.nodes.map((node) => {
-                    const position = layout.positions.get(node.id);
-                    if (!position) return null;
-
-                    const edge = edgeByTargetId.get(node.id);
-                    const tooltip = node.isFocus
-                        ? `${node.name} • nó central`
-                        : `${node.name} • ${describeEdge(edge as StudentInteractionEdge)}`;
-                    const fill = node.isFocus
-                        ? `url(#${graph.graphKind}-focus-fill-${graph.focusId})`
-                        : "#ffffff";
-                    const stroke = node.isFocus ? "var(--color-surface)" : position.stroke;
-
-                    return (
-                        <a href={node.profileHref ?? undefined}>
-                            <circle
-                                cx={position.x}
-                                cy={position.y}
-                                r={position.radius}
-                                fill={fill}
-                                stroke={stroke}
-                                stroke-width={node.isFocus ? 3.5 : 2.5}
-                                class="transition-opacity hover:opacity-85"
-                            >
-                                <title>{tooltip}</title>
-                            </circle>
-                        </a>
-                    );
-                })}
-
-                {graph.nodes.map((node) => {
-                    const position = layout.positions.get(node.id);
-                    if (!position) return null;
-
-                    const label = getNodeLabelPlacement(node, position);
-
-                    return (
-                        <text
-                            x={label.x}
-                            y={label.y}
-                            text-anchor={label.textAnchor}
-                            dominant-baseline="middle"
-                            paint-order="stroke"
-                            stroke-width={node.isFocus ? 7 : 5}
-                            class={`fill-text-main stroke-surface ${node.isFocus ? "text-[24px] font-bold" : usesDenseLabels ? "text-[10px] font-bold" : "text-[12px] font-bold"}`}
-                        >
-                            {label.text}
-                        </text>
-                    );
-                })}
+                        );
+                    })}
+                </g>
             </svg>
+
+            <button
+                type="button"
+                class="absolute bottom-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-outline bg-page-bg/95 text-text-main shadow-md transition-all hover:bg-page-bg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-premium-accent reset-graph-btn"
+                title="Resetar zoom"
+                aria-label="Resetar visualização do grafo"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                </svg>
+            </button>
+
+            <GraphLegend sections={legendSections} />
 
             <p class="mt-4 text-xs leading-relaxed text-text-secondary">
                 Os nomes ficam visíveis no próprio grafo. Clique em um círculo
@@ -524,7 +599,7 @@ const getEdgeLabelPlacement = (
         </div>
 
         <aside class="space-y-4">
-            <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
+            <article class="rounded-3xl border border-outline bg-page-bg/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     Como ler
                 </p>
@@ -534,25 +609,25 @@ const getEdgeLabelPlacement = (
                         O nó central é o perfil atual.
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="h-3 w-3 rounded-full border-2 border-border-main bg-surface"></span>
+                        <span class="h-3 w-3 rounded-full border-2 border-slate-500 bg-white"></span>
                         Os nós periféricos são conexões diretas.
                     </div>
                     <p class="leading-relaxed">
                         A espessura da aresta acompanha o peso da conexão. Nós
-                        maiores indicam vínculos mais fortes dentro desta rede.
+                        maiores indicam vínculos mais fortes dentro deste recorte.
                     </p>
                 </div>
             </article>
 
-            <article class="rounded-3xl border border-border-main bg-surface p-5 shadow-sm">
+            <article class="rounded-3xl border border-outline bg-page-bg/88 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     Conexões em destaque
                 </p>
 
                 {topConnections.length > 0 ? (
-                    <div class="mt-4 space-y-3">
+                    <div class="mt-4 space-y-3" data-highlights-list="true">
                         {topConnections.map((connection) => (
-                            <div class="rounded-2xl border border-border-main bg-surface p-4">
+                            <div class="rounded-2xl border border-outline bg-page-bg/90 p-4" data-connection-card="true" data-target-id={connection.id}>
                                 <div class="flex items-start justify-between gap-4">
                                     <div class="min-w-0">
                                         <a
@@ -573,13 +648,13 @@ const getEdgeLabelPlacement = (
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     {connection.relationTypes.map((relationType) => (
                                         <span
-                                            class="inline-flex items-center gap-2 rounded-full border border-border-main bg-track px-2.5 py-1 text-[11px] font-bold text-text-main"
+                                            class="inline-flex items-center gap-2 rounded-full border border-outline px-2.5 py-1 text-[11px] font-semibold text-text-main"
                                         >
                                             <span
                                                 class="h-2 w-2 rounded-full"
-                                                style={`background:${relationColors[relationType]}`}
+                                                style={`background:${getRelationColor([relationType])}`}
                                             ></span>
-                                            {relationLabels[relationType]}
+                                            {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
                                         </span>
                                     ))}
                                 </div>
@@ -588,11 +663,15 @@ const getEdgeLabelPlacement = (
 
                         {
                             remainingConnections > 0 && (
-                                <p class="text-xs text-text-secondary">
+                                <p class="text-xs text-text-secondary" data-remaining-connections="true">
                                     + {remainingConnections} conexões adicionais fora do destaque inicial.
                                 </p>
                             )
                         }
+
+                        <p class="text-sm leading-relaxed text-text-secondary hidden" data-highlight-empty-state="true">
+                            Nenhuma conexão em destaque para os filtros selecionados.
+                        </p>
                     </div>
                 ) : (
                     <p class="mt-4 text-sm leading-relaxed text-text-secondary">
@@ -605,3 +684,309 @@ const getEdgeLabelPlacement = (
 
     <PersonInteractionTable graphKind={graph.graphKind} rows={tableRows} />
 </section>
+
+<script>
+    function setupGraphPanZoom() {
+        const svgs = document.querySelectorAll('svg.interaction-graph-svg');
+        svgs.forEach(svg => {
+            if (svg.dataset.panZoomInitialized) return;
+            svg.dataset.panZoomInitialized = 'true';
+
+            const viewport = svg.querySelector('.viewport') as SVGGElement | null;
+            if (!viewport) return;
+
+            const parentDiv = svg.closest('.relative');
+            const resetBtn = parentDiv ? parentDiv.querySelector('.reset-graph-btn') : null;
+
+            let scale = 1;
+            let translateX = 0;
+            let translateY = 0;
+
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+
+            const minScale = 0.2;
+            const maxScale = 5;
+
+            function updateTransform() {
+                viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                viewport.style.transformOrigin = '0px 0px';
+            }
+
+            // Initial transform reset
+            updateTransform();
+
+            // Zooming
+            svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = svg.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const zoomFactor = 1.1;
+                const oldScale = scale;
+                
+                if (e.deltaY < 0) {
+                    scale = Math.min(maxScale, scale * zoomFactor);
+                } else {
+                    scale = Math.max(minScale, scale / zoomFactor);
+                }
+
+                translateX = mouseX - (mouseX - translateX) * (scale / oldScale);
+                translateY = mouseY - (mouseY - translateY) * (scale / oldScale);
+
+                updateTransform();
+            }, { passive: false });
+
+            // Panning
+            svg.addEventListener('pointerdown', (e) => {
+                if (e.button !== 0) return;
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                svg.style.cursor = 'grabbing';
+                svg.setPointerCapture(e.pointerId);
+            });
+
+            svg.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            });
+
+            const endDrag = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                svg.style.cursor = 'grab';
+                try {
+                    svg.releasePointerCapture(e.pointerId);
+                } catch (err) {}
+            };
+
+            svg.addEventListener('pointerup', endDrag);
+            svg.addEventListener('pointercancel', endDrag);
+            svg.addEventListener('pointerleave', endDrag);
+
+            // Reset
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    scale = 1;
+                    translateX = 0;
+                    translateY = 0;
+                    updateTransform();
+                });
+            }
+        });
+    }
+
+    function setupGraphFilters() {
+        const containers = document.querySelectorAll('[data-graph-container="true"]');
+        containers.forEach(container => {
+            if (!(container instanceof HTMLElement)) return;
+            if (container.dataset.filtersInitialized === "true") return;
+            container.dataset.filtersInitialized = "true";
+
+            const focusId = container.dataset.focusId;
+            const toggles = container.querySelectorAll('.filter-toggle-btn');
+            const edges = container.querySelectorAll('.edge-group');
+            const nodes = container.querySelectorAll('.node-link');
+            const labels = container.querySelectorAll('[data-label-for]');
+            const sidebarCards = container.querySelectorAll('[data-connection-card="true"]');
+            const remainingConnText = container.querySelector('[data-remaining-connections="true"]');
+            const sidebarEmptyState = container.querySelector('[data-highlight-empty-state="true"]');
+
+            const metricNodes = container.querySelector('[data-metric-value="displayed-nodes"]');
+            const metricEdges = container.querySelector('[data-metric-value="displayed-edges"]');
+            const metricWeight = container.querySelector('[data-metric-value="total-weight"]');
+            const metricRelationTypes = container.querySelector('[data-metric-value="relation-types"]');
+
+            const originalNodesVal = metricNodes ? metricNodes.textContent.trim() : '0';
+            const originalEdgesVal = metricEdges ? metricEdges.textContent.trim() : '0';
+            const originalWeightVal = metricWeight ? metricWeight.textContent.trim() : '0';
+            const originalRelationTypesVal = metricRelationTypes ? metricRelationTypes.textContent.trim() : '0';
+
+            const tableRows = container.querySelectorAll('[data-table-row="true"]');
+            const tableNoResults = container.querySelector('[data-table-no-results="true"]');
+            const tableCountLabel = container.querySelector('[data-table-count-label="true"]');
+            const tableOriginalLabel = tableCountLabel ? tableCountLabel.dataset.originalLabel : '';
+
+            function isEdgeMatch(relationTypesStr, activeFilters) {
+                if (activeFilters.length === 0) return true;
+                if (!relationTypesStr) return false;
+                const normalizeKey = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/_/g, ' ').trim();
+                const mapKey = (s) => {
+                    const norm = normalizeKey(s);
+                    if (norm === 'project' || norm === 'projeto') return 'projeto';
+                    if (norm === 'orientation' || norm === 'orientacao' || norm === 'advisorship') return 'orientacao';
+                    if (norm === 'article' || norm === 'artigo') return 'artigo';
+                    if (norm === 'initiative' || norm === 'iniciativa') return 'iniciativa';
+                    if (norm === 'research group' || norm === 'grupo de pesquisa') return 'grupo de pesquisa';
+                    return norm;
+                };
+                const relationTypes = relationTypesStr.split(',').map(mapKey);
+                const activeNorm = activeFilters.map(mapKey);
+                return relationTypes.some(type => activeNorm.includes(type));
+            }
+
+            function updateFilters() {
+                const activeFilters = Array.from(toggles)
+                    .filter(btn => btn.getAttribute('aria-pressed') === 'true')
+                    .map(btn => (btn as HTMLElement).dataset.relationType);
+
+                if (activeFilters.length === 0) {
+                    edges.forEach(el => (el as HTMLElement).style.display = '');
+                    nodes.forEach(el => (el as HTMLElement).style.display = '');
+                    labels.forEach(el => (el as HTMLElement).style.display = '');
+                    sidebarCards.forEach(el => (el as HTMLElement).style.display = '');
+                    tableRows.forEach(el => (el as HTMLElement).style.display = '');
+
+                    if (remainingConnText) (remainingConnText as HTMLElement).style.display = '';
+                    if (sidebarEmptyState) sidebarEmptyState.classList.add('hidden');
+                    if (tableNoResults) tableNoResults.classList.add('hidden');
+
+                    if (metricNodes) metricNodes.textContent = originalNodesVal;
+                    if (metricEdges) metricEdges.textContent = originalEdgesVal;
+                    if (metricWeight) metricWeight.textContent = originalWeightVal;
+                    if (metricRelationTypes) metricRelationTypes.textContent = originalRelationTypesVal;
+
+                    if (tableCountLabel) tableCountLabel.textContent = tableOriginalLabel;
+                } else {
+                    const visibleNodeIds = new Set();
+                    visibleNodeIds.add(focusId);
+
+                    let visibleEdgesCount = 0;
+                    let totalWeight = 0;
+
+                    edges.forEach(el => {
+                        const types = (el as HTMLElement).dataset.relationTypes;
+                        const source = (el as HTMLElement).dataset.source;
+                        const target = (el as HTMLElement).dataset.target;
+                        const matches = isEdgeMatch(types, activeFilters);
+
+                        if (matches) {
+                            (el as HTMLElement).style.display = '';
+                            visibleEdgesCount += 1;
+                            const weight = parseFloat((el as HTMLElement).dataset.weight || '0');
+                            totalWeight += weight;
+
+                            visibleNodeIds.add(source);
+                            visibleNodeIds.add(target);
+                        } else {
+                            (el as HTMLElement).style.display = 'none';
+                        }
+                    });
+
+                    nodes.forEach(el => {
+                        const id = (el as HTMLElement).dataset.nodeId;
+                        const isFocus = (el as HTMLElement).dataset.isFocus === 'true';
+                        if (isFocus || visibleNodeIds.has(id)) {
+                            (el as HTMLElement).style.display = '';
+                        } else {
+                            (el as HTMLElement).style.display = 'none';
+                        }
+                    });
+
+                    labels.forEach(el => {
+                        const id = (el as HTMLElement).dataset.labelFor;
+                        const isFocus = (el as HTMLElement).dataset.isFocus === 'true';
+                        if (isFocus || visibleNodeIds.has(id)) {
+                            (el as HTMLElement).style.display = '';
+                        } else {
+                            (el as HTMLElement).style.display = 'none';
+                        }
+                    });
+
+                    let visibleCardsCount = 0;
+                    sidebarCards.forEach(el => {
+                        const targetId = (el as HTMLElement).dataset.targetId;
+                        if (visibleNodeIds.has(targetId)) {
+                            (el as HTMLElement).style.display = '';
+                            visibleCardsCount += 1;
+                        } else {
+                            (el as HTMLElement).style.display = 'none';
+                        }
+                    });
+
+                    if (remainingConnText) (remainingConnText as HTMLElement).style.display = 'none';
+
+                    if (visibleCardsCount === 0) {
+                        if (sidebarEmptyState) sidebarEmptyState.classList.remove('hidden');
+                    } else {
+                        if (sidebarEmptyState) sidebarEmptyState.classList.add('hidden');
+                    }
+
+                    let visibleTableRowsCount = 0;
+                    tableRows.forEach(el => {
+                        const types = (el as HTMLElement).dataset.relationTypes;
+                        const matches = isEdgeMatch(types, activeFilters);
+
+                        if (matches) {
+                            (el as HTMLElement).style.display = '';
+                            visibleTableRowsCount += 1;
+                        } else {
+                            (el as HTMLElement).style.display = 'none';
+                        }
+                    });
+
+                    if (visibleTableRowsCount === 0) {
+                        if (tableNoResults) tableNoResults.classList.remove('hidden');
+                    } else {
+                        if (tableNoResults) tableNoResults.classList.add('hidden');
+                    }
+
+                    if (metricNodes) metricNodes.textContent = visibleNodeIds.size.toString();
+                    if (metricEdges) metricEdges.textContent = visibleEdgesCount.toString();
+                    if (metricWeight) metricWeight.textContent = totalWeight.toString();
+                    if (metricRelationTypes) metricRelationTypes.textContent = activeFilters.length.toString();
+
+                    if (tableCountLabel) {
+                        const plural = visibleTableRowsCount !== 1;
+                        const recordType = container.getAttribute('aria-labelledby').includes('collaboration') ? 'colaborações' : 'relacionamentos';
+                        tableCountLabel.textContent = `${visibleTableRowsCount} ${recordType} ${plural ? 'mapeados' : 'mapeado'} com os filtros selecionados`;
+                    }
+                }
+            }
+
+            toggles.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pressed = btn.getAttribute('aria-pressed') === 'true';
+                    btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+                    updateFilters();
+                });
+            });
+        });
+    }
+
+    function initAll() {
+        setupGraphPanZoom();
+        setupGraphFilters();
+    }
+
+    // Setup pan/zoom and filters on DOM content load
+    document.addEventListener('DOMContentLoaded', initAll);
+    
+    // Astro-specific transitions support
+    document.addEventListener('astro:page-load', initAll);
+
+    // Fallback run
+    initAll();
+</script>
+
+<style>
+    .filter-toggle-btn[aria-pressed="true"] {
+        border-color: var(--active-color) !important;
+        background-color: color-mix(in srgb, var(--active-color) 12%, rgba(255, 255, 255, 0.03)) !important;
+        color: var(--color-text-main) !important;
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--active-color) 15%, transparent);
+    }
+    :global(.dark) .filter-toggle-btn[aria-pressed="true"] {
+        background-color: color-mix(in srgb, var(--active-color) 18%, rgba(0, 0, 0, 0.2)) !important;
+    }
+    .filter-toggle-btn[aria-pressed="true"] span {
+        opacity: 1 !important;
+        transform: scale(1.25);
+        box-shadow: 0 0 6px var(--active-color);
+    }
+</style>
