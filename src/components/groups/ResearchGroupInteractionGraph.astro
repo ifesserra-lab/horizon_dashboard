@@ -4,6 +4,7 @@ import type {
     ResearchGroupInteractionRelationType,
     ResearchGroupInteractionViewModel,
 } from "../../types/groups";
+import GraphLegend from "../graphs/GraphLegend.astro";
 
 interface Props {
     groupId: string | number;
@@ -71,6 +72,73 @@ const initialModeSummary =
 const serializedGraphData = hasGraphData
     ? JSON.stringify(graphData).replace(/</g, "\\u003c")
     : null;
+
+const legendSections = [
+    {
+        title: "Nós (Classificação)",
+        items: [
+            {
+                label: "Pesquisador",
+                type: "node" as const,
+                color: "#38bdf8",
+                strokeColor: "#94a3b8"
+            },
+            {
+                label: "Estudante",
+                type: "node" as const,
+                color: "#8b5cf6",
+                strokeColor: "#94a3b8"
+            },
+            {
+                label: "Externo ao Ifes",
+                type: "node" as const,
+                color: "#f59e0b",
+                strokeColor: "#94a3b8"
+            },
+            {
+                label: "Sem classificação",
+                type: "node" as const,
+                color: "#94a3b8",
+                strokeColor: "#94a3b8"
+            }
+        ]
+    },
+    {
+        title: "Nós (Papel e Vínculo)",
+        items: [
+            {
+                label: "Membro do Grupo",
+                type: "node" as const,
+                color: "#ffffff",
+                strokeColor: "#2563eb"
+            },
+            {
+                label: "Não-Membro",
+                type: "node" as const,
+                color: "#ffffff",
+                strokeColor: "#94a3b8"
+            },
+            {
+                label: "Vizinho via Orientação",
+                type: "node" as const,
+                color: "#ffffff",
+                strokeColor: "#94a3b8",
+                secondaryIndicator: "ring" as const
+            }
+        ]
+    },
+    {
+        title: "Vínculos (Arestas)",
+        items: [
+            { label: "Projeto", type: "line" as const, color: "#0f766e" },
+            { label: "Artigo", type: "line" as const, color: "#0284c7" },
+            { label: "Orientação", type: "line" as const, color: "#d97706" },
+            { label: "Iniciativa", type: "line" as const, color: "#0891b2" },
+            { label: "Grupo de pesquisa / Outros", type: "line" as const, color: "#475569" },
+            { label: "Múltiplos vínculos", type: "line" as const, color: "#7c3aed" }
+        ]
+    }
+];
 ---
 
 <section
@@ -340,6 +408,7 @@ const serializedGraphData = hasGraphData
                                     </p>
                                 </div>
                             </div>
+                            <GraphLegend sections={legendSections} />
                         </div>
 
                         <div class="rounded-3xl border border-outline bg-page-bg p-5 shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
@@ -723,39 +792,49 @@ const serializedGraphData = hasGraphData
                 right.weightedDegree - left.weightedDegree ||
                 left.name.localeCompare(right.name, "pt-BR");
 
+            const normalizeRelationKey = (relationType: string): string => {
+                if (!relationType) return "";
+                const norm = String(relationType)
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/_/g, " ")
+                    .trim();
+
+                if (norm === "project" || norm === "projeto") return "projeto";
+                if (norm === "orientation" || norm === "orientacao" || norm === "advisorship") return "orientacao";
+                if (norm === "article" || norm === "artigo") return "artigo";
+                if (norm === "initiative" || norm === "iniciativa") return "iniciativa";
+                if (norm === "research group" || norm === "grupo de pesquisa" || norm === "research_group") return "grupo de pesquisa";
+
+                return norm;
+            };
+
             const getRelationColor = (edge: ResearchGroupInteractionEdge) => {
                 if (edge.relationTypes.length > 1) {
                     return "#7c3aed";
                 }
 
-                if (edge.relationTypes.includes("project")) {
+                const normalizedTypes = (edge.relationTypes || []).map(normalizeRelationKey);
+
+                if (normalizedTypes.includes("projeto")) {
                     return "#0f766e";
                 }
 
-                if (edge.relationTypes.includes("article")) {
-                    return "#2563eb";
+                if (normalizedTypes.includes("artigo")) {
+                    return "#0284c7";
                 }
 
-                if (
-                    edge.relationTypes.includes("orientation") ||
-                    edge.relationTypes.includes("advisorship")
-                ) {
+                if (normalizedTypes.includes("orientacao")) {
                     return "#d97706";
                 }
 
-                if (
-                    edge.relationTypes.includes("initiative") &&
-                    edge.relationTypes.includes("advisorship")
-                ) {
-                    return "#7c3aed";
+                if (normalizedTypes.includes("iniciativa")) {
+                    return "#0891b2";
                 }
 
-                if (edge.relationTypes.includes("initiative")) {
-                    return "#059669";
-                }
-
-                if (edge.relationTypes.includes("advisorship")) {
-                    return "#d97706";
+                if (normalizedTypes.includes("grupo de pesquisa")) {
+                    return "#475569";
                 }
 
                 return "#475569";

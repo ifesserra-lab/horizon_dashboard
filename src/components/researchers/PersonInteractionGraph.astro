@@ -7,6 +7,7 @@ import type {
     StudentInteractionRelationType,
     StudentInteractionViewModel,
 } from "../../types/student-graphs";
+import GraphLegend from "../graphs/GraphLegend.astro";
 
 interface Props {
     graph: StudentInteractionViewModel;
@@ -14,22 +15,50 @@ interface Props {
 
 const { graph } = Astro.props;
 
-const relationLabels: Record<StudentInteractionRelationType, string> = {
+const normalizeRelationKey = (relationType: string): string => {
+    if (!relationType) return "";
+    const norm = String(relationType)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/_/g, " ")
+        .trim();
+
+    if (norm === "project" || norm === "projeto") return "projeto";
+    if (norm === "orientation" || norm === "orientacao" || norm === "advisorship") return "orientacao";
+    if (norm === "article" || norm === "artigo") return "artigo";
+    if (norm === "initiative" || norm === "iniciativa") return "iniciativa";
+    if (norm === "research group" || norm === "grupo de pesquisa" || norm === "research_group") return "grupo de pesquisa";
+
+    return norm;
+};
+
+const relationLabels: Record<string, string> = {
     project: "Projeto",
+    projeto: "Projeto",
     orientation: "Orientação",
+    orientacao: "Orientação",
     article: "Artigo",
+    artigo: "Artigo",
     initiative: "Iniciativa",
+    iniciativa: "Iniciativa",
     research_group: "Grupo de pesquisa",
+    "grupo de pesquisa": "Grupo de pesquisa",
     advisorship: "Orientação",
 };
 
-const relationColors: Record<StudentInteractionRelationType, string> = {
+const relationColors: Record<string, string> = {
+    projeto: "#0f766e",
     project: "#0f766e",
+    orientacao: "#d97706",
     orientation: "#d97706",
-    article: "#0284c7",
-    initiative: "#0891b2",
-    research_group: "#475569",
     advisorship: "#d97706",
+    artigo: "#0284c7",
+    article: "#0284c7",
+    iniciativa: "#0891b2",
+    initiative: "#0891b2",
+    "grupo de pesquisa": "#475569",
+    research_group: "#475569",
 };
 
 const graphTitle =
@@ -97,18 +126,24 @@ const metrics = [
     },
 ];
 
-const getRelationColor = (relationTypes: StudentInteractionRelationType[]) => {
+const getRelationColor = (relationTypes: (string | StudentInteractionRelationType)[]) => {
+    if (!relationTypes || relationTypes.length === 0) return "#94a3b8";
     if (relationTypes.length > 1) return "#7c3aed";
 
     const firstRelationType = relationTypes[0];
-    return firstRelationType ? relationColors[firstRelationType] : "#94a3b8";
+    if (!firstRelationType) return "#94a3b8";
+
+    const normalizedKey = normalizeRelationKey(firstRelationType);
+    return relationColors[normalizedKey] ?? relationColors[firstRelationType] ?? "#94a3b8";
 };
 
 const truncateLabel = (value: string, maxLength: number) =>
     value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
 
 const describeEdge = (edge: StudentInteractionEdge) => {
-    const relationText = edge.relationTypes.map((type) => relationLabels[type]).join(" + ");
+    const relationText = edge.relationTypes
+        .map((type) => relationLabels[type] ?? relationLabels[normalizeRelationKey(type)] ?? type)
+        .join(" + ");
 
     if (!relationText) {
         return `Peso ${edge.weight}`;
@@ -272,6 +307,46 @@ const getNodeLabelPlacement = (
         textAnchor: dx >= 0 ? "start" : "end",
     };
 };
+
+const legendColors = {
+    projeto: "#0f766e",
+    orientacao: "#d97706",
+    artigo: "#0284c7",
+    iniciativa: "#0891b2",
+    "grupo de pesquisa": "#475569",
+    advisorship: "#d97706",
+};
+
+const legendSections = [
+    {
+        title: "Nós (Entidades)",
+        items: [
+            {
+                label: "Você (Nó Central)",
+                type: "node" as const,
+                color: "#38bdf8",
+                strokeColor: "#0f172a"
+            },
+            {
+                label: "Conexões Diretas",
+                type: "node" as const,
+                color: "#ffffff",
+                strokeColor: "#94a3b8"
+            }
+        ]
+    },
+    {
+        title: "Vínculos (Arestas)",
+        items: [
+            { label: "Projeto", type: "line" as const, color: getRelationColor(["projeto"]) },
+            { label: "Orientação", type: "line" as const, color: getRelationColor(["orientacao"]) },
+            { label: "Artigo", type: "line" as const, color: getRelationColor(["artigo"]) },
+            { label: "Iniciativa", type: "line" as const, color: getRelationColor(["iniciativa"]) },
+            { label: "Grupo de pesquisa", type: "line" as const, color: getRelationColor(["grupo de pesquisa"]) },
+            { label: "Múltiplos vínculos", type: "line" as const, color: "#7c3aed" }
+        ]
+    }
+];
 ---
 
 <section
@@ -332,9 +407,9 @@ const getNodeLabelPlacement = (
                 >
                     <span
                         class="h-2.5 w-2.5 rounded-full"
-                        style={`background:${relationColors[relationType]}`}
+                        style={`background:${getRelationColor([relationType])}`}
                     ></span>
-                    {relationLabels[relationType]}
+                    {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
                     <span class="text-text-secondary">
                         {graph.stats.relationTypeCounts[relationType]}
                     </span>
@@ -359,13 +434,13 @@ const getNodeLabelPlacement = (
                             class="filter-toggle-btn inline-flex items-center gap-2 rounded-full border border-outline bg-page-bg/60 px-3 py-1.5 text-xs font-semibold text-text-secondary transition-all hover:bg-page-bg hover:text-text-main focus:outline-none focus:ring-2 focus:ring-premium-accent/40 active:scale-95 cursor-pointer"
                             data-relation-type={relationType}
                             aria-pressed="false"
-                            style={`--active-color: ${relationColors[relationType]}`}
+                            style={`--active-color: ${getRelationColor([relationType])}`}
                         >
                             <span
                                 class="h-2 w-2 rounded-full transition-transform"
-                                style={`background: ${relationColors[relationType]}; opacity: 0.5;`}
+                                style={`background: ${getRelationColor([relationType])}; opacity: 0.5;`}
                             ></span>
-                            {relationLabels[relationType]}
+                            {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
                         </button>
                     ))}
                 </div>
@@ -515,6 +590,8 @@ const getNodeLabelPlacement = (
                 </svg>
             </button>
 
+            <GraphLegend sections={legendSections} />
+
             <p class="mt-4 text-xs leading-relaxed text-text-secondary">
                 Os nomes ficam visíveis no próprio grafo. Clique em um círculo
                 para abrir o perfil da pessoa conectada.
@@ -575,9 +652,9 @@ const getNodeLabelPlacement = (
                                         >
                                             <span
                                                 class="h-2 w-2 rounded-full"
-                                                style={`background:${relationColors[relationType]}`}
+                                                style={`background:${getRelationColor([relationType])}`}
                                             ></span>
-                                            {relationLabels[relationType]}
+                                            {relationLabels[relationType] ?? relationLabels[normalizeRelationKey(relationType)] ?? relationType}
                                         </span>
                                     ))}
                                 </div>
@@ -738,8 +815,19 @@ const getNodeLabelPlacement = (
             function isEdgeMatch(relationTypesStr, activeFilters) {
                 if (activeFilters.length === 0) return true;
                 if (!relationTypesStr) return false;
-                const relationTypes = relationTypesStr.split(',');
-                return relationTypes.some(type => activeFilters.includes(type));
+                const normalizeKey = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/_/g, ' ').trim();
+                const mapKey = (s) => {
+                    const norm = normalizeKey(s);
+                    if (norm === 'project' || norm === 'projeto') return 'projeto';
+                    if (norm === 'orientation' || norm === 'orientacao' || norm === 'advisorship') return 'orientacao';
+                    if (norm === 'article' || norm === 'artigo') return 'artigo';
+                    if (norm === 'initiative' || norm === 'iniciativa') return 'iniciativa';
+                    if (norm === 'research group' || norm === 'grupo de pesquisa') return 'grupo de pesquisa';
+                    return norm;
+                };
+                const relationTypes = relationTypesStr.split(',').map(mapKey);
+                const activeNorm = activeFilters.map(mapKey);
+                return relationTypes.some(type => activeNorm.includes(type));
             }
 
             function updateFilters() {
