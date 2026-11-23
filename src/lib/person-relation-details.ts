@@ -1,6 +1,6 @@
-import initiativesCanonical from "../data/initiatives_canonical.json";
-import advisorshipsCanonical from "../data/advisorships_canonical.json";
-import researchGroupsCanonical from "../data/research_groups_canonical.json";
+import initiativesCanonical from "../data/initiatives_canonical.parquet";
+import advisorshipsCanonical from "../data/advisorships_canonical.parquet";
+import researchGroupsCanonical from "../data/research_groups_canonical.parquet";
 import type {
     StudentInteractionNamedRelationItem,
     StudentInteractionRelationType,

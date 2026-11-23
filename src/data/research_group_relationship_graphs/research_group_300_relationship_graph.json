@@ -1,6 +1,6 @@
 {
     "metadata": {
-        "generated_at": "2026-09-23T21:46:21.825852+00:00",
+        "generated_at": "2026-11-21T09:39:59.318498+00:00",
         "sources": {
             "researchers": "/home/runner/work/horizon_etl/horizon_etl/data/exports/researchers_canonical.json",
             "initiatives": "/home/runner/work/horizon_etl/horizon_etl/data/exports/initiatives_canonical.json",
@@ -14,8 +14,8 @@
                 "name": "Pesquisa em Recursos de Otimização Metalúrgica por Prompts e Tecnologias Inteligentes",
                 "short_name": "PROMPT",
                 "member_count": 3,
-                "expanded_node_count": 3,
-                "advisorship_neighbor_count": 0
+                "expanded_node_count": 4,
+                "advisorship_neighbor_count": 1
             }
         },
         "weight_definition": "Each edge weight equals the total number of relationship evidences between two people. Every shared initiative, shared research group, and advisorship adds 1 to the edge weight.",
@@ -26,42 +26,49 @@
         }
     },
     "graph_stats": {
-        "nodes": 3,
-        "edges": 3,
+        "nodes": 4,
+        "edges": 5,
         "isolated_nodes": 0,
         "connected_components": 1,
-        "largest_component_size": 3,
+        "largest_component_size": 4,
         "relation_event_totals": {
-            "initiative": 0,
-            "research_group": 3,
-            "advisorship": 0
+            "initiative": 2,
+            "research_group": 5,
+            "advisorship": 1
         },
         "edge_relation_presence": {
-            "initiative": 0,
-            "research_group": 3,
-            "advisorship": 0
+            "initiative": 1,
+            "research_group": 5,
+            "advisorship": 1
         },
         "classification_distribution": {
-            "researcher": 3
+            "researcher": 4
         },
         "top_people_by_weighted_degree": [
             {
-                "id": 410,
-                "name": "Bruna Brito Freitas",
+                "id": 5276,
+                "name": "Mariana Valinhos Barcelos",
                 "classification": "researcher",
-                "weighted_degree": 2,
+                "weighted_degree": 6,
+                "degree": 3
+            },
+            {
+                "id": 45,
+                "name": "Estefano Aparecido Vieira",
+                "classification": "researcher",
+                "weighted_degree": 5,
                 "degree": 2
             },
             {
-                "id": 1768,
+                "id": 1774,
                 "name": "Artur Pratti de Barros",
                 "classification": "researcher",
-                "weighted_degree": 2,
-                "degree": 2
+                "weighted_degree": 3,
+                "degree": 3
             },
             {
-                "id": 5224,
-                "name": "Mariana Valinhos Barcelos",
+                "id": 409,
+                "name": "Bruna Brito Freitas",
                 "classification": "researcher",
                 "weighted_degree": 2,
                 "degree": 2
@@ -74,19 +81,6 @@
         "graph": {},
         "nodes": [
             {
-                "name": "Artur Pratti de Barros",
-                "classification": "researcher",
-                "classification_confidence": "high",
-                "was_student": false,
-                "was_staff": true,
-                "campus_name": "Vitória",
-                "degree": 2,
-                "weighted_degree": 2,
-                "is_group_member": true,
-                "is_advisorship_neighbor": false,
-                "id": 1768
-            },
-            {
                 "name": "Bruna Brito Freitas",
                 "classification": "researcher",
                 "classification_confidence": "high",
@@ -97,20 +91,46 @@
                 "weighted_degree": 2,
                 "is_group_member": true,
                 "is_advisorship_neighbor": false,
-                "id": 410
+                "id": 409
             },
             {
                 "name": "Mariana Valinhos Barcelos",
                 "classification": "researcher",
                 "classification_confidence": "high",
-                "was_student": false,
+                "was_student": true,
+                "was_staff": true,
+                "campus_name": "Vitória",
+                "degree": 3,
+                "weighted_degree": 6,
+                "is_group_member": true,
+                "is_advisorship_neighbor": false,
+                "id": 5276
+            },
+            {
+                "name": "Estefano Aparecido Vieira",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": true,
                 "was_staff": true,
                 "campus_name": "Vitória",
                 "degree": 2,
-                "weighted_degree": 2,
+                "weighted_degree": 5,
+                "is_group_member": false,
+                "is_advisorship_neighbor": true,
+                "id": 45
+            },
+            {
+                "name": "Artur Pratti de Barros",
+                "classification": "researcher",
+                "classification_confidence": "high",
+                "was_student": false,
+                "was_staff": true,
+                "campus_name": "Vitória",
+                "degree": 3,
+                "weighted_degree": 3,
                 "is_group_member": true,
                 "is_advisorship_neighbor": false,
-                "id": 5224
+                "id": 1774
             }
         ],
         "edges": [
@@ -122,8 +142,8 @@
                 "relation_types": [
                     "research_group"
                 ],
-                "source": 1768,
-                "target": 410
+                "source": 409,
+                "target": 1774
             },
             {
                 "weight": 1,
@@ -133,8 +153,21 @@
                 "relation_types": [
                     "research_group"
                 ],
-                "source": 1768,
-                "target": 5224
+                "source": 409,
+                "target": 5276
+            },
+            {
+                "weight": 4,
+                "initiative_count": 2,
+                "research_group_count": 1,
+                "advisorship_count": 1,
+                "relation_types": [
+                    "initiative",
+                    "research_group",
+                    "advisorship"
+                ],
+                "source": 5276,
+                "target": 45
             },
             {
                 "weight": 1,
@@ -144,8 +177,19 @@
                 "relation_types": [
                     "research_group"
                 ],
-                "source": 410,
-                "target": 5224
+                "source": 5276,
+                "target": 1774
+            },
+            {
+                "weight": 1,
+                "initiative_count": 0,
+                "research_group_count": 1,
+                "advisorship_count": 0,
+                "relation_types": [
+                    "research_group"
+                ],
+                "source": 45,
+                "target": 1774
             }
         ]
     }

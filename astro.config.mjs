@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
+import parquetPlugin from './parquet-plugin.mjs';
 
 // Base e site configuráveis por ambiente.
 // - GitHub Pages (padrão): serve em /horizon_dashboard/.
@@ -15,6 +16,6 @@ export default defineConfig({
   site: SITE_URL,
   base: SITE_BASE,
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [parquetPlugin(), tailwindcss()]
   }
 });

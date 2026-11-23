@@ -28,3 +28,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
+        env:
+          # Runner de 16 GB: com heap de 24 GB o V8 adia o GC e estoura a RAM.
+          # Com 10 GB o build local passa com pico de 10,7 GB.
+          BUILD_HEAP_MB: 10240

@@ -144,7 +144,7 @@ O Horizon Dashboard foi desenvolvido com **conformidade estrita ao WCAG 2.1 Nív
 │   │   └── index.astro     # Home Dashboard
 │   ├── styles/             # Estilos globais
 │   │   └── global.css      # CSS variables e utils
-│   └── data/               # Fontes de dados JSON canônicas
+│   └── data/               # Dados do ETL em Parquet (+ alguns JSON só do site)
 ├── tests/                  # Suite de testes
 │   ├── accessibility.test.ts  # Testes de acessibilidade
 │   └── projects.test.ts       # Testes de lógica
@@ -153,6 +153,18 @@ O Horizon Dashboard foi desenvolvido com **conformidade estrita ao WCAG 2.1 Nív
 │   └── 2 - implementacao/  # SI (Requirements, Architecture, Design)
 └── astro.config.mjs        # Configuração Astro
 ```
+
+---
+
+## 🗄️ Dados
+
+Os dados do site ficam em `src/data`, em **Parquet** (tabelas e grafos exportados pelo `horizon_etl`), lidos no build pelo `parquet-plugin.mjs`. Para atualizar a partir dos pacotes do ETL:
+
+```bash
+scripts/sync-etl-data.sh exports_parquet.zip exports_canonical.zip
+```
+
+O script sobrepõe os pacotes em `src/data`, normaliza os nomes (Title Case com siglas preservadas) e valida os arquivos. O workflow `sync-etl-data.yml` faz o mesmo semanalmente. Para buildar numa máquina de 16 GB, use `BUILD_HEAP_MB=10240 npm run build`.
 
 ---
 

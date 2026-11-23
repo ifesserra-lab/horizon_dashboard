@@ -1,6 +1,6 @@
-import attributeAssertionsCanonical from "../data/attribute_assertions_canonical.json";
-import ingestionRunsCanonical from "../data/ingestion_runs_canonical.json";
-import sourceRecordsCanonical from "../data/source_records_canonical.json";
+import attributeAssertionsCanonical from "../data/attribute_assertions_canonical.parquet";
+import ingestionRunsCanonical from "../data/ingestion_runs_canonical.parquet";
+import sourceRecordsCanonical from "../data/source_records_canonical.parquet";
 
 export type CanonicalEntityType =
     | "academic_education"

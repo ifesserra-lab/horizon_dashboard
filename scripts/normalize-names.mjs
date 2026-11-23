@@ -31,32 +31,35 @@
  * Rewrites only the affected JSON string literals — all other bytes
  * (indentation, float style e.g. 0.0, minified layout, escapes) are preserved.
  *
- * Run from the repository root:  node scripts/normalize-names.mjs
+ * Run from the repository root:  node scripts/normalize-names.mjs [--dir <dir>]
+ * (default dir: src/data). Parquet files are handled by normalize-parquet.mjs.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "src",
-  "data",
-);
+const dirArg = process.argv.indexOf("--dir");
+const root =
+  process.argv[1] === fileURLToPath(import.meta.url) && dirArg !== -1
+    ? path.resolve(process.argv[dirArg + 1])
+    : path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "src", "data");
 
-const EXCLUDE_FILES = new Set([
-  "attribute_assertions_canonical.json", // provenance audit data (hashes + raw values)
-  "data_provenance_canonical.json", // metadata only
-  "entity_change_logs_canonical.json", // audit log
-  "entity_matches_canonical.json", // internal matching
-  "ingestion_runs_canonical.json", // ETL metadata
-  "source_records_canonical.json", // raw source records
-  "advisorships_tracking.json", // ETL tracking
-  "initiatives_tracking.json", // ETL tracking
-  "researchers_tracking.json", // ETL tracking
-  "_meta.json",
+// Dataset base names (no extension) never normalized, whatever the format
+// (JSON here, Parquet in scripts/normalize-parquet.mjs).
+export const EXCLUDE_DATASETS = new Set([
+  "attribute_assertions_canonical", // provenance audit data (hashes + raw values)
+  "data_provenance_canonical", // metadata only
+  "entity_change_logs_canonical", // audit log
+  "entity_matches_canonical", // internal matching
+  "ingestion_runs_canonical", // ETL metadata
+  "source_records_canonical", // raw source records
+  "advisorships_tracking", // ETL tracking
+  "initiatives_tracking", // ETL tracking
+  "researchers_tracking", // ETL tracking
+  "_meta",
 ]);
+const EXCLUDE_FILES = new Set([...EXCLUDE_DATASETS].map((n) => `${n}.json`));
 
 const NAME_KEY_RE = /(^|_)(name|names|nome|curso)(_|$)/i;
 const TITLE_KEY_RE = /title/i;
@@ -238,12 +241,23 @@ function buildIncludeFiles() {
   return files;
 }
 
+/**
+ * Normalizes the JSON text stored in a Parquet JSON column (listed in the
+ * <name>.cols.json sidecar). Strings before any nested key (e.g. a column
+ * holding a plain list of names) are judged by the column name, exactly as
+ * they were when the column was a field of the JSON export.
+ */
+export function normalizeJsonColumnText(column, text) {
+  return transformJsonText(text, normalizeValue, column);
+}
+
 // Rewrite only JSON string literals under a name/title key.
-export function transformJsonText(text, normalizeValueFn = normalizeValue) {
+// `initialKey` is the key in effect before the first key of `text`.
+export function transformJsonText(text, normalizeValueFn = normalizeValue, initialKey = null) {
   const n = text.length;
   let out = "";
   let i = 0;
-  let pendingKey = null;
+  let pendingKey = initialKey;
 
   while (i < n) {
     const c = text[i];

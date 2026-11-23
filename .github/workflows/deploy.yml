@@ -32,6 +32,10 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+        env:
+          # Runner de 16 GB: com heap de 24 GB o V8 adia o GC e estoura a RAM.
+          # Com 10 GB o build local passa com pico de 10,7 GB.
+          BUILD_HEAP_MB: 10240
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

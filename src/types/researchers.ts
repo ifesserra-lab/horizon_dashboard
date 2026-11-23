@@ -62,6 +62,7 @@ export interface Researcher {
     birthday?: string | null;
     cnpq_url?: string | null;
     google_scholar_url?: string | null;
+    linkedin_url?: string | null;
     resume?: string | null;
     citation_names?: string | null;
     initiatives: ResearcherInitiative[];

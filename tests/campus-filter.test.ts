@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import researchersData from "../src/data/researchers_canonical.json";
-import initiativesData from "../src/data/initiatives_canonical.json";
-import advisorshipsData from "../src/data/advisorships_canonical.json";
+import researchersData from "../src/data/researchers_canonical.parquet";
+import initiativesData from "../src/data/initiatives_canonical.parquet";
+import advisorshipsData from "../src/data/advisorships_canonical.parquet";
 import type { Researcher } from "../src/types/researchers";
 import type { Project } from "../src/types/projects";
 import type { ProjectAdvisorship } from "../src/types/advisorships";

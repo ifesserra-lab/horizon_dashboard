@@ -9,6 +9,12 @@ interface Props {
 }
 
 const { researcher, sources = [] } = Astro.props;
+
+// LinkedIn profile link from the ETL (spec 037 there); only https links are shown.
+const linkedinUrl =
+    typeof researcher.linkedin_url === "string" && /^https:\/\/([a-z0-9-]+\.)?linkedin\.com\//i.test(researcher.linkedin_url.trim())
+        ? researcher.linkedin_url.trim()
+        : null;
 ---
 
 <article class="glass-card p-8" aria-labelledby="researcher-title">
@@ -68,7 +74,7 @@ const { researcher, sources = [] } = Astro.props;
             </div>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3">
             {
                 researcher.cnpq_url && (
                     <a
@@ -106,6 +112,33 @@ const { researcher, sources = [] } = Astro.props;
                         class="px-4 py-2 bg-[var(--tag-bg)] hover:bg-premium-purple/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-purple"
                     >
                         Google Scholar
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                    </a>
+                )
+            }
+            {
+                linkedinUrl && (
+                    <a
+                        href={linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Abrir perfil no LinkedIn de ${researcher.name} em nova aba`}
+                        class="px-4 py-2 bg-[var(--tag-bg)] hover:bg-premium-accent/10 border border-border-main rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-text-main focus:ring-2 focus:ring-premium-accent"
+                    >
+                        LinkedIn
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="w-4 h-4"
