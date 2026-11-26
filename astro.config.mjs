@@ -5,10 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 import parquetPlugin from './parquet-plugin.mjs';
 
 // Base e site configuráveis por ambiente.
-// - GitHub Pages (padrão): serve em /horizon_dashboard/.
+// - GitHub Pages (padrão): serve em /horizon/.
 // - Raiz (Vercel/Netlify/Cloudflare/Render): defina SITE_BASE=/ e, se quiser,
 //   SITE_URL=https://seu-subdominio (para OG/canonical corretos).
-const SITE_BASE = process.env.SITE_BASE || '/horizon_dashboard/';
+const SITE_BASE = process.env.SITE_BASE || '/horizon/';
 const SITE_URL = process.env.SITE_URL || 'https://ifesserra-lab.github.io';
 
 // https://astro.build/config

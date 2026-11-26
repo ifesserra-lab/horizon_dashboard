@@ -4,7 +4,7 @@
 
 **Horizon** é um dashboard acadêmico de última geração projetado para visualizar, monitorar e gerenciar dados de grupos de pesquisa, projetos de pesquisa e extensão. Construído com rigorosa aderência aos padrões Agile e princípios premium de UX, fornece uma plataforma centralizada para rastreamento de outputs de pesquisa, dinâmicas de liderança e impacto institucional.
 
-🔗 **Site em Produção:** **[https://ifesserra-lab.github.io/horizon_dashboard/](https://ifesserra-lab.github.io/horizon_dashboard/)**
+🔗 **Site em Produção:** **[https://ifesserra-lab.github.io/horizon/](https://ifesserra-lab.github.io/horizon/)**
 
 ---
 
@@ -191,7 +191,7 @@ O script sobrepõe os pacotes em `src/data`, normaliza os nomes (Title Case com 
    ```bash
    npm run dev
    ```
-   Acesse em `http://localhost:4321/horizon_dashboard/`
+   Acesse em `http://localhost:4321/horizon/`
 
 4. **Build para produção**
    ```bash
@@ -310,7 +310,7 @@ Este projeto está sob licença conforme definido pela instituição.
 Desenvolvido com ❤️ pela equipe do **Projeto Horizon** seguindo rigorosos padrões de governança Agile e excelência técnica.
 
 ### Links Úteis
-- 🌐 [Site em Produção](https://ifesserra-lab.github.io/horizon_dashboard/)
+- 🌐 [Site em Produção](https://ifesserra-lab.github.io/horizon/)
 - 📘 [Documentação Completa](docs/)
 - 🐛 [Reportar Bug](https://github.com/ifesserra-lab/horizon_dashboard/issues/new?labels=bug)
 - 💡 [Sugerir Feature](https://github.com/ifesserra-lab/horizon_dashboard/issues/new?labels=feature)
